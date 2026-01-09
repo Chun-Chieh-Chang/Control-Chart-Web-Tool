@@ -613,100 +613,114 @@ var SPCApp = {
         var specs = data.specs;
         var cavityCount = data.xbarR.summary.n;
 
+        // Total 30 virtual columns: 1 (Labels) + 25 (Batches) + 4 (Summary Sidebar)
         var html = '<table class="excel-table" style="width:100\%; border-collapse:collapse; font-size:11px; font-family:sans-serif; border:2px solid #000; table-layout:fixed;">';
 
         // Width distribution: 
-        // Label col: 12%
-        // Batch cols: 75% total / 25 = 3% each
-        // Summary sidebar: 13% total
-        var labelWidth = '12\%';
-        var batchWidth = (75 / 25).toFixed(2) + '\%';
+        // Label col: 5% (Reduced)
+        // Batch cols: 80% total / 25 = 3.2% each (Increased)
+        // Summary sidebar: 15% total (Merged 4 cols)
+        var labelWidth = '5\%';
+        var batchWidth = '3.2\%';
 
         // --- Row 1: Header ---
-        html += '<tr style="background:#f3f4f6;"><td colspan="' + (pageLabels.length + 5) + '" style="border:1px solid #000; text-align:center; font-weight:bold; font-size:14px; padding:3px;">X̄ - R 管制圖</td></tr>';
+        html += '<tr style="background:#f3f4f6;"><td colspan="30" style="border:1px solid #000; text-align:center; font-weight:bold; font-size:14px; padding:3px;">X̄ - R 管制圖</td></tr>';
 
-        // --- Row 2-5: Metadata & Limits ---
+        // --- Row 2-5: Metadata & Limits (Re-distributed colspans out of 30) ---
         var rows = [
-            { l1: '商品名稱', v1: info.name, l2: '規格', v2: '標準', l3: '管制圖', v3: 'X̄', v4: 'R', l4: '製造部門' },
-            { l1: '商品料號', v1: info.item, l2: '最大值', v2: specs.usl, l3: '上限', v3: SPCEngine.round(pageXbarR.xBar.UCL, 4), v4: SPCEngine.round(pageXbarR.R.UCL, 4), l4: info.dept },
-            { l1: '測量單位', v1: info.unit, l2: '目標值', v2: specs.target, l3: '中心值', v3: SPCEngine.round(pageXbarR.xBar.CL, 4), v4: SPCEngine.round(pageXbarR.R.CL, 4), l4: '檢驗人員' },
-            { l1: '管制特性', v1: info.char, l2: '最小值', v2: specs.lsl, l3: '下限', v3: SPCEngine.round(pageXbarR.xBar.LCL, 4), v4: '-', l4: info.inspector }
+            { l1: '商品名稱', v1: info.name, l2: '規格', v2: '標準', l3: '管制圖', v3: 'X̄', v4: 'R', l4: '製造部門', v4_val: info.dept },
+            { l1: '商品料號', v1: info.item, l2: '最大值', v2: specs.usl, l3: '上限', v3: SPCEngine.round(pageXbarR.xBar.UCL, 4), v4: SPCEngine.round(pageXbarR.R.UCL, 4), l4: '檢驗人員', v4_val: info.inspector },
+            { l1: '測量單位', v1: info.unit, l2: '目標值', v2: specs.target, l3: '中心值', v3: SPCEngine.round(pageXbarR.xBar.CL, 4), v4: SPCEngine.round(pageXbarR.R.CL, 4), l4: '管制特性', v4_val: info.char },
+            { l1: '檢驗日期', v1: info.batchRange || '-', l2: '最小值', v2: specs.lsl, l3: '下限', v3: SPCEngine.round(pageXbarR.xBar.LCL, 4), v4: '-', l4: '圖表編號', v4_val: info.chartNo || '-' }
         ];
 
         rows.forEach(function (r) {
             html += '<tr>' +
-                '<td style="border:1px solid #000; padding:1px 4px; font-weight:bold; width:' + labelWidth + '; background:#f9fafb;">' + r.l1 + '</td>' +
-                '<td colspan="4" style="border:1px solid #000; padding:1px 4px; overflow:hidden; text-overflow:ellipsis;">' + r.v1 + '</td>' +
-                '<td style="border:1px solid #000; padding:1px 4px; font-weight:bold; width:50px; background:#f9fafb;">' + r.l2 + '</td>' +
-                '<td style="border:1px solid #000; padding:1px 4px; width:50px;">' + r.v2 + '</td>' +
-                '<td style="border:1px solid #000; padding:1px 4px; font-weight:bold; width:50px; background:#f9fafb;">' + r.l3 + '</td>' +
-                '<td style="border:1px solid #000; padding:1px 4px; width:50px;">' + r.v3 + '</td>' +
-                '<td style="border:1px solid #000; padding:1px 4px; width:50px;">' + (r.v4 || '') + '</td>' +
-                '<td style="border:1px solid #000; padding:1px 4px; font-weight:bold; width:80px; background:#f9fafb;">' + (r.l4 || '') + '</td>' +
-                '<td colspan="' + (pageLabels.length - 6) + '" style="border:1px solid #000;"></td>' +
+                '<td colspan="2" style="border:1px solid #000; padding:1px 4px; font-weight:bold; width:8\%; background:#f9fafb;">' + r.l1 + '</td>' +
+                '<td colspan="7" style="border:1px solid #000; padding:1px 4px; overflow:hidden; width:22\%;">' + r.v1 + '</td>' +
+                '<td colspan="2" style="border:1px solid #000; padding:1px 4px; font-weight:bold; width:8\%; background:#f9fafb;">' + r.l2 + '</td>' +
+                '<td colspan="2" style="border:1px solid #000; padding:1px 4px; width:7\%;">' + r.v2 + '</td>' +
+                '<td colspan="2" style="border:1px solid #000; padding:1px 4px; font-weight:bold; width:8\%; background:#f9fafb;">' + r.l3 + '</td>' +
+                '<td colspan="3" style="border:1px solid #000; padding:1px 4px; width:10\%;">' + r.v3 + '</td>' +
+                '<td colspan="3" style="border:1px solid #000; padding:1px 4px; width:10\%;">' + (r.v4 || '') + '</td>' +
+                '<td colspan="2" style="border:1px solid #000; padding:1px 4px; font-weight:bold; width:8\%; background:#f9fafb;">' + (r.l4 || '') + '</td>' +
+                '<td colspan="7" style="border:1px solid #000; padding:1px 4px; width:17\%;">' + (r.v4_val || '') + '</td>' +
                 '</tr>';
         });
 
         // --- Data Header: Batch Names ---
         html += '<tr style="background:#e5e7eb; font-weight:bold;">' +
-            '<td style="border:1px solid #000; text-align:center; width:' + labelWidth + ';">檢驗日期</td>';
+            '<td style="border:1px solid #000; text-align:center; width:' + labelWidth + ';">批號</td>';
         pageLabels.forEach(function (name) {
-            html += '<td style="border:1px solid #000; text-align:center; height:35px; width:' + batchWidth + '; overflow:hidden; font-size:9px;">' + name + '</td>';
+            html += '<td style="border:1px solid #000; text-align:center; height:35px; width:' + batchWidth + '; overflow:hidden; font-size:9px; word-break:break-all;">' + name + '</td>';
         });
-        html += '<td colspan="4" style="border:1px solid #000;"></td></tr>';
+        // Fill empty if less than 25 batches
+        for (var f = pageLabels.length; f < 25; f++) html += '<td style="border:1px solid #000; width:' + batchWidth + ';"></td>';
+
+        html += '<td colspan="4" style="border:1px solid #000; text-align:center; width:15\%;">彙總</td></tr>';
 
         // --- Main Data Rows: Cavities ---
         for (var i = 0; i < cavityCount; i++) {
             html += '<tr><td style="border:1px solid #000; text-align:center; font-weight:bold;">X' + (i + 1) + '</td>';
-            var rowSum = 0;
-            for (var j = 0; j < pageDataMatrix.length; j++) {
-                var val = pageDataMatrix[j][i];
+            for (var j = 0; j < 25; j++) {
+                var val = (pageDataMatrix[j] && pageDataMatrix[j][i] !== undefined) ? pageDataMatrix[j][i] : null;
                 html += '<td style="border:1px solid #000; text-align:center;">' + (val !== null ? val : '') + '</td>';
             }
 
             // Sidebar summary on first few rows
-            if (i === 0) html += '<td colspan="4" rowspan="2" style="border:1px solid #000; padding-left:5px; font-weight:bold;">ΣX̄ = ' + SPCEngine.round(pageXbarR.summary.xBarSum, 4) + '</td>';
-            else if (i === 2) html += '<td colspan="4" rowspan="2" style="border:1px solid #000; padding-left:5px; font-weight:bold;">X̿ = ' + SPCEngine.round(pageXbarR.summary.xDoubleBar, 4) + '</td>';
-            else if (i === 4) html += '<td colspan="4" rowspan="2" style="border:1px solid #000; padding-left:5px; font-weight:bold;">ΣR = ' + SPCEngine.round(pageXbarR.summary.rSum, 4) + '</td>';
-            else if (i === 6) html += '<td colspan="4" rowspan="2" style="border:1px solid #000; padding-left:5px; font-weight:bold;">R̄ = ' + SPCEngine.round(pageXbarR.summary.rBar, 4) + '</td>';
-            else if (i >= 8 || i < 8) {
-                // Do nothing for extra padding columns if already handled
-            }
+            if (i === 0) html += '<td colspan="4" rowspan="2" style="border:1px solid #000; padding-left:5px; font-weight:bold; background:#fefefe;">ΣX̄ = ' + SPCEngine.round(pageXbarR.summary.xBarSum, 4) + '</td>';
+            else if (i === 2) html += '<td colspan="4" rowspan="2" style="border:1px solid #000; padding-left:5px; font-weight:bold; background:#fefefe;">X̿ = ' + SPCEngine.round(pageXbarR.summary.xDoubleBar, 4) + '</td>';
+            else if (i === 4) html += '<td colspan="4" rowspan="2" style="border:1px solid #000; padding-left:5px; font-weight:bold; background:#fefefe;">ΣR = ' + SPCEngine.round(pageXbarR.summary.rSum, 4) + '</td>';
+            else if (i === 6) html += '<td colspan="4" rowspan="2" style="border:1px solid #000; padding-left:5px; font-weight:bold; background:#fefefe;">R̄ = ' + SPCEngine.round(pageXbarR.summary.rBar, 4) + '</td>';
+            else if (i >= 8) html += '<td colspan="4" style="border:1px solid #000; background:#fcfcfc;"></td>';
             html += '</tr>';
         }
 
         // --- Footer Rows: ΣX, X̄, R ---
         // ΣX Row
         html += '<tr style="background:#f9fafb;"><td style="border:1px solid #000; text-align:center; font-weight:bold;">ΣX</td>';
-        pageDataMatrix.forEach(function (batch) {
-            var sum = batch.reduce(function (a, b) { return a + (b || 0); }, 0);
-            html += '<td style="border:1px solid #000; text-align:center;">' + SPCEngine.round(sum, 4) + '</td>';
-        });
-        html += '<td colspan="4" style="border:1px solid #000;"></td></tr>';
+        for (var b = 0; b < 25; b++) {
+            var val = '';
+            if (pageDataMatrix[b]) {
+                var sum = pageDataMatrix[b].reduce(function (a, b) { return a + (b || 0); }, 0);
+                val = SPCEngine.round(sum, 4);
+            }
+            html += '<td style="border:1px solid #000; text-align:center;">' + val + '</td>';
+        }
+        html += '<td colspan="4" style="border:1px solid #000; background:#f9fafb;"></td></tr>';
 
         // X̄ Row (with yellow highlighting)
         html += '<tr style="background:#f9fafb;"><td style="border:1px solid #000; text-align:center; font-weight:bold;">X̄</td>';
-        for (var k = 0; k < pageXbarR.xBar.data.length; k++) {
-            var val = pageXbarR.xBar.data[k];
-            var isOOC = val > pageXbarR.xBar.UCL || val < pageXbarR.xBar.LCL;
-            var style = isOOC ? 'background:yellow;' : '';
-            html += '<td style="border:1px solid #000; text-align:center;' + style + '">' + SPCEngine.round(val, 4) + '</td>';
+        for (var k = 0; k < 25; k++) {
+            var val = '', style = '';
+            if (pageXbarR.xBar.data[k] !== undefined) {
+                var v = pageXbarR.xBar.data[k];
+                val = SPCEngine.round(v, 4);
+                if (v > pageXbarR.xBar.UCL || v < pageXbarR.xBar.LCL) style = 'background:yellow;';
+            }
+            html += '<td style="border:1px solid #000; text-align:center;' + style + '">' + val + '</td>';
         }
-        html += '<td colspan="4" style="border:1px solid #000;"></td></tr>';
+        html += '<td colspan="4" style="border:1px solid #000; background:#f9fafb;"></td></tr>';
 
         // R Row
         html += '<tr style="background:#f9fafb;"><td style="border:1px solid #000; text-align:center; font-weight:bold;">R</td>';
-        for (var k = 0; k < pageXbarR.R.data.length; k++) {
-            var val = pageXbarR.R.data[k];
-            var isOOC = val > pageXbarR.R.UCL;
-            var style = isOOC ? 'background:yellow;' : '';
-            html += '<td style="border:1px solid #000; text-align:center;' + style + '">' + SPCEngine.round(val, 4) + '</td>';
+        for (var k = 0; k < 25; k++) {
+            var val = '', style = '';
+            if (pageXbarR.R.data[k] !== undefined) {
+                var v = pageXbarR.R.data[k];
+                val = SPCEngine.round(v, 4);
+                if (v > pageXbarR.R.UCL) style = 'background:yellow;';
+            }
+            html += '<td style="border:1px solid #000; text-align:center;' + style + '">' + val + '</td>';
         }
-        html += '<td colspan="4" style="border:1px solid #000;"></td></tr>';
+        html += '<td colspan="4" style="border:1px solid #000; background:#f9fafb;"></td></tr>';
 
         html += '</table>';
         document.getElementById('detailedTableContainer').innerHTML = html;
     },
+
+
+
 
     renderCharts: function () {
         var data = this.analysisResults;

@@ -1,9 +1,9 @@
-# Mouldex Control Chart
+# Control Chart Web Tool
 
-> **SPC Statistical Process Control Analysis Tool**  
+> **SPC 統計製程管制分析工具 / SPC Statistical Process Control Analysis Tool**  
 > Web-based QIP (Quality Inspection Program) analysis system
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](../LICENSE)
 ![Version](https://img.shields.io/badge/version-1.0.0-green)
 
 [中文](#中文說明) | [English](#english-description)
@@ -15,8 +15,8 @@
 ### 📊 功能特色
 
 - **三種分析模式**
-  - 📈 **批號分析**: X-Bar R 管制圖 + 製程能力分析
-  - 🔍 **模穴分析**: 模穴比較 + 能力評估 (Cp/Cpk/Pp/Ppk)
+  - 📈 **批號分析**: X̄-R 管制圖，每頁 25 批號獨立計算管制界限
+  - 🔍 **模穴分析**: 模穴比較 + Cpk/Ppk 製程能力評估
   - 📊 **群組分析**: Min-Max-Avg 管制圖
 
 - **100% 本地端處理**
@@ -25,9 +25,9 @@
   - ✅ 支援離線使用
 
 - **專業輸出**
-  - 📁 Excel 檔案輸出（含數據表格與圖表圖片）
+  - 📁 VBA 相容格式 Excel 輸出
   - 📊 互動式網頁圖表顯示
-  - 🖼️ 圖表匯出為 PNG 圖片
+  - 🔴 超出管制界限點紅色標示
 
 - **中英雙語介面**
   - 🌐 支援繁體中文與英文切換
@@ -36,8 +36,7 @@
 ### 🚀 使用方法
 
 1. **開啟網頁**
-   - 在瀏覽器中開啟 `index.html`
-   - 或訪問 GitHub Pages: [https://YOUR_USERNAME.github.io/Mouldex-Control-Chart](https://YOUR_USERNAME.github.io/Mouldex-Control-Chart)
+   - 訪問: https://chun-chieh-chang.github.io/Control-Chart-Web-Tool/
 
 2. **選擇數據檔案**
    - 點擊或拖曳 Excel 檔案（.xlsx 或 .xls）
@@ -50,7 +49,7 @@
 
 5. **查看結果**
    - 網頁即時顯示統計結果與圖表
-   - 下載 Excel 檔案或匯出圖表
+   - 下載 Excel 檔案
 
 ### 📋 輸入檔案格式
 
@@ -71,10 +70,8 @@ Excel 檔案需符合以下格式：
 
 ### 🛠️ 技術架構
 
-- **前端**: HTML5, CSS3, JavaScript (ES6 Modules)
-- **Excel 處理**: 
-  - SheetJS (讀取)
-  - ExcelJS (生成)
+- **前端**: HTML5, CSS3, Vanilla JavaScript
+- **Excel 處理**: SheetJS (讀取與生成)
 - **圖表**: Chart.js
 - **計算引擎**: 自訂 SPC 統計引擎
 
@@ -85,20 +82,13 @@ web/
 ├── index.html              # 主頁面
 ├── css/
 │   └── style.css           # 樣式表
-├── js/
-│   ├── app.js              # 應用主控制器
-│   ├── data-input.js       # Excel 檔案解析
-│   ├── spc-engine.js       # SPC 計算引擎
-│   ├── batch-analysis.js   # 批號分析
-│   ├── cavity-analysis.js  # 模穴分析
-│   ├── group-analysis.js   # 群組分析
-│   └── excel-export.js     # Excel 匯出
-└── README.md               # 說明文件
+└── js/
+    └── spc-all.js          # 整合 JavaScript（包含所有功能）
 ```
 
 ### 📊 SPC 計算公式
 
-#### X-Bar R 管制圖
+#### X̄-R 管制圖
 - UCL(X̄) = X̿ + A₂ × R̄
 - CL(X̄) = X̿
 - LCL(X̄) = X̿ - A₂ × R̄
@@ -116,8 +106,8 @@ web/
 
 基於 VBA 程式碼轉換為 Web 應用，保持完全相同的：
 - 輸入檔案格式
-- 計算邏輯
-- 輸出結構
+- 計算邏輯（每頁 25 批號獨立計算管制界限）
+- 輸出結構（VBA 相容格式）
 
 ### 📄 授權
 
@@ -130,8 +120,8 @@ MIT License
 ### 📊 Features
 
 - **Three Analysis Modes**
-  - 📈 **Batch Analysis**: X-Bar R Control Charts + Process Capability
-  - 🔍 **Cavity Analysis**: Cavity Comparison + Capability Assessment (Cp/Cpk/Pp/Ppk)
+  - 📈 **Batch Analysis**: X̄-R Control Charts with 25 batches per page
+  - 🔍 **Cavity Analysis**: Cavity Comparison + Cpk/Ppk Assessment
   - 📊 **Group Analysis**: Min-Max-Avg Control Charts
 
 - **100% Client-Side Processing**
@@ -140,9 +130,9 @@ MIT License
   - ✅ Offline support
 
 - **Professional Output**
-  - 📁 Excel file output (with data tables and chart images)
+  - 📁 VBA-compatible Excel file output
   - 📊 Interactive web chart display
-  - 🖼️ Chart export as PNG images
+  - 🔴 Out-of-control points highlighted in red
 
 - **Bilingual Interface**
   - 🌐 Traditional Chinese and English support
@@ -151,8 +141,7 @@ MIT License
 ### 🚀 Usage
 
 1. **Open the Web App**
-   - Open `index.html` in browser
-   - Or visit GitHub Pages: [https://YOUR_USERNAME.github.io/Mouldex-Control-Chart](https://YOUR_USERNAME.github.io/Mouldex-Control-Chart)
+   - Visit: https://chun-chieh-chang.github.io/Control-Chart-Web-Tool/
 
 2. **Select Data File**
    - Click or drag Excel file (.xlsx or .xls)
@@ -165,7 +154,7 @@ MIT License
 
 5. **View Results**
    - Real-time statistics and charts on web page
-   - Download Excel file or export charts
+   - Download Excel file
 
 ### 📋 Input File Format
 
@@ -186,16 +175,14 @@ Excel file must follow this format:
 
 ### 🛠️ Tech Stack
 
-- **Frontend**: HTML5, CSS3, JavaScript (ES6 Modules)
-- **Excel Processing**: 
-  - SheetJS (reading)
-  - ExcelJS (generation)
+- **Frontend**: HTML5, CSS3, Vanilla JavaScript
+- **Excel Processing**: SheetJS (reading and writing)
 - **Charts**: Chart.js
 - **Calculation Engine**: Custom SPC statistical engine
 
 ### 📊 SPC Formulas
 
-#### X-Bar R Control Charts
+#### X̄-R Control Charts
 - UCL(X̄) = X̿ + A₂ × R̄
 - CL(X̄) = X̿
 - LCL(X̄) = X̿ - A₂ × R̄
@@ -215,4 +202,4 @@ MIT License
 
 ---
 
-© 2026 Mouldex Control Chart. All rights reserved.
+© 2026 Control Chart Web Tool. All rights reserved.

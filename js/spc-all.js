@@ -614,12 +614,13 @@ var SPCApp = {
         var cavityCount = data.xbarR.summary.n;
 
         // Total 30 virtual columns: 1 (Labels) + 25 (Batches) + 4 (Summary Sidebar)
-        var html = '<table class="excel-table" style="width:100\%; border-collapse:collapse; font-size:11px; font-family:sans-serif; border:2px solid #000; table-layout:fixed;">';
+        var html = '<table class="excel-table" style="width:100\%; border-collapse:collapse; font-size:10px; font-family:sans-serif; border:2px solid #000; table-layout:fixed;">';
 
+        // Balanced Widths: Label 4%, Batch 3.4%*25=85%, Summary 11% (approx 2.75% each)
         html += '<colgroup>';
-        html += '<col style="width:3.5\%;">';
-        for (var c = 0; c < 25; c++) html += '<col style="width:3.6\%;">';
-        html += '<col style="width:1.6\%;"><col style="width:1.6\%;"><col style="width:1.6\%;"><col style="width:1.7\%;">';
+        html += '<col style="width:4\%;">';
+        for (var c = 0; c < 25; c++) html += '<col style="width:3.4\%;">';
+        html += '<col style="width:2.7\%;"><col style="width:2.7\%;"><col style="width:2.7\%;"><col style="width:2.9\%;">';
         html += '</colgroup>';
 
 
@@ -636,15 +637,15 @@ var SPCApp = {
 
         rows.forEach(function (r) {
             html += '<tr>' +
-                '<td colspan="2" style="border:1px solid #000; padding:1px 4px; font-weight:bold; background:#f9fafb;">' + r.l1 + '</td>' +
-                '<td colspan="7" style="border:1px solid #000; padding:1px 4px; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;">' + r.v1 + '</td>' +
-                '<td colspan="2" style="border:1px solid #000; padding:1px 4px; font-weight:bold; background:#f9fafb;">' + r.l2 + '</td>' +
-                '<td colspan="2" style="border:1px solid #000; padding:1px 4px;">' + r.v2 + '</td>' +
-                '<td colspan="2" style="border:1px solid #000; padding:1px 4px; font-weight:bold; background:#f9fafb;">' + r.l3 + '</td>' +
-                '<td colspan="3" style="border:1px solid #000; padding:1px 4px;">' + r.v3 + '</td>' +
-                '<td colspan="3" style="border:1px solid #000; padding:1px 4px;">' + (r.v4 || '') + '</td>' +
-                '<td colspan="2" style="border:1px solid #000; padding:1px 4px; font-weight:bold; background:#f9fafb;">' + (r.l4 || '') + '</td>' +
-                '<td colspan="7" style="border:1px solid #000; padding:1px 4px;">' + (r.v4_val || '') + '</td>' +
+                '<td colspan="2" style="border:1px solid #000; padding:1px 1px; font-weight:bold; background:#f9fafb;">' + r.l1 + '</td>' +
+                '<td colspan="7" style="border:1px solid #000; padding:1px 1px; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;">' + r.v1 + '</td>' +
+                '<td colspan="2" style="border:1px solid #000; padding:1px 1px; font-weight:bold; background:#f9fafb;">' + r.l2 + '</td>' +
+                '<td colspan="2" style="border:1px solid #000; padding:1px 1px;">' + r.v2 + '</td>' +
+                '<td colspan="2" style="border:1px solid #000; padding:1px 1px; font-weight:bold; background:#f9fafb;">' + r.l3 + '</td>' +
+                '<td colspan="3" style="border:1px solid #000; padding:1px 1px;">' + r.v3 + '</td>' +
+                '<td colspan="3" style="border:1px solid #000; padding:1px 1px;">' + (r.v4 || '') + '</td>' +
+                '<td colspan="2" style="border:1px solid #000; padding:1px 1px; font-weight:bold; background:#f9fafb;">' + (r.l4 || '') + '</td>' +
+                '<td colspan="7" style="border:1px solid #000; padding:1px 1px;">' + (r.v4_val || '') + '</td>' +
                 '</tr>';
         });
 

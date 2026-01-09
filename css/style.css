@@ -108,9 +108,37 @@ body {
    ============================================================================ */
 
 .container {
-    max-width: 1200px;
+    max-width: 98%;
+    /* Unlock width for all sections */
     margin: 0 auto;
-    padding: 2rem 1rem;
+    padding: 1rem;
+}
+
+#results .card-body {
+    padding: 1rem;
+    /* Reduce padding to save space */
+}
+
+/* Ultra Compact Excel Style Table */
+.excel-table {
+    table-layout: fixed;
+    /* Force fixed width */
+    width: 100%;
+}
+
+.excel-table td {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding: 2px 4px !important;
+    /* Extremely tight padding */
+    font-size: 11px !important;
+    /* Smaller font for data */
+}
+
+.excel-table tr {
+    height: 28px;
+    /* Fixed height to save vertical space */
 }
 
 #results.container {

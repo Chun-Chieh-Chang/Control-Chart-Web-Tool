@@ -613,10 +613,17 @@ var SPCApp = {
         var specs = data.specs;
         var cavityCount = data.xbarR.summary.n;
 
-        var html = '<table class="excel-table" style="width:100\%; border-collapse:collapse; font-size:13px; font-family:sans-serif; border:2px solid #000; table-layout:auto;">';
+        var html = '<table class="excel-table" style="width:100\%; border-collapse:collapse; font-size:11px; font-family:sans-serif; border:2px solid #000; table-layout:fixed;">';
+
+        // Width distribution: 
+        // Label col: 12%
+        // Batch cols: 75% total / 25 = 3% each
+        // Summary sidebar: 13% total
+        var labelWidth = '12\%';
+        var batchWidth = (75 / 25).toFixed(2) + '\%';
 
         // --- Row 1: Header ---
-        html += '<tr style="background:#f3f4f6;"><td colspan="' + (pageLabels.length + 5) + '" style="border:1px solid #000; text-align:center; font-weight:bold; font-size:18px; padding:10px;">X̄ - R 管制圖</td></tr>';
+        html += '<tr style="background:#f3f4f6;"><td colspan="' + (pageLabels.length + 5) + '" style="border:1px solid #000; text-align:center; font-weight:bold; font-size:14px; padding:3px;">X̄ - R 管制圖</td></tr>';
 
         // --- Row 2-5: Metadata & Limits ---
         var rows = [
@@ -628,23 +635,23 @@ var SPCApp = {
 
         rows.forEach(function (r) {
             html += '<tr>' +
-                '<td style="border:1px solid #000; padding:6px 10px; font-weight:bold; width:120px; background:#f9fafb;">' + r.l1 + '</td>' +
-                '<td colspan="4" style="border:1px solid #000; padding:6px 10px; min-width:200px;">' + r.v1 + '</td>' +
-                '<td style="border:1px solid #000; padding:6px 10px; font-weight:bold; width:80px; background:#f9fafb;">' + r.l2 + '</td>' +
-                '<td style="border:1px solid #000; padding:6px 10px; width:80px;">' + r.v2 + '</td>' +
-                '<td style="border:1px solid #000; padding:6px 10px; font-weight:bold; width:80px; background:#f9fafb;">' + r.l3 + '</td>' +
-                '<td style="border:1px solid #000; padding:6px 10px; width:80px;">' + r.v3 + '</td>' +
-                '<td style="border:1px solid #000; padding:6px 10px; width:80px;">' + (r.v4 || '') + '</td>' +
-                '<td style="border:1px solid #000; padding:6px 10px; font-weight:bold; width:120px; background:#f9fafb;">' + (r.l4 || '') + '</td>' +
+                '<td style="border:1px solid #000; padding:1px 4px; font-weight:bold; width:' + labelWidth + '; background:#f9fafb;">' + r.l1 + '</td>' +
+                '<td colspan="4" style="border:1px solid #000; padding:1px 4px; overflow:hidden; text-overflow:ellipsis;">' + r.v1 + '</td>' +
+                '<td style="border:1px solid #000; padding:1px 4px; font-weight:bold; width:50px; background:#f9fafb;">' + r.l2 + '</td>' +
+                '<td style="border:1px solid #000; padding:1px 4px; width:50px;">' + r.v2 + '</td>' +
+                '<td style="border:1px solid #000; padding:1px 4px; font-weight:bold; width:50px; background:#f9fafb;">' + r.l3 + '</td>' +
+                '<td style="border:1px solid #000; padding:1px 4px; width:50px;">' + r.v3 + '</td>' +
+                '<td style="border:1px solid #000; padding:1px 4px; width:50px;">' + (r.v4 || '') + '</td>' +
+                '<td style="border:1px solid #000; padding:1px 4px; font-weight:bold; width:80px; background:#f9fafb;">' + (r.l4 || '') + '</td>' +
                 '<td colspan="' + (pageLabels.length - 6) + '" style="border:1px solid #000;"></td>' +
                 '</tr>';
         });
 
         // --- Data Header: Batch Names ---
         html += '<tr style="background:#e5e7eb; font-weight:bold;">' +
-            '<td style="border:1px solid #000; text-align:center; padding:8px;">檢驗日期</td>';
+            '<td style="border:1px solid #000; text-align:center; width:' + labelWidth + ';">檢驗日期</td>';
         pageLabels.forEach(function (name) {
-            html += '<td style="border:1px solid #000; text-align:center; height:70px; min-width:85px; word-wrap:break-word; padding:5px;">' + name + '</td>';
+            html += '<td style="border:1px solid #000; text-align:center; height:35px; width:' + batchWidth + '; overflow:hidden; font-size:9px;">' + name + '</td>';
         });
         html += '<td colspan="4" style="border:1px solid #000;"></td></tr>';
 
@@ -823,9 +830,9 @@ var SPCApp = {
                 },
                 options: {
                     responsive: true,
-                    aspectRatio: 3.5,
+                    aspectRatio: 4, // More compact vertical
                     plugins: {
-                        legend: { position: 'top', labels: { boxWidth: 12, padding: 20, font: { size: 14 } } }
+                        legend: { position: 'top', labels: { boxWidth: 10, padding: 10, font: { size: 12 } } }
                     },
                     scales: {
                         x: { grid: { display: false } },
@@ -858,9 +865,9 @@ var SPCApp = {
                 },
                 options: {
                     responsive: true,
-                    aspectRatio: 3.5,
+                    aspectRatio: 4,
                     plugins: {
-                        legend: { position: 'top', labels: { boxWidth: 12, padding: 20, font: { size: 14 } } }
+                        legend: { position: 'top', labels: { boxWidth: 10, padding: 10, font: { size: 12 } } }
                     },
                     scales: {
                         x: { grid: { display: false } },

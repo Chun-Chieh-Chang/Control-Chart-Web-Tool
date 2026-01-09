@@ -103,21 +103,67 @@ var SPCEngine = {
         var xDoubleBar = this.mean(xBars);
         var rBar = this.mean(ranges);
 
-        return {
+        var xUCL = xDoubleBar + constants.A2 * rBar;
+        var xLCL = xDoubleBar - constants.A2 * rBar;
+        var rUCL = constants.D4 * rBar;
+        var rLCL = constants.D3 * rBar;
+
+        var results = {
             xBar: {
                 data: xBars,
-                UCL: xDoubleBar + constants.A2 * rBar,
+                UCL: xUCL,
                 CL: xDoubleBar,
-                LCL: xDoubleBar - constants.A2 * rBar
+                LCL: xLCL,
+                sigma: (xUCL - xDoubleBar) / 3
             },
             R: {
                 data: ranges,
-                UCL: constants.D4 * rBar,
+                UCL: rUCL,
                 CL: rBar,
-                LCL: constants.D3 * rBar
+                LCL: rLCL
             },
-            summary: { n: n, k: dataMatrix.length, xDoubleBar: xDoubleBar, rBar: rBar }
+            summary: { n: n, k: xBars.length, xDoubleBar: xDoubleBar, rBar: rBar }
         };
+
+        results.xBar.violations = this.checkNelsonRules(xBars, xDoubleBar, results.xBar.sigma);
+        return results;
+    },
+
+    checkNelsonRules: function (data, cl, sigma) {
+        var violations = [];
+        if (data.length === 0 || sigma === 0) return violations;
+
+        for (var i = 0; i < data.length; i++) {
+            var rules = [];
+            if (Math.abs(data[i] - cl) > 3 * sigma) rules.push(1);
+            if (i >= 8) {
+                var sameSide = true, side = data[i] > cl;
+                for (var j = i - 8; j <= i; j++) { if ((data[j] > cl) !== side || data[j] === cl) { sameSide = false; break; } }
+                if (sameSide) rules.push(2);
+            }
+            if (i >= 5) {
+                var inc = true, dec = true;
+                for (var j = i - 5; j < i; j++) { if (data[j + 1] <= data[j]) inc = false; if (data[j + 1] >= data[j]) dec = false; }
+                if (inc || dec) rules.push(3);
+            }
+            if (i >= 13) {
+                var isAlt = true;
+                for (var j = i - 13; j < i; j++) { if ((data[j + 1] >= data[j] && data[j] >= data[j - 1]) || (data[j + 1] <= data[j] && data[j] <= data[j - 1])) { isAlt = false; break; } }
+                if (isAlt) rules.push(4);
+            }
+            if (i >= 2) {
+                var up = 0, lo = 0;
+                for (var j = i - 2; j <= i; j++) { if (data[j] > cl + 2 * sigma) up++; if (data[j] < cl - 2 * sigma) lo++; }
+                if (up >= 2 || lo >= 2) rules.push(5);
+            }
+            if (i >= 4) {
+                var up = 0, lo = 0;
+                for (var j = i - 4; j <= i; j++) { if (data[j] > cl + 1 * sigma) up++; if (data[j] < cl - 1 * sigma) lo++; }
+                if (up >= 4 || lo >= 4) rules.push(6);
+            }
+            if (rules.length > 0) violations.push({ index: i, rules: rules });
+        }
+        return violations;
     },
 
     calculateProcessCapability: function (data, usl, lsl) {
@@ -475,6 +521,9 @@ var SPCApp = {
             // Dynamic control limits container (updated per page)
             html += '<div id="pageLimitsContainer"></div>';
 
+            // Abnormality Diagnostic Results Container
+            html += '<div id="diagnosticContainer" style="margin-top:20px;"></div>';
+
             html += '<div id="batchChartsContainer">' +
                 '<div class="chart-container"><h3 class="chart-title">' + this.t('X̄ 管制圖', 'X-Bar Chart') + '</h3><canvas id="xbarChart"></canvas></div>' +
                 '<div class="chart-container"><h3 class="chart-title">' + this.t('R 管制圖', 'R Chart') + '</h3><canvas id="rChart"></canvas></div>' +
@@ -563,29 +612,61 @@ var SPCApp = {
                 '<tr><td>R</td><td>' + SPCEngine.round(pageXbarR.R.UCL, 4) + '</td><td>' + SPCEngine.round(pageXbarR.R.CL, 4) + '</td><td>' + SPCEngine.round(pageXbarR.R.LCL, 4) + '</td></tr></tbody></table>';
             document.getElementById('pageLimitsContainer').innerHTML = limitsHtml;
 
+            var diagnosticHtml = '<div class="diagnostic-panel" style="background:#fff; border-radius:8px; padding:15px; margin-top:20px; border:1px solid #e2e8f0;">' +
+                '<h3 style="margin-top:0; color:#1e293b; border-bottom:2px solid #3b82f6; padding-bottom:8px; margin-bottom:12px;">' +
+                this.t('異常診斷 (Nelson Rules)', 'Abnormality Diagnostic') + '</h3>';
+
+            if (pageXbarR.xBar.violations.length === 0) {
+                diagnosticHtml += '<p style="color:#10b981; font-weight:bold;">✅ ' + this.t('本頁數據未發現明顯異常趨勢。', 'No obvious abnormal trends found.') + '</p>';
+            } else {
+                diagnosticHtml += '<ul style="padding-left:20px; color:#475569;">';
+                var ruleDescs = {
+                    1: this.t('法則 1: 超出管制界限 (3σ)', 'Rule 1: Outside 3σ'),
+                    2: this.t('法則 2: 連續 9 點在中心線同一側', 'Rule 2: 9 pts on one side'),
+                    3: this.t('法則 3: 連續 6 點持續上升或下降', 'Rule 3: 6 pts trending'),
+                    4: this.t('法則 4: 連續 14 點交互升降', 'Rule 4: 14 pts alternating'),
+                    5: this.t('法則 5: 3 點中有 2 點在 2σ 外', 'Rule 5: 2/3 outside 2σ'),
+                    6: this.t('法則 6: 5 點中有 4 點在 1σ 外', 'Rule 6: 4/5 outside 1σ')
+                };
+                pageXbarR.xBar.violations.forEach(function (v) {
+                    diagnosticHtml += '<li style="margin-bottom:8px;"><strong style="color:#ef4444;">[' + pageLabels[v.index] + ']</strong>: ' +
+                        v.rules.map(function (r) { return ruleDescs[r]; }).join(', ') + '</li>';
+                });
+                diagnosticHtml += '</ul>';
+            }
+            diagnosticHtml += '</div>';
+
+            // Ensure diagnosticContainer exists or create it
+            var diagDiv = document.getElementById('diagnosticContainer');
+            if (!diagDiv) {
+                diagDiv = document.createElement('div');
+                diagDiv.id = 'diagnosticContainer';
+                document.getElementById('batchChartsContainer').parentNode.insertBefore(diagDiv, document.getElementById('batchChartsContainer'));
+            }
+            diagDiv.innerHTML = diagnosticHtml;
+
             var fillUCL = [], fillCL = [], fillLCL = [];
             var xbarColors = [], rColors = [];
 
-            // Determine point colors based on page-specific control limits
+            var vMap = {};
+            pageXbarR.xBar.violations.forEach(function (v) { vMap[v.index] = true; });
+
             for (var i = 0; i < pageLabels.length; i++) {
                 fillUCL.push(pageXbarR.xBar.UCL);
                 fillCL.push(pageXbarR.xBar.CL);
                 fillLCL.push(pageXbarR.xBar.LCL);
 
-                // X-Bar: red if out of control
-                var xVal = pageXbarR.xBar.data[i];
-                if (xVal > pageXbarR.xBar.UCL || xVal < pageXbarR.xBar.LCL) {
-                    xbarColors.push('#ef4444'); // Red
+                if (vMap[i]) {
+                    xbarColors.push('#ef4444');
                 } else {
-                    xbarColors.push('#3b82f6'); // Blue
+                    xbarColors.push('#3b82f6');
                 }
 
-                // R: red if out of control
                 var rVal = pageXbarR.R.data[i];
                 if (rVal > pageXbarR.R.UCL) {
-                    rColors.push('#ef4444'); // Red
+                    rColors.push('#ef4444');
                 } else {
-                    rColors.push('#3b82f6'); // Blue
+                    rColors.push('#3b82f6');
                 }
             }
 

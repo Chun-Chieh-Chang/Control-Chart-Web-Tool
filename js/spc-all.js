@@ -663,10 +663,10 @@ var SPCApp = {
             }
 
             // Sidebar summary on first few rows
-            if (i === 0) html += '<td colspan="4" rowspan="2" style="border:1px solid #000; padding-left:2px; font-weight:bold; font-size:10px; background:#fefefe;">ΣX̄=' + SPCEngine.round(pageXbarR.summary.xBarSum, 3) + '</td>';
-            else if (i === 2) html += '<td colspan="4" rowspan="2" style="border:1px solid #000; padding-left:2px; font-weight:bold; font-size:10px; background:#fefefe;">X̿=' + SPCEngine.round(pageXbarR.summary.xDoubleBar, 3) + '</td>';
-            else if (i === 4) html += '<td colspan="4" rowspan="2" style="border:1px solid #000; padding-left:2px; font-weight:bold; font-size:10px; background:#fefefe;">ΣR=' + SPCEngine.round(pageXbarR.summary.rSum, 3) + '</td>';
-            else if (i === 6) html += '<td colspan="4" rowspan="2" style="border:1px solid #000; padding-left:2px; font-weight:bold; font-size:10px; background:#fefefe;">R̄=' + SPCEngine.round(pageXbarR.summary.rBar, 3) + '</td>';
+            if (i === 0) html += '<td colspan="4" rowspan="2" style="border:1px solid #000; padding-left:2px; font-weight:bold; font-size:10px; background:#fefefe;">ΣX̄=' + SPCEngine.round(pageXbarR.summary.xBarSum, 4) + '</td>';
+            else if (i === 2) html += '<td colspan="4" rowspan="2" style="border:1px solid #000; padding-left:2px; font-weight:bold; font-size:10px; background:#fefefe;">X̿=' + SPCEngine.round(pageXbarR.summary.xDoubleBar, 4) + '</td>';
+            else if (i === 4) html += '<td colspan="4" rowspan="2" style="border:1px solid #000; padding-left:2px; font-weight:bold; font-size:10px; background:#fefefe;">ΣR=' + SPCEngine.round(pageXbarR.summary.rSum, 4) + '</td>';
+            else if (i === 6) html += '<td colspan="4" rowspan="2" style="border:1px solid #000; padding-left:2px; font-weight:bold; font-size:10px; background:#fefefe;">R̄=' + SPCEngine.round(pageXbarR.summary.rBar, 4) + '</td>';
             else if (i >= 8) html += '<td colspan="4" style="border:1px solid #000; background:#fcfcfc;"></td>';
             html += '</tr>';
         }
@@ -674,7 +674,7 @@ var SPCApp = {
         // --- Footer Rows: ΣX, X̄, R ---
         html += '<tr style="background:#f9fafb;"><td style="border:1px solid #000; text-align:center; font-weight:bold;">ΣX</td>';
         for (var b = 0; b < 25; b++) {
-            var val = (pageDataMatrix[b]) ? SPCEngine.round(pageDataMatrix[b].reduce(function (a, b) { return a + (b || 0); }, 0), 3) : '';
+            var val = (pageDataMatrix[b]) ? SPCEngine.round(pageDataMatrix[b].reduce(function (a, b) { return a + (b || 0); }, 0), 4) : '';
             html += '<td style="border:1px solid #000; text-align:center;">' + val + '</td>';
         }
         html += '<td colspan="4" style="border:1px solid #000; background:#f9fafb;"></td></tr>';
@@ -684,7 +684,7 @@ var SPCApp = {
             var val = '', style = '';
             if (pageXbarR.xBar.data[k] !== undefined) {
                 var v = pageXbarR.xBar.data[k];
-                val = SPCEngine.round(v, 3);
+                val = SPCEngine.round(v, 4);
                 if (v > pageXbarR.xBar.UCL || v < pageXbarR.xBar.LCL) style = 'background:yellow;';
             }
             html += '<td style="border:1px solid #000; text-align:center;' + style + '">' + val + '</td>';
@@ -696,7 +696,7 @@ var SPCApp = {
             var val = '', style = '';
             if (pageXbarR.R.data[k] !== undefined) {
                 var v = pageXbarR.R.data[k];
-                val = SPCEngine.round(v, 3);
+                val = SPCEngine.round(v, 4);
                 if (v > pageXbarR.R.UCL) style = 'background:yellow;';
             }
             html += '<td style="border:1px solid #000; text-align:center;' + style + '">' + val + '</td>';

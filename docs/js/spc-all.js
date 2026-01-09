@@ -230,6 +230,19 @@ function DataInput(worksheet) {
 
 DataInput.prototype.parse = function () {
     var self = this;
+
+    // Extract metadata from headers or fixed positions
+    this.productInfo = {
+        name: this.data[0] && this.data[0][1] ? this.data[0][1] : '',
+        item: this.data[0] && this.data[0][2] ? this.data[0][2] : '',
+        unit: 'Inch', // Default or extracted
+        char: '平均值/全距',
+        dept: '品管部',
+        inspector: '品管組',
+        batchRange: '',
+        chartNo: ''
+    };
+
     this.headers = this.data[0] || [];
     this.specs = {
         target: parseFloat(this.data[1] && this.data[1][1]) || 0,
@@ -250,10 +263,27 @@ DataInput.prototype.parse = function () {
     for (var j = 0; j < this.dataRows.length; j++) {
         var name = this.dataRows[j][0];
         if (name && name !== '') {
-            // Clean batch name to remove suffixes
             this.batchNames.push(cleanBatchName(name));
         }
     }
+};
+
+DataInput.prototype.getSpecs = function () { return this.specs; };
+DataInput.prototype.getProductInfo = function () { return this.productInfo; };
+DataInput.prototype.getCavityNames = function () { return this.cavityColumns.map(function (c) { return c.name; }); };
+DataInput.prototype.getCavityCount = function () { return this.cavityColumns.length; };
+
+DataInput.prototype.getDataMatrix = function () {
+    var matrix = [];
+    for (var i = 0; i < this.dataRows.length; i++) {
+        var batchData = [];
+        for (var j = 0; j < this.cavityColumns.length; j++) {
+            var value = parseFloat(this.dataRows[i][this.cavityColumns[j].index]);
+            batchData.push(isNaN(value) ? null : value);
+        }
+        matrix.push(batchData);
+    }
+    return matrix;
 };
 
 DataInput.prototype.getCavityBatchData = function (cavityIndex) {
@@ -444,7 +474,8 @@ var SPCApp = {
                         batchNames: dataInput.batchNames,
                         specs: dataInput.getSpecs(),
                         dataMatrix: dataMatrix,
-                        cavityNames: dataInput.getCavityNames()
+                        cavityNames: dataInput.getCavityNames(),
+                        productInfo: dataInput.getProductInfo()
                     };
                 } else if (type === 'cavity') {
                     var specs = dataInput.getSpecs();
@@ -496,7 +527,6 @@ var SPCApp = {
             var maxPerPage = 25;
             var totalPages = Math.ceil(totalBatches / maxPerPage);
 
-            // Store pagination info
             this.batchPagination = {
                 currentPage: 1,
                 totalPages: totalPages,
@@ -509,7 +539,6 @@ var SPCApp = {
                 '<div class="stat-card"><div class="stat-label">' + this.t('總批號數', 'Total Batches') + '</div><div class="stat-value">' + totalBatches + '</div></div>' +
                 '</div>';
 
-            // Pagination controls
             if (totalPages > 1) {
                 html += '<div class="pagination-controls" style="display:flex;justify-content:center;align-items:center;gap:15px;margin:20px 0;">' +
                     '<button id="prevPageBtn" class="btn-secondary" style="padding:8px 16px;">' + this.t('上一頁', 'Prev') + '</button>' +
@@ -518,10 +547,10 @@ var SPCApp = {
                     '</div>';
             }
 
-            // Dynamic control limits container (updated per page)
-            html += '<div id="pageLimitsContainer"></div>';
+            // Detailed Data Table Container (Excel Style)
+            html += '<div id="detailedTableContainer" style="margin-bottom:30px; overflow-x:auto;"></div>';
 
-            // Abnormality Diagnostic Results Container
+            html += '<div id="pageLimitsContainer"></div>';
             html += '<div id="diagnosticContainer" style="margin-top:20px;"></div>';
 
             html += '<div id="batchChartsContainer">' +
@@ -578,6 +607,100 @@ var SPCApp = {
         document.getElementById('nextPageBtn').disabled = (p.currentPage >= p.totalPages);
     },
 
+    renderDetailedDataTable: function (pageLabels, pageDataMatrix, pageXbarR) {
+        var data = this.analysisResults;
+        var info = data.productInfo;
+        var specs = data.specs;
+        var cavityCount = data.xbarR.summary.n;
+
+        var html = '<table class="excel-table" style="width:100\%; border-collapse:collapse; font-size:12px; font-family:sans-serif; border:2px solid #000; table-layout:fixed;">';
+
+        // --- Row 1: Header ---
+        html += '<tr style="background:#f3f4f6;"><td colspan="' + (pageLabels.length + 5) + '" style="border:1px solid #000; text-align:center; font-weight:bold; font-size:16px; padding:5px;">X̄ - R 管制圖</td></tr>';
+
+        // --- Row 2-5: Metadata & Limits ---
+        var rows = [
+            { l1: '商品名稱', v1: info.name, l2: '規格', v2: '標準', l3: '管制圖', v3: 'X̄', v4: 'R', l4: '製造部門' },
+            { l1: '商品料號', v1: info.item, l2: '最大值', v2: specs.usl, l3: '上限', v3: SPCEngine.round(pageXbarR.xBar.UCL, 4), v4: SPCEngine.round(pageXbarR.R.UCL, 4), l4: info.dept },
+            { l1: '測量單位', v1: info.unit, l2: '目標值', v2: specs.target, l3: '中心值', v3: SPCEngine.round(pageXbarR.xBar.CL, 4), v4: SPCEngine.round(pageXbarR.R.CL, 4), l4: '檢驗人員' },
+            { l1: '管制特性', v1: info.char, l2: '最小值', v2: specs.lsl, l3: '下限', v3: SPCEngine.round(pageXbarR.xBar.LCL, 4), v4: '-', l4: info.inspector }
+        ];
+
+        rows.forEach(function (r) {
+            html += '<tr>' +
+                '<td style="border:1px solid #000; padding:2px; font-weight:bold; width:80px;">' + r.l1 + '</td>' +
+                '<td colspan="4" style="border:1px solid #000; padding:2px;">' + r.v1 + '</td>' +
+                '<td style="border:1px solid #000; padding:2px; font-weight:bold; width:60px;">' + r.l2 + '</td>' +
+                '<td style="border:1px solid #000; padding:2px; width:60px;">' + r.v2 + '</td>' +
+                '<td style="border:1px solid #000; padding:2px; font-weight:bold; width:60px;">' + r.l3 + '</td>' +
+                '<td style="border:1px solid #000; padding:2px; width:60px;">' + r.v3 + '</td>' +
+                '<td style="border:1px solid #000; padding:2px; width:60px;">' + (r.v4 || '') + '</td>' +
+                '<td style="border:1px solid #000; padding:2px; font-weight:bold; width:80px;">' + (r.l4 || '') + '</td>' +
+                '<td colspan="' + (pageLabels.length - 6) + '" style="border:1px solid #000;"></td>' +
+                '</tr>';
+        });
+
+        // --- Data Header: Batch Names ---
+        html += '<tr style="background:#e5e7eb; font-weight:bold;">' +
+            '<td style="border:1px solid #000; text-align:center;">檢驗日期</td>';
+        pageLabels.forEach(function (name) {
+            html += '<td style="border:1px solid #000; text-align:center; height:60px; word-wrap:break-word;">' + name + '</td>';
+        });
+        html += '<td colspan="4" style="border:1px solid #000;"></td></tr>';
+
+        // --- Main Data Rows: Cavities ---
+        for (var i = 0; i < cavityCount; i++) {
+            html += '<tr><td style="border:1px solid #000; text-align:center; font-weight:bold;">X' + (i + 1) + '</td>';
+            var rowSum = 0;
+            for (var j = 0; j < pageDataMatrix.length; j++) {
+                var val = pageDataMatrix[j][i];
+                html += '<td style="border:1px solid #000; text-align:center;">' + (val !== null ? val : '') + '</td>';
+            }
+
+            // Sidebar summary on first few rows
+            if (i === 0) html += '<td colspan="4" rowspan="2" style="border:1px solid #000; padding-left:5px; font-weight:bold;">ΣX̄ = ' + SPCEngine.round(pageXbarR.summary.xBarSum, 4) + '</td>';
+            else if (i === 2) html += '<td colspan="4" rowspan="2" style="border:1px solid #000; padding-left:5px; font-weight:bold;">X̿ = ' + SPCEngine.round(pageXbarR.summary.xDoubleBar, 4) + '</td>';
+            else if (i === 4) html += '<td colspan="4" rowspan="2" style="border:1px solid #000; padding-left:5px; font-weight:bold;">ΣR = ' + SPCEngine.round(pageXbarR.summary.rSum, 4) + '</td>';
+            else if (i === 6) html += '<td colspan="4" rowspan="2" style="border:1px solid #000; padding-left:5px; font-weight:bold;">R̄ = ' + SPCEngine.round(pageXbarR.summary.rBar, 4) + '</td>';
+            else if (i >= 8 || i < 8) {
+                // Do nothing for extra padding columns if already handled
+            }
+            html += '</tr>';
+        }
+
+        // --- Footer Rows: ΣX, X̄, R ---
+        // ΣX Row
+        html += '<tr style="background:#f9fafb;"><td style="border:1px solid #000; text-align:center; font-weight:bold;">ΣX</td>';
+        pageDataMatrix.forEach(function (batch) {
+            var sum = batch.reduce(function (a, b) { return a + (b || 0); }, 0);
+            html += '<td style="border:1px solid #000; text-align:center;">' + SPCEngine.round(sum, 4) + '</td>';
+        });
+        html += '<td colspan="4" style="border:1px solid #000;"></td></tr>';
+
+        // X̄ Row (with yellow highlighting)
+        html += '<tr style="background:#f9fafb;"><td style="border:1px solid #000; text-align:center; font-weight:bold;">X̄</td>';
+        for (var k = 0; k < pageXbarR.xBar.data.length; k++) {
+            var val = pageXbarR.xBar.data[k];
+            var isOOC = val > pageXbarR.xBar.UCL || val < pageXbarR.xBar.LCL;
+            var style = isOOC ? 'background:yellow;' : '';
+            html += '<td style="border:1px solid #000; text-align:center;' + style + '">' + SPCEngine.round(val, 4) + '</td>';
+        }
+        html += '<td colspan="4" style="border:1px solid #000;"></td></tr>';
+
+        // R Row
+        html += '<tr style="background:#f9fafb;"><td style="border:1px solid #000; text-align:center; font-weight:bold;">R</td>';
+        for (var k = 0; k < pageXbarR.R.data.length; k++) {
+            var val = pageXbarR.R.data[k];
+            var isOOC = val > pageXbarR.R.UCL;
+            var style = isOOC ? 'background:yellow;' : '';
+            html += '<td style="border:1px solid #000; text-align:center;' + style + '">' + SPCEngine.round(val, 4) + '</td>';
+        }
+        html += '<td colspan="4" style="border:1px solid #000;"></td></tr>';
+
+        html += '</table>';
+        document.getElementById('detailedTableContainer').innerHTML = html;
+    },
+
     renderCharts: function () {
         var data = this.analysisResults;
 
@@ -599,6 +722,13 @@ var SPCApp = {
 
             // Calculate control limits for this page's data (VBA style - each page has its own limits)
             var pageXbarR = SPCEngine.calculateXBarRLimits(pageDataMatrix);
+
+            // Add sums for detailed table display
+            pageXbarR.summary.xBarSum = pageXbarR.xBar.data.reduce(function (a, b) { return a + b; }, 0);
+            pageXbarR.summary.rSum = pageXbarR.R.data.reduce(function (a, b) { return a + b; }, 0);
+
+            // Render detailed data table
+            this.renderDetailedDataTable(pageLabels, pageDataMatrix, pageXbarR);
 
             // Update page limits display
             var limitsHtml = '<div class="results-summary" style="margin-top:15px;">' +

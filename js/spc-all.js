@@ -616,12 +616,9 @@ var SPCApp = {
         // Total 30 virtual columns: 1 (Labels) + 25 (Batches) + 4 (Summary Sidebar)
         var html = '<table class="excel-table" style="width:100\%; border-collapse:collapse; font-size:11px; font-family:sans-serif; border:2px solid #000; table-layout:fixed;">';
 
-        // Width distribution: 
-        // Label col: 5% (Reduced)
-        // Batch cols: 80% total / 25 = 3.2% each (Increased)
-        // Summary sidebar: 15% total (Merged 4 cols)
-        var labelWidth = '5\%';
-        var batchWidth = '3.2\%';
+        var labelWidth = '4\%';
+        var batchWidth = '3.52\%'; // 88 / 25
+        var summaryWidth = '8\%';
 
         // --- Row 1: Header ---
         html += '<tr style="background:#f3f4f6;"><td colspan="30" style="border:1px solid #000; text-align:center; font-weight:bold; font-size:14px; padding:3px;">X̄ - R 管制圖</td></tr>';
@@ -636,15 +633,15 @@ var SPCApp = {
 
         rows.forEach(function (r) {
             html += '<tr>' +
-                '<td colspan="2" style="border:1px solid #000; padding:1px 4px; font-weight:bold; width:8\%; background:#f9fafb;">' + r.l1 + '</td>' +
-                '<td colspan="7" style="border:1px solid #000; padding:1px 4px; overflow:hidden; width:22\%;">' + r.v1 + '</td>' +
-                '<td colspan="2" style="border:1px solid #000; padding:1px 4px; font-weight:bold; width:8\%; background:#f9fafb;">' + r.l2 + '</td>' +
-                '<td colspan="2" style="border:1px solid #000; padding:1px 4px; width:7\%;">' + r.v2 + '</td>' +
-                '<td colspan="2" style="border:1px solid #000; padding:1px 4px; font-weight:bold; width:8\%; background:#f9fafb;">' + r.l3 + '</td>' +
-                '<td colspan="3" style="border:1px solid #000; padding:1px 4px; width:10\%;">' + r.v3 + '</td>' +
-                '<td colspan="3" style="border:1px solid #000; padding:1px 4px; width:10\%;">' + (r.v4 || '') + '</td>' +
-                '<td colspan="2" style="border:1px solid #000; padding:1px 4px; font-weight:bold; width:8\%; background:#f9fafb;">' + (r.l4 || '') + '</td>' +
-                '<td colspan="7" style="border:1px solid #000; padding:1px 4px; width:17\%;">' + (r.v4_val || '') + '</td>' +
+                '<td colspan="2" style="border:1px solid #000; padding:1px 4px; font-weight:bold; width:6.6\%; background:#f9fafb;">' + r.l1 + '</td>' +
+                '<td colspan="8" style="border:1px solid #000; padding:1px 4px; overflow:hidden; text-overflow:ellipsis; width:26.6\%;">' + r.v1 + '</td>' +
+                '<td colspan="2" style="border:1px solid #000; padding:1px 4px; font-weight:bold; width:6.6\%; background:#f9fafb;">' + r.l2 + '</td>' +
+                '<td colspan="2" style="border:1px solid #000; padding:1px 4px; width:6.6\%;">' + r.v2 + '</td>' +
+                '<td colspan="2" style="border:1px solid #000; padding:1px 4px; font-weight:bold; width:6.6\%; background:#f9fafb;">' + r.l3 + '</td>' +
+                '<td colspan="4" style="border:1px solid #000; padding:1px 4px; width:13.3\%;">' + r.v3 + '</td>' +
+                '<td colspan="4" style="border:1px solid #000; padding:1px 4px; width:13.3\%;">' + (r.v4 || '') + '</td>' +
+                '<td colspan="2" style="border:1px solid #000; padding:1px 4px; font-weight:bold; width:6.6\%; background:#f9fafb;">' + (r.l4 || '') + '</td>' +
+                '<td colspan="4" style="border:1px solid #000; padding:1px 4px; width:13.3\%;">' + (r.v4_val || '') + '</td>' +
                 '</tr>';
         });
 
@@ -654,10 +651,8 @@ var SPCApp = {
         pageLabels.forEach(function (name) {
             html += '<td style="border:1px solid #000; text-align:center; height:35px; width:' + batchWidth + '; overflow:hidden; font-size:9px; word-break:break-all;">' + name + '</td>';
         });
-        // Fill empty if less than 25 batches
         for (var f = pageLabels.length; f < 25; f++) html += '<td style="border:1px solid #000; width:' + batchWidth + ';"></td>';
-
-        html += '<td colspan="4" style="border:1px solid #000; text-align:center; width:15\%;">彙總</td></tr>';
+        html += '<td colspan="4" style="border:1px solid #000; text-align:center; width:' + summaryWidth + ';">彙總</td></tr>';
 
         // --- Main Data Rows: Cavities ---
         for (var i = 0; i < cavityCount; i++) {
@@ -668,47 +663,40 @@ var SPCApp = {
             }
 
             // Sidebar summary on first few rows
-            if (i === 0) html += '<td colspan="4" rowspan="2" style="border:1px solid #000; padding-left:5px; font-weight:bold; background:#fefefe;">ΣX̄ = ' + SPCEngine.round(pageXbarR.summary.xBarSum, 4) + '</td>';
-            else if (i === 2) html += '<td colspan="4" rowspan="2" style="border:1px solid #000; padding-left:5px; font-weight:bold; background:#fefefe;">X̿ = ' + SPCEngine.round(pageXbarR.summary.xDoubleBar, 4) + '</td>';
-            else if (i === 4) html += '<td colspan="4" rowspan="2" style="border:1px solid #000; padding-left:5px; font-weight:bold; background:#fefefe;">ΣR = ' + SPCEngine.round(pageXbarR.summary.rSum, 4) + '</td>';
-            else if (i === 6) html += '<td colspan="4" rowspan="2" style="border:1px solid #000; padding-left:5px; font-weight:bold; background:#fefefe;">R̄ = ' + SPCEngine.round(pageXbarR.summary.rBar, 4) + '</td>';
+            if (i === 0) html += '<td colspan="4" rowspan="2" style="border:1px solid #000; padding-left:2px; font-weight:bold; font-size:10px; background:#fefefe;">ΣX̄=' + SPCEngine.round(pageXbarR.summary.xBarSum, 3) + '</td>';
+            else if (i === 2) html += '<td colspan="4" rowspan="2" style="border:1px solid #000; padding-left:2px; font-weight:bold; font-size:10px; background:#fefefe;">X̿=' + SPCEngine.round(pageXbarR.summary.xDoubleBar, 3) + '</td>';
+            else if (i === 4) html += '<td colspan="4" rowspan="2" style="border:1px solid #000; padding-left:2px; font-weight:bold; font-size:10px; background:#fefefe;">ΣR=' + SPCEngine.round(pageXbarR.summary.rSum, 3) + '</td>';
+            else if (i === 6) html += '<td colspan="4" rowspan="2" style="border:1px solid #000; padding-left:2px; font-weight:bold; font-size:10px; background:#fefefe;">R̄=' + SPCEngine.round(pageXbarR.summary.rBar, 3) + '</td>';
             else if (i >= 8) html += '<td colspan="4" style="border:1px solid #000; background:#fcfcfc;"></td>';
             html += '</tr>';
         }
 
         // --- Footer Rows: ΣX, X̄, R ---
-        // ΣX Row
         html += '<tr style="background:#f9fafb;"><td style="border:1px solid #000; text-align:center; font-weight:bold;">ΣX</td>';
         for (var b = 0; b < 25; b++) {
-            var val = '';
-            if (pageDataMatrix[b]) {
-                var sum = pageDataMatrix[b].reduce(function (a, b) { return a + (b || 0); }, 0);
-                val = SPCEngine.round(sum, 4);
-            }
+            var val = (pageDataMatrix[b]) ? SPCEngine.round(pageDataMatrix[b].reduce(function (a, b) { return a + (b || 0); }, 0), 3) : '';
             html += '<td style="border:1px solid #000; text-align:center;">' + val + '</td>';
         }
         html += '<td colspan="4" style="border:1px solid #000; background:#f9fafb;"></td></tr>';
 
-        // X̄ Row (with yellow highlighting)
         html += '<tr style="background:#f9fafb;"><td style="border:1px solid #000; text-align:center; font-weight:bold;">X̄</td>';
         for (var k = 0; k < 25; k++) {
             var val = '', style = '';
             if (pageXbarR.xBar.data[k] !== undefined) {
                 var v = pageXbarR.xBar.data[k];
-                val = SPCEngine.round(v, 4);
+                val = SPCEngine.round(v, 3);
                 if (v > pageXbarR.xBar.UCL || v < pageXbarR.xBar.LCL) style = 'background:yellow;';
             }
             html += '<td style="border:1px solid #000; text-align:center;' + style + '">' + val + '</td>';
         }
         html += '<td colspan="4" style="border:1px solid #000; background:#f9fafb;"></td></tr>';
 
-        // R Row
         html += '<tr style="background:#f9fafb;"><td style="border:1px solid #000; text-align:center; font-weight:bold;">R</td>';
         for (var k = 0; k < 25; k++) {
             var val = '', style = '';
             if (pageXbarR.R.data[k] !== undefined) {
                 var v = pageXbarR.R.data[k];
-                val = SPCEngine.round(v, 4);
+                val = SPCEngine.round(v, 3);
                 if (v > pageXbarR.R.UCL) style = 'background:yellow;';
             }
             html += '<td style="border:1px solid #000; text-align:center;' + style + '">' + val + '</td>';

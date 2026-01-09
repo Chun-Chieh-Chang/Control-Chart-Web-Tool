@@ -613,10 +613,10 @@ var SPCApp = {
         var specs = data.specs;
         var cavityCount = data.xbarR.summary.n;
 
-        var html = '<table class="excel-table" style="width:100\%; border-collapse:collapse; font-size:12px; font-family:sans-serif; border:2px solid #000; table-layout:fixed;">';
+        var html = '<table class="excel-table" style="width:100\%; border-collapse:collapse; font-size:13px; font-family:sans-serif; border:2px solid #000; table-layout:auto;">';
 
         // --- Row 1: Header ---
-        html += '<tr style="background:#f3f4f6;"><td colspan="' + (pageLabels.length + 5) + '" style="border:1px solid #000; text-align:center; font-weight:bold; font-size:16px; padding:5px;">X̄ - R 管制圖</td></tr>';
+        html += '<tr style="background:#f3f4f6;"><td colspan="' + (pageLabels.length + 5) + '" style="border:1px solid #000; text-align:center; font-weight:bold; font-size:18px; padding:10px;">X̄ - R 管制圖</td></tr>';
 
         // --- Row 2-5: Metadata & Limits ---
         var rows = [
@@ -628,23 +628,23 @@ var SPCApp = {
 
         rows.forEach(function (r) {
             html += '<tr>' +
-                '<td style="border:1px solid #000; padding:2px; font-weight:bold; width:80px;">' + r.l1 + '</td>' +
-                '<td colspan="4" style="border:1px solid #000; padding:2px;">' + r.v1 + '</td>' +
-                '<td style="border:1px solid #000; padding:2px; font-weight:bold; width:60px;">' + r.l2 + '</td>' +
-                '<td style="border:1px solid #000; padding:2px; width:60px;">' + r.v2 + '</td>' +
-                '<td style="border:1px solid #000; padding:2px; font-weight:bold; width:60px;">' + r.l3 + '</td>' +
-                '<td style="border:1px solid #000; padding:2px; width:60px;">' + r.v3 + '</td>' +
-                '<td style="border:1px solid #000; padding:2px; width:60px;">' + (r.v4 || '') + '</td>' +
-                '<td style="border:1px solid #000; padding:2px; font-weight:bold; width:80px;">' + (r.l4 || '') + '</td>' +
+                '<td style="border:1px solid #000; padding:6px 10px; font-weight:bold; width:120px; background:#f9fafb;">' + r.l1 + '</td>' +
+                '<td colspan="4" style="border:1px solid #000; padding:6px 10px; min-width:200px;">' + r.v1 + '</td>' +
+                '<td style="border:1px solid #000; padding:6px 10px; font-weight:bold; width:80px; background:#f9fafb;">' + r.l2 + '</td>' +
+                '<td style="border:1px solid #000; padding:6px 10px; width:80px;">' + r.v2 + '</td>' +
+                '<td style="border:1px solid #000; padding:6px 10px; font-weight:bold; width:80px; background:#f9fafb;">' + r.l3 + '</td>' +
+                '<td style="border:1px solid #000; padding:6px 10px; width:80px;">' + r.v3 + '</td>' +
+                '<td style="border:1px solid #000; padding:6px 10px; width:80px;">' + (r.v4 || '') + '</td>' +
+                '<td style="border:1px solid #000; padding:6px 10px; font-weight:bold; width:120px; background:#f9fafb;">' + (r.l4 || '') + '</td>' +
                 '<td colspan="' + (pageLabels.length - 6) + '" style="border:1px solid #000;"></td>' +
                 '</tr>';
         });
 
         // --- Data Header: Batch Names ---
         html += '<tr style="background:#e5e7eb; font-weight:bold;">' +
-            '<td style="border:1px solid #000; text-align:center;">檢驗日期</td>';
+            '<td style="border:1px solid #000; text-align:center; padding:8px;">檢驗日期</td>';
         pageLabels.forEach(function (name) {
-            html += '<td style="border:1px solid #000; text-align:center; height:60px; word-wrap:break-word;">' + name + '</td>';
+            html += '<td style="border:1px solid #000; text-align:center; height:70px; min-width:85px; word-wrap:break-word; padding:5px;">' + name + '</td>';
         });
         html += '<td colspan="4" style="border:1px solid #000;"></td></tr>';
 
@@ -823,9 +823,9 @@ var SPCApp = {
                 },
                 options: {
                     responsive: true,
-                    aspectRatio: 2.5,
+                    aspectRatio: 3.5,
                     plugins: {
-                        legend: { position: 'top', labels: { boxWidth: 12, padding: 15 } }
+                        legend: { position: 'top', labels: { boxWidth: 12, padding: 20, font: { size: 14 } } }
                     },
                     scales: {
                         x: { grid: { display: false } },
@@ -858,9 +858,9 @@ var SPCApp = {
                 },
                 options: {
                     responsive: true,
-                    aspectRatio: 2.5,
+                    aspectRatio: 3.5,
                     plugins: {
-                        legend: { position: 'top', labels: { boxWidth: 12, padding: 15 } }
+                        legend: { position: 'top', labels: { boxWidth: 12, padding: 20, font: { size: 14 } } }
                     },
                     scales: {
                         x: { grid: { display: false } },
@@ -890,8 +890,8 @@ var SPCApp = {
                 },
                 options: {
                     responsive: true,
-                    aspectRatio: 2.5,
-                    plugins: { legend: { position: 'top', labels: { boxWidth: 12, padding: 15 } } },
+                    aspectRatio: 3.5,
+                    plugins: { legend: { position: 'top', labels: { boxWidth: 12, padding: 20, font: { size: 14 } } } },
                     scales: { x: { grid: { display: false } }, y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.08)' } } }
                 }
             }));
@@ -922,8 +922,8 @@ var SPCApp = {
                 },
                 options: {
                     responsive: true,
-                    aspectRatio: 2.5,
-                    plugins: { legend: { position: 'top', labels: { boxWidth: 12, padding: 15 } } },
+                    aspectRatio: 3.5,
+                    plugins: { legend: { position: 'top', labels: { boxWidth: 12, padding: 20, font: { size: 14 } } } },
                     scales: { x: { grid: { display: false } }, y: { grid: { color: 'rgba(0,0,0,0.08)' } } }
                 }
             }));

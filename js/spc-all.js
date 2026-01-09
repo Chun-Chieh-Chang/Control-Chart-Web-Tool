@@ -613,17 +613,23 @@ var SPCApp = {
         var specs = data.specs;
         var cavityCount = data.xbarR.summary.n;
 
-        // Total 30 virtual columns: 1 (Labels) + 25 (Batches) + 4 (Summary Sidebar)
+        // --- Start Table with COLGROUP for guaranteed width control ---
         var html = '<table class="excel-table" style="width:100\%; border-collapse:collapse; font-size:11px; font-family:sans-serif; border:2px solid #000; table-layout:fixed;">';
 
-        var labelWidth = '4\%';
-        var batchWidth = '3.52\%'; // 88 / 25
-        var summaryWidth = '8\%';
+        html += '<colgroup>';
+        html += '<col style="width: 4\%;">'; // Col 1: Labels
+        for (var i = 0; i < 25; i++) {
+            html += '<col style="width: 3.6\%;">'; // Col 2-26: 25 Data Cols (Total 90%)
+        }
+        for (var j = 0; j < 4; j++) {
+            html += '<col style="width: 1.5\%;">'; // Col 27-30: Sidebar Summary (Total 6%)
+        }
+        html += '</colgroup>';
 
         // --- Row 1: Header ---
         html += '<tr style="background:#f3f4f6;"><td colspan="30" style="border:1px solid #000; text-align:center; font-weight:bold; font-size:14px; padding:3px;">X̄ - R 管制圖</td></tr>';
 
-        // --- Row 2-5: Metadata & Limits (Re-distributed colspans out of 30) ---
+        // --- Row 2-5: Metadata & Limits (Total 30 units) ---
         var rows = [
             { l1: '商品名稱', v1: info.name, l2: '規格', v2: '標準', l3: '管制圖', v3: 'X̄', v4: 'R', l4: '製造部門', v4_val: info.dept },
             { l1: '商品料號', v1: info.item, l2: '最大值', v2: specs.usl, l3: '上限', v3: SPCEngine.round(pageXbarR.xBar.UCL, 4), v4: SPCEngine.round(pageXbarR.R.UCL, 4), l4: '檢驗人員', v4_val: info.inspector },
@@ -633,26 +639,26 @@ var SPCApp = {
 
         rows.forEach(function (r) {
             html += '<tr>' +
-                '<td colspan="2" style="border:1px solid #000; padding:1px 4px; font-weight:bold; width:6.6\%; background:#f9fafb;">' + r.l1 + '</td>' +
-                '<td colspan="8" style="border:1px solid #000; padding:1px 4px; overflow:hidden; text-overflow:ellipsis; width:26.6\%;">' + r.v1 + '</td>' +
-                '<td colspan="2" style="border:1px solid #000; padding:1px 4px; font-weight:bold; width:6.6\%; background:#f9fafb;">' + r.l2 + '</td>' +
-                '<td colspan="2" style="border:1px solid #000; padding:1px 4px; width:6.6\%;">' + r.v2 + '</td>' +
-                '<td colspan="2" style="border:1px solid #000; padding:1px 4px; font-weight:bold; width:6.6\%; background:#f9fafb;">' + r.l3 + '</td>' +
-                '<td colspan="4" style="border:1px solid #000; padding:1px 4px; width:13.3\%;">' + r.v3 + '</td>' +
-                '<td colspan="4" style="border:1px solid #000; padding:1px 4px; width:13.3\%;">' + (r.v4 || '') + '</td>' +
-                '<td colspan="2" style="border:1px solid #000; padding:1px 4px; font-weight:bold; width:6.6\%; background:#f9fafb;">' + (r.l4 || '') + '</td>' +
-                '<td colspan="4" style="border:1px solid #000; padding:1px 4px; width:13.3\%;">' + (r.v4_val || '') + '</td>' +
+                '<td colspan="3" style="border:1px solid #000; padding:1px 4px; font-weight:bold; background:#f9fafb;">' + r.l1 + '</td>' +
+                '<td colspan="11" style="border:1px solid #000; padding:1px 4px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">' + r.v1 + '</td>' +
+                '<td colspan="2" style="border:1px solid #000; padding:1px 4px; font-weight:bold; background:#f9fafb;">' + r.l2 + '</td>' +
+                '<td colspan="2" style="border:1px solid #000; padding:1px 4px;">' + r.v2 + '</td>' +
+                '<td colspan="2" style="border:1px solid #000; padding:1px 4px; font-weight:bold; background:#f9fafb;">' + r.l3 + '</td>' +
+                '<td colspan="2" style="border:1px solid #000; padding:1px 4px;">' + r.v3 + '</td>' +
+                '<td colspan="2" style="border:1px solid #000; padding:1px 4px;">' + (r.v4 || '') + '</td>' +
+                '<td colspan="2" style="border:1px solid #000; padding:1px 4px; font-weight:bold; background:#f9fafb;">' + (r.l4 || '') + '</td>' +
+                '<td colspan="4" style="border:1px solid #000; padding:1px 4px; overflow:hidden; text-overflow:ellipsis;">' + (r.v4_val || '') + '</td>' +
                 '</tr>';
         });
 
         // --- Data Header: Batch Names ---
         html += '<tr style="background:#e5e7eb; font-weight:bold;">' +
-            '<td style="border:1px solid #000; text-align:center; width:' + labelWidth + ';">批號</td>';
+            '<td style="border:1px solid #000; text-align:center;">批號</td>';
         pageLabels.forEach(function (name) {
-            html += '<td style="border:1px solid #000; text-align:center; height:35px; width:' + batchWidth + '; overflow:hidden; font-size:9px; word-break:break-all;">' + name + '</td>';
+            html += '<td style="border:1px solid #000; text-align:center; height:35px; font-size:9px; word-break:break-all; vertical-align:middle;">' + name + '</td>';
         });
-        for (var f = pageLabels.length; f < 25; f++) html += '<td style="border:1px solid #000; width:' + batchWidth + ';"></td>';
-        html += '<td colspan="4" style="border:1px solid #000; text-align:center; width:' + summaryWidth + ';">彙總</td></tr>';
+        for (var f = pageLabels.length; f < 25; f++) html += '<td style="border:1px solid #000;"></td>';
+        html += '<td colspan="4" style="border:1px solid #000; text-align:center;">彙總</td></tr>';
 
         // --- Main Data Rows: Cavities ---
         for (var i = 0; i < cavityCount; i++) {
@@ -662,11 +668,10 @@ var SPCApp = {
                 html += '<td style="border:1px solid #000; text-align:center;">' + (val !== null ? val : '') + '</td>';
             }
 
-            // Sidebar summary on first few rows
-            if (i === 0) html += '<td colspan="4" rowspan="2" style="border:1px solid #000; padding-left:2px; font-weight:bold; font-size:10px; background:#fefefe;">ΣX̄=' + SPCEngine.round(pageXbarR.summary.xBarSum, 4) + '</td>';
-            else if (i === 2) html += '<td colspan="4" rowspan="2" style="border:1px solid #000; padding-left:2px; font-weight:bold; font-size:10px; background:#fefefe;">X̿=' + SPCEngine.round(pageXbarR.summary.xDoubleBar, 4) + '</td>';
-            else if (i === 4) html += '<td colspan="4" rowspan="2" style="border:1px solid #000; padding-left:2px; font-weight:bold; font-size:10px; background:#fefefe;">ΣR=' + SPCEngine.round(pageXbarR.summary.rSum, 4) + '</td>';
-            else if (i === 6) html += '<td colspan="4" rowspan="2" style="border:1px solid #000; padding-left:2px; font-weight:bold; font-size:10px; background:#fefefe;">R̄=' + SPCEngine.round(pageXbarR.summary.rBar, 4) + '</td>';
+            if (i === 0) html += '<td colspan="4" rowspan="2" style="border:1px solid #000; padding:0 2px; font-weight:bold; font-size:10px; background:#fefefe; vertical-align:middle; line-height:1;">ΣX̄=' + SPCEngine.round(pageXbarR.summary.xBarSum, 4) + '</td>';
+            else if (i === 2) html += '<td colspan="4" rowspan="2" style="border:1px solid #000; padding:0 2px; font-weight:bold; font-size:10px; background:#fefefe; vertical-align:middle; line-height:1;">X̿=' + SPCEngine.round(pageXbarR.summary.xDoubleBar, 4) + '</td>';
+            else if (i === 4) html += '<td colspan="4" rowspan="2" style="border:1px solid #000; padding:0 2px; font-weight:bold; font-size:10px; background:#fefefe; vertical-align:middle; line-height:1;">ΣR=' + SPCEngine.round(pageXbarR.summary.rSum, 4) + '</td>';
+            else if (i === 6) html += '<td colspan="4" rowspan="2" style="border:1px solid #000; padding:0 2px; font-weight:bold; font-size:10px; background:#fefefe; vertical-align:middle; line-height:1;">R̄=' + SPCEngine.round(pageXbarR.summary.rBar, 4) + '</td>';
             else if (i >= 8) html += '<td colspan="4" style="border:1px solid #000; background:#fcfcfc;"></td>';
             html += '</tr>';
         }

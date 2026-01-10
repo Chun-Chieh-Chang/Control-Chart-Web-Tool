@@ -852,9 +852,7 @@ var SPCApp = {
             XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(wsData), 'Group');
         }
 
-        var dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, '');
-        var itemStr = (self.selectedItem || data.type).replace(/[:\/\\*?"<>|]/g, '_');
-        var defaultName = 'SPC_Report_' + itemStr + '_' + dateStr + '.xlsx';
+        var defaultName = 'SPC_Report_' + data.type + '.xlsx';
 
         try {
             if (window.showSaveFilePicker) {

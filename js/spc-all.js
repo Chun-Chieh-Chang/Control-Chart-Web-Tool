@@ -695,8 +695,8 @@ var SPCApp = {
                 '<tr>' +
                 '<th class="px-6 py-4 font-bold tracking-wider">Cavity</th>' +
                 '<th class="px-6 py-4 text-center">Mean</th>' +
-                '<th class="px-6 py-4 text-center">σ Within</th>' +
-                '<th class="px-6 py-4 text-center">σ Overall</th>' +
+                '<th class="px-6 py-4 text-center">StdDev (within)</th>' +
+                '<th class="px-6 py-4 text-center">StdDev (overall)</th>' +
                 '<th class="px-6 py-4 text-center">Cp</th>' +
                 '<th class="px-6 py-4 text-center">Cpk</th>' +
                 '<th class="px-6 py-4 text-center">Pp</th>' +
@@ -1096,7 +1096,7 @@ var SPCApp = {
                 },
                 options: {
                     responsive: true,
-                    aspectRatio: 3.5,
+                    maintainAspectRatio: false,
                     plugins: { legend: { position: 'top', labels: { boxWidth: 12, padding: 20, font: { size: 14 } } } },
                     scales: { x: { grid: { display: false } }, y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.08)' } } }
                 }
@@ -1128,7 +1128,7 @@ var SPCApp = {
                 },
                 options: {
                     responsive: true,
-                    aspectRatio: 3.5,
+                    maintainAspectRatio: false,
                     plugins: { legend: { position: 'top', labels: { boxWidth: 12, padding: 20, font: { size: 14 } } } },
                     scales: { x: { grid: { display: false } }, y: { grid: { color: 'rgba(0,0,0,0.08)' } } }
                 }

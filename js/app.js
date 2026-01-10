@@ -346,6 +346,7 @@ var SPCApp = {
     },
 
     // Convert QIP Extracted JSON to Virtual Workbook for SPC
+    // Updated to match DataInput standard format (Header row with metadata, Spec row, Data rows)
     loadExtractedData: function (extracted) {
         console.log('Loading extracted data into SPC...', extracted);
         var self = this;
@@ -361,7 +362,7 @@ var SPCApp = {
         // Create a sheet for each batch
         Object.keys(batches).forEach(function (batchName) {
             var items = batches[batchName];
-            // Sort by cavity ID (assuming numeric if possible)
+            // Sort by cavity ID
             items.sort(function (a, b) {
                 var na = parseFloat(a.cavity);
                 var nb = parseFloat(b.cavity);
@@ -369,18 +370,28 @@ var SPCApp = {
                 return a.cavity.localeCompare(b.cavity);
             });
 
-            // Construct AOA (Array of Arrays)
-            // Row 1: Headers (Cavity IDs)
-            // Row 2: Values
-            var headers = items.map(function (i) { return i.cavity; });
+            // 1. Prepare Headers (Row 1)
+            // Format: [BatchName, ProductName, ItemName, Cavity1穴, Cavity2穴...]
+            // DataInput expects '穴' in cavity headers
+            var cavityHeaders = items.map(function (i) { return i.cavity + '穴'; });
+            var row1 = ['Batch No.', extracted.productCode || 'QIP-Product', 'QIP-Data'].concat(cavityHeaders);
+
+            // 2. Prepare Specs (Row 2) - Placeholders
+            // Format: [Label, Target, USL, LSL, ...]
+            // Since we don't have extracted specs, we set them to 0 or empty
+            var row2 = ['Specs', 0, 0, 0]; // Target, USL, LSL at indices 1, 2, 3
+            // Pad remaining layout
+            while (row2.length < row1.length) row2.push('');
+
+            // 3. Prepare Data (Row 3)
+            // Format: [BatchNameStr, ..., ..., Val1, Val2...]
+            // DataInput reads batch name from Col 0
+            // DataInput reads cavity data from columns consistent with Row 1 headers
+            // Cavity starts at index 3 in Row 1.
             var values = items.map(function (i) { return i.value; });
+            var row3 = [batchName, '', ''].concat(values);
 
-            // Add some metadata headers if standard logic expects specific row?
-            // Existing logic in DataInput parses headers (cavity ID) and data. 
-            // Usually assumes Layout: Cavity IDs in one row, Data in subsequent rows.
-            // Let's create a standard clean sheet.
-
-            var aoa = [headers, values];
+            var aoa = [row1, row2, row3];
             var ws = XLSX.utils.aoa_to_sheet(aoa);
             XLSX.utils.book_append_sheet(wb, ws, batchName);
         });
@@ -685,49 +696,74 @@ var SPCApp = {
             var labels = data.cavityStats.map(s => s.name);
             var cpkVal = data.cavityStats.map(s => s.Cpk);
 
+            // Cpk Chart with color coding and rules
             var cpkOpt = {
                 chart: { type: 'bar', height: 350, toolbar: { show: false }, background: 'transparent' },
                 theme: { mode: theme.mode },
                 series: [{ name: 'Cpk', data: cpkVal }],
                 xaxis: { categories: labels, labels: { style: { colors: theme.text } } },
-                colors: ['#4f46e5'],
-                plotOptions: { bar: { borderRadius: 6 } },
-                grid: { borderColor: theme.grid }
+                plotOptions: {
+                    bar: {
+                        borderRadius: 4,
+                        colors: {
+                            ranges: [
+                                { from: 0, to: 1.33, color: '#f43f5e' }, // Red < 1.33
+                                { from: 1.33, to: 1.67, color: '#fbbf24' }, // Yellow 1.33-1.67
+                                { from: 1.67, to: 10, color: '#10b981' } // Green > 1.67
+                            ]
+                        }
+                    }
+                },
+                grid: { borderColor: theme.grid },
+                annotations: {
+                    yaxis: [{
+                        y: 1.33, borderColor: '#f43f5e', label: { borderColor: '#f43f5e', style: { color: '#fff', background: '#f43f5e' }, text: 'Target 1.33' }
+                    }]
+                }
             };
             var chartCpk = new ApexCharts(document.querySelector("#cpkChart"), cpkOpt);
             chartCpk.render(); this.chartInstances.push(chartCpk);
 
+            // Mean Chart
             var meanOpt = {
                 chart: { type: 'line', height: 350, toolbar: { show: false }, background: 'transparent' },
                 theme: { mode: theme.mode },
                 series: [
-                    { name: this.t('平均值', 'Mean'), data: data.cavityStats.map(s => s.mean) },
-                    { name: 'USL', data: new Array(labels.length).fill(data.specs.usl) },
-                    { name: 'LSL', data: new Array(labels.length).fill(data.specs.lsl) }
+                    { name: 'Mean', data: data.cavityStats.map(s => s.mean), type: 'bar' },
+                    { name: 'USL', data: new Array(labels.length).fill(data.specs.usl), type: 'line' },
+                    { name: 'LSL', data: new Array(labels.length).fill(data.specs.lsl), type: 'line' }
                 ],
-                colors: ['#007bff', '#dc3545', '#dc3545'],
+                colors: ['#4f46e5', '#ef4444', '#ef4444'],
+                stroke: { width: [0, 2, 2], dashArray: [0, 5, 5] }, // Bar has 0 width stroke
                 xaxis: { categories: labels, labels: { style: { colors: theme.text } } },
-                grid: { borderColor: theme.grid }
+                grid: { borderColor: theme.grid },
+                plotOptions: { bar: { columnWidth: '50%', borderRadius: 4 } }
             };
             var chartMean = new ApexCharts(document.querySelector("#meanChart"), meanOpt);
             chartMean.render(); this.chartInstances.push(chartMean);
 
+            // StdDev Chart (Bar for better comparison)
             var stdOpt = {
-                chart: { type: 'line', height: 350, toolbar: { show: false }, background: 'transparent' },
+                chart: { type: 'bar', height: 350, toolbar: { show: false }, background: 'transparent' },
                 theme: { mode: theme.mode },
                 series: [
                     { name: 'Overall σ', data: data.cavityStats.map(s => s.overallStdDev) },
                     { name: 'Within σ', data: data.cavityStats.map(s => s.withinStdDev) }
                 ],
-                colors: ['#dc3545', '#007bff'],
+                colors: ['#f59e0b', '#3b82f6'],
                 xaxis: { categories: labels, labels: { style: { colors: theme.text } } },
-                grid: { borderColor: theme.grid }
+                grid: { borderColor: theme.grid },
+                plotOptions: { bar: { borderRadius: 4, dataLabels: { position: 'top' } } },
+                dataLabels: { enabled: false }
             };
             var chartStd = new ApexCharts(document.querySelector("#stdDevChart"), stdOpt);
             chartStd.render(); this.chartInstances.push(chartStd);
 
         } else if (data.type === 'group') {
             var labels = data.groupStats.map(s => s.batch);
+
+            // Trend Chart: Area for Min-Max could be nice, but Line is safer.
+            // Let's use solid line for Avg, dashed for Min/Max
             var gOpt = {
                 chart: { type: 'line', height: 380, toolbar: { show: false } },
                 theme: { mode: theme.mode },
@@ -736,20 +772,24 @@ var SPCApp = {
                     { name: 'Avg', data: data.groupStats.map(s => s.avg) },
                     { name: 'Min', data: data.groupStats.map(s => s.min) }
                 ],
-                colors: ['#f43f5e', '#4f46e5', '#10b981'],
+                colors: ['#9ca3af', '#4f46e5', '#9ca3af'], // Grey for min/max, Primary for Avg
+                stroke: { width: [1, 3, 1], dashArray: [5, 0, 5], curve: 'smooth' },
                 xaxis: { categories: labels, labels: { style: { colors: theme.text } } },
-                grid: { borderColor: theme.grid }
+                grid: { borderColor: theme.grid },
+                markers: { size: [0, 4, 0] } // Markers only on Avg
             };
             var chartG = new ApexCharts(document.querySelector("#groupChart"), gOpt);
             chartG.render(); this.chartInstances.push(chartG);
 
+            // Variation Chart - Bar Chart is better for magnitude
             var vOpt = {
-                chart: { type: 'line', height: 380, toolbar: { show: false } },
+                chart: { type: 'bar', height: 380, toolbar: { show: false } },
                 theme: { mode: theme.mode },
                 series: [{ name: 'Range', data: data.groupStats.map(s => s.range) }],
                 colors: ['#8b5cf6'],
                 xaxis: { categories: labels, labels: { style: { colors: theme.text } } },
-                grid: { borderColor: theme.grid }
+                grid: { borderColor: theme.grid },
+                plotOptions: { bar: { borderRadius: 2 } }
             };
             var chartV = new ApexCharts(document.querySelector("#groupVarChart"), vOpt);
             chartV.render(); this.chartInstances.push(chartV);

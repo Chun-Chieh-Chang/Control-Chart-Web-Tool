@@ -615,7 +615,7 @@ var SPCApp = {
 
         var colWidths = {
             label: 60,
-            batch: 80,     // 生產批號欄位寬度
+            batch: 70,     // 生產批號欄位寬度
             summary: 30    // 彙總基礎欄寬 (總寬度 = 30 * 4 = 120px)
         };
         // Calculate total width explicitly to force horizontal scrolling
@@ -676,10 +676,10 @@ var SPCApp = {
             }
 
             // Sidebar summary on first few rows
-            if (i === 0) html += '<td colspan="4" rowspan="2" style="border:1px solid #000; padding-left:5px; font-weight:bold; background:#fefefe; font-size:10px;">ΣX̄ = ' + SPCEngine.round(pageXbarR.summary.xBarSum, 4) + '</td>';
-            else if (i === 2) html += '<td colspan="4" rowspan="2" style="border:1px solid #000; padding-left:5px; font-weight:bold; background:#fefefe; font-size:10px;">X̿ = ' + SPCEngine.round(pageXbarR.summary.xDoubleBar, 4) + '</td>';
-            else if (i === 4) html += '<td colspan="4" rowspan="2" style="border:1px solid #000; padding-left:5px; font-weight:bold; background:#fefefe; font-size:10px;">ΣR = ' + SPCEngine.round(pageXbarR.summary.rSum, 4) + '</td>';
-            else if (i === 6) html += '<td colspan="4" rowspan="2" style="border:1px solid #000; padding-left:5px; font-weight:bold; background:#fefefe; font-size:10px;">R̄ = ' + SPCEngine.round(pageXbarR.summary.rBar, 4) + '</td>';
+            if (i === 0) html += '<td colspan="4" rowspan="2" style="border:1px solid #000; text-align:center; font-weight:bold; background:#fefefe; font-size:10px;">ΣX̄ = ' + SPCEngine.round(pageXbarR.summary.xBarSum, 4) + '</td>';
+            else if (i === 2) html += '<td colspan="4" rowspan="2" style="border:1px solid #000; text-align:center; font-weight:bold; background:#fefefe; font-size:10px;">X̿ = ' + SPCEngine.round(pageXbarR.summary.xDoubleBar, 4) + '</td>';
+            else if (i === 4) html += '<td colspan="4" rowspan="2" style="border:1px solid #000; text-align:center; font-weight:bold; background:#fefefe; font-size:10px;">ΣR = ' + SPCEngine.round(pageXbarR.summary.rSum, 4) + '</td>';
+            else if (i === 6) html += '<td colspan="4" rowspan="2" style="border:1px solid #000; text-align:center; font-weight:bold; background:#fefefe; font-size:10px;">R̄ = ' + SPCEngine.round(pageXbarR.summary.rBar, 4) + '</td>';
             else if (i >= 8) html += '<td colspan="4" style="border:1px solid #000; background:#fcfcfc;"></td>';
             html += '</tr>';
         }

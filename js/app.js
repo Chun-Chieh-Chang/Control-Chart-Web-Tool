@@ -846,10 +846,37 @@ var SPCApp = {
             var wsData = [[this.t('模穴分析', 'Cavity Analysis')], ['Cavity', 'Mean', 'Cpk', 'n']];
             data.cavityStats.forEach(s => wsData.push([s.name, s.mean, s.Cpk, s.count]));
             XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(wsData), 'Cavity');
+        } else if (data.type === 'group') {
+            var wsData = [[this.t('群組分析', 'Group Analysis')], ['Batch', 'Max', 'Avg', 'Min', 'Range']];
+            data.groupStats.forEach(function (s) { wsData.push([s.batch, s.max, s.avg, s.min, s.range]); });
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(wsData), 'Group');
         }
 
-        var filename = 'SPC_Report_' + data.type + '.xlsx';
-        XLSX.writeFile(wb, filename);
+        var dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+        var itemStr = (self.selectedItem || data.type).replace(/[:\/\\*?"<>|]/g, '_');
+        var defaultName = 'SPC_Report_' + itemStr + '_' + dateStr + '.xlsx';
+
+        try {
+            if (window.showSaveFilePicker) {
+                var handle = await window.showSaveFilePicker({
+                    suggestedName: defaultName,
+                    types: [{
+                        description: 'Excel Workbook',
+                        accept: { 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.xlsx'] }
+                    }]
+                });
+                var writable = await handle.createWritable();
+                var wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+                await writable.write(wbout);
+                await writable.close();
+                return;
+            }
+        } catch (err) {
+            if (err.name !== 'AbortError') console.error('File save error:', err);
+            else return;
+        }
+
+        XLSX.writeFile(wb, defaultName);
     },
 
     showLoading: function (text) {

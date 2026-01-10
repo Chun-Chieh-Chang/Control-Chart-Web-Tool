@@ -490,6 +490,17 @@ var SPCApp = {
             });
         }
         document.getElementById('downloadExcel').addEventListener('click', function () { self.downloadExcel(); });
+
+        // Recent Files Clear All
+        var clearBtn = document.getElementById('clearRecentBtn');
+        if (clearBtn) {
+            clearBtn.addEventListener('click', function () {
+                var container = this.closest('.saas-card').querySelector('.space-y-4');
+                if (container) {
+                    container.innerHTML = '<div class="text-[10px] text-slate-400 py-4 text-center italic">No recent activities</div>';
+                }
+            });
+        }
     },
 
     executeAnalysis: function (type) {
@@ -887,7 +898,17 @@ var SPCApp = {
 
             // X-Bar Apex Chart
             var xOptions = {
-                chart: { type: 'line', height: 380, toolbar: { show: false }, background: 'transparent' },
+                chart: {
+                    type: 'line',
+                    height: 380,
+                    toolbar: { show: false },
+                    background: 'transparent',
+                    events: {
+                        dataPointSelection: function (event, chartContext, config) {
+                            // Optional click logic
+                        }
+                    }
+                },
                 series: [
                     { name: 'X-Bar', data: pageXbarR.xBar.data },
                     { name: 'UCL', data: new Array(pageLabels.length).fill(pageXbarR.xBar.UCL) },
@@ -897,6 +918,12 @@ var SPCApp = {
                 colors: ['#4f46e5', '#f43f5e', '#10b981', '#f43f5e'],
                 stroke: { width: [3, 1.5, 1.5, 1.5], dashArray: [0, 6, 0, 6], curve: 'straight' },
                 xaxis: { categories: pageLabels, labels: { style: { colors: '#64748b', fontSize: '10px' } } },
+                yaxis: {
+                    labels: {
+                        formatter: function (val) { return val.toFixed(4); },
+                        style: { colors: '#64748b' }
+                    }
+                },
                 tooltip: { y: { formatter: function (val) { return val.toFixed(4); } } },
                 markers: {
                     size: 4,
@@ -917,6 +944,7 @@ var SPCApp = {
             var chartX = new ApexCharts(document.querySelector("#xbarChart"), xOptions);
             chartX.render();
             this.chartInstances.push(chartX);
+            document.querySelector("#xbarChart").addEventListener('dblclick', function () { chartX.resetSeries(); });
 
             // R Apex Chart
             var rOptions = {
@@ -929,43 +957,115 @@ var SPCApp = {
                 colors: ['#64748b', '#f43f5e', '#10b981'],
                 stroke: { width: [2.5, 1, 1], dashArray: [0, 6, 0] },
                 xaxis: { categories: pageLabels, labels: { style: { colors: '#64748b', fontSize: '10px' } } },
+                yaxis: {
+                    labels: {
+                        formatter: function (val) { return val.toFixed(4); },
+                        style: { colors: '#64748b' }
+                    }
+                },
                 tooltip: { y: { formatter: function (val) { return val.toFixed(4); } } }
             };
             var chartR = new ApexCharts(document.querySelector("#rChart"), rOptions);
             chartR.render();
             this.chartInstances.push(chartR);
+            document.querySelector("#rChart").addEventListener('dblclick', function () { chartR.resetSeries(); });
 
             this.renderAnomalySidebar(pageXbarR, pageLabels);
 
         } else if (data.type === 'cavity') {
             var labels = data.cavityStats.map(function (s) { return s.name; });
             var cpkVals = data.cavityStats.map(function (s) { return s.Cpk; });
+            var meanVals = data.cavityStats.map(function (s) { return s.mean; });
+            var stdVals = data.cavityStats.map(function (s) { return s.stdDev; });
+
+            // Cpk Performance Chart
             var cpkOptions = {
                 chart: { type: 'bar', height: 350, toolbar: { show: false } },
                 series: [{ name: 'Cpk', data: cpkVals }],
-                xaxis: { categories: labels, labels: { style: { colors: '#64748b' } } },
-                colors: ['#6366f1'],
-                plotOptions: { bar: { borderRadius: 6, columnWidth: '55%' } },
+                xaxis: { categories: labels, labels: { style: { colors: '#64748b', fontSize: '11px' } } },
+                yaxis: { labels: { formatter: function (v) { return v.toFixed(3); }, style: { colors: '#64748b' } } },
+                colors: ['#4f46e5'],
+                plotOptions: { bar: { borderRadius: 6, columnWidth: '55%', dataLabels: { position: 'top' } } },
+                dataLabels: { enabled: false }, // User requested to hide data point values on bars
                 tooltip: { y: { formatter: function (val) { return val.toFixed(3); } } }
             };
             var chartCpk = new ApexCharts(document.querySelector("#cpkChart"), cpkOptions);
             chartCpk.render();
             this.chartInstances.push(chartCpk);
+            document.querySelector("#cpkChart").addEventListener('dblclick', function () { chartCpk.resetSeries(); });
+
+            // Mean Distribution Chart
+            var meanOpt = {
+                chart: { type: 'bar', height: 350, toolbar: { show: false } },
+                series: [{ name: 'Mean', data: meanVals }],
+                xaxis: { categories: labels, labels: { style: { colors: '#64748b', fontSize: '10px' } } },
+                yaxis: { labels: { formatter: function (v) { return v.toFixed(4); }, style: { colors: '#64748b' } } },
+                colors: ['#10b981'],
+                plotOptions: { bar: { borderRadius: 4, columnWidth: '50%' } },
+                dataLabels: { enabled: false },
+                tooltip: { y: { formatter: function (val) { return val.toFixed(4); } } }
+            };
+            var chartMean = new ApexCharts(document.querySelector("#meanChart"), meanOpt);
+            chartMean.render();
+            this.chartInstances.push(chartMean);
+            document.querySelector("#meanChart").addEventListener('dblclick', function () { chartMean.resetSeries(); });
+
+            // StdDev Distribution Chart
+            var stdOpt = {
+                chart: { type: 'bar', height: 350, toolbar: { show: false } },
+                series: [{ name: 'StdDev', data: stdVals }],
+                xaxis: { categories: labels, labels: { style: { colors: '#64748b', fontSize: '10px' } } },
+                yaxis: { labels: { formatter: function (v) { return v.toFixed(4); }, style: { colors: '#64748b' } } },
+                colors: ['#f59e0b'],
+                plotOptions: { bar: { borderRadius: 4, columnWidth: '50%' } },
+                dataLabels: { enabled: false },
+                tooltip: { y: { formatter: function (val) { return val.toFixed(4); } } }
+            };
+            var chartStd = new ApexCharts(document.querySelector("#stdDevChart"), stdOpt);
+            chartStd.render();
+            this.chartInstances.push(chartStd);
+            document.querySelector("#stdDevChart").addEventListener('dblclick', function () { chartStd.resetSeries(); });
 
         } else if (data.type === 'group') {
             var labels = data.groupStats.map(function (s) { return s.batch; });
             var avgVals = data.groupStats.map(function (s) { return s.avg; });
+            var rangeVals = data.groupStats.map(function (s) { return s.range; });
+            var minVals = data.groupStats.map(function (s) { return s.min; });
+            var maxVals = data.groupStats.map(function (s) { return s.max; });
+
+            // Group Trend Chart - Use Line Chart as requested
             var gOptions = {
-                chart: { type: 'area', height: 380, toolbar: { show: false } },
-                series: [{ name: 'Average', data: avgVals }],
+                chart: { type: 'line', height: 380, toolbar: { show: false } },
+                series: [
+                    { name: 'Max', data: maxVals },
+                    { name: 'Average', data: avgVals },
+                    { name: 'Min', data: minVals }
+                ],
+                colors: ['#f43f5e', '#4f46e5', '#10b981'],
+                stroke: { width: [1, 3, 1], curve: 'straight' },
                 xaxis: { categories: labels, labels: { style: { colors: '#64748b', fontSize: '10px' } } },
-                stroke: { curve: 'smooth', width: 2 },
-                fill: { type: 'gradient', gradient: { shadeIntensity: 1, opacityFrom: 0.45, opacityTo: 0.05 } },
+                yaxis: { labels: { formatter: function (v) { return v.toFixed(4); }, style: { colors: '#64748b' } } },
                 tooltip: { y: { formatter: function (val) { return val.toFixed(4); } } }
             };
             var chartG = new ApexCharts(document.querySelector("#groupChart"), gOptions);
             chartG.render();
             this.chartInstances.push(chartG);
+            document.querySelector("#groupChart").addEventListener('dblclick', function () { chartG.resetSeries(); });
+
+            // Inter-Cavity Variation (Range) - Use Line Chart as requested
+            var vOptions = {
+                chart: { type: 'line', height: 380, toolbar: { show: false } },
+                series: [{ name: 'Range', data: rangeVals }],
+                colors: ['#8b5cf6'],
+                stroke: { width: 3, curve: 'straight' },
+                xaxis: { categories: labels, labels: { style: { colors: '#64748b', fontSize: '10px' } } },
+                yaxis: { labels: { formatter: function (v) { return v.toFixed(4); }, style: { colors: '#64748b' } } },
+                tooltip: { y: { formatter: function (val) { return val.toFixed(4); } } }
+            };
+            var chartV = new ApexCharts(document.querySelector("#groupVarChart"), vOptions);
+            chartV.render();
+            this.chartInstances.push(chartV);
+            document.querySelector("#groupVarChart").addEventListener('dblclick', function () { chartV.resetSeries(); });
         }
     },
 

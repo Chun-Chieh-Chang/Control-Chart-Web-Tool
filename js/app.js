@@ -158,7 +158,7 @@ var SPCApp = {
             return;
         }
 
-        body.innerHTML = this.history.map(function (h) {
+        body.innerHTML = this.history.map(function (h, index) {
             var d = new Date(h.time);
             var dateStr = d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
             return '<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">' +
@@ -169,7 +169,7 @@ var SPCApp = {
                 '<td class="px-6 py-4 text-xs font-mono text-slate-500">' + h.item + '</td>' +
                 '<td class="px-6 py-4 text-xs text-slate-500">' + dateStr + '</td>' +
                 '<td class="px-6 py-4 text-center">' +
-                '<button class="text-primary hover:text-indigo-700 font-bold text-xs">View Log</button>' +
+                '<button class="text-primary hover:text-indigo-700 font-bold text-xs view-log-btn" data-index="' + index + '">View Log</button>' +
                 '</td>' +
                 '</tr>';
         }).join('');
@@ -266,6 +266,20 @@ var SPCApp = {
             var el = document.getElementById(id);
             if (el) el.addEventListener('click', function (e) { e.preventDefault(); self.switchView(id.replace('nav-', '')); });
         });
+
+        // Event Delegation for History 'View Log'
+        var historyBody = document.getElementById('historyTableBody');
+        if (historyBody) {
+            historyBody.addEventListener('click', function (e) {
+                if (e.target.classList.contains('view-log-btn')) {
+                    var idx = parseInt(e.target.dataset.index);
+                    var entry = self.history[idx];
+                    if (entry) {
+                        alert("Log Details:\n\nFile: " + entry.name + "\nAnalysis: " + entry.type + "\nItem: " + entry.item + "\nTimestamp: " + entry.time);
+                    }
+                }
+            });
+        }
 
         this.setupSearch();
         this.setupDarkModeToggle();
@@ -852,7 +866,9 @@ var SPCApp = {
             XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(wsData), 'Group');
         }
 
-        var defaultName = 'SPC_Report_' + data.type + '.xlsx';
+        var dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+        var itemStr = (self.selectedItem || 'Data').replace(/[:\/\\*?"<>|]/g, '_');
+        var defaultName = 'SPC_Report_' + itemStr + '_' + data.type + '_' + dateStr + '.xlsx';
 
         try {
             if (window.showSaveFilePicker) {

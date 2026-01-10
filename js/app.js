@@ -315,10 +315,10 @@ var SPCApp = {
 
     switchView: function (viewId) {
         var self = this;
-        var viewMap = { 'dashboard': 'view-import', 'import': 'view-import', 'analysis': 'view-analysis', 'history': 'view-history', 'qip-extract': 'view-qip-extract', 'settings': 'view-import' };
+        var viewMap = { 'dashboard': 'view-import', 'import': 'view-import', 'analysis': 'view-analysis', 'history': 'view-history', 'qip-extract': 'view-qip-extract', 'nelson': 'view-nelson', 'settings': 'view-import' };
         var targetId = viewMap[viewId] || 'view-import';
 
-        ['view-import', 'view-analysis', 'view-history', 'view-qip-extract'].forEach(function (id) {
+        ['view-import', 'view-analysis', 'view-history', 'view-qip-extract', 'view-nelson'].forEach(function (id) {
             var el = document.getElementById(id);
             if (el) el.classList.add('hidden');
         });
@@ -914,11 +914,46 @@ var SPCApp = {
             list.innerHTML = '<div class="text-center text-slate-500 mt-10 px-6">' + this.t('本頁數據全數受控', 'All points within control limits.') + '</div>';
             return;
         }
+
+        var nelsonExpertise = {
+            1: { m: "突發異常：異物阻塞射嘴、加熱圈燒毀、模具未鎖緊。", q: "非機遇原因介入 (0.3%)，需立即隔離全檢。" },
+            2: { m: "製程漂移：原料批次變更、模溫水路積垢、油溫未熱平衡。", q: "平均值移動，Cpk 將下降，建議預防性調整。" },
+            3: { m: "漸進變化：頂針/滑塊/止逆環磨損、溫控失效。", q: "強烈失控預兆 (Trend)，應立即預防保養(PM)。" },
+            4: { m: "人為過度干預：頻繁調整保壓/背壓，或液壓不穩。", q: "負自相關 (Oscillation)，請停止微調 (Hands Off)。" },
+            5: { m: "製程設定改變：冷卻時間或週期不穩。", q: "中等程度的製程偏移傾向 (2/3 > 2σ)。" },
+            6: { m: "製程不穩定：原料混合不均或計量不穩。", q: "小幅度的連續偏移 (4/5 > 1σ)。" },
+            7: { m: "分層現象：多模穴流動平衡不佳。", q: "數據過於集中 (Hugging Center)，可能變異數估算錯誤。" },
+            8: { m: "混合分佈：兩台機器混料或雙模穴差異大。", q: "雙峰分佈 (Mixture)，避開了中心區域。" }
+        };
+
         violations.forEach(function (v) {
+            var ruleId = v.rules[0];
+            var exp = nelsonExpertise[ruleId] || { m: "請檢查製程參數。", q: "請參考標準作業程序。" };
+
             var card = document.createElement('div');
-            card.className = 'bg-white dark:bg-slate-800 border p-4 rounded-xl mb-3 mx-4';
-            card.innerHTML = '<div class="text-sm font-bold dark:text-white">' + (pageLabels[v.index] || 'Batch') + '</div>' +
-                '<div class="text-[10px] text-rose-500 uppercase font-bold">' + v.rules.map(r => 'Rule ' + r).join(', ') + '</div>';
+            card.className = 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-4 rounded-xl mb-3 mx-4 group relative cursor-help hover:border-rose-400 dark:hover:border-rose-500 transition-colors shadow-sm';
+
+            var rulesText = v.rules.map(function (r) { return 'Rule ' + r; }).join(', ');
+
+            card.innerHTML = '<div class="flex justify-between items-start mb-1">' +
+                '<div class="text-sm font-bold text-slate-900 dark:text-white">' + (pageLabels[v.index] || 'Batch') + '</div>' +
+                '<div class="text-xs font-bold text-rose-500 bg-rose-50 dark:bg-rose-900/30 px-2 py-0.5 rounded-full">' + rulesText + '</div>' +
+                '</div>' +
+                '<div class="text-xs text-slate-500 dark:text-slate-400">Index: ' + (v.index + 1) + '</div>' +
+
+                '<div class="absolute right-full top-0 mr-2 w-72 bg-slate-900 text-white text-xs rounded-xl p-4 shadow-xl opacity-0 group-hover:opacity-100 transition-all duration-200 z-50 pointer-events-none translate-x-2 group-hover:translate-x-0">' +
+                '<div class="font-bold text-base mb-2 border-b border-slate-700 pb-2">Nelson Rule ' + ruleId + '</div>' +
+                '<div class="mb-3">' +
+                '<div class="flex items-center gap-2 text-sky-400 font-bold mb-1"><span class="material-icons-outlined text-sm">precision_manufacturing</span> 成型專家</div>' +
+                '<div class="text-slate-300 leading-relaxed">' + exp.m + '</div>' +
+                '</div>' +
+                '<div>' +
+                '<div class="flex items-center gap-2 text-emerald-400 font-bold mb-1"><span class="material-icons-outlined text-sm">assignment_turned_in</span> 品管專家</div>' +
+                '<div class="text-slate-300 leading-relaxed">' + exp.q + '</div>' +
+                '</div>' +
+                '<div class="absolute top-6 -right-1.5 w-3 h-3 bg-slate-900 transform rotate-45"></div>' +
+                '</div>';
+
             list.appendChild(card);
         });
     },

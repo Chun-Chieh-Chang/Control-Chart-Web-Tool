@@ -497,10 +497,10 @@ var SPCApp = {
                 '<div class="saas-card p-8"> <h3 class="text-base font-bold mb-6 dark:text-white">' + this.t('R 管制圖', 'R Chart') + '</h3> <div id="rChart" class="h-80"></div> </div> </div>';
         } else if (data.type === 'cavity') {
             html = '<div class="grid grid-cols-1 gap-8">' +
-                '<div class="saas-card p-8"> <h3 class="text-base font-bold mb-6 dark:text-white">' + this.t('模穴 Cpk 效能比較', 'Cavity Cpk') + '</h3> <div id="cpkChart" class="h-96"></div> </div>' +
+                '<div class="saas-card p-8"> <h3 class="text-base font-bold mb-6 dark:text-white">' + this.t('模穴 Cpk 比較', 'Cavity Cpk Comparison') + '</h3> <div class="relative w-full" style="height:400px"><canvas id="cavityCpkChart"></canvas></div> </div>' +
                 '<div class="grid grid-cols-1 md:grid-cols-2 gap-6">' +
-                '<div class="saas-card p-8"> <h3 class="text-base font-bold mb-6 dark:text-white">' + this.t('均值比較', 'Mean Comp') + '</h3> <div id="meanChart" class="h-80"></div> </div>' +
-                '<div class="saas-card p-8"> <h3 class="text-base font-bold mb-6 dark:text-white">' + this.t('標差比較', 'StdDev Comp') + '</h3> <div id="stdDevChart" class="h-80"></div> </div> </div>' +
+                '<div class="saas-card p-8"> <h3 class="text-base font-bold mb-6 dark:text-white">' + this.t('模穴平均值比較', 'Cavity Mean Comparison') + '</h3> <div class="relative w-full" style="height:350px"><canvas id="cavityMeanChart"></canvas></div> </div>' +
+                '<div class="saas-card p-8"> <h3 class="text-base font-bold mb-6 dark:text-white">' + this.t('模穴標準差比較', 'Cavity Standard Deviation Comparison') + '</h3> <div class="relative w-full" style="height:350px"><canvas id="cavityStdDevChart"></canvas></div> </div> </div>' +
                 '<div class="saas-card overflow-hidden"> <div class="p-6 border-b dark:border-slate-700"> <h3 class="text-base font-bold dark:text-white">' + this.t('數據明細', 'Details') + '</h3> </div>' +
                 '<table class="w-full text-sm text-left"> <thead class="text-xs text-slate-400 bg-slate-50/50 dark:bg-slate-700/50 uppercase"> <tr><th class="px-6 py-3">Name</th><th class="px-6 py-3 text-center">Mean</th><th class="px-6 py-3 text-center">Cpk</th><th class="px-6 py-3 text-center">n</th></tr> </thead>' +
                 '<tbody class="divide-y dark:divide-slate-700">' + data.cavityStats.map(function (s) {
@@ -509,8 +509,8 @@ var SPCApp = {
                 }).join('') + '</tbody> </table> </div> </div>';
         } else if (data.type === 'group') {
             html = '<div class="grid grid-cols-1 gap-8">' +
-                '<div class="saas-card p-8"> <h3 class="text-base font-bold mb-6 dark:text-white">' + this.t('群組趨勢 (Min-Max-Avg)', 'Trend') + '</h3> <div id="groupChart" class="h-96"></div> </div>' +
-                '<div class="saas-card p-8"> <h3 class="text-base font-bold mb-6 dark:text-white">' + this.t('組間全距 (Variation)', 'Variation') + '</h3> <div id="groupVarChart" class="h-96"></div> </div> </div>';
+                '<div class="saas-card p-8"> <h3 class="text-base font-bold mb-6 dark:text-white">' + this.t('Min-Max-Avg 管制圖', 'Min-Max-Avg Control Chart') + '</h3> <div class="relative w-full" style="height:400px"><canvas id="groupMinMaxAvgChart"></canvas></div> </div>' +
+                '<div class="saas-card p-8"> <h3 class="text-base font-bold mb-6 dark:text-white">' + this.t('全距 (Range) 圖 - 模穴間變異', 'Range Chart - Inter-Cavity Variation') + '</h3> <div class="relative w-full" style="height:400px"><canvas id="groupRangeChart"></canvas></div> </div> </div>';
         }
 
         resultsContent.innerHTML = html;
@@ -694,112 +694,132 @@ var SPCApp = {
 
         } else if (data.type === 'cavity') {
             var labels = data.cavityStats.map(s => s.name);
-            var cpkVal = data.cavityStats.map(s => s.Cpk);
+            var specs = data.specs;
+            var cavityStats = data.cavityStats;
 
-            // 1. Cpk Comparison Chart (Matches VBA + Old Chart.js color scheme)
-            var cpkOpt = {
-                chart: { type: 'bar', height: 350, toolbar: { show: false }, background: 'transparent' },
-                theme: { mode: theme.mode },
-                series: [{ name: 'Cpk', data: cpkVal }],
-                xaxis: { categories: labels, labels: { style: { colors: theme.text } } },
-                plotOptions: {
-                    bar: {
-                        borderRadius: 4,
-                        colors: {
-                            ranges: [
-                                { from: 0, to: 0.999, color: '#ef4444' },     // Red-500 < 1.0
-                                { from: 1.0, to: 1.329, color: '#f59e0b' },   // Amber-500 1.0 - 1.33
-                                { from: 1.33, to: 1.669, color: '#10b981' },  // Emerald-500 1.33 - 1.67
-                                { from: 1.67, to: 99, color: '#10b981' }      // Emerald-500 > 1.67
-                            ]
-                        }
-                    }
-                },
-                grid: { borderColor: theme.grid },
-                annotations: {
-                    yaxis: [
-                        { y: 1.0, borderColor: '#f59e0b', strokeDashArray: 4, label: { text: '1.0' } },
-                        { y: 1.33, borderColor: '#10b981', strokeDashArray: 4, label: { text: '1.33' } },
-                        { y: 1.67, borderColor: '#10b981', strokeDashArray: 4, label: { text: '1.67' } }
+            // 1. Mean Chart
+            var ctxMean = document.getElementById('cavityMeanChart').getContext('2d');
+            this.chartInstances.push(new Chart(ctxMean, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        { label: self.t('平均值', 'Mean'), data: cavityStats.map(s => s.mean), borderColor: '#3b82f6', backgroundColor: '#3b82f6', pointRadius: 6, pointHoverRadius: 8, borderWidth: 2 },
+                        { label: self.t('目標值', 'Target'), data: Array(labels.length).fill(specs.target), borderColor: '#10b981', borderWidth: 2, pointRadius: 0, fill: false },
+                        { label: 'USL', data: Array(labels.length).fill(specs.usl), borderColor: '#ef4444', borderDash: [5, 5], borderWidth: 2, pointRadius: 0, fill: false },
+                        { label: 'LSL', data: Array(labels.length).fill(specs.lsl), borderColor: '#ef4444', borderDash: [5, 5], borderWidth: 2, pointRadius: 0, fill: false }
                     ]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { position: 'top' } },
+                    scales: {
+                        y: { title: { display: true, text: self.t('平均值', 'Mean Value') } },
+                        x: { title: { display: true, text: self.t('模穴', 'Cavity') } }
+                    }
                 }
-            };
-            var chartCpk = new ApexCharts(document.querySelector("#cpkChart"), cpkOpt);
-            chartCpk.render(); this.chartInstances.push(chartCpk);
+            }));
 
-            // 2. Mean Comparison Chart (Visual match to old Chart.js)
-            var meanOpt = {
-                chart: { type: 'line', height: 350, toolbar: { show: false }, background: 'transparent' },
-                theme: { mode: theme.mode },
-                series: [
-                    { name: 'Mean', data: data.cavityStats.map(s => s.mean) },
-                    { name: 'Target', data: new Array(labels.length).fill(data.specs.target) },
-                    { name: 'USL', data: new Array(labels.length).fill(data.specs.usl) },
-                    { name: 'LSL', data: new Array(labels.length).fill(data.specs.lsl) }
-                ],
-                colors: ['#3b82f6', '#10b981', '#ef4444', '#ef4444'], // Blue-500, Emerald-500, Red-500
-                stroke: { width: [3, 2, 2, 2], dashArray: [0, 0, 5, 5] },
-                markers: { size: [4, 0, 0, 0], hover: { size: 6 } },
-                xaxis: { categories: labels, labels: { style: { colors: theme.text } } },
-                grid: { borderColor: theme.grid }
-            };
-            var chartMean = new ApexCharts(document.querySelector("#meanChart"), meanOpt);
-            chartMean.render(); this.chartInstances.push(chartMean);
+            // 2. Cpk Chart
+            var cpkColors = cavityStats.map(s => {
+                if (s.Cpk >= 1.67) return '#10b981';
+                if (s.Cpk >= 1.33) return '#10b981';
+                if (s.Cpk >= 1.0) return '#f59e0b';
+                return '#ef4444';
+            });
 
-            // 3. StdDev Comparison Chart (Visual match to old Chart.js)
-            var stdOpt = {
-                chart: { type: 'line', height: 350, toolbar: { show: false }, background: 'transparent' },
-                theme: { mode: theme.mode },
-                series: [
-                    { name: 'Within σ', data: data.cavityStats.map(s => s.withinStdDev) },
-                    { name: 'Overall σ', data: data.cavityStats.map(s => s.overallStdDev) }
-                ],
-                colors: ['#3b82f6', '#ef4444'], // Blue-500, Red-500
-                stroke: { width: 3 },
-                markers: { size: 4, shape: ['circle', 'rect'] },
-                xaxis: { categories: labels, labels: { style: { colors: theme.text } } },
-                grid: { borderColor: theme.grid }
-            };
-            var chartStd = new ApexCharts(document.querySelector("#stdDevChart"), stdOpt);
-            chartStd.render(); this.chartInstances.push(chartStd);
+            var ctxCpk = document.getElementById('cavityCpkChart').getContext('2d');
+            this.chartInstances.push(new Chart(ctxCpk, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        { label: 'Cpk', data: cavityStats.map(s => s.Cpk), backgroundColor: cpkColors, borderColor: cpkColors, borderWidth: 1 },
+                        { label: self.t('優異 (1.67)', 'Excellent (1.67)'), data: Array(labels.length).fill(1.67), type: 'line', borderColor: '#10b981', borderDash: [5, 5], borderWidth: 2, pointRadius: 0 },
+                        { label: self.t('良好 (1.33)', 'Good (1.33)'), data: Array(labels.length).fill(1.33), type: 'line', borderColor: '#f59e0b', borderDash: [5, 5], borderWidth: 2, pointRadius: 0 },
+                        { label: self.t('可接受 (1.0)', 'Acceptable (1.0)'), data: Array(labels.length).fill(1.0), type: 'line', borderColor: '#ef4444', borderDash: [5, 5], borderWidth: 2, pointRadius: 0 }
+                    ]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { position: 'top' } },
+                    scales: {
+                        y: { beginAtZero: true, title: { display: true, text: 'Cpk' } },
+                        x: { title: { display: true, text: self.t('模穴', 'Cavity') } }
+                    }
+                }
+            }));
+
+            // 3. StdDev Chart
+            var ctxStd = document.getElementById('cavityStdDevChart').getContext('2d');
+            this.chartInstances.push(new Chart(ctxStd, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        { label: self.t('組內標準差', 'Within StdDev'), data: cavityStats.map(s => s.withinStdDev), borderColor: '#3b82f6', backgroundColor: '#3b82f6', pointRadius: 5, borderWidth: 2 },
+                        { label: self.t('整體標準差', 'Overall StdDev'), data: cavityStats.map(s => s.overallStdDev), borderColor: '#ef4444', backgroundColor: '#ef4444', pointRadius: 5, borderWidth: 2 }
+                    ]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { position: 'top' } },
+                    scales: {
+                        y: { beginAtZero: true, title: { display: true, text: self.t('標準差', 'Standard Deviation') } },
+                        x: { title: { display: true, text: self.t('模穴', 'Cavity') } }
+                    }
+                }
+            }));
 
         } else if (data.type === 'group') {
             var labels = data.groupStats.map(s => s.batch);
+            var specs = data.specs;
+            var groupStats = data.groupStats;
 
-            // 4. Group Trend Chart (Visual match to old Chart.js)
-            var gOpt = {
-                chart: { type: 'line', height: 380, toolbar: { show: false } },
-                theme: { mode: theme.mode },
-                series: [
-                    { name: 'Max', data: data.groupStats.map(s => s.max) },
-                    { name: 'Avg', data: data.groupStats.map(s => s.avg) },
-                    { name: 'Min', data: data.groupStats.map(s => s.min) },
-                    { name: 'USL', data: new Array(labels.length).fill(data.specs.usl) },
-                    { name: 'Target', data: new Array(labels.length).fill(data.specs.target) },
-                    { name: 'LSL', data: new Array(labels.length).fill(data.specs.lsl) }
-                ],
-                colors: ['#ef4444', '#3b82f6', '#ef4444', '#ff9800', '#10b981', '#ff9800'], // Red, Blue, Red, Orange, Emerald, Orange
-                stroke: { width: [1.5, 3, 1.5, 2, 2, 2], dashArray: [0, 0, 0, 5, 0, 5] },
-                markers: { size: [0, 4, 0, 0, 0, 0], colors: ['#3b82f6'], strokeColors: '#fff' },
-                xaxis: { categories: labels, labels: { style: { colors: theme.text } } },
-                grid: { borderColor: theme.grid }
-            };
-            var chartG = new ApexCharts(document.querySelector("#groupChart"), gOpt);
-            chartG.render(); this.chartInstances.push(chartG);
+            // 4. Min-Max-Avg Chart
+            var ctxGroup = document.getElementById('groupMinMaxAvgChart').getContext('2d');
+            this.chartInstances.push(new Chart(ctxGroup, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        { label: self.t('最大值 (Max)', 'Max'), data: groupStats.map(s => s.max), borderColor: '#ef4444', backgroundColor: 'transparent', pointRadius: 0, borderWidth: 1.5, fill: false },
+                        { label: self.t('平均值 (Avg)', 'Avg'), data: groupStats.map(s => s.avg), borderColor: '#3b82f6', backgroundColor: '#3b82f6', pointRadius: 5, pointHoverRadius: 7, borderWidth: 2.5, fill: false },
+                        { label: self.t('最小值 (Min)', 'Min'), data: groupStats.map(s => s.min), borderColor: '#ef4444', backgroundColor: 'transparent', pointRadius: 0, borderWidth: 1.5, fill: false },
+                        { label: 'USL', data: Array(labels.length).fill(specs.usl), borderColor: '#ff9800', borderDash: [5, 5], borderWidth: 2, pointRadius: 0, fill: false },
+                        { label: 'Target', data: Array(labels.length).fill(specs.target), borderColor: '#10b981', borderWidth: 1.5, pointRadius: 0, fill: false },
+                        { label: 'LSL', data: Array(labels.length).fill(specs.lsl), borderColor: '#ff9800', borderDash: [5, 5], borderWidth: 2, pointRadius: 0, fill: false }
+                    ]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { position: 'top', labels: { font: { size: 12 } } } },
+                    scales: {
+                        y: { title: { display: true, text: self.t('測量值', 'Measurement Value'), font: { size: 14, weight: 'bold' } } },
+                        x: { title: { display: true, text: self.t('生產批號', 'Batch Number'), font: { size: 14, weight: 'bold' } } }
+                    }
+                }
+            }));
 
-            // 5. Variation Chart (Visual match to old Chart.js)
-            var vOpt = {
-                chart: { type: 'line', height: 380, toolbar: { show: false } },
-                theme: { mode: theme.mode },
-                series: [{ name: 'Range', data: data.groupStats.map(s => s.range) }],
-                colors: ['#8b5cf6'], // Violet-500
-                stroke: { width: 2 },
-                markers: { size: 4, shape: 'square' },
-                xaxis: { categories: labels, labels: { style: { colors: theme.text } } },
-                grid: { borderColor: theme.grid }
-            };
-            var chartV = new ApexCharts(document.querySelector("#groupVarChart"), vOpt);
-            chartV.render(); this.chartInstances.push(chartV);
+            // 5. Variation Chart
+            var ctxVar = document.getElementById('groupRangeChart').getContext('2d');
+            this.chartInstances.push(new Chart(ctxVar, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        { label: self.t('全距 (模穴間變異)', 'Range (Inter-Cavity Variation)'), data: groupStats.map(s => s.range), borderColor: '#8b5cf6', backgroundColor: '#8b5cf6', pointRadius: 5, pointHoverRadius: 7, borderWidth: 2, fill: false }
+                    ]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { position: 'top' } },
+                    scales: {
+                        y: { beginAtZero: true, title: { display: true, text: self.t('全距 (Range)', 'Range'), font: { size: 14, weight: 'bold' } } },
+                        x: { title: { display: true, text: self.t('生產批號', 'Batch Number'), font: { size: 14, weight: 'bold' } } }
+                    }
+                }
+            }));
         }
     },
 

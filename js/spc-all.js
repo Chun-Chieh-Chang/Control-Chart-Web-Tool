@@ -644,15 +644,15 @@ var SPCApp = {
 
         rows.forEach(function (r) {
             html += '<tr>' +
-                '<td colspan="2" style="border:1px solid #000; padding:1px 1px; font-weight:bold; background:#f9fafb;">' + r.l1 + '</td>' +
+                '<td colspan="2" style="border:1px solid #000; padding:1px 1px; font-weight:bold; background:#f9fafb; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;">' + r.l1 + '</td>' +
                 '<td colspan="7" style="border:1px solid #000; padding:1px 1px; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;">' + r.v1 + '</td>' +
-                '<td colspan="2" style="border:1px solid #000; padding:1px 1px; font-weight:bold; background:#f9fafb;">' + r.l2 + '</td>' +
-                '<td colspan="2" style="border:1px solid #000; padding:1px 1px;">' + r.v2 + '</td>' +
-                '<td colspan="2" style="border:1px solid #000; padding:1px 1px; font-weight:bold; background:#f9fafb;">' + r.l3 + '</td>' +
-                '<td colspan="3" style="border:1px solid #000; padding:1px 1px;">' + r.v3 + '</td>' +
-                '<td colspan="3" style="border:1px solid #000; padding:1px 1px;">' + (r.v4 || '') + '</td>' +
-                '<td colspan="2" style="border:1px solid #000; padding:1px 1px; font-weight:bold; background:#f9fafb;">' + (r.l4 || '') + '</td>' +
-                '<td colspan="7" style="border:1px solid #000; padding:1px 1px;">' + (r.v4_val || '') + '</td>' +
+                '<td colspan="2" style="border:1px solid #000; padding:1px 1px; font-weight:bold; background:#f9fafb; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;">' + r.l2 + '</td>' +
+                '<td colspan="2" style="border:1px solid #000; padding:1px 1px; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;">' + r.v2 + '</td>' +
+                '<td colspan="2" style="border:1px solid #000; padding:1px 1px; font-weight:bold; background:#f9fafb; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;">' + r.l3 + '</td>' +
+                '<td colspan="3" style="border:1px solid #000; padding:1px 1px; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;">' + r.v3 + '</td>' +
+                '<td colspan="3" style="border:1px solid #000; padding:1px 1px; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;">' + (r.v4 || '') + '</td>' +
+                '<td colspan="2" style="border:1px solid #000; padding:1px 1px; font-weight:bold; background:#f9fafb; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;">' + (r.l4 || '') + '</td>' +
+                '<td colspan="7" style="border:1px solid #000; padding:1px 1px; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;">' + (r.v4_val || '') + '</td>' +
                 '</tr>';
         });
 
@@ -660,10 +660,10 @@ var SPCApp = {
         html += '<tr style="background:#e5e7eb; font-weight:bold;">' +
             '<td style="border:1px solid #000; text-align:center;">批號</td>';
         pageLabels.forEach(function (name) {
-            html += '<td style="border:1px solid #000; text-align:center; height:35px; overflow:hidden; font-size:10px; white-space:nowrap; text-overflow:ellipsis;">' + name + '</td>';
+            html += '<td style="border:1px solid #000; text-align:center; height:35px; overflow:hidden; font-size:10px; white-space:nowrap; text-overflow:ellipsis; width:' + colWidths.batch + 'px; max-width:' + colWidths.batch + 'px;">' + name + '</td>';
         });
         // Fill empty if less than 25 batches
-        for (var f = pageLabels.length; f < 25; f++) html += '<td style="border:1px solid #000;"></td>';
+        for (var f = pageLabels.length; f < 25; f++) html += '<td style="border:1px solid #000; width:' + colWidths.batch + 'px; max-width:' + colWidths.batch + 'px;"></td>';
 
         html += '<td colspan="4" style="border:1px solid #000; text-align:center;">彙總</td></tr>';
 

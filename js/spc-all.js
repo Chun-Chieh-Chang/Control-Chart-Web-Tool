@@ -615,8 +615,8 @@ var SPCApp = {
 
         var colWidths = {
             label: 60,
-            batch: 100,    // 生產批號欄位寬度 (獨立調整)
-            summary: 120   // 彙總欄位寬度 (獨立調整，一次控制4欄)
+            batch: 80,     // 生產批號欄位寬度
+            summary: 30    // 彙總基礎欄寬 (總寬度 = 30 * 4 = 120px)
         };
         // Calculate total width explicitly to force horizontal scrolling
         // Total = Label(1) + Batch(25) + Summary(4)

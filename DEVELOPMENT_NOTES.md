@@ -99,3 +99,26 @@ Addressed visual layout issues in analysis results and clarified statistical ter
     *   **Upgrade**: Converted 'Cavity' and 'Group' analysis tables to use the new "Glassmorphism DataGrid" style (Tailwind CSS), matching the main UI's aesthetic (Dark mode, transparent borders, zebra striping).
     *   **Visual Cues**: Added color-coded badges (Green/Yellow/Red) for Cpk values to instantly indicate process capability levels.
 
+
+## 2026-01-10: 全局搜尋與深色模式同步實作 (Global Search & Dark Mode Sync)
+
+### 1. 全局搜尋實作 (Global Search)
+實作了一套基於客戶端的即時搜尋機制，優化用戶在大量數據中的操作體驗。
+- **偵聽機制**: 監聽導航欄 `#globalSearch` 的 `input` 事件，實現即時過濾（Real-time filtering）。
+- **過濾對象**:
+    - **檢驗項目卡片**: 過濾 `Step 2` 中的動態生成卡片，根據 Sheet 名稱隱藏/顯示。
+    - **歷史紀錄紀錄**: 過濾歷史視圖中的表格行。
+- **技術細節**: 使用 `textContent.toLowerCase().includes(term)` 進行模糊比對，確保搜尋不分大小寫且反應迅速。
+
+### 2. 深色模式同步與主題視覺修正
+解決了強大 SaaS 背景下，圖表與表格組件在切換主題時的顯示異常。
+- **圖表即時重繪 (Chart Lifecycle)**:
+    - **問題**: ApexCharts 的主題模式（light/dark）是初始化時決定的，單純切換 CSS Class 無法改變圖表內部的文字與 Tooltip 顏色。
+    - **解決**: 在 `darkModeBtn` 點擊事件中加入 `setTimeout`，在 DOM 更新後調用 `SPCApp.renderCharts()`，強制圖表重新取得 `getChartTheme()` 的狀態並重繪。
+- **CSS 變數化管理**:
+    - 將 `renderDetailedDataTable` 生成的 HTML 顏色替換為 CSS 變數（如 `var(--table-border)`）。
+    - 在 `:root` 與 `.dark` 選擇器中定義這些變數，實現無需重建 HTML 即可切換表格主題。
+- **ApexCharts Tooltip 修正**: 
+    - 透過 CSS 強制覆蓋 `.apexcharts-tooltip` 在深色模式下的背景色與文字色，解決了 Tooltip 在某些情況下字體看不清的問題。
+- **全局文字顏色對齊**: 
+    - 使用 Tailwind 的 `dark:` 變體全面檢查並修正了麵包屑、歡迎語、檔案資訊卡片的文字顏色對比度。

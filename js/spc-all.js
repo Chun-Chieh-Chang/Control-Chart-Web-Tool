@@ -403,6 +403,15 @@ var SPCApp = {
 
     history: [],
 
+    getChartTheme: function () {
+        var isDark = document.documentElement.classList.contains('dark');
+        return {
+            mode: isDark ? 'dark' : 'light',
+            text: isDark ? '#94a3b8' : '#64748b',
+            grid: isDark ? '#334155' : '#f1f5f9'
+        };
+    },
+
     saveToHistory: function (file, analysisType, item) {
         if (!file) return;
         var entry = {
@@ -603,6 +612,54 @@ var SPCApp = {
                 });
             }
         });
+
+        this.setupSearch();
+        this.setupDarkModeToggle();
+    },
+
+    setupSearch: function () {
+        var self = this;
+        var input = document.getElementById('globalSearch');
+        if (input) {
+            input.addEventListener('input', function (e) {
+                var term = e.target.value.toLowerCase();
+                self.performSearch(term);
+            });
+        }
+    },
+
+    performSearch: function (term) {
+        // Filter inspection items if visible (Step 2 cards)
+        var cards = document.querySelectorAll('#itemList .saas-card');
+        cards.forEach(function (card) {
+            var text = card.textContent.toLowerCase();
+            card.style.display = text.includes(term) ? 'block' : 'none';
+        });
+
+        // Filter history rows if visible
+        var rows = document.querySelectorAll('#historyTableBody tr');
+        rows.forEach(function (row) {
+            var text = row.textContent.toLowerCase();
+            row.style.display = text.includes(term) ? 'table-row' : 'none';
+        });
+
+        // Inform user if no results in current context
+        console.log('Searching for: ' + term);
+    },
+
+    setupDarkModeToggle: function () {
+        var self = this;
+        var btn = document.getElementById('darkModeBtn');
+        if (btn) {
+            btn.addEventListener('click', function () {
+                // Ensure chart theme updates because ApexCharts uses specific theme modes
+                setTimeout(function () {
+                    if (self.analysisResults) {
+                        self.renderCharts();
+                    }
+                }, 100);
+            });
+        }
     },
 
     switchView: function (viewId) {
@@ -941,7 +998,7 @@ var SPCApp = {
         // Total = Label(1) + Batch(25) + Summary(4)
         var totalWidth = colWidths.label + (25 * colWidths.batch) + (4 * colWidths.summary);
 
-        var html = '<table class="excel-table" style="width:' + totalWidth + 'px; border-collapse:collapse; font-size:10px; font-family:sans-serif; border:2px solid #000; table-layout:fixed;">';
+        var html = '<table class="excel-table" style="width:' + totalWidth + 'px; border-collapse:collapse; font-size:10px; font-family:sans-serif; border:2px solid var(--table-border); table-layout:fixed;">';
 
         html += '<colgroup>';
         html += '<col style="width:' + colWidths.label + 'px;">';
@@ -951,7 +1008,7 @@ var SPCApp = {
 
 
         // --- Row 1: Header ---
-        html += '<tr style="background:#f3f4f6;"><td colspan="30" style="border:1px solid #000; text-align:center; font-weight:bold; font-size:14px; padding:3px;">X̄ - R 管制圖</td></tr>';
+        html += '<tr style="background:var(--table-header-bg);"><td colspan="30" style="border:1px solid var(--table-border); text-align:center; font-weight:bold; font-size:14px; padding:3px;">X̄ - R 管制圖</td></tr>';
 
         // --- Row 2-5: Metadata & Limits (Re-distributed colspans out of 30) ---
         var rows = [
@@ -963,84 +1020,84 @@ var SPCApp = {
 
         rows.forEach(function (r) {
             html += '<tr>' +
-                '<td colspan="2" style="border:1px solid #000; padding:1px 1px; font-weight:bold; background:#f9fafb; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;">' + r.l1 + '</td>' +
-                '<td colspan="7" style="border:1px solid #000; padding:1px 1px; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;">' + r.v1 + '</td>' +
-                '<td colspan="2" style="border:1px solid #000; padding:1px 1px; font-weight:bold; background:#f9fafb; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;">' + r.l2 + '</td>' +
-                '<td colspan="2" style="border:1px solid #000; padding:1px 1px; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;">' + r.v2 + '</td>' +
-                '<td colspan="2" style="border:1px solid #000; padding:1px 1px; font-weight:bold; background:#f9fafb; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;">' + r.l3 + '</td>' +
-                '<td colspan="3" style="border:1px solid #000; padding:1px 1px; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;">' + r.v3 + '</td>' +
-                '<td colspan="3" style="border:1px solid #000; padding:1px 1px; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;">' + (r.v4 || '') + '</td>' +
-                '<td colspan="2" style="border:1px solid #000; padding:1px 1px; font-weight:bold; background:#f9fafb; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;">' + (r.l4 || '') + '</td>' +
-                '<td colspan="7" style="border:1px solid #000; padding:1px 1px; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;">' + (r.v4_val || '') + '</td>' +
+                '<td colspan="2" style="border:1px solid var(--table-border); padding:1px 1px; font-weight:bold; background:var(--table-label-bg); overflow:hidden; white-space:nowrap; text-overflow:ellipsis;">' + r.l1 + '</td>' +
+                '<td colspan="7" style="border:1px solid var(--table-border); padding:1px 1px; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;">' + r.v1 + '</td>' +
+                '<td colspan="2" style="border:1px solid var(--table-border); padding:1px 1px; font-weight:bold; background:var(--table-label-bg); overflow:hidden; white-space:nowrap; text-overflow:ellipsis;">' + r.l2 + '</td>' +
+                '<td colspan="2" style="border:1px solid var(--table-border); padding:1px 1px; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;">' + r.v2 + '</td>' +
+                '<td colspan="2" style="border:1px solid var(--table-border); padding:1px 1px; font-weight:bold; background:var(--table-label-bg); overflow:hidden; white-space:nowrap; text-overflow:ellipsis;">' + r.l3 + '</td>' +
+                '<td colspan="3" style="border:1px solid var(--table-border); padding:1px 1px; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;">' + r.v3 + '</td>' +
+                '<td colspan="3" style="border:1px solid var(--table-border); padding:1px 1px; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;">' + (r.v4 || '') + '</td>' +
+                '<td colspan="2" style="border:1px solid var(--table-border); padding:1px 1px; font-weight:bold; background:var(--table-label-bg); overflow:hidden; white-space:nowrap; text-overflow:ellipsis;">' + (r.l4 || '') + '</td>' +
+                '<td colspan="7" style="border:1px solid var(--table-border); padding:1px 1px; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;">' + (r.v4_val || '') + '</td>' +
                 '</tr>';
         });
 
         // --- Data Header: Batch Names ---
-        html += '<tr style="background:#e5e7eb; font-weight:bold;">' +
-            '<td style="border:1px solid #000; text-align:center;">批號</td>';
+        html += '<tr style="background:var(--table-data-header-bg); font-weight:bold;">' +
+            '<td style="border:1px solid var(--table-border); text-align:center;">批號</td>';
         pageLabels.forEach(function (name) {
-            html += '<td style="border:1px solid #000; text-align:center; height:35px; overflow:hidden; font-size:10px; white-space:nowrap; text-overflow:ellipsis; width:' + colWidths.batch + 'px; max-width:' + colWidths.batch + 'px; min-width:' + colWidths.batch + 'px; padding:0;">' + name + '</td>';
+            html += '<td style="border:1px solid var(--table-border); text-align:center; height:35px; overflow:hidden; font-size:10px; white-space:nowrap; text-overflow:ellipsis; width:' + colWidths.batch + 'px; max-width:' + colWidths.batch + 'px; min-width:' + colWidths.batch + 'px; padding:0;">' + name + '</td>';
         });
         // Fill empty if less than 25 batches
-        for (var f = pageLabels.length; f < 25; f++) html += '<td style="border:1px solid #000; width:' + colWidths.batch + 'px; max-width:' + colWidths.batch + 'px; min-width:' + colWidths.batch + 'px;"></td>';
+        for (var f = pageLabels.length; f < 25; f++) html += '<td style="border:1px solid var(--table-border); width:' + colWidths.batch + 'px; max-width:' + colWidths.batch + 'px; min-width:' + colWidths.batch + 'px;"></td>';
 
-        html += '<td colspan="4" style="border:1px solid #000; text-align:center;">彙總</td></tr>';
+        html += '<td colspan="4" style="border:1px solid var(--table-border); text-align:center;">彙總</td></tr>';
 
         // --- Main Data Rows: Cavities ---
         for (var i = 0; i < cavityCount; i++) {
-            html += '<tr><td style="border:1px solid #000; text-align:center; font-weight:bold;">X' + (i + 1) + '</td>';
+            html += '<tr><td style="border:1px solid var(--table-border); text-align:center; font-weight:bold; background:var(--table-label-bg);">X' + (i + 1) + '</td>';
             for (var j = 0; j < 25; j++) {
                 var val = (pageDataMatrix[j] && pageDataMatrix[j][i] !== undefined) ? pageDataMatrix[j][i] : null;
-                html += '<td style="border:1px solid #000; text-align:center; padding:0; overflow:hidden; white-space:nowrap; width:' + colWidths.batch + 'px; max-width:' + colWidths.batch + 'px; min-width:' + colWidths.batch + 'px;">' + (val !== null ? val : '') + '</td>';
+                html += '<td style="border:1px solid var(--table-border); text-align:center; padding:0; overflow:hidden; white-space:nowrap; width:' + colWidths.batch + 'px; max-width:' + colWidths.batch + 'px; min-width:' + colWidths.batch + 'px;">' + (val !== null ? val : '') + '</td>';
             }
 
             // Sidebar summary on first few rows
-            if (i === 0) html += '<td colspan="4" rowspan="2" style="border:1px solid #000; text-align:center !important; font-weight:bold; background:#fefefe; font-size:10px;">ΣX̄ = ' + SPCEngine.round(pageXbarR.summary.xDoubleBar * pageXbarR.xBar.data.length, 4) + '</td>';
-            else if (i === 2) html += '<td colspan="4" rowspan="2" style="border:1px solid #000; text-align:center !important; font-weight:bold; background:#fefefe; font-size:10px;">X̿ = ' + SPCEngine.round(pageXbarR.summary.xDoubleBar, 4) + '</td>';
-            else if (i === 4) html += '<td colspan="4" rowspan="2" style="border:1px solid #000; text-align:center !important; font-weight:bold; background:#fefefe; font-size:10px;">ΣR = ' + SPCEngine.round(pageXbarR.summary.rBar * pageXbarR.R.data.length, 4) + '</td>';
-            else if (i === 6) html += '<td colspan="4" rowspan="2" style="border:1px solid #000; text-align:center !important; font-weight:bold; background:#fefefe; font-size:10px;">R̄ = ' + SPCEngine.round(pageXbarR.summary.rBar, 4) + '</td>';
-            else if (i >= 8) html += '<td colspan="4" style="border:1px solid #000; background:#fcfcfc;"></td>';
+            if (i === 0) html += '<td colspan="4" rowspan="2" style="border:1px solid var(--table-border); text-align:center !important; font-weight:bold; background:var(--table-bg); font-size:10px;">ΣX̄ = ' + SPCEngine.round(pageXbarR.summary.xDoubleBar * pageXbarR.xBar.data.length, 4) + '</td>';
+            else if (i === 2) html += '<td colspan="4" rowspan="2" style="border:1px solid var(--table-border); text-align:center !important; font-weight:bold; background:var(--table-bg); font-size:10px;">X̿ = ' + SPCEngine.round(pageXbarR.summary.xDoubleBar, 4) + '</td>';
+            else if (i === 4) html += '<td colspan="4" rowspan="2" style="border:1px solid var(--table-border); text-align:center !important; font-weight:bold; background:var(--table-bg); font-size:10px;">ΣR = ' + SPCEngine.round(pageXbarR.summary.rBar * pageXbarR.R.data.length, 4) + '</td>';
+            else if (i === 6) html += '<td colspan="4" rowspan="2" style="border:1px solid var(--table-border); text-align:center !important; font-weight:bold; background:var(--table-bg); font-size:10px;">R̄ = ' + SPCEngine.round(pageXbarR.summary.rBar, 4) + '</td>';
+            else if (i >= 8) html += '<td colspan="4" style="border:1px solid var(--table-border); background:transparent;"></td>';
             html += '</tr>';
         }
 
         // --- Footer Rows: ΣX, X̄, R ---
         // ΣX Row
-        html += '<tr style="background:#f9fafb;"><td style="border:1px solid #000; text-align:center; font-weight:bold;">ΣX</td>';
+        html += '<tr style="background:var(--table-header-bg);"><td style="border:1px solid var(--table-border); text-align:center; font-weight:bold;">ΣX</td>';
         for (var b = 0; b < 25; b++) {
             var val = '';
             if (pageDataMatrix[b]) {
                 var sum = pageDataMatrix[b].reduce(function (a, b) { return a + (b || 0); }, 0);
                 val = SPCEngine.round(sum, 4);
             }
-            html += '<td style="border:1px solid #000; text-align:center;">' + val + '</td>';
+            html += '<td style="border:1px solid var(--table-border); text-align:center;">' + val + '</td>';
         }
-        html += '<td colspan="4" style="border:1px solid #000; background:#f9fafb;"></td></tr>';
+        html += '<td colspan="4" style="border:1px solid var(--table-border);"></td></tr>';
 
         // X̄ Row (with yellow highlighting)
-        html += '<tr style="background:#f9fafb;"><td style="border:1px solid #000; text-align:center; font-weight:bold;">X̄</td>';
+        html += '<tr style="background:var(--table-header-bg);"><td style="border:1px solid var(--table-border); text-align:center; font-weight:bold;">X̄</td>';
         for (var k = 0; k < 25; k++) {
             var val = '', style = '';
             if (pageXbarR.xBar.data[k] !== undefined) {
                 var v = pageXbarR.xBar.data[k];
                 val = SPCEngine.round(v, 4);
-                if (v > pageXbarR.xBar.UCL || v < pageXbarR.xBar.LCL) style = 'background:yellow;';
+                if (v > pageXbarR.xBar.UCL || v < pageXbarR.xBar.LCL) style = 'background:var(--table-ooc-bg); color:var(--table-ooc-text);';
             }
-            html += '<td style="border:1px solid #000; text-align:center;' + style + '">' + val + '</td>';
+            html += '<td style="border:1px solid var(--table-border); text-align:center;' + style + '">' + val + '</td>';
         }
-        html += '<td colspan="4" style="border:1px solid #000; background:#f9fafb;"></td></tr>';
+        html += '<td colspan="4" style="border:1px solid var(--table-border);"></td></tr>';
 
         // R Row
-        html += '<tr style="background:#f9fafb;"><td style="border:1px solid #000; text-align:center; font-weight:bold;">R</td>';
+        html += '<tr style="background:var(--table-header-bg);"><td style="border:1px solid var(--table-border); text-align:center; font-weight:bold;">R</td>';
         for (var k = 0; k < 25; k++) {
             var val = '', style = '';
             if (pageXbarR.R.data[k] !== undefined) {
                 var v = pageXbarR.R.data[k];
                 val = SPCEngine.round(v, 4);
-                if (v > pageXbarR.R.UCL) style = 'background:yellow;';
+                if (v > pageXbarR.R.UCL) style = 'background:var(--table-ooc-bg); color:var(--table-ooc-text);';
             }
-            html += '<td style="border:1px solid #000; text-align:center;' + style + '">' + val + '</td>';
+            html += '<td style="border:1px solid var(--table-border); text-align:center;' + style + '">' + val + '</td>';
         }
-        html += '<td colspan="4" style="border:1px solid #000; background:#f9fafb;"></td></tr>';
+        html += '<td colspan="4" style="border:1px solid var(--table-border);"></td></tr>';
 
         html += '</table>';
         document.getElementById('detailedTableContainer').innerHTML = html;
@@ -1068,6 +1125,8 @@ var SPCApp = {
 
             this.renderDetailedDataTable(pageLabels, pageDataMatrix, pageXbarR);
 
+            var theme = this.getChartTheme();
+
             // X-Bar Apex Chart
             var xOptions = {
                 chart: {
@@ -1075,12 +1134,9 @@ var SPCApp = {
                     height: 380,
                     toolbar: { show: false },
                     background: 'transparent',
-                    events: {
-                        dataPointSelection: function (event, chartContext, config) {
-                            // Optional click logic
-                        }
-                    }
+                    animations: { enabled: true }
                 },
+                theme: { mode: theme.mode },
                 series: [
                     { name: 'X-Bar', data: pageXbarR.xBar.data },
                     { name: 'UCL', data: new Array(pageLabels.length).fill(pageXbarR.xBar.UCL) },
@@ -1089,14 +1145,15 @@ var SPCApp = {
                 ],
                 colors: ['#4f46e5', '#f43f5e', '#10b981', '#f43f5e'],
                 stroke: { width: [3, 1.5, 1.5, 1.5], dashArray: [0, 6, 0, 6], curve: 'straight' },
-                xaxis: { categories: pageLabels, labels: { style: { colors: '#64748b', fontSize: '10px' } } },
+                xaxis: { categories: pageLabels, labels: { style: { colors: theme.text, fontSize: '10px' } }, axisBorder: { color: theme.grid }, axisTicks: { color: theme.grid } },
                 yaxis: {
                     labels: {
                         formatter: function (val) { return val.toFixed(4); },
-                        style: { colors: '#64748b' }
+                        style: { colors: theme.text }
                     }
                 },
-                tooltip: { y: { formatter: function (val) { return val.toFixed(4); } } },
+                grid: { borderColor: theme.grid },
+                tooltip: { theme: theme.mode, y: { formatter: function (val) { return val.toFixed(4); } } },
                 markers: {
                     size: 4,
                     discrete: pageXbarR.xBar.violations.map(function (v) {
@@ -1120,7 +1177,8 @@ var SPCApp = {
 
             // R Apex Chart
             var rOptions = {
-                chart: { type: 'line', height: 300, toolbar: { show: false } },
+                chart: { type: 'line', height: 300, toolbar: { show: false }, background: 'transparent' },
+                theme: { mode: theme.mode },
                 series: [
                     { name: 'Range', data: pageXbarR.R.data },
                     { name: 'UCL', data: new Array(pageLabels.length).fill(pageXbarR.R.UCL) },
@@ -1128,14 +1186,15 @@ var SPCApp = {
                 ],
                 colors: ['#64748b', '#f43f5e', '#10b981'],
                 stroke: { width: [2.5, 1, 1], dashArray: [0, 6, 0] },
-                xaxis: { categories: pageLabels, labels: { style: { colors: '#64748b', fontSize: '10px' } } },
+                xaxis: { categories: pageLabels, labels: { style: { colors: theme.text, fontSize: '10px' } }, axisBorder: { color: theme.grid }, axisTicks: { color: theme.grid } },
                 yaxis: {
                     labels: {
                         formatter: function (val) { return val.toFixed(4); },
-                        style: { colors: '#64748b' }
+                        style: { colors: theme.text }
                     }
                 },
-                tooltip: { y: { formatter: function (val) { return val.toFixed(4); } } }
+                grid: { borderColor: theme.grid },
+                tooltip: { theme: theme.mode, y: { formatter: function (val) { return val.toFixed(4); } } }
             };
             var chartR = new ApexCharts(document.querySelector("#rChart"), rOptions);
             chartR.render();
@@ -1146,21 +1205,19 @@ var SPCApp = {
 
         } else if (data.type === 'cavity') {
             var labels = data.cavityStats.map(function (s) { return s.name; });
-            var cpkVals = data.cavityStats.map(function (s) { return s.Cpk; });
-            var meanVals = data.cavityStats.map(function (s) { return s.mean; });
-            var stdOverallVals = data.cavityStats.map(function (s) { return s.overallStdDev; });
-            var stdWithinVals = data.cavityStats.map(function (s) { return s.withinStdDev; });
-
+            var theme = this.getChartTheme(); labels.map(function (s) { return s.name; });
             // Cpk Performance Chart
             var cpkOptions = {
-                chart: { type: 'bar', height: 350, toolbar: { show: false } },
+                chart: { type: 'bar', height: 350, toolbar: { show: false }, background: 'transparent' },
+                theme: { mode: theme.mode },
                 series: [{ name: 'Cpk', data: cpkVals }],
-                xaxis: { categories: labels, labels: { style: { colors: '#64748b', fontSize: '11px' } } },
-                yaxis: { labels: { formatter: function (v) { return v.toFixed(3); }, style: { colors: '#64748b' } } },
+                xaxis: { categories: labels, labels: { style: { colors: theme.text, fontSize: '11px' } }, axisBorder: { color: theme.grid }, axisTicks: { color: theme.grid } },
+                yaxis: { labels: { formatter: function (v) { return v.toFixed(3); }, style: { colors: theme.text } } },
                 colors: ['#4f46e5'],
                 plotOptions: { bar: { borderRadius: 6, columnWidth: '55%' } },
                 dataLabels: { enabled: false },
-                tooltip: { y: { formatter: function (val) { return val.toFixed(3); } } }
+                grid: { borderColor: theme.grid },
+                tooltip: { theme: theme.mode, y: { formatter: function (val) { return val.toFixed(3); } } }
             };
             var chartCpk = new ApexCharts(document.querySelector("#cpkChart"), cpkOptions);
             chartCpk.render();
@@ -1169,7 +1226,8 @@ var SPCApp = {
 
             // Mean Comparison Chart (Line)
             var meanOpt = {
-                chart: { type: 'line', height: 350, toolbar: { show: false } },
+                chart: { type: 'line', height: 350, toolbar: { show: false }, background: 'transparent' },
+                theme: { mode: theme.mode },
                 series: [
                     { name: this.t('平均值', 'Mean'), data: meanVals },
                     { name: this.t('目標值', 'Target'), data: new Array(labels.length).fill(data.specs.target) },
@@ -1178,10 +1236,11 @@ var SPCApp = {
                 ],
                 stroke: { width: [3, 2, 1.5, 1.5], dashArray: [0, 0, 8, 8], curve: 'straight' },
                 colors: ['#007bff', '#28a745', '#dc3545', '#dc3545'], // Match image colors
-                xaxis: { categories: labels, labels: { style: { colors: '#64748b', fontSize: '10px' } } },
-                yaxis: { labels: { formatter: function (v) { return v.toFixed(4); }, style: { colors: '#64748b' } } },
+                xaxis: { categories: labels, labels: { style: { colors: theme.text, fontSize: '10px' } }, axisBorder: { color: theme.grid }, axisTicks: { color: theme.grid } },
+                yaxis: { labels: { formatter: function (v) { return v.toFixed(4); }, style: { colors: theme.text } } },
                 markers: { size: [5, 0, 0, 0] },
-                tooltip: { y: { formatter: function (val) { return val.toFixed(4); } } }
+                grid: { borderColor: theme.grid },
+                tooltip: { theme: theme.mode, y: { formatter: function (val) { return val.toFixed(4); } } }
             };
             var chartMean = new ApexCharts(document.querySelector("#meanChart"), meanOpt);
             chartMean.render();
@@ -1190,17 +1249,19 @@ var SPCApp = {
 
             // StdDev Comparison Chart (Line)
             var stdOpt = {
-                chart: { type: 'line', height: 350, toolbar: { show: false } },
+                chart: { type: 'line', height: 350, toolbar: { show: false }, background: 'transparent' },
+                theme: { mode: theme.mode },
                 series: [
                     { name: this.t('整體標準差 (s)', 'Overall StdDev'), data: stdOverallVals },
                     { name: this.t('組內標準差 (σ)', 'Within StdDev'), data: stdWithinVals }
                 ],
                 stroke: { width: 3, curve: 'straight' },
                 colors: ['#dc3545', '#007bff'], // Red square-ish vs Blue circle-ish mapping
-                xaxis: { categories: labels, labels: { style: { colors: '#64748b', fontSize: '10px' } } },
-                yaxis: { labels: { formatter: function (v) { return v.toFixed(5); }, style: { colors: '#64748b' } } },
+                xaxis: { categories: labels, labels: { style: { colors: theme.text, fontSize: '10px' } }, axisBorder: { color: theme.grid }, axisTicks: { color: theme.grid } },
+                yaxis: { labels: { formatter: function (v) { return v.toFixed(5); }, style: { colors: theme.text } } },
                 markers: { size: 5, shape: ['square', 'circle'] },
-                tooltip: { y: { formatter: function (val) { return val.toFixed(5); } } }
+                grid: { borderColor: theme.grid },
+                tooltip: { theme: theme.mode, y: { formatter: function (val) { return val.toFixed(5); } } }
             };
             var chartStd = new ApexCharts(document.querySelector("#stdDevChart"), stdOpt);
             chartStd.render();
@@ -1214,9 +1275,11 @@ var SPCApp = {
             var minVals = data.groupStats.map(function (s) { return s.min; });
             var maxVals = data.groupStats.map(function (s) { return s.max; });
 
+            var theme = this.getChartTheme();
             // Group Trend Chart - Use Line Chart as requested
             var gOptions = {
-                chart: { type: 'line', height: 380, toolbar: { show: false } },
+                chart: { type: 'line', height: 380, toolbar: { show: false }, background: 'transparent' },
+                theme: { mode: theme.mode },
                 series: [
                     { name: 'Max', data: maxVals },
                     { name: 'Average', data: avgVals },
@@ -1224,9 +1287,10 @@ var SPCApp = {
                 ],
                 colors: ['#f43f5e', '#4f46e5', '#10b981'],
                 stroke: { width: [1, 3, 1], curve: 'straight' },
-                xaxis: { categories: labels, labels: { style: { colors: '#64748b', fontSize: '10px' } } },
-                yaxis: { labels: { formatter: function (v) { return v.toFixed(4); }, style: { colors: '#64748b' } } },
-                tooltip: { y: { formatter: function (val) { return val.toFixed(4); } } }
+                xaxis: { categories: labels, labels: { style: { colors: theme.text, fontSize: '10px' } }, axisBorder: { color: theme.grid }, axisTicks: { color: theme.grid } },
+                yaxis: { labels: { formatter: function (v) { return v.toFixed(4); }, style: { colors: theme.text } } },
+                grid: { borderColor: theme.grid },
+                tooltip: { theme: theme.mode, y: { formatter: function (val) { return val.toFixed(4); } } }
             };
             var chartG = new ApexCharts(document.querySelector("#groupChart"), gOptions);
             chartG.render();
@@ -1235,13 +1299,15 @@ var SPCApp = {
 
             // Inter-Cavity Variation (Range) - Use Line Chart as requested
             var vOptions = {
-                chart: { type: 'line', height: 380, toolbar: { show: false } },
+                chart: { type: 'line', height: 380, toolbar: { show: false }, background: 'transparent' },
+                theme: { mode: theme.mode },
                 series: [{ name: 'Range', data: rangeVals }],
                 colors: ['#8b5cf6'],
                 stroke: { width: 3, curve: 'straight' },
-                xaxis: { categories: labels, labels: { style: { colors: '#64748b', fontSize: '10px' } } },
-                yaxis: { labels: { formatter: function (v) { return v.toFixed(4); }, style: { colors: '#64748b' } } },
-                tooltip: { y: { formatter: function (val) { return val.toFixed(4); } } }
+                xaxis: { categories: labels, labels: { style: { colors: theme.text, fontSize: '10px' } }, axisBorder: { color: theme.grid }, axisTicks: { color: theme.grid } },
+                yaxis: { labels: { formatter: function (v) { return v.toFixed(4); }, style: { colors: theme.text } } },
+                grid: { borderColor: theme.grid },
+                tooltip: { theme: theme.mode, y: { formatter: function (val) { return val.toFixed(4); } } }
             };
             var chartV = new ApexCharts(document.querySelector("#groupVarChart"), vOptions);
             chartV.render();

@@ -149,6 +149,34 @@
             color: #f1f5f9;
         }
 
+        :root {
+            --table-border: #000;
+            --table-bg: #fff;
+            --table-text: #000;
+            --table-header-bg: #f3f4f6;
+            --table-label-bg: #f9fafb;
+            --table-data-header-bg: #e5e7eb;
+            --table-ooc-bg: yellow;
+            --table-ooc-text: #000;
+        }
+
+        .dark {
+            --table-border: #475569;
+            --table-bg: #0f172a;
+            --table-text: #f1f5f9;
+            --table-header-bg: #1e293b;
+            --table-label-bg: #334155;
+            --table-data-header-bg: #1e293b;
+            --table-ooc-bg: #991b1b;
+            --table-ooc-text: #fff;
+        }
+
+        .excel-table {
+            background-color: var(--table-bg);
+            color: var(--table-text);
+            border-color: var(--table-border) !important;
+        }
+
         .dark body {
             background-color: #0f172a;
         }
@@ -156,6 +184,66 @@
         .dark header {
             background-color: rgba(30, 41, 59, 0.8);
             border-color: #334155;
+        }
+
+        /* Fix visibility of generic slate text in dark mode */
+        .dark .text-slate-900 {
+            color: #f1f5f9 !important;
+        }
+
+        .dark .text-slate-800 {
+            color: #e2e8f0 !important;
+        }
+
+        .dark .text-slate-700 {
+            color: #cbd5e1 !important;
+        }
+
+        .dark .text-slate-600 {
+            color: #94a3b8 !important;
+        }
+
+        .dark .text-slate-500 {
+            color: #64748b !important;
+        }
+
+        .dark .bg-white {
+            background-color: #1e293b !important;
+        }
+
+        .dark .bg-slate-50 {
+            background-color: #0f172a !important;
+        }
+
+        .dark .bg-slate-100 {
+            background-color: #1e293b !important;
+        }
+
+        .dark .border-slate-100 {
+            border-color: #334155 !important;
+        }
+
+        .dark .border-slate-200 {
+            border-color: #334155 !important;
+        }
+
+        /* ApexCharts Tooltip Dark Mode Fix */
+        .dark .apexcharts-tooltip {
+            background: #1e293b !important;
+            border-color: #334155 !important;
+            color: #f1f5f9 !important;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5) !important;
+        }
+
+        .dark .apexcharts-tooltip-title {
+            background: #334155 !important;
+            border-bottom-color: #475569 !important;
+        }
+
+        .dark .apexcharts-xaxistooltip {
+            background: #1e293b !important;
+            color: #f1f5f9 !important;
+            border-color: #334155 !important;
         }
     </style>
 
@@ -225,12 +313,13 @@
         <!-- Top Header -->
         <header
             class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-8 bg-white/80 backdrop-blur-md z-20">
-            <div class="flex items-center text-sm space-x-2 text-slate-500">
-                <span class="hover:text-slate-700 cursor-pointer">Workspace</span>
+            <div class="flex items-center text-sm space-x-2 text-slate-500 dark:text-slate-400">
+                <span class="hover:text-slate-700 dark:hover:text-slate-200 cursor-pointer">Workspace</span>
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
                 </svg>
-                <span class="text-slate-900 font-semibold" data-en="QIP Statistical Analysis" data-zh="QIP 統計分析">QIP
+                <span class="text-slate-900 dark:text-white font-semibold" data-en="QIP Statistical Analysis"
+                    data-zh="QIP 統計分析">QIP
                     統計分析</span>
             </div>
 
@@ -238,8 +327,8 @@
                 <div class="hidden md:flex relative group">
                     <span
                         class="material-icons-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-lg transition-colors group-focus-within:text-primary">search</span>
-                    <input type="text" placeholder="Search data..."
-                        class="pl-10 pr-4 py-2 bg-slate-100 dark:bg-slate-800 border-transparent focus:bg-white dark:focus:bg-slate-900 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 dark:focus:ring-indigo-900/20 rounded-xl text-xs w-64 transition-all">
+                    <input type="text" id="globalSearch" placeholder="Search data..."
+                        class="pl-10 pr-4 py-2 bg-slate-100 dark:bg-slate-800 border-transparent focus:bg-white dark:focus:bg-slate-900 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 dark:focus:ring-indigo-900/20 rounded-xl text-xs w-64 transition-all text-slate-900 dark:text-white">
                 </div>
                 <!-- Language Toggle -->
                 <button id="langBtn"
@@ -259,7 +348,7 @@
 
         <!-- Dark Mode Toggle (Floating) -->
         <div class="fixed bottom-6 right-6 z-50">
-            <button
+            <button id="darkModeBtn"
                 class="w-12 h-12 bg-slate-800 text-white rounded-full shadow-2xl flex items-center justify-center hover:bg-slate-700 transition-all active:scale-90"
                 onclick="document.documentElement.classList.toggle('dark')">
                 <span class="material-icons-outlined block dark:hidden">dark_mode</span>
@@ -274,9 +363,9 @@
                 <!-- Step 1: Upload & Welcome -->
                 <section id="uploadSection" class="space-y-8">
                     <header class="mb-10">
-                        <h1 class="text-2xl font-bold text-slate-900 mb-2" data-en="Welcome to SPC Insights"
-                            data-zh="歡迎使用 SPC 洞察系統">歡迎使用 SPC 洞察系統</h1>
-                        <p class="text-slate-500"
+                        <h1 class="text-2xl font-bold text-slate-900 dark:text-white mb-2"
+                            data-en="Welcome to SPC Insights" data-zh="歡迎使用 SPC 洞察系統">歡迎使用 SPC 洞察系統</h1>
+                        <p class="text-slate-500 dark:text-slate-400"
                             data-en="Connect your production data to generate professional control charts and capability reports."
                             data-zh="連結生產數據以產生專業的管制圖與製程能力報表。">連結生產數據以產生專業的管制圖與製程能力報表。</p>
                     </header>
@@ -363,8 +452,8 @@
                                 </svg>
                             </div>
                             <div>
-                                <p class="text-slate-900 font-bold" id="fileName">Filename.xlsx</p>
-                                <p class="text-xs text-slate-500 uppercase font-bold tracking-widest mt-0.5"
+                                <p class="text-slate-900 dark:text-white font-bold" id="fileName">Filename.xlsx</p>
+                                <p class="text-xs text-slate-500 dark:text-slate-400 uppercase font-bold tracking-widest mt-0.5"
                                     data-en="READY FOR ANALYSIS" data-zh="就緒：準備分析">就緒：準備分析</p>
                             </div>
                         </div>

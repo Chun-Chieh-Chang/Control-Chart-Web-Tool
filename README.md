@@ -32,6 +32,8 @@
 - **中英雙語介面**
   - 🌐 支援繁體中文與英文切換
   - 📱 響應式設計，支援桌面與行動裝置
+  - 🌓 **深色模式**: 支援一鍵切換深色/淺色主題，圖表與表格自動適應配色
+  - 🔍 **全局搜尋**: 支援在檢驗項目清單與歷史紀錄中快速搜尋關鍵字
 
 ### 🚀 使用方法
 
@@ -50,6 +52,10 @@
 5. **查看結果**
    - 網頁即時顯示統計結果與圖表
    - 下載 Excel 檔案
+
+6. **搜尋與自訂**
+   - 使用頂部搜尋框快速篩選檢驗項目
+   - 點擊右下角按鈕切換深色/淺色模式以符合您的視覺偏好
 
 ### 📋 輸入檔案格式
 
@@ -137,6 +143,8 @@ MIT License
 - **Bilingual Interface**
   - 🌐 Traditional Chinese and English support
   - 📱 Responsive design for desktop and mobile
+  - 🌓 **Dark Mode**: One-click toggle for dark/light themes with auto-adjusting charts/tables
+  - 🔍 **Global Search**: Instantly find inspection items and history records via keywords
 
 ### 🚀 Usage
 
@@ -155,6 +163,10 @@ MIT License
 5. **View Results**
    - Real-time statistics and charts on web page
    - Download Excel file
+
+6. **Search & Customization**
+   - Use the top search bar to filter items quickly
+   - Toggle Dark/Light mode via the floating button for personalized visual experience
 
 ### 📋 Input File Format
 

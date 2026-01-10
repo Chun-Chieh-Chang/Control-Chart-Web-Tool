@@ -489,7 +489,9 @@ var SPCApp = {
                 self.executeAnalysis(this.dataset.analysis);
             });
         }
-        document.getElementById('downloadExcel').addEventListener('click', function () { self.downloadExcel(); });
+
+        var downloadBtn = document.getElementById('downloadExcel');
+        if (downloadBtn) downloadBtn.addEventListener('click', function () { self.downloadExcel(); });
 
         // Recent Files Clear All
         var clearBtn = document.getElementById('clearRecentBtn');
@@ -503,18 +505,22 @@ var SPCApp = {
         }
 
         // Sidebar Navigation
-        document.getElementById('nav-dashboard').addEventListener('click', function (e) { e.preventDefault(); self.switchView('dashboard'); });
-        document.getElementById('nav-import').addEventListener('click', function (e) { e.preventDefault(); self.switchView('import'); });
-        document.getElementById('nav-analysis').addEventListener('click', function (e) { e.preventDefault(); self.switchView('analysis'); });
-        document.getElementById('nav-history').addEventListener('click', function (e) { e.preventDefault(); self.switchView('history'); });
-        document.getElementById('nav-settings').addEventListener('click', function (e) { e.preventDefault(); self.switchView('settings'); });
+        var navIds = ['nav-dashboard', 'nav-import', 'nav-analysis', 'nav-history', 'nav-settings'];
+        navIds.forEach(function (id) {
+            var el = document.getElementById(id);
+            if (el) {
+                el.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    self.switchView(id.replace('nav-', ''));
+                });
+            }
+        });
     },
 
     switchView: function (viewId) {
         var self = this;
-        // Map logical view to DOM IDs
         var viewMap = {
-            'dashboard': 'view-import', // Temporary dashboard maps to import until one is built
+            'dashboard': 'view-import',
             'import': 'view-import',
             'analysis': 'view-analysis',
             'history': 'view-import',
@@ -522,24 +528,26 @@ var SPCApp = {
         };
 
         var targetId = viewMap[viewId] || 'view-import';
+        var vImport = document.getElementById('view-import');
+        var vAnalysis = document.getElementById('view-analysis');
 
-        // Toggle visibility
-        document.getElementById('view-import').classList.add('hidden');
-        document.getElementById('view-analysis').classList.add('hidden');
-        document.getElementById(targetId).classList.remove('hidden');
+        if (vImport) vImport.classList.add('hidden');
+        if (vAnalysis) vAnalysis.classList.add('hidden');
+
+        var targetEl = document.getElementById(targetId);
+        if (targetEl) targetEl.classList.remove('hidden');
 
         // Update sidebar links
         var navLinks = document.querySelectorAll('#main-nav .nav-link');
-        navLinks.forEach(function (link) {
-            link.className = 'nav-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800 transition-all';
-        });
+        for (var i = 0; i < navLinks.length; i++) {
+            navLinks[i].className = 'nav-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800 transition-all';
+        }
 
         var activeLink = document.getElementById('nav-' + viewId);
         if (activeLink) {
             activeLink.className = 'nav-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium bg-primary text-white shadow-lg shadow-primary/20';
         }
 
-        // Potential Breadcrumb update
         var breadcrumb = document.querySelector('header .text-slate-900');
         if (breadcrumb) {
             var titles = {
@@ -552,16 +560,21 @@ var SPCApp = {
             breadcrumb.innerText = titles[viewId] || 'QIP 統計分析';
         }
 
-        // Cleanup
         if (viewId === 'import') {
-            document.getElementById('anomalySidebar').classList.add('hidden');
+            var side = document.getElementById('anomalySidebar');
+            if (side) side.classList.add('hidden');
         } else if (viewId === 'analysis' && this.analysisResults) {
-            document.getElementById('anomalySidebar').classList.remove('hidden');
+            var side = document.getElementById('anomalySidebar');
+            if (side) side.classList.remove('hidden');
         }
     },
 
     executeAnalysis: function (type) {
         var self = this;
+        if (!this.selectedItem) {
+            alert(this.t('請先選擇分析項目', 'Please select an item first'));
+            return;
+        }
         this.showLoading(this.t('分析中...', 'Analyzing...'));
 
         for (var i = 0; i < this.chartInstances.length; i++) {

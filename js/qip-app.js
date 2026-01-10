@@ -251,10 +251,11 @@ var QIPExtractApp = {
         // Debug info in UI
         var selectionTypeEl = document.getElementById('qip-selection-type');
         if (selectionTypeEl) {
-            var currentText = selectionTypeEl.innerText;
-            // Append debug info only if not already there
-            if (!currentText.includes('Merged')) {
-                // selectionTypeEl.innerText += ' (Merged areas: ' + merges.length + ')';
+            var currentText = selectionTypeEl.innerText.split(' (')[0]; // Reset prev info
+            if (merges.length > 0) {
+                selectionTypeEl.innerText = currentText + ' (已偵測到 ' + merges.length + ' 個合併區域)';
+            } else {
+                selectionTypeEl.innerText = currentText;
             }
         }
         console.log('Rendering preview. Merged areas count:', merges.length);

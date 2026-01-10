@@ -45,10 +45,13 @@
 
         .qip-preview-table th,
         .qip-preview-table td {
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            max-width: 150px;
+            white-space: normal;
+            /* Allow text wrapping for merged cells */
+            text-align: center;
+            /* QIP usually centers text */
+            vertical-align: middle;
+            border: 1px solid #cbd5e1;
+            padding: 4px;
         }
     </style>
 </head>

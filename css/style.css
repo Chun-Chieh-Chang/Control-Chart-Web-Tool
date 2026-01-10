@@ -1,204 +1,242 @@
-/* ============================================================================
-   SPC Analysis Tool - Design System
-   Modern SaaS Dark Theme with Glassmorphism
-   ============================================================================ */
+/**
+ * SPC Analysis Tool - Main Stylesheet
+ * Consistently themed for Light and Dark modes.
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 :root {
-    /* Color Palette - Dark Theme */
-    --primary: #6366f1;
-    /* Indigo 500 */
-    --primary-light: #818cf8;
-    --primary-dark: #4f46e5;
-    --accent: #3b82f6;
-    --accent-hover: #2563eb;
-    --success: #10b981;
-    --warning: #f59e0b;
-    --danger: #ef4444;
+    /* Color Palette - Default Light */
+    --primary: #4f46e5;
+    --background: #f8fafc;
+    --surface: #ffffff;
+    --text-main: #1e293b;
 
-    --text-primary: #f3f4f6;
-    /* Gray 100 */
-    --text-secondary: #9ca3af;
-    /* Gray 400 */
-    --text-light: #d1d5db;
+    /* Table Variables */
+    --table-border: #000;
+    --table-bg: #fff;
+    --table-text: #000;
+    --table-header-bg: #f3f4f6;
+    --table-label-bg: #f9fafb;
+    --table-data-header-bg: #e5e7eb;
+    --table-ooc-bg: yellow;
+    --table-ooc-text: #000;
 
-    --bg-primary: #111827;
-    /* Gray 900 */
-    --bg-secondary: #1f2937;
-    /* Gray 800 */
-    --border: rgba(255, 255, 255, 0.1);
-    --shadow: rgba(0, 0, 0, 0.3);
-
-    --card-glass: rgba(30, 41, 59, 0.7);
-    /* Slate 800 with opacity */
-
-    /* Typography */
-    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    --font-mono: "Consolas", "Monaco", monospace;
-
-    /* Spacing */
-    --spacing-xs: 0.25rem;
-    --spacing-sm: 0.5rem;
-    --spacing-md: 1rem;
-    --spacing-lg: 1.5rem;
-    --spacing-xl: 2rem;
-    --spacing-2xl: 3rem;
-
-    /* Border Radius */
-    --radius-sm: 0.375rem;
-    --radius-md: 0.5rem;
-    --radius-lg: 0.75rem;
-    --radius-xl: 1rem;
-
-    /* Transitions */
-    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --card-bg: #ffffff;
 }
 
-/* ============================================================================
-   Reset & Base Styles
-   ============================================================================ */
+/* Dark Mode Overrides */
+html.dark {
+    --background: #0f172a;
+    --surface: #1e293b;
+    --text-main: #f1f5f9;
 
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+    --table-border: #334155 !important;
+    --table-bg: #0f172a !important;
+    --table-text: #f1f5f9 !important;
+    --table-header-bg: #0f172a !important;
+    --table-label-bg: #0f172a !important;
+    --table-data-header-bg: #0f172a !important;
+    --table-ooc-bg: #991b1b !important;
+    --table-ooc-text: #ffffff !important;
+
+    --card-bg: #1e293b;
 }
 
-html {
-    font-size: 16px;
-    scroll-behavior: smooth;
-}
-
-/* Body handled by Tailwind in index.html, but keeping this as backup/reset */
 body {
-    font-family: var(--font-sans);
-    color: var(--text-primary);
-    background: var(--bg-primary);
-    line-height: 1.6;
+    background-color: var(--background);
+    color: var(--text-main);
 }
 
-/* ============================================================================
-   Common Components (Glassmorphism)
-   ============================================================================ */
-
-.card {
-    background: var(--card-glass);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-xl);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-    margin-bottom: var(--spacing-xl);
-    overflow: hidden;
+/* SaaS Card Style */
+.saas-card {
+    background: var(--card-bg);
+    border: 1px solid #f1f5f9;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    border-radius: 16px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.card-header {
-    background: rgba(255, 255, 255, 0.05);
-    border-bottom: 1px solid var(--border);
-    padding: var(--spacing-lg);
-}
-
-.card-header h2 {
-    color: var(--text-primary);
-}
-
-.card-body {
-    padding: var(--spacing-lg);
-}
-
-/* ============================================================================
-   Excel Table (Detailed View)
-   ============================================================================ */
-
-/* Ultra Compact Excel Style Table */
-.excel-table {
-    table-layout: fixed;
-    width: auto;
-    background: white;
-    /* Keep white for readability of data */
-    color: #000;
-    /* Keep black text for contrast against white */
-}
-
-.excel-table td {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    padding: 2px 4px !important;
-    font-size: 11px !important;
-    border-color: #d1d5db !important;
-    /* Gray 300 border */
-}
-
-.excel-table tr {
-    height: 28px;
-}
-
-/* ============================================================================
-   Results Section Components
-   ============================================================================ */
-
-.results-summary {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1rem;
-    margin-bottom: 2rem;
-}
-
-.stat-card {
-    padding: 1.5rem;
-    background: rgba(255, 255, 255, 0.05);
-    /* Glass style */
-    border: 1px solid var(--border);
-    backdrop-filter: blur(5px);
-    color: white;
-    border-radius: var(--radius-lg);
-    text-align: center;
-    transition: var(--transition);
-}
-
-.stat-card:hover {
-    background: rgba(255, 255, 255, 0.1);
+.saas-card:hover {
     transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
 
-.stat-label {
-    font-size: 0.875rem;
-    color: var(--text-secondary);
-    margin-bottom: 0.5rem;
+.dark .saas-card {
+    border-color: #334155;
+    color: #f1f5f9;
 }
 
-.stat-value {
-    font-size: 2rem;
-    font-weight: 700;
-    color: var(--text-primary);
+/* Anomaly Pulse Animation */
+@keyframes pulse-red {
+    0% {
+        transform: scale(1);
+        opacity: 0.8;
+        box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.7);
+    }
+
+    70% {
+        transform: scale(1.2);
+        opacity: 1;
+        box-shadow: 0 0 0 10px rgba(244, 63, 94, 0);
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 0.8;
+        box-shadow: 0 0 0 0 rgba(244, 63, 94, 0);
+    }
 }
 
-.chart-container {
-    margin: 2rem 0;
-    padding: 1.5rem;
-    background: rgba(255, 255, 255, 0.95);
-    /* Light bg for charts for now */
-    border-radius: var(--radius-lg);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+.anomaly-pulse {
+    animation: pulse-red 2s infinite;
+    background-color: #f43f5e;
+    border-radius: 50%;
 }
 
-.chart-title {
-    font-size: 1.25rem;
-    font-weight: 600;
-    margin-bottom: 1rem;
-    color: #1f2937;
-    /* Dark text for light chart bg */
+/* Loading Spinner */
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(8px);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    z-index: 9999;
 }
 
-/* Legacy Utility Classes */
-.text-center {
-    text-align: center;
+.dark .loading-overlay {
+    background: rgba(15, 23, 42, 0.9);
 }
 
-.mt-2 {
-    margin-top: 1rem;
+.spinner {
+    border: 4px solid #f1f5f9;
+    border-top: 4px solid var(--primary);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s cubic-bezier(0.4, 0, 0.2, 1) infinite;
 }
 
-.mb-2 {
-    margin-bottom: 1rem;
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* Scrollbar Refinement */
+::-webkit-scrollbar {
+    width: 5px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #e2e8f0;
+    border-radius: 20px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #cbd5e1;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+    background: #334155;
+}
+
+/* Navigation Active State */
+.nav-item-active {
+    background-color: var(--primary);
+    color: #ffffff !important;
+    box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.2);
+}
+
+/* Detailed Excel Table Styles */
+.excel-table {
+    background-color: var(--table-bg) !important;
+    color: var(--table-text) !important;
+    border-color: var(--table-border) !important;
+}
+
+.excel-table td,
+.excel-table th {
+    border-color: var(--table-border) !important;
+    color: inherit !important;
+}
+
+.dark header {
+    background-color: rgba(30, 41, 59, 0.8) !important;
+    border-color: #334155 !important;
+}
+
+/* Utility Text Colors for Dark Mode */
+.dark .text-slate-900 {
+    color: #f1f5f9 !important;
+}
+
+.dark .text-slate-800 {
+    color: #e2e8f0 !important;
+}
+
+.dark .text-slate-700 {
+    color: #cbd5e1 !important;
+}
+
+.dark .text-slate-600 {
+    color: #94a3b8 !important;
+}
+
+.dark .text-slate-500 {
+    color: #64748b !important;
+}
+
+/* Utility Background Colors for Dark Mode */
+.dark .bg-white {
+    background-color: #1e293b !important;
+}
+
+.dark .bg-slate-50 {
+    background-color: #0f172a !important;
+}
+
+.dark .bg-slate-100 {
+    background-color: #1e293b !important;
+}
+
+.dark .border-slate-100 {
+    border-color: #334155 !important;
+}
+
+.dark .border-slate-200 {
+    border-color: #334155 !important;
+}
+
+/* ApexCharts Tooltip Dark Mode Fix */
+.dark .apexcharts-tooltip {
+    background: #1e293b !important;
+    border-color: #334155 !important;
+    color: #f1f5f9 !important;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5) !important;
+}
+
+.dark .apexcharts-tooltip-title {
+    background: #334155 !important;
+    border-bottom-color: #475569 !important;
+}
+
+.dark .apexcharts-xaxistooltip {
+    background: #1e293b !important;
+    color: #f1f5f9 !important;
+    border-color: #334155 !important;
 }

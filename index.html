@@ -97,6 +97,11 @@
                 <span class="material-icons-outlined text-xl">history</span>
                 <span data-en="History" data-zh="歷史紀錄">歷史紀錄</span>
             </a>
+            <a href="#" id="nav-nelson"
+                class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800 transition-all">
+                <span class="material-icons-outlined text-xl">fact_check</span>
+                <span data-en="Nelson Rules" data-zh="Nelson 法則解讀">Nelson 法則解讀</span>
+            </a>
             <div class="pt-8 mb-2 px-3 text-[10px] font-bold text-slate-500 uppercase tracking-widest">System</div>
             <a href="#" id="nav-settings"
                 class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800 transition-all">
@@ -410,6 +415,228 @@
                             </tbody>
                         </table>
                     </div>
+                </div>
+            </div>
+
+            <!-- View: Nelson Rules (Expert Interpretation) -->
+            <div id="view-nelson" class="p-8 max-w-7xl mx-auto space-y-8 hidden">
+                <div class="flex items-center gap-4 mb-8">
+                    <div
+                        class="w-12 h-12 rounded-2xl bg-indigo-600 text-white flex items-center justify-center shadow-lg shadow-indigo-200 dark:shadow-none">
+                        <span class="material-icons-outlined text-2xl">psychology</span>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-bold text-slate-900 dark:text-white"
+                            data-en="Nelson Rules Expert Interpretation" data-zh="Nelson 法則：專家實務解讀">Nelson 法則：專家實務解讀
+                        </h2>
+                        <p class="text-sm text-slate-500 dark:text-slate-400">Combining statistical theory with
+                            injection molding field experience.</p>
+                    </div>
+                </div>
+
+                <!-- Expert Profiles -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+                    <div
+                        class="bg-white dark:bg-slate-800 p-6 rounded-xl border border-slate-100 dark:border-slate-700 flex items-center gap-4 shadow-sm">
+                        <div
+                            class="w-14 h-14 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 flex items-center justify-center">
+                            <span class="material-icons-outlined text-3xl">precision_manufacturing</span>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-slate-900 dark:text-white">資深射出成型專家</h4>
+                            <p class="text-xs text-slate-500">觀點：模具磨損、機台參數、原料變異、周邊設備</p>
+                        </div>
+                    </div>
+                    <div
+                        class="bg-white dark:bg-slate-800 p-6 rounded-xl border border-slate-100 dark:border-slate-700 flex items-center gap-4 shadow-sm">
+                        <div
+                            class="w-14 h-14 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 flex items-center justify-center">
+                            <span class="material-icons-outlined text-3xl">assignment_turned_in</span>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-slate-900 dark:text-white">資深品管品質專家</h4>
+                            <p class="text-xs text-slate-500">觀點：統計顯著性、抽樣風險、可歸屬原因、客戶規範</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Rules Grid -->
+                <div class="space-y-6">
+                    <!-- Rule 1 -->
+                    <div class="saas-card overflow-hidden group">
+                        <div
+                            class="p-6 border-b border-slate-100 dark:border-slate-700 bg-rose-50/50 dark:bg-rose-900/10 flex justify-between items-start">
+                            <div class="flex gap-4">
+                                <div
+                                    class="w-10 h-10 rounded-lg bg-rose-500 text-white flex items-center justify-center font-bold text-lg">
+                                    1</div>
+                                <div>
+                                    <h3 class="text-lg font-bold text-slate-900 dark:text-white">一點超出 3σ 管制界限 (One point
+                                        beyond Zone A)</h3>
+                                    <p class="text-xs font-mono text-rose-600 dark:text-rose-400 mt-1">Out of Control
+                                        (OOC)</p>
+                                </div>
+                            </div>
+                            <span
+                                class="material-icons-outlined text-rose-300 text-4xl group-hover:scale-110 transition-transform">warning</span>
+                        </div>
+                        <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div class="space-y-2">
+                                <div class="flex items-center gap-2 text-blue-600 font-bold text-sm mb-2">
+                                    <span class="material-icons-outlined text-base">precision_manufacturing</span>
+                                    成型現場觀點
+                                </div>
+                                <p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+                                    「這通常代表<strong>災難性的突發異常</strong>。在射出成型中，最常見的原因是<span
+                                        class="text-slate-900 dark:text-white font-bold">異物阻塞射嘴</span>導致短射 (Short
+                                    Shot)，或者是<span
+                                        class="text-slate-900 dark:text-white font-bold">加熱圈燒毀</span>導致料溫驟降。如果是尺寸暴增，請檢查是否<span
+                                        class="text-slate-900 dark:text-white font-bold">模具未鎖緊</span>或是產生嚴重毛邊 (Flash)。」
+                                </p>
+                            </div>
+                            <div class="space-y-2 pl-0 md:pl-8 md:border-l border-slate-100 dark:border-slate-700">
+                                <div class="flex items-center gap-2 text-emerald-600 font-bold text-sm mb-2">
+                                    <span class="material-icons-outlined text-base">assignment_turned_in</span> 品管專家解讀
+                                </div>
+                                <p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+                                    「統計學上此事件發生機率僅 0.3%，幾乎可以確定有<strong>『非機遇原因 (Assignable
+                                        Cause)』</strong>介入。必須立即隔離該批次產品並進行全檢 (100% Inspection)，否則不良品流出的風險極高。」
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Rule 2 -->
+                    <div class="saas-card overflow-hidden group">
+                        <div
+                            class="p-6 border-b border-slate-100 dark:border-slate-700 bg-amber-50/50 dark:bg-amber-900/10 flex justify-between items-start">
+                            <div class="flex gap-4">
+                                <div
+                                    class="w-10 h-10 rounded-lg bg-amber-500 text-white flex items-center justify-center font-bold text-lg">
+                                    2</div>
+                                <div>
+                                    <h3 class="text-lg font-bold text-slate-900 dark:text-white">連續 9 點在中心線同一側 (9 points
+                                        on same side)</h3>
+                                    <p class="text-xs font-mono text-amber-600 dark:text-amber-400 mt-1">Process Shift
+                                        (Mean Shift)</p>
+                                </div>
+                            </div>
+                            <span
+                                class="material-icons-outlined text-amber-300 text-4xl group-hover:scale-110 transition-transform">trending_flat</span>
+                        </div>
+                        <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div class="space-y-2">
+                                <div class="flex items-center gap-2 text-blue-600 font-bold text-sm mb-2">
+                                    <span class="material-icons-outlined text-base">precision_manufacturing</span>
+                                    成型現場觀點
+                                </div>
+                                <p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+                                    「這是典型的<strong>平均值漂移 (Process Shift)</strong>。最常見原因是<span
+                                        class="text-slate-900 dark:text-white font-bold">更換了不同批次的原料</span>（熔融指數 MI
+                                    改變），或者是<span
+                                        class="text-slate-900 dark:text-white font-bold">模溫機冷卻水路</span>逐漸積垢導致散熱效率改變。如果發生在開機初期，可能是機台油溫尚未熱平衡。」
+                                </p>
+                            </div>
+                            <div class="space-y-2 pl-0 md:pl-8 md:border-l border-slate-100 dark:border-slate-700">
+                                <div class="flex items-center gap-2 text-emerald-600 font-bold text-sm mb-2">
+                                    <span class="material-icons-outlined text-base">assignment_turned_in</span> 品管專家解讀
+                                </div>
+                                <p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+                                    「雖然個別數據可能還在規格內，但製程分佈已經整體移動。長期來看這將導致 Cpk 下降。若偏移方向是趨近規格上限 (USL)，建議預防性調整參數 (Process
+                                    Center Adjustment)。」
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Rule 3 -->
+                    <div class="saas-card overflow-hidden group">
+                        <div
+                            class="p-6 border-b border-slate-100 dark:border-slate-700 bg-sky-50/50 dark:bg-sky-900/10 flex justify-between items-start">
+                            <div class="flex gap-4">
+                                <div
+                                    class="w-10 h-10 rounded-lg bg-sky-500 text-white flex items-center justify-center font-bold text-lg">
+                                    3</div>
+                                <div>
+                                    <h3 class="text-lg font-bold text-slate-900 dark:text-white">連續 6 點持續上升或下降 (6 points
+                                        trend)</h3>
+                                    <p class="text-xs font-mono text-sky-600 dark:text-sky-400 mt-1">Trend (Drift)</p>
+                                </div>
+                            </div>
+                            <span
+                                class="material-icons-outlined text-sky-300 text-4xl group-hover:scale-110 transition-transform">trending_up</span>
+                        </div>
+                        <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div class="space-y-2">
+                                <div class="flex items-center gap-2 text-blue-600 font-bold text-sm mb-2">
+                                    <span class="material-icons-outlined text-base">precision_manufacturing</span>
+                                    成型現場觀點
+                                </div>
+                                <p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+                                    「這代表一種<strong>漸進式的變化</strong>。請重點檢查<span
+                                        class="text-slate-900 dark:text-white font-bold">工具磨損 (Tool
+                                        Wear)</span>，例如頂針、滑塊或螺桿止逆環 (Check Ring) 的磨耗。另一個可能是<span
+                                        class="text-slate-900 dark:text-white font-bold">料管溫度控制失效</span>導致溫度緩慢持續爬升。」
+                                </p>
+                            </div>
+                            <div class="space-y-2 pl-0 md:pl-8 md:border-l border-slate-100 dark:border-slate-700">
+                                <div class="flex items-center gap-2 text-emerald-600 font-bold text-sm mb-2">
+                                    <span class="material-icons-outlined text-base">assignment_turned_in</span> 品管專家解讀
+                                </div>
+                                <p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+                                    「趨勢是一種強烈的警告訊號，預示著製程即將失控。此時不應等待超規發生，而應立即執行預防保養 (PM)。磨耗類的可歸屬原因通常是不可逆的，必須通過更換部件來解決。」
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Rule 4 -->
+                    <div class="saas-card overflow-hidden group">
+                        <div
+                            class="p-6 border-b border-slate-100 dark:border-slate-700 bg-indigo-50/50 dark:bg-indigo-900/10 flex justify-between items-start">
+                            <div class="flex gap-4">
+                                <div
+                                    class="w-10 h-10 rounded-lg bg-indigo-500 text-white flex items-center justify-center font-bold text-lg">
+                                    4</div>
+                                <div>
+                                    <h3 class="text-lg font-bold text-slate-900 dark:text-white">連續 14 點上下交替 (14 points
+                                        alternating)</h3>
+                                    <p class="text-xs font-mono text-indigo-600 dark:text-indigo-400 mt-1">Oscillation
+                                        (Over-control)</p>
+                                </div>
+                            </div>
+                            <span
+                                class="material-icons-outlined text-indigo-300 text-4xl group-hover:scale-110 transition-transform">waves</span>
+                        </div>
+                        <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div class="space-y-2">
+                                <div class="flex items-center gap-2 text-blue-600 font-bold text-sm mb-2">
+                                    <span class="material-icons-outlined text-base">precision_manufacturing</span>
+                                    成型現場觀點
+                                </div>
+                                <p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+                                    「這通常是<strong>人為干預過度</strong>造成的。現場操作員可能每打一模就去微調保壓或背壓，試圖讓尺寸『完美』，反而造成系統震盪。也可能是<span
+                                        class="text-slate-900 dark:text-white font-bold">機台液壓系統不穩定</span>（Hunting現象）。」
+                                </p>
+                            </div>
+                            <div class="space-y-2 pl-0 md:pl-8 md:border-l border-slate-100 dark:border-slate-700">
+                                <div class="flex items-center gap-2 text-emerald-600 font-bold text-sm mb-2">
+                                    <span class="material-icons-outlined text-base">assignment_turned_in</span> 品管專家解讀
+                                </div>
+                                <p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+                                    「這在統計上稱為負自相關 (Negative Autocorrelation)。請告訴現場人員：『<strong>放手 (Hands
+                                        off)</strong>』。只要製程在管制界限內，自然的隨機變異是正常的，不需要頻繁調整。過度調整只會增加變異。」
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-8 text-center">
+                    <button onclick="document.getElementById('nav-dashboard').click()"
+                        class="px-6 py-3 bg-white hover:bg-slate-50 border border-slate-200 text-slate-600 font-medium rounded-lg shadow-sm transition-all hover:shadow-md">
+                        返回儀表板
+                    </button>
                 </div>
             </div>
 

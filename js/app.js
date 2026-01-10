@@ -261,7 +261,7 @@ var SPCApp = {
         var clearRecentBtn = document.getElementById('clearRecentBtn');
         if (clearRecentBtn) clearRecentBtn.addEventListener('click', function () { self.clearHistory(); });
 
-        var navIds = ['nav-dashboard', 'nav-import', 'nav-analysis', 'nav-history', 'nav-qip-extract', 'nav-settings'];
+        var navIds = ['nav-dashboard', 'nav-import', 'nav-analysis', 'nav-history', 'nav-qip-extract', 'nav-nelson', 'nav-settings'];
         navIds.forEach(function (id) {
             var el = document.getElementById(id);
             if (el) el.addEventListener('click', function (e) { e.preventDefault(); self.switchView(id.replace('nav-', '')); });

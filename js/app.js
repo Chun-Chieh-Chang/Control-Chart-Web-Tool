@@ -715,7 +715,7 @@ var SPCApp = {
                         }
                     }
                 },
-                grid: { borderColor: theme.grid },
+                dataLabels: { enabled: false }, yaxis: { labels: { formatter: function (v) { return v.toFixed(3); } }, title: { text: 'Cpk' } }, grid: { borderColor: theme.grid },
                 annotations: {
                     yaxis: [
                         { y: 1.0, borderColor: '#f59e0b', strokeDashArray: 4, label: { text: '1.0' } },
@@ -741,7 +741,7 @@ var SPCApp = {
                 stroke: { width: [3, 2, 2, 2], dashArray: [0, 0, 5, 5] },
                 markers: { size: [4, 0, 0, 0], hover: { size: 6 } },
                 xaxis: { categories: labels, labels: { style: { colors: theme.text } } },
-                grid: { borderColor: theme.grid }
+                dataLabels: { enabled: false }, yaxis: { labels: { formatter: function (v) { return v.toFixed(4); } }, title: { text: self.t('平均值', 'Mean') } }, grid: { borderColor: theme.grid }
             };
             var chartMean = new ApexCharts(document.querySelector("#meanChart"), meanOpt);
             chartMean.render(); this.chartInstances.push(chartMean);
@@ -758,7 +758,7 @@ var SPCApp = {
                 stroke: { width: 3 },
                 markers: { size: 4, shape: ['circle', 'rect'] },
                 xaxis: { categories: labels, labels: { style: { colors: theme.text } } },
-                grid: { borderColor: theme.grid }
+                dataLabels: { enabled: false }, yaxis: { labels: { formatter: function (v) { return v.toFixed(4); } }, title: { text: self.t('標準差', 'StdDev') } }, grid: { borderColor: theme.grid }
             };
             var chartStd = new ApexCharts(document.querySelector("#stdDevChart"), stdOpt);
             chartStd.render(); this.chartInstances.push(chartStd);
@@ -782,7 +782,7 @@ var SPCApp = {
                 stroke: { width: [1.5, 3, 1.5, 2, 2, 2], dashArray: [0, 0, 0, 5, 0, 5] },
                 markers: { size: [0, 4, 0, 0, 0, 0], colors: ['#3b82f6'], strokeColors: '#fff' },
                 xaxis: { categories: labels, labels: { style: { colors: theme.text } } },
-                grid: { borderColor: theme.grid }
+                dataLabels: { enabled: false }, yaxis: { labels: { formatter: function (v) { return v.toFixed(4); } }, title: { text: self.t('測量值', 'Value') } }, grid: { borderColor: theme.grid }
             };
             var chartG = new ApexCharts(document.querySelector("#groupChart"), gOpt);
             chartG.render(); this.chartInstances.push(chartG);
@@ -796,7 +796,7 @@ var SPCApp = {
                 stroke: { width: 2 },
                 markers: { size: 4, shape: 'square' },
                 xaxis: { categories: labels, labels: { style: { colors: theme.text } } },
-                grid: { borderColor: theme.grid }
+                dataLabels: { enabled: false }, yaxis: { labels: { formatter: function (v) { return v.toFixed(4); } }, title: { text: self.t('全距', 'Range') } }, grid: { borderColor: theme.grid }
             };
             var chartV = new ApexCharts(document.querySelector("#groupVarChart"), vOpt);
             chartV.render(); this.chartInstances.push(chartV);

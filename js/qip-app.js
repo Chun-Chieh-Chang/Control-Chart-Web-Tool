@@ -26,7 +26,6 @@ var QIPExtractApp = {
             fileInfo: document.getElementById('qip-file-info'),
             fileName: document.getElementById('qip-file-name'),
             removeFile: document.getElementById('qip-remove-file'),
-            workbookInfo: document.getElementById('qip-workbook-info'),
 
             productCode: document.getElementById('qip-product-code'),
             cavityCount: document.getElementById('qip-cavity-count'),
@@ -101,7 +100,6 @@ var QIPExtractApp = {
                 self.els.uploadZone.classList.add('hidden');
                 self.els.fileInfo.classList.remove('hidden');
                 self.els.fileName.textContent = file.name;
-                self.els.workbookInfo.textContent = self.workbook.SheetNames.length + ' 個工作表';
 
                 // Auto-fill product code
                 if (!self.els.productCode.value) {

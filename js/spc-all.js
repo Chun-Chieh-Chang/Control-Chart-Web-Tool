@@ -750,7 +750,7 @@ var SPCApp = {
                             if (dataMatrix[i][j] !== null) allValues.push(dataMatrix[i][j]);
                         }
                     }
-                    var specs = dataInput.getSpecs();
+                    var specs = dataInput.specs;
                     var capability = SPCEngine.calculateProcessCapability(allValues, specs.usl, specs.lsl);
                     xbarR.summary.Cpk = capability.Cpk;
                     xbarR.summary.Ppk = capability.Ppk;
@@ -762,10 +762,10 @@ var SPCApp = {
                         specs: specs,
                         dataMatrix: dataMatrix,
                         cavityNames: dataInput.getCavityNames(),
-                        productInfo: dataInput.getProductInfo()
+                        productInfo: dataInput.productInfo
                     };
                 } else if (type === 'cavity') {
-                    var specs = dataInput.getSpecs();
+                    var specs = dataInput.specs;
                     var cavityStats = [];
                     for (var i = 0; i < dataInput.getCavityCount(); i++) {
                         var cavData = dataInput.getCavityBatchData(i);
@@ -773,9 +773,9 @@ var SPCApp = {
                         cap.name = dataInput.getCavityNames()[i];
                         cavityStats.push(cap);
                     }
-                    results = { type: 'cavity', cavityStats: cavityStats, specs: specs };
+                    results = { type: 'cavity', cavityStats: cavityStats, specs: specs, productInfo: dataInput.productInfo };
                 } else if (type === 'group') {
-                    var specs = dataInput.getSpecs();
+                    var specs = dataInput.specs;
                     var dataMatrix = dataInput.getDataMatrix();
                     var groupStats = [];
                     for (var i = 0; i < dataMatrix.length; i++) {
@@ -789,7 +789,7 @@ var SPCApp = {
                             count: filtered.length
                         });
                     }
-                    results = { type: 'group', groupStats: groupStats, specs: specs };
+                    results = { type: 'group', groupStats: groupStats, specs: specs, productInfo: dataInput.productInfo };
                 }
 
                 self.analysisResults = results;
@@ -1205,7 +1205,11 @@ var SPCApp = {
 
         } else if (data.type === 'cavity') {
             var labels = data.cavityStats.map(function (s) { return s.name; });
-            var theme = this.getChartTheme(); labels.map(function (s) { return s.name; });
+            var cpkVals = data.cavityStats.map(function (s) { return s.Cpk; });
+            var meanVals = data.cavityStats.map(function (s) { return s.mean; });
+            var stdOverallVals = data.cavityStats.map(function (s) { return s.overallStdDev; });
+            var stdWithinVals = data.cavityStats.map(function (s) { return s.withinStdDev; });
+            var theme = this.getChartTheme();
             // Cpk Performance Chart
             var cpkOptions = {
                 chart: { type: 'bar', height: 350, toolbar: { show: false }, background: 'transparent' },

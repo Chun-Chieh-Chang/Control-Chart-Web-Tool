@@ -261,7 +261,7 @@ var SPCApp = {
         var clearRecentBtn = document.getElementById('clearRecentBtn');
         if (clearRecentBtn) clearRecentBtn.addEventListener('click', function () { self.clearHistory(); });
 
-        var navIds = ['nav-dashboard', 'nav-import', 'nav-analysis', 'nav-history', 'nav-settings'];
+        var navIds = ['nav-dashboard', 'nav-import', 'nav-analysis', 'nav-history', 'nav-qip-extract', 'nav-settings'];
         navIds.forEach(function (id) {
             var el = document.getElementById(id);
             if (el) el.addEventListener('click', function (e) { e.preventDefault(); self.switchView(id.replace('nav-', '')); });
@@ -301,10 +301,10 @@ var SPCApp = {
 
     switchView: function (viewId) {
         var self = this;
-        var viewMap = { 'dashboard': 'view-import', 'import': 'view-import', 'analysis': 'view-analysis', 'history': 'view-history', 'settings': 'view-import' };
+        var viewMap = { 'dashboard': 'view-import', 'import': 'view-import', 'analysis': 'view-analysis', 'history': 'view-history', 'qip-extract': 'view-qip-extract', 'settings': 'view-import' };
         var targetId = viewMap[viewId] || 'view-import';
 
-        ['view-import', 'view-analysis', 'view-history'].forEach(function (id) {
+        ['view-import', 'view-analysis', 'view-history', 'view-qip-extract'].forEach(function (id) {
             var el = document.getElementById(id);
             if (el) el.classList.add('hidden');
         });
@@ -323,7 +323,7 @@ var SPCApp = {
 
         var titleEl = document.querySelector('header .text-slate-900');
         if (titleEl) {
-            var titles = { 'dashboard': this.t('數據總覽', 'Dashboard'), 'import': this.t('QIP 數據導入', 'QIP Import'), 'analysis': this.t('統計分析結果', 'Analysis Result'), 'history': this.t('歷史分析紀錄', 'History'), 'settings': this.t('系統設定', 'Settings') };
+            var titles = { 'dashboard': this.t('數據總覽', 'Dashboard'), 'import': this.t('QIP 數據導入', 'QIP Import'), 'analysis': this.t('統計分析結果', 'Analysis Result'), 'history': this.t('歷史分析紀錄', 'History'), 'qip-extract': this.t('QIP 數據提取', 'QIP Data Extract'), 'settings': this.t('系統設定', 'Settings') };
             titleEl.innerText = titles[viewId] || 'SPC Analysis';
         }
 

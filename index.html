@@ -421,9 +421,9 @@
                         data-zh="資料隱私保障：所有處理在瀏覽器本地完成">資料隱私保障：所有處理在瀏覽器本地完成</span>
                 </div>
 
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div class="grid grid-cols-1 lg:grid-cols-7 gap-6">
                     <!-- Step 1: File Upload -->
-                    <div class="lg:col-span-2 space-y-6">
+                    <div class="lg:col-span-6 space-y-6">
                         <div class="saas-card p-6">
                             <div class="flex items-center gap-3 mb-4">
                                 <span
@@ -604,22 +604,33 @@
                             </ul>
                         </div>
 
-                        <div id="qip-preview-panel" class="saas-card p-6 hidden">
-                            <div class="flex items-center justify-between mb-3">
-                                <h4 class="text-sm font-bold text-slate-900 dark:text-white" data-en="Worksheet Preview"
-                                    data-zh="工作表預覽">工作表預覽</h4>
-                                <div class="flex gap-1">
-                                    <button id="qip-prev-sheet"
-                                        class="p-1 rounded hover:bg-slate-100 dark:hover:bg-slate-700"><span
-                                            class="material-icons-outlined text-sm">chevron_left</span></button>
-                                    <button id="qip-next-sheet"
-                                        class="p-1 rounded hover:bg-slate-100 dark:hover:bg-slate-700"><span
-                                            class="material-icons-outlined text-sm">chevron_right</span></button>
-                                </div>
-                            </div>
-                            <div id="qip-preview-content" class="overflow-auto max-h-96 text-xs"></div>
+
+                    </div>
+                </div>
+
+                <!-- Worksheet Preview Panel (Full Width Below) -->
+                <div id="qip-preview-panel" class="saas-card p-6 hidden mt-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center gap-3">
+                            <h4 class="text-sm font-bold text-slate-900 dark:text-white" data-en="Worksheet Preview"
+                                data-zh="工作表預覽">工作表預覽</h4>
+                            <span id="qip-selection-mode"
+                                class="text-xs px-2 py-1 bg-primary/10 text-primary rounded hidden">
+                                選擇模式：<strong id="qip-selection-type">無</strong>
+                            </span>
+                        </div>
+                        <div class="flex gap-2">
+                            <button id="qip-prev-sheet"
+                                class="p-1.5 rounded hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"><span
+                                    class="material-icons-outlined text-base">chevron_left</span></button>
+                            <button id="qip-next-sheet"
+                                class="p-1.5 rounded hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"><span
+                                    class="material-icons-outlined text-base">chevron_right</span></button>
                         </div>
                     </div>
+                    <div id="qip-preview-content"
+                        class="overflow-auto border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800"
+                        style="max-height: 600px;"></div>
                 </div>
             </div>
 

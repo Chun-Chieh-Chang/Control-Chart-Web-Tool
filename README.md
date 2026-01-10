@@ -4,7 +4,7 @@
 > Web-based QIP (Quality Inspection Program) analysis system
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](../LICENSE)
-![Version](https://img.shields.io/badge/version-1.0.0-green)
+![Version](https://img.shields.io/badge/version-2.0.0-blue)
 
 [中文](#中文說明) | [English](#english-description)
 
@@ -18,6 +18,10 @@
   - 📈 **批號分析**: X̄-R 管制圖，每頁 25 批號獨立計算管制界限
   - 🔍 **模穴分析**: 模穴比較 + Cpk/Ppk 製程能力評估
   - 📊 **群組分析**: Min-Max-Avg 管制圖
+  - 🧠 **專家解讀系統**: 
+    - 內建 Nelson Rules (1-6) 異常偵測
+    - 提供「成型現場」與「品管專家」雙視角實務建議
+    - 支援異常列表懸停即時輔助 (Tooltip)
 
 - **100% 本地端處理**
   - ✅ 無數據上傳，完全保護隱私
@@ -76,20 +80,25 @@ Excel 檔案需符合以下格式：
 
 ### 🛠️ 技術架構
 
-- **前端**: HTML5, CSS3, Vanilla JavaScript
+- **前端**: HTML5, Vanilla JavaScript
+- **樣式框架**: Tailwind CSS (CDN)
 - **Excel 處理**: SheetJS (讀取與生成)
-- **圖表**: Chart.js
+- **圖表**: ApexCharts (SVG rendering for high resolution)
 - **計算引擎**: 自訂 SPC 統計引擎
 
 ### 📁 專案結構
 
 ```
 web/
-├── index.html              # 主頁面
-├── css/
-│   └── style.css           # 樣式表
+├── index.html              # 主頁面 (Entry Point)
+├── documents/              # 相關文檔 (SOP, DEV_LOG)
 └── js/
-    └── spc-all.js          # 整合 JavaScript（包含所有功能）
+    ├── app.js              # 主程式邏輯 (UI & Flow)
+    ├── engine.js           # SPC 統計運算核心
+    ├── input.js            # 檔案讀取與預處理
+    └── qip/                # QIP 解析模組
+        ├── data-extractor.js
+        └── ...
 ```
 
 ### 📊 SPC 計算公式
@@ -129,6 +138,10 @@ MIT License
   - 📈 **Batch Analysis**: X̄-R Control Charts with 25 batches per page
   - 🔍 **Cavity Analysis**: Cavity Comparison + Cpk/Ppk Assessment
   - 📊 **Group Analysis**: Min-Max-Avg Control Charts
+  - 🧠 **Expert Interpretation System**: 
+    - Built-in Nelson Rules (1-6) anomaly detection
+    - Dual-perspective practical advice from "Molding Expert" & "QC Expert"
+    - Supports hover tooltips on anomaly list for instant guidance
 
 - **100% Client-Side Processing**
   - ✅ No data upload, complete privacy protection
@@ -187,9 +200,10 @@ Excel file must follow this format:
 
 ### 🛠️ Tech Stack
 
-- **Frontend**: HTML5, CSS3, Vanilla JavaScript
+- **Frontend**: HTML5, Vanilla JavaScript
+- **Styling**: Tailwind CSS (CDN)
 - **Excel Processing**: SheetJS (reading and writing)
-- **Charts**: Chart.js
+- **Charts**: ApexCharts (SVG rendering)
 - **Calculation Engine**: Custom SPC statistical engine
 
 ### 📊 SPC Formulas

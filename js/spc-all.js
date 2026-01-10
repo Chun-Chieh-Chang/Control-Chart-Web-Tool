@@ -335,6 +335,7 @@ var SPCApp = {
     init: function () {
         this.setupLanguageToggle();
         this.setupFileUpload();
+        this.setupNavigation();
         this.setupEventListeners();
         this.updateLanguage();
         console.log('SPC Analysis Tool initialized');

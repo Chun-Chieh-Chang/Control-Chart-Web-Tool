@@ -335,7 +335,6 @@ var SPCApp = {
     init: function () {
         this.setupLanguageToggle();
         this.setupFileUpload();
-        this.setupNavigation();
         this.setupEventListeners();
         this.updateLanguage();
         console.log('SPC Analysis Tool initialized');
@@ -398,68 +397,7 @@ var SPCApp = {
         }
     },
 
-    setupNavigation: function () {
-        var self = this;
-        // Since we didn't add IDs to the sidebar links in index.html (oops), let's grab them by order.
-        // There are 3 links in the nav.
-        var navLinks = document.querySelectorAll('aside nav a');
-        if (navLinks.length < 3) return;
 
-        var navImport = navLinks[0];
-        var navAnalysis = navLinks[1];
-        var navReports = navLinks[2];
-
-        // 1. Data Import
-        navImport.addEventListener('click', function (e) {
-            e.preventDefault();
-            self.updateActiveNav(navImport);
-            document.getElementById('step1').scrollIntoView({ behavior: 'smooth' });
-        });
-
-        // 2. Analysis
-        navAnalysis.addEventListener('click', function (e) {
-            e.preventDefault();
-            self.updateActiveNav(navAnalysis);
-            // Smart scroll logic
-            if (document.getElementById('step3').style.display !== 'none') {
-                document.getElementById('step3').scrollIntoView({ behavior: 'smooth' });
-            } else if (document.getElementById('step2').style.display !== 'none') {
-                document.getElementById('step2').scrollIntoView({ behavior: 'smooth' });
-            } else {
-                // If not ready, bounce user back to step 1 or 2
-                if (self.workbook) {
-                    document.getElementById('step2').style.display = 'block';
-                    document.getElementById('step2').scrollIntoView({ behavior: 'smooth' });
-                } else {
-                    document.getElementById('step1').scrollIntoView({ behavior: 'smooth' });
-                }
-            }
-        });
-
-        // 3. Reports
-        navReports.addEventListener('click', function (e) {
-            e.preventDefault();
-            self.updateActiveNav(navReports);
-            if (document.getElementById('results').style.display !== 'none') {
-                document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
-            } else {
-                alert(self.t('請先執行分析產生報表', 'Please run analysis first to generate reports'));
-            }
-        });
-    },
-
-    updateActiveNav: function (activeEl) {
-        var navLinks = document.querySelectorAll('aside nav a');
-        navLinks.forEach(function (el) {
-            if (el === activeEl) {
-                // Active State
-                el.className = 'flex items-center space-x-3 px-4 py-3 text-white bg-white/10 rounded-lg shadow-sm cursor-pointer border-l-4 border-indigo-500';
-            } else {
-                // Inactive State
-                el.className = 'flex items-center space-x-3 px-4 py-3 text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors cursor-pointer';
-            }
-        });
-    },
 
 
     handleFile: function (file) {

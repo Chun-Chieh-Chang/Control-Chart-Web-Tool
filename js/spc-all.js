@@ -584,9 +584,6 @@ var SPCApp = {
             });
         }
 
-        var downloadBtn = document.getElementById('downloadExcel');
-        if (downloadBtn) downloadBtn.addEventListener('click', function () { self.downloadExcel(); });
-
         // Recent Files Clear All
         var clearBtn = document.getElementById('clearRecentBtn');
         if (clearBtn) {
@@ -887,6 +884,15 @@ var SPCApp = {
 
         resultsContent.innerHTML = html;
         document.getElementById('results').style.display = 'block';
+
+        // Re-attach download listener
+        var downloadBtn = document.getElementById('downloadExcel');
+        if (downloadBtn) {
+            // Remove old listeners by replacing the element or just adding a new one (delegation is better but this is explicit)
+            var newBtn = downloadBtn.cloneNode(true);
+            downloadBtn.parentNode.replaceChild(newBtn, downloadBtn);
+            newBtn.addEventListener('click', function () { self.downloadExcel(); });
+        }
 
         if (data.type === 'batch') {
             if (this.batchPagination.totalPages > 1) {
@@ -1383,7 +1389,12 @@ var SPCApp = {
         var now = new Date();
         var ts = now.getFullYear() + String(now.getMonth() + 1).padStart(2, '0') + String(now.getDate()).padStart(2, '0') + '_' +
             String(now.getHours()).padStart(2, '0') + String(now.getMinutes()).padStart(2, '0');
-        var filename = 'SPC_Report_' + data.type + '_' + this.selectedItem + '_' + ts + '.xlsx';
+
+        // Sanitize filename: remove / \ : * ? " < > | and replace spaces with underscore
+        var safeItem = String(this.selectedItem || 'Analysis').replace(/[\\\/\:\*\?\"\<\>\|]/g, '').replace(/\s+/g, '_');
+        var filename = 'SPC_Report_' + data.type + '_' + safeItem + '_' + ts + '.xlsx';
+
+        console.log('Attempting export: ' + filename);
 
         if (window.showSaveFilePicker) {
             try {
@@ -1398,13 +1409,20 @@ var SPCApp = {
                 const out = XLSX.write(wb, { type: 'array', bookType: 'xlsx' });
                 await writable.write(out);
                 await writable.close();
+                console.log('Export successful via File System Access API');
             } catch (err) {
                 if (err.name !== 'AbortError') {
-                    console.error('File picker error, falling back', err);
+                    console.error('File picker error:', err);
+                    alert(this.t('由於系統權限或瀏覽器限制，將改用預設下載方式。', 'Folder selection failed. Using default download instead.'));
                     XLSX.writeFile(wb, filename);
                 }
             }
         } else {
+            console.log('showSaveFilePicker not supported, using XLSX.writeFile');
+            // Inform user if they are on a non-secure context or incompatible browser
+            if (window.location.protocol === 'file:') {
+                alert(this.t('提示：偵測到本地執行 (file://)，瀏覽器限制無法主動選擇資料夾。檔案將下載至您的預設下載預設路徑。', 'Note: Local file detected. Browser security prevents folder selection. File will go to your default Downloads.'));
+            }
             XLSX.writeFile(wb, filename);
         }
     },

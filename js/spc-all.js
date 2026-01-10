@@ -614,7 +614,8 @@ var SPCApp = {
         var cavityCount = data.xbarR.summary.n;
 
         // Total 30 virtual columns: 1 (Labels) + 25 (Batches) + 4 (Summary Sidebar)
-        var html = '<table class="excel-table" style="width:max-content; border-collapse:collapse; font-size:10px; font-family:sans-serif; border:2px solid #000; table-layout:fixed;">';
+        // Explicit total width: 60 + (25 * 120) + (4 * 150) = 3660px
+        var html = '<table class="excel-table" style="width:3660px; border-collapse:collapse; font-size:13px; font-family:sans-serif; border:2px solid #000; table-layout:fixed;">';
 
         // Fixed Widths: Label 60px, Batch 120px, Summary 150px
         html += '<colgroup>';

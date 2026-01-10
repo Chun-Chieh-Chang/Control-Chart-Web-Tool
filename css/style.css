@@ -123,17 +123,17 @@ body {
 .excel-table {
     table-layout: fixed;
     /* Force fixed width */
-    width: 100%;
+    width: auto;
 }
 
 .excel-table td {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    padding: 2px 4px !important;
-    /* Extremely tight padding */
-    font-size: 11px !important;
-    /* Smaller font for data */
+    padding: 0px 1px !important;
+    /* Minimal padding */
+    font-size: 13px !important;
+    /* Larger font for data */
 }
 
 .excel-table tr {
@@ -144,16 +144,6 @@ body {
 #results.container {
     max-width: 95%;
     /* Use 95% of the screen width for results */
-}
-
-/* Excel Style Table */
-.excel-table td {
-    white-space: nowrap;
-    padding: 8px 12px !important;
-}
-
-.excel-table tr {
-    height: 35px;
 }
 
 /* ============================================================================

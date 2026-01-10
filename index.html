@@ -45,12 +45,13 @@
             background: #ffffff;
             border: 1px solid #f1f5f9;
             box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-            border-radius: 12px;
-            transition: all 0.2s ease;
+            border-radius: 16px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .saas-card:hover {
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
         }
 
         /* Anomaly Pulse Animation */
@@ -87,8 +88,8 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(4px);
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(8px);
             display: none;
             justify-content: center;
             align-items: center;
@@ -97,12 +98,12 @@
         }
 
         .spinner {
-            border: 3px solid #f1f5f9;
-            border-top: 3px solid #6366f1;
+            border: 4px solid #f1f5f9;
+            border-top: 4px solid #4f46e5;
             border-radius: 50%;
-            width: 32px;
-            height: 32px;
-            animation: spin 0.8s linear infinite;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s cubic-bezier(0.4, 0, 0.2, 1) infinite;
         }
 
         @keyframes spin {
@@ -115,22 +116,29 @@
             }
         }
 
-        /* Scrollbar */
+        /* Scrollbar Refinement */
         ::-webkit-scrollbar {
-            width: 6px;
+            width: 5px;
         }
 
         ::-webkit-scrollbar-track {
-            background: #f8fafc;
+            background: transparent;
         }
 
         ::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 10px;
+            background: #e2e8f0;
+            border-radius: 20px;
         }
 
         ::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8;
+            background: #cbd5e1;
+        }
+
+        /* Navigation Active State */
+        .nav-item-active {
+            background-color: #1e293b;
+            color: #ffffff;
+            box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
         }
     </style>
 
@@ -139,204 +147,403 @@
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 </head>
 
-<body class="font-sans antialiased text-gray-100 flex h-screen overflow-hidden bg-[#1a1f3c]">
+<body class="font-sans antialiased text-slate-800 flex h-screen overflow-hidden bg-slate-50">
 
-    <!-- Sidebar removed -->
+    <!-- Sidebar Layout -->
+    <aside class="w-64 bg-slate-900 flex-shrink-0 flex flex-col h-full z-30 transition-all">
+        <!-- Logo -->
+        <div class="h-16 flex items-center px-6 border-b border-slate-800">
+            <div class="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center mr-3">
+                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"></path>
+                </svg>
+            </div>
+            <span class="text-white font-bold tracking-tight">SPC Insights</span>
+        </div>
 
-    <!-- Main Content -->
-    <main class="flex-1 bg-slate-50 overflow-y-auto relative">
-        <div class="p-8 max-w-7xl mx-auto h-full flex flex-col">
+        <!-- Navigation Items -->
+        <nav class="flex-1 px-4 py-6 space-y-1 overflow-y-auto">
+            <a href="#"
+                class="flex items-center px-4 py-3 text-slate-400 hover:text-white hover:bg-slate-800 rounded-xl transition-all group">
+                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6">
+                    </path>
+                </svg>
+                <span class="text-sm font-medium" data-en="Dashboard" data-zh="數據總覽">數據總覽</span>
+            </a>
+            <a href="#" class="flex items-center px-4 py-3 text-white bg-slate-800 rounded-xl transition-all group">
+                <svg class="w-5 h-5 mr-3 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                    </path>
+                </svg>
+                <span class="text-sm font-medium" data-en="QIP Import" data-zh="QIP 匯入">QIP 匯入</span>
+            </a>
+            <a href="#"
+                class="flex items-center px-4 py-3 text-slate-400 hover:text-white hover:bg-slate-800 rounded-xl transition-all group">
+                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z">
+                    </path>
+                </svg>
+                <span class="text-sm font-medium" data-en="Statistical" data-zh="統計分析">統計分析</span>
+            </a>
+            <a href="#"
+                class="flex items-center px-4 py-3 text-slate-400 hover:text-white hover:bg-slate-800 rounded-xl transition-all group">
+                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <span class="text-sm font-medium" data-en="History" data-zh="歷史紀錄">歷史紀錄</span>
+            </a>
+            <div class="pt-10 mb-2 px-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Support</div>
+            <a href="#"
+                class="flex items-center px-4 py-3 text-slate-400 hover:text-white hover:bg-slate-800 rounded-xl transition-all group">
+                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z">
+                    </path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                </svg>
+                <span class="text-sm font-medium" data-en="Settings" data-zh="設定">設定</span>
+            </a>
+        </nav>
 
-            <!-- Page Header -->
-            <header class="mb-6 flex justify-between items-end">
-                <div>
-                    <h2 class="text-2xl font-bold tracking-tight text-slate-800" data-en="Analysis Workspace"
-                        data-zh="統計分析工作區">統計分析工作區</h2>
-                    <p class="text-slate-500 mt-1 text-sm"
-                        data-en="Upload documents to generate real-time SPC insights." data-zh="上傳報表以產生即時 SPC 數據洞察。">
-                        上傳報表以產生即時 SPC 數據洞察。</p>
+        <!-- User Profile -->
+        <div class="p-4 border-t border-slate-800">
+            <div class="flex items-center p-3 bg-slate-800/50 rounded-xl">
+                <div
+                    class="w-8 h-8 rounded-lg bg-indigo-500 flex items-center justify-center font-bold text-white text-xs mr-3">
+                    QC</div>
+                <div class="flex-1 overflow-hidden">
+                    <div class="text-xs font-bold text-white truncate">Administrator</div>
+                    <div class="text-[10px] text-slate-500 truncate">Premium Account</div>
                 </div>
-                <!-- Language Toggle Button relocated here -->
-                <button id="langBtn"
-                    class="bg-white hover:bg-slate-50 text-slate-700 px-4 py-2 rounded-lg transition-all flex items-center space-x-2 border border-slate-200 shadow-sm"
-                    title="Switch Language">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-400" fill="none"
-                        viewBox="0 0 24 24" stroke="currentColor">
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <div class="flex-1 flex flex-col h-full overflow-hidden">
+
+        <!-- Top Header -->
+        <header
+            class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-8 bg-white/80 backdrop-blur-md z-20">
+            <div class="flex items-center text-sm space-x-2 text-slate-500">
+                <span class="hover:text-slate-700 cursor-pointer">Workspace</span>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                </svg>
+                <span class="text-slate-900 font-semibold" data-en="QIP Statistical Analysis" data-zh="QIP 統計分析">QIP
+                    統計分析</span>
+            </div>
+
+            <div class="flex items-center space-x-4">
+                <div class="hidden md:flex relative group">
+                    <svg class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 transition-colors group-hover:text-indigo-500"
+                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" />
+                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                     </svg>
-                    <span id="langText" class="font-medium text-xs tracking-wider">EN</span>
+                    <input type="text" placeholder="Search data..."
+                        class="pl-10 pr-4 py-2 bg-slate-100 border-transparent focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 rounded-xl text-xs w-64 transition-all">
+                </div>
+                <!-- Language Toggle -->
+                <button id="langBtn"
+                    class="p-2 hover:bg-slate-100 rounded-lg transition-all text-slate-600 border border-slate-200 shadow-sm flex items-center">
+                    <span id="langText" class="text-[10px] font-bold px-1">EN</span>
                 </button>
-            </header>
+                <div class="w-px h-6 bg-slate-200"></div>
+                <button class="relative p-2 text-slate-500 hover:text-indigo-600 transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9">
+                        </path>
+                    </svg>
+                    <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
+                </button>
+            </div>
+        </header>
 
-            <!-- STEP 1: Upload Zone -->
-            <section id="step1">
-                <div class="relative rounded-2xl p-[1px] bg-slate-200 shadow-sm mb-10 overflow-hidden">
-                    <div class="rounded-[15px] bg-white p-10 text-center w-full flex flex-col items-center justify-center gap-4 hover:bg-slate-50 transition-colors cursor-pointer"
-                        id="uploadZone">
+        <!-- Dynamic Main Scrollable Area -->
+        <main class="flex-1 overflow-y-auto p-8 relative">
+            <div class="max-w-6xl mx-auto">
 
-                        <input type="file" id="fileInput" accept=".xlsx,.xls" hidden>
+                <!-- STEP 1: Upload & Welcome -->
+                <section id="step1" class="space-y-8">
+                    <header class="mb-10">
+                        <h1 class="text-2xl font-bold text-slate-900 mb-2" data-en="Welcome to SPC Insights"
+                            data-zh="歡迎使用 SPC 洞察系統">歡迎使用 SPC 洞察系統</h1>
+                        <p class="text-slate-500"
+                            data-en="Connect your production data to generate professional control charts and capability reports."
+                            data-zh="連結生產數據以產生專業的管制圖與製程能力報表。">連結生產數據以產生專業的管制圖與製程能力報表。</p>
+                    </header>
 
-                        <div class="w-14 h-14 rounded-2xl bg-indigo-50 flex items-center justify-center mb-2">
-                            <svg class="w-7 h-7 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                            </svg>
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        <!-- Upload Card -->
+                        <div class="lg:col-span-2 saas-card p-1">
+                            <div class="rounded-[11px] bg-white border-2 border-dashed border-slate-200 p-12 text-center flex flex-col items-center justify-center hover:border-indigo-400 hover:bg-indigo-50/10 transition-all cursor-pointer group"
+                                id="uploadZone">
+                                <input type="file" id="fileInput" accept=".xlsx,.xls" hidden>
+                                <div
+                                    class="w-20 h-20 rounded-full bg-indigo-50 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform shadow-inner">
+                                    <svg class="w-10 h-10 text-indigo-600" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12">
+                                        </path>
+                                    </svg>
+                                </div>
+                                <h3 class="text-lg font-bold text-slate-900 mb-2" data-en="Drop your QIP Report"
+                                    data-zh="拖曳 QIP 報表至此">拖曳 QIP 報表至此</h3>
+                                <p class="text-sm text-slate-500 mb-6" data-en="Support formats: .xlsx, .csv"
+                                    data-zh="支援格式：.xlsx, .csv">支援格式：.xlsx, .csv</p>
+                                <button
+                                    class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold text-sm shadow-md shadow-indigo-100 transition-all">
+                                    Browse Files
+                                </button>
+                            </div>
                         </div>
 
-                        <h3 class="text-lg text-slate-800 font-semibold" data-en="Import Data File" data-zh="導入數據檔案">
-                            導入數據檔案</h3>
-                        <p class="text-xs text-slate-400" data-en="Drag & drop your Excel report here or browse"
-                            data-zh="拖曳 Excel 報表至此，或點擊瀏覽">拖曳 Excel 報表至此，或點擊瀏覽</p>
-                    </div>
-                </div>
+                        <!-- Sidebar Info: Quick Start -->
+                        <div class="space-y-6">
+                            <div class="saas-card p-6 bg-indigo-600 text-white relative overflow-hidden">
+                                <svg class="absolute -right-4 -bottom-4 w-32 h-32 text-white/10" fill="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path
+                                        d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z">
+                                    </path>
+                                </svg>
+                                <h4 class="font-bold mb-3 flex items-center">
+                                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                                    </svg>
+                                    Quick Start Guide
+                                </h4>
+                                <ul class="text-xs space-y-3 text-indigo-100 font-medium">
+                                    <li class="flex items-start"><span
+                                            class="w-4 h-4 rounded-full bg-white/20 flex items-center justify-center mr-2 flex-shrink-0 text-[10px]">1</span>
+                                        Upload excel file containing batch measurement data.</li>
+                                    <li class="flex items-start"><span
+                                            class="w-4 h-4 rounded-full bg-white/20 flex items-center justify-center mr-2 flex-shrink-0 text-[10px]">2</span>
+                                        Select specific inspection items and analysis type.</li>
+                                    <li class="flex items-start"><span
+                                            class="w-4 h-4 rounded-full bg-white/20 flex items-center justify-center mr-2 flex-shrink-0 text-[10px]">3</span>
+                                        Visual interactive charts and OOC alerts will be generated.</li>
+                                </ul>
+                            </div>
 
-                <!-- File Info (Hidden initially) -->
-                <div class="glass-card rounded-xl p-6 flex justify-between items-center" id="fileInfo"
-                    style="display: none;">
-                    <div class="flex items-center space-x-4">
-                        <div
-                            class="w-10 h-10 rounded-full bg-green-500/20 text-green-400 flex items-center justify-center">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M5 13l4 4L19 7"></path>
-                            </svg>
+                            <div class="saas-card p-6">
+                                <h4 class="text-sm font-bold text-slate-900 mb-4 flex justify-between items-center">
+                                    <span>Recent Files</span>
+                                    <span
+                                        class="text-[10px] text-slate-400 cursor-pointer hover:text-indigo-600 uppercase">Clear
+                                        All</span>
+                                </h4>
+                                <div class="space-y-4">
+                                    <div class="flex items-center group cursor-pointer">
+                                        <div
+                                            class="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center mr-3 group-hover:bg-indigo-50 transition-colors">
+                                            <svg class="w-4 h-4 text-slate-400 group-hover:text-indigo-600" fill="none"
+                                                stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                                                </path>
+                                            </svg>
+                                        </div>
+                                        <div class="flex-1 min-w-0">
+                                            <div class="text-xs font-bold text-slate-800 truncate">QIP_Batch_2026.xlsx
+                                            </div>
+                                            <div class="text-[10px] text-slate-400">2.4 MB • 2 hours ago</div>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center group cursor-pointer opacity-60 grayscale">
+                                        <div
+                                            class="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center mr-3">
+                                            <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                                                </path>
+                                            </svg>
+                                        </div>
+                                        <div class="flex-1 min-w-0">
+                                            <div class="text-xs font-bold text-slate-800 truncate">MouldEx_Cavity.xlsx
+                                            </div>
+                                            <div class="text-[10px] text-slate-400">1.8 MB • Yesterday</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div>
-                            <p class="text-gray-200 font-medium" id="fileName">Filename.xlsx</p>
-                            <p class="text-xs text-gray-400" data-en="Ready for analysis" data-zh="準備分析">準備分析</p>
-                        </div>
                     </div>
-                    <button id="resetBtn"
-                        class="text-gray-400 hover:text-white text-sm underline decoration-gray-500 underline-offset-4"
-                        data-en="Change File" data-zh="更換檔案">更換檔案</button>
-                </div>
-            </section>
 
-            <!-- STEP 2: Inspection Item Selection -->
-            <section id="step2" style="display: none;" class="mb-12">
-                <div class="glass-card rounded-xl p-8">
-                    <h3 class="text-xl font-semibold text-gray-100 mb-6 border-l-4 border-indigo-500 pl-4"
-                        data-en="Select Inspection Item" data-zh="選擇檢驗項目">選擇檢驗項目</h3>
-                    <div id="itemList" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                        <!-- Items injected by JS -->
-                    </div>
-                </div>
-            </section>
-
-            <!-- STEP 3: Analysis Type -->
-            <section id="step3" style="display: none;" class="mb-12">
-                <div class="glass-card rounded-xl p-8">
-                    <h3 class="text-xl font-semibold text-gray-100 mb-6 border-l-4 border-indigo-500 pl-4"
-                        data-en="Select Analysis Type" data-zh="選擇分析類型">選擇分析類型</h3>
-
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <!-- Batch Analysis -->
-                        <div class="analysis-card bg-white/5 hover:bg-white/10 p-6 rounded-xl border border-white/10 cursor-pointer transition-all hover:-translate-y-1 group"
-                            data-type="batch">
+                    <!-- File Info (Hidden initially) -->
+                    <div id="fileInfo" style="display: none;"
+                        class="saas-card p-6 flex justify-between items-center bg-white border-l-4 border-l-indigo-500 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                        <div class="flex items-center space-x-4">
                             <div
-                                class="w-12 h-12 rounded-lg bg-blue-500/20 text-blue-400 flex items-center justify-center mb-4 group-hover:bg-blue-500 group-hover:text-white transition-colors">
+                                class="w-12 h-12 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center">
                                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M5 13l4 4L19 7"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <p class="text-slate-900 font-bold" id="fileName">Filename.xlsx</p>
+                                <p class="text-xs text-slate-500 uppercase font-bold tracking-widest mt-0.5"
+                                    data-en="READY FOR ANALYSIS" data-zh="就緒：準備分析">就緒：準備分析</p>
+                            </div>
+                        </div>
+                        <button id="resetBtn"
+                            class="px-4 py-2 text-slate-400 hover:text-slate-600 text-xs font-bold border border-slate-200 rounded-lg hover:bg-slate-50 transition-all"
+                            data-en="Change File" data-zh="更換檔案">更換檔案</button>
+                    </div>
+                </section>
+
+                <!-- STEP 2: Selection (SheetJS populated) -->
+                <section id="step2" style="display: none;" class="mt-12">
+                    <div class="flex items-center gap-3 mb-6">
+                        <div
+                            class="w-8 h-8 rounded-lg bg-indigo-600 text-white flex items-center justify-center text-sm font-bold shadow-lg shadow-indigo-100">
+                            01</div>
+                        <h3 class="text-xl font-bold text-slate-900" data-en="Choose Inspection Item" data-zh="點擊欲分析項目">
+                            點擊欲分析項目</h3>
+                    </div>
+                    <div id="itemList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <!-- JS injected cards -->
+                    </div>
+                </section>
+
+                <!-- STEP 3: Analysis Models -->
+                <section id="step3" style="display: none;"
+                    class="mt-12 bg-white rounded-3xl p-10 shadow-sm border border-slate-100">
+                    <div class="flex items-center gap-3 mb-10">
+                        <div
+                            class="w-8 h-8 rounded-lg bg-indigo-600 text-white flex items-center justify-center text-sm font-bold shadow-lg shadow-indigo-100">
+                            02</div>
+                        <h3 class="text-xl font-bold text-slate-900" data-en="Select Statistical Model"
+                            data-zh="選擇統計分析模型">選擇統計分析模型</h3>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        <!-- Batch -->
+                        <div class="p-8 rounded-2xl border border-slate-100 bg-slate-50/50 hover:bg-white hover:border-indigo-200 hover:shadow-xl hover:shadow-indigo-50 transition-all cursor-pointer group"
+                            data-analysis="batch">
+                            <div
+                                class="w-14 h-14 rounded-2xl bg-white shadow-sm flex items-center justify-center mb-6 text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white transition-all">
+                                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z">
                                     </path>
                                 </svg>
                             </div>
-                            <h4 class="text-lg font-bold text-white mb-2" data-en="Batch Analysis" data-zh="批號分析">批號分析
-                            </h4>
-                            <p class="text-sm text-gray-400 mb-6" data-en="X-Bar R Charts + Capability"
-                                data-zh="X-Bar R 管制圖 + 製程能力">X-Bar R 管制圖 + 製程能力</p>
-                            <button
-                                class="w-full py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-medium transition-colors"
-                                data-analysis="batch" data-en="Execute" data-zh="執行分析">執行分析</button>
+                            <h4 class="font-bold text-slate-900 mb-2">Batch Analysis</h4>
+                            <p class="text-xs text-slate-500 leading-relaxed mb-6">X-Bar R control charts with automated
+                                Nelson rules violation detection and process capability reporting.</p>
+                            <span
+                                class="text-xs font-bold text-indigo-600 group-hover:translate-x-1 transition-transform inline-flex items-center">Run
+                                Model <svg class="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M9 5l7 7-7 7"></path>
+                                </svg></span>
                         </div>
-
-                        <!-- Cavity Analysis -->
-                        <div class="analysis-card bg-white/5 hover:bg-white/10 p-6 rounded-xl border border-white/10 cursor-pointer transition-all hover:-translate-y-1 group"
-                            data-type="cavity">
+                        <!-- Cavity -->
+                        <div class="p-8 rounded-2xl border border-slate-100 bg-slate-50/50 hover:bg-white hover:border-indigo-200 hover:shadow-xl hover:shadow-indigo-50 transition-all cursor-pointer group"
+                            data-analysis="cavity">
                             <div
-                                class="w-12 h-12 rounded-lg bg-pink-500/20 text-pink-400 flex items-center justify-center mb-4 group-hover:bg-pink-500 group-hover:text-white transition-colors">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                class="w-14 h-14 rounded-2xl bg-white shadow-sm flex items-center justify-center mb-6 text-rose-600 group-hover:bg-rose-600 group-hover:text-white transition-all">
+                                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                                 </svg>
                             </div>
-                            <h4 class="text-lg font-bold text-white mb-2" data-en="Cavity Analysis" data-zh="模穴分析">模穴分析
-                            </h4>
-                            <p class="text-sm text-gray-400 mb-6" data-en="Comparisons + Cp/Cpk"
-                                data-zh="模穴比較 + Cp/Cpk">模穴比較 + Cp/Cpk</p>
-                            <button
-                                class="w-full py-2 bg-pink-600 hover:bg-pink-500 text-white rounded-lg font-medium transition-colors"
-                                data-analysis="cavity" data-en="Execute" data-zh="執行分析">執行分析</button>
+                            <h4 class="font-bold text-slate-900 mb-2">Cavity Analysis</h4>
+                            <p class="text-xs text-slate-500 leading-relaxed mb-6">Cross-cavity performance comparison.
+                                Evaluate Cpk differences between multiple tooling positions.</p>
+                            <span
+                                class="text-xs font-bold text-indigo-600 group-hover:translate-x-1 transition-transform inline-flex items-center">Run
+                                Model <svg class="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M9 5l7 7-7 7"></path>
+                                </svg></span>
                         </div>
-
-                        <!-- Group Analysis -->
-                        <div class="analysis-card bg-white/5 hover:bg-white/10 p-6 rounded-xl border border-white/10 cursor-pointer transition-all hover:-translate-y-1 group"
-                            data-type="group">
+                        <!-- Group -->
+                        <div class="p-8 rounded-2xl border border-slate-100 bg-slate-50/50 hover:bg-white hover:border-indigo-200 hover:shadow-xl hover:shadow-indigo-50 transition-all cursor-pointer group"
+                            data-analysis="group">
                             <div
-                                class="w-12 h-12 rounded-lg bg-yellow-500/20 text-yellow-400 flex items-center justify-center mb-4 group-hover:bg-yellow-500 group-hover:text-white transition-colors">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                class="w-14 h-14 rounded-2xl bg-white shadow-sm flex items-center justify-center mb-6 text-amber-600 group-hover:bg-amber-600 group-hover:text-white transition-all">
+                                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z">
                                     </path>
                                 </svg>
                             </div>
-                            <h4 class="text-lg font-bold text-white mb-2" data-en="Group Analysis" data-zh="群組分析">群組分析
-                            </h4>
-                            <p class="text-sm text-gray-400 mb-6" data-en="Min-Max-Avg Charts"
-                                data-zh="Min-Max-Avg 管制圖">Min-Max-Avg 管制圖</p>
-                            <button
-                                class="w-full py-2 bg-yellow-600 hover:bg-yellow-500 text-white rounded-lg font-medium transition-colors"
-                                data-analysis="group" data-en="Execute" data-zh="執行分析">執行分析</button>
+                            <h4 class="font-bold text-slate-900 mb-2">Group Variance</h4>
+                            <p class="text-xs text-slate-500 leading-relaxed mb-6">Analyze overall variation trends
+                                using Min-Max-Average grouping for large scale production monitoring.</p>
+                            <span
+                                class="text-xs font-bold text-indigo-600 group-hover:translate-x-1 transition-transform inline-flex items-center">Run
+                                Model <svg class="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M9 5l7 7-7 7"></path>
+                                </svg></span>
                         </div>
                     </div>
-                </div>
-            </section>
+                </section>
 
-            <!-- Results -->
-            <section id="results" style="display: none;" class="mb-12">
-                <div class="glass-card rounded-xl p-2">
-                    <div class="flex justify-between items-center p-6 border-b border-white/10">
-                        <h3 class="text-xl font-semibold text-gray-100" data-en="Analysis Results" data-zh="分析結果">分析結果
-                        </h3>
+                <!-- Results Section -->
+                <section id="results" style="display: none;" class="mt-12 pb-20">
+                    <div class="flex justify-between items-center mb-10">
+                        <div class="flex items-center gap-3">
+                            <div
+                                class="w-8 h-8 rounded-lg bg-indigo-600 text-white flex items-center justify-center text-sm font-bold shadow-lg shadow-indigo-100">
+                                03</div>
+                            <h3 class="text-xl font-bold text-slate-900" data-en="Analysis Insights" data-zh="分析洞察結果">
+                                分析洞察結果</h3>
+                        </div>
                         <button id="downloadExcel"
-                            class="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-500 text-white rounded-lg text-sm font-medium transition-colors">
+                            class="flex items-center gap-2 px-6 py-2.5 bg-slate-900 text-white rounded-xl text-sm font-bold hover:bg-slate-800 transition-all shadow-lg active:scale-95">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
                             </svg>
-                            <span data-en="Download Excel" data-zh="下載 Excel">下載 Excel</span>
+                            <span data-en="Export Report" data-zh="匯出專業報表">匯出專業報表</span>
                         </button>
                     </div>
-                    <div class="p-6 overflow-x-auto" id="resultsContent">
-                        <!-- Results injected by JS -->
+                    <div id="resultsContent">
+                        <!-- Content -->
                     </div>
-                </div>
-            </section>
-        </div>
-    </main>
+                </section>
 
-    <!-- Right Sidebar: Anomaly Insights (Hidden by default) -->
-    <aside id="anomalySidebar" class="w-80 bg-[#1e293b] border-l border-gray-700/30 flex flex-col hidden">
-        <div class="p-6 border-b border-gray-700/30 bg-[#2b3252]/50 backdrop-blur-md">
-            <h3 class="font-bold text-gray-100 flex items-center gap-2">
-                <span class="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
-                <span data-en="Anomaly Insights" data-zh="異常洞察">異常洞察</span>
-            </h3>
-        </div>
-        <div class="flex-1 overflow-y-auto p-4 space-y-3" id="anomalyList">
-            <!-- Anomaly Cards injected here -->
-            <div class="text-center text-gray-500 mt-10">
-                <p data-en="No anomalies detected" data-zh="未檢測到異常">未檢測到異常</p>
             </div>
+        </main>
+    </div>
+
+    <!-- Right Sidebar: Anomaly Insights (Interactive) -->
+    <aside id="anomalySidebar" class="w-96 bg-white border-l border-slate-200 flex flex-col hidden z-10 shadow-2xl">
+        <div class="p-8 border-b border-slate-100">
+            <h3 class="font-bold text-slate-900 text-lg flex items-center justify-between">
+                <span data-en="Anomaly Alerts" data-zh="異常偵測警報">異常偵測警報</span>
+                <span
+                    class="px-2 py-1 bg-rose-50 text-rose-600 text-[10px] font-bold rounded uppercase animate-pulse">Live</span>
+            </h3>
+            <p class="text-xs text-slate-500 mt-2">Real-time detection based on Nelson Rules for SPC.</p>
+        </div>
+        <div class="flex-1 overflow-y-auto p-4 space-y-4" id="anomalyList">
+            <!-- Cards -->
         </div>
     </aside>
 
     <!-- Loading Overlay -->
     <div class="loading-overlay" id="loadingOverlay">
-        <div class="spinner mb-4"></div>
-        <p id="loadingText" class="text-white text-lg font-light tracking-widest" data-en="Processing..."
-            data-zh="處理中...">處理中...</p>
+        <div class="spinner mb-6"></div>
+        <p id="loadingText" class="text-slate-600 text-sm font-bold tracking-widest uppercase"
+            data-en="Analyzing Production Data..." data-zh="正在分析生產數據...">正在分析生產數據...</p>
     </div>
 
     <!-- Scripts -->

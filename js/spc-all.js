@@ -442,17 +442,23 @@ var SPCApp = {
             var target = data[1] && data[1][1] ? data[1][1] : 'N/A';
 
             var card = document.createElement('div');
-            // Add clearer visual cues: hover scale, cursor pointer, distinct border
-            card.className = 'bg-[#2d3748] hover:bg-[#4a5568] p-6 rounded-xl border border-gray-600 hover:border-indigo-400 cursor-pointer transition-all shadow-lg group relative';
+            // Clean SaaS Light style for selection cards
+            card.className = 'saas-card p-6 cursor-pointer hover:border-indigo-400 hover:shadow-xl hover:shadow-indigo-50 transition-all group relative overflow-hidden';
 
-            // Add "Click to Select" overlay or badge
             card.innerHTML =
-                '<div class="flex justify-between items-start mb-2">' +
-                '<h3 class="text-lg font-bold text-white group-hover:text-indigo-300">' + sheetName + '</h3>' +
-                '<span class="px-2 py-1 bg-indigo-500/20 text-indigo-300 text-xs rounded-full border border-indigo-500/30">Select</span>' +
+                '<div class="relative z-10">' +
+                '<div class="flex justify-between items-start mb-4">' +
+                '<h3 class="text-base font-bold text-slate-900 group-hover:text-indigo-600 transition-colors">' + sheetName + '</h3>' +
+                '<span class="px-2 py-0.5 bg-slate-100 text-slate-500 text-[10px] font-bold rounded uppercase tracking-wider group-hover:bg-indigo-600 group-hover:text-white transition-all">Select</span>' +
                 '</div>' +
-                '<p class="text-sm text-gray-400">Target: <span class="text-white">' + target + '</span></p>' +
-                '<div class="absolute inset-0 border-2 border-transparent group-hover:border-indigo-500 rounded-xl transition-all"></div>'; // Active border effect
+                '<div class="flex flex-col space-y-1">' +
+                '<div class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">' + this.t('目標值', 'Target Value') + '</div>' +
+                '<div class="text-sm font-mono font-bold text-slate-700">' + target + '</div>' +
+                '</div>' +
+                '</div>' +
+                '<div class="absolute -right-2 -bottom-2 opacity-[0.03] group-hover:opacity-[0.08] transition-opacity">' +
+                '<svg class="w-16 h-16" fill="currentColor" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zM6 20V4h7v5h5v11H6z"/></svg>' +
+                '</div>';
 
             card.dataset.sheet = sheetName;
             card.addEventListener('click', function () {

@@ -697,6 +697,11 @@ var SPCApp = {
             var cpkVal = data.cavityStats.map(s => s.Cpk);
 
             // Cpk Chart with color coding and rules
+        } else if (data.type === 'cavity') {
+            var labels = data.cavityStats.map(s => s.name);
+            var cpkVal = data.cavityStats.map(s => s.Cpk);
+
+            // 1. Cpk Comparison Chart (Matches VBA: 4 color levels + 3 ref lines)
             var cpkOpt = {
                 chart: { type: 'bar', height: 350, toolbar: { show: false }, background: 'transparent' },
                 theme: { mode: theme.mode },
@@ -707,54 +712,58 @@ var SPCApp = {
                         borderRadius: 4,
                         colors: {
                             ranges: [
-                                { from: 0, to: 1.33, color: '#f43f5e' }, // Red < 1.33
-                                { from: 1.33, to: 1.67, color: '#fbbf24' }, // Yellow 1.33-1.67
-                                { from: 1.67, to: 10, color: '#10b981' } // Green > 1.67
+                                { from: 0, to: 0.999, color: '#ef4444' },     // Red < 1.0 (RGB(255,0,0) approx)
+                                { from: 1.0, to: 1.329, color: '#f59e0b' },   // Yellow 1.0 - 1.33 (RGB(255,192,0) approx)
+                                { from: 1.33, to: 1.669, color: '#84cc16' },  // Light Green 1.33 - 1.67 (RGB(146,208,80) approx)
+                                { from: 1.67, to: 99, color: '#10b981' }      // Green > 1.67 (RGB(0,176,80) approx)
                             ]
                         }
                     }
                 },
                 grid: { borderColor: theme.grid },
                 annotations: {
-                    yaxis: [{
-                        y: 1.33, borderColor: '#f43f5e', label: { borderColor: '#f43f5e', style: { color: '#fff', background: '#f43f5e' }, text: 'Target 1.33' }
-                    }]
+                    yaxis: [
+                        { y: 1.0, borderColor: '#f59e0b', strokeDashArray: 4, label: { text: '1.0' } },
+                        { y: 1.33, borderColor: '#84cc16', strokeDashArray: 4, label: { text: '1.33' } },
+                        { y: 1.67, borderColor: '#10b981', strokeDashArray: 4, label: { text: '1.67' } }
+                    ]
                 }
             };
             var chartCpk = new ApexCharts(document.querySelector("#cpkChart"), cpkOpt);
             chartCpk.render(); this.chartInstances.push(chartCpk);
 
-            // Mean Chart
+            // 2. Mean Comparison Chart (Matches VBA: Line Chart with Target/USL/LSL)
             var meanOpt = {
                 chart: { type: 'line', height: 350, toolbar: { show: false }, background: 'transparent' },
                 theme: { mode: theme.mode },
                 series: [
-                    { name: 'Mean', data: data.cavityStats.map(s => s.mean), type: 'bar' },
-                    { name: 'USL', data: new Array(labels.length).fill(data.specs.usl), type: 'line' },
-                    { name: 'LSL', data: new Array(labels.length).fill(data.specs.lsl), type: 'line' }
+                    { name: 'Mean', data: data.cavityStats.map(s => s.mean) },
+                    { name: 'Target', data: new Array(labels.length).fill(data.specs.target) },
+                    { name: 'USL', data: new Array(labels.length).fill(data.specs.usl) },
+                    { name: 'LSL', data: new Array(labels.length).fill(data.specs.lsl) }
                 ],
-                colors: ['#4f46e5', '#ef4444', '#ef4444'],
-                stroke: { width: [0, 2, 2], dashArray: [0, 5, 5] }, // Bar has 0 width stroke
+                colors: ['#0ea5e9', '#22c55e', '#ef4444', '#ef4444'], // Blue, Green, Red, Red
+                stroke: { width: [3, 2, 1.5, 1.5], dashArray: [0, 0, 5, 5] },
+                markers: { size: [5, 0, 0, 0] },
                 xaxis: { categories: labels, labels: { style: { colors: theme.text } } },
-                grid: { borderColor: theme.grid },
-                plotOptions: { bar: { columnWidth: '50%', borderRadius: 4 } }
+                grid: { borderColor: theme.grid }
             };
             var chartMean = new ApexCharts(document.querySelector("#meanChart"), meanOpt);
             chartMean.render(); this.chartInstances.push(chartMean);
 
-            // StdDev Chart (Bar for better comparison)
+            // 3. StdDev Comparison Chart (Matches VBA: Line Chart, Within vs Overall)
             var stdOpt = {
-                chart: { type: 'bar', height: 350, toolbar: { show: false }, background: 'transparent' },
+                chart: { type: 'line', height: 350, toolbar: { show: false }, background: 'transparent' },
                 theme: { mode: theme.mode },
                 series: [
-                    { name: 'Overall σ', data: data.cavityStats.map(s => s.overallStdDev) },
-                    { name: 'Within σ', data: data.cavityStats.map(s => s.withinStdDev) }
+                    { name: 'Within σ', data: data.cavityStats.map(s => s.withinStdDev) }, // Blue in VBA
+                    { name: 'Overall σ', data: data.cavityStats.map(s => s.overallStdDev) } // Red in VBA
                 ],
-                colors: ['#f59e0b', '#3b82f6'],
+                colors: ['#0ea5e9', '#ef4444'],
+                stroke: { width: 3 },
+                markers: { size: 5, shape: ['circle', 'square'] },
                 xaxis: { categories: labels, labels: { style: { colors: theme.text } } },
-                grid: { borderColor: theme.grid },
-                plotOptions: { bar: { borderRadius: 4, dataLabels: { position: 'top' } } },
-                dataLabels: { enabled: false }
+                grid: { borderColor: theme.grid }
             };
             var chartStd = new ApexCharts(document.querySelector("#stdDevChart"), stdOpt);
             chartStd.render(); this.chartInstances.push(chartStd);
@@ -762,34 +771,37 @@ var SPCApp = {
         } else if (data.type === 'group') {
             var labels = data.groupStats.map(s => s.batch);
 
-            // Trend Chart: Area for Min-Max could be nice, but Line is safer.
-            // Let's use solid line for Avg, dashed for Min/Max
+            // 4. Group Trend Chart (Matches VBA: Min/Max/Avg + Specs)
             var gOpt = {
                 chart: { type: 'line', height: 380, toolbar: { show: false } },
                 theme: { mode: theme.mode },
                 series: [
-                    { name: 'Max', data: data.groupStats.map(s => s.max) },
-                    { name: 'Avg', data: data.groupStats.map(s => s.avg) },
-                    { name: 'Min', data: data.groupStats.map(s => s.min) }
+                    { name: 'Max', data: data.groupStats.map(s => s.max) },      // Red Thin
+                    { name: 'Avg', data: data.groupStats.map(s => s.avg) },      // Blue Thick
+                    { name: 'Min', data: data.groupStats.map(s => s.min) },      // Red Thin
+                    { name: 'USL', data: new Array(labels.length).fill(data.specs.usl) }, // Orange Dash
+                    { name: 'Target', data: new Array(labels.length).fill(data.specs.target) }, // Green Solid
+                    { name: 'LSL', data: new Array(labels.length).fill(data.specs.lsl) }  // Orange Dash
                 ],
-                colors: ['#9ca3af', '#4f46e5', '#9ca3af'], // Grey for min/max, Primary for Avg
-                stroke: { width: [1, 3, 1], dashArray: [5, 0, 5], curve: 'smooth' },
+                colors: ['#ef4444', '#0ea5e9', '#ef4444', '#f59e0b', '#22c55e', '#f59e0b'],
+                stroke: { width: [1.5, 3, 1.5, 2, 2, 2], dashArray: [0, 0, 0, 5, 0, 5] },
+                markers: { size: [0, 5, 0, 0, 0, 0] },
                 xaxis: { categories: labels, labels: { style: { colors: theme.text } } },
-                grid: { borderColor: theme.grid },
-                markers: { size: [0, 4, 0] } // Markers only on Avg
+                grid: { borderColor: theme.grid }
             };
             var chartG = new ApexCharts(document.querySelector("#groupChart"), gOpt);
             chartG.render(); this.chartInstances.push(chartG);
 
-            // Variation Chart - Bar Chart is better for magnitude
+            // 5. Variation Chart (Matches VBA: Range Line Chart, Purple)
             var vOpt = {
-                chart: { type: 'bar', height: 380, toolbar: { show: false } },
+                chart: { type: 'line', height: 380, toolbar: { show: false } }, // VBA uses Line
                 theme: { mode: theme.mode },
                 series: [{ name: 'Range', data: data.groupStats.map(s => s.range) }],
-                colors: ['#8b5cf6'],
+                colors: ['#8b5cf6'], // Purple
+                stroke: { width: 2 },
+                markers: { size: 5, shape: 'square' },
                 xaxis: { categories: labels, labels: { style: { colors: theme.text } } },
-                grid: { borderColor: theme.grid },
-                plotOptions: { bar: { borderRadius: 2 } }
+                grid: { borderColor: theme.grid }
             };
             var chartV = new ApexCharts(document.querySelector("#groupVarChart"), vOpt);
             chartV.render(); this.chartInstances.push(chartV);

@@ -30,9 +30,6 @@ var QIPExtractApp = {
 
             productCode: document.getElementById('qip-product-code'),
             cavityCount: document.getElementById('qip-cavity-count'),
-            worksheetSelectGroup: document.getElementById('qip-worksheet-select-group'),
-            worksheetSelect: document.getElementById('qip-worksheet-select'),
-            previewBtn: document.getElementById('qip-preview-btn'),
             cavityGroups: document.getElementById('qip-cavity-groups'),
 
             configName: document.getElementById('qip-config-name'),
@@ -49,12 +46,7 @@ var QIPExtractApp = {
             downloadExcel: document.getElementById('qip-download-excel'),
             sendToSpc: document.getElementById('qip-send-to-spc'),
             errorLog: document.getElementById('qip-error-log'),
-            errorList: document.getElementById('qip-error-list'),
-
-            previewPanel: document.getElementById('qip-preview-panel'),
-            previewContent: document.getElementById('qip-preview-content'),
-            prevSheet: document.getElementById('qip-prev-sheet'),
-            nextSheet: document.getElementById('qip-next-sheet')
+            errorList: document.getElementById('qip-error-list')
         };
     },
 
@@ -78,11 +70,7 @@ var QIPExtractApp = {
         // Cavity count change
         if (this.els.cavityCount) this.els.cavityCount.addEventListener('change', function () { self.handleCavityCountChange(); });
 
-        // Worksheet selection
-        if (this.els.worksheetSelect) this.els.worksheetSelect.addEventListener('change', function () { self.previewWorksheet(); });
-        if (this.els.previewBtn) this.els.previewBtn.addEventListener('click', function () { self.previewWorksheet(); });
 
-        // Config management
         if (this.els.saveConfig) this.els.saveConfig.addEventListener('click', function () { self.saveConfiguration(); });
         if (this.els.loadConfig) this.els.loadConfig.addEventListener('click', function () { self.showConfigDialog(); });
 
@@ -120,8 +108,6 @@ var QIPExtractApp = {
                     self.els.productCode.value = file.name.replace(/\.[^/.]+$/, '');
                 }
 
-                self.updateWorksheetSelector();
-                self.els.worksheetSelectGroup.classList.remove('hidden');
                 self.updateStartButton();
             } catch (error) {
                 alert('檔案讀取失敗: ' + error.message);
@@ -136,24 +122,12 @@ var QIPExtractApp = {
         this.els.fileInput.value = '';
         this.els.uploadZone.classList.remove('hidden');
         this.els.fileInfo.classList.add('hidden');
-        this.els.worksheetSelectGroup.classList.add('hidden');
         this.els.cavityGroups.classList.add('hidden');
         this.els.resultSection.classList.add('hidden');
         this.updateStartButton();
     },
 
-    updateWorksheetSelector: function () {
-        var select = this.els.worksheetSelect;
-        select.innerHTML = '<option value="">-- 請選擇 --</option>';
-        if (this.workbook) {
-            this.workbook.SheetNames.forEach(function (name) {
-                var opt = document.createElement('option');
-                opt.value = name;
-                opt.textContent = name;
-                select.appendChild(opt);
-            });
-        }
-    },
+
 
     handleCavityCountChange: function () {
         var count = parseInt(this.els.cavityCount.value) || 0;
@@ -189,24 +163,7 @@ var QIPExtractApp = {
         this.els.cavityGroups.innerHTML = html;
     },
 
-    previewWorksheet: function () {
-        var sheetName = this.els.worksheetSelect.value;
-        if (!sheetName || !this.workbook) return;
 
-        var ws = this.workbook.Sheets[sheetName];
-        var html = XLSX.utils.sheet_to_html(ws, { header: '', editable: false });
-        this.els.previewContent.innerHTML = html;
-        this.els.previewPanel.classList.remove('hidden');
-    },
-
-    switchSheet: function (offset) {
-        var select = this.els.worksheetSelect;
-        var newIdx = select.selectedIndex + offset;
-        if (newIdx >= 1 && newIdx < select.options.length) {
-            select.selectedIndex = newIdx;
-            this.previewWorksheet();
-        }
-    },
 
     gatherConfiguration: function () {
         var config = {

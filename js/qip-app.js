@@ -650,7 +650,8 @@ var QIPExtractApp = {
 
                             // Let's try to assume first row is the correct data
                             values = values.slice(0, ids.length);
-                            results.errors.push('提示：工作表 [' + sheetName + '] 第 ' + i + ' 組數據範圍過大，已自動修正為首行數據。');
+                            // Suppress the warning for cleaner UI since this is a handled case now
+                            // results.errors.push('提示：工作表 [' + sheetName + '] 第 ' + i + ' 組數據範圍過大，已自動修正為首行數據。');
                         } else {
                             results.errors.push('工作表 [' + sheetName + '] 第 ' + i + ' 組設定錯誤：穴號數量(' + ids.length + ')與數據數量(' + values.length + ')不符');
                             continue;
@@ -760,17 +761,57 @@ var QIPExtractApp = {
         if (!this.processingResults) { alert('沒有可下載的結果'); return; }
 
         try {
-            if (typeof ExcelExporter !== 'undefined') {
-                var exporter = new ExcelExporter();
-                exporter.exportResults(this.processingResults, this.fileName.replace(/\.[^/.]+$/, '') + '_extracted.xlsx');
-            } else {
-                // Fallback
-                var wb = XLSX.utils.book_new();
-                var ws = XLSX.utils.json_to_sheet(this.processingResults.data || []);
-                XLSX.utils.book_append_sheet(wb, ws, 'Data');
-                XLSX.writeFile(wb, this.fileName.replace(/\.[^/.]+$/, '') + '_extracted.xlsx');
+            var extracted = this.processingResults;
+            var wb = XLSX.utils.book_new();
+
+            // Group by batch (sheet name)
+            var batches = {};
+            if (extracted.data) {
+                extracted.data.forEach(function (item) {
+                    if (!batches[item.batch]) batches[item.batch] = [];
+                    batches[item.batch].push(item);
+                });
             }
+
+            // Create a sheet for each batch
+            Object.keys(batches).forEach(function (batchName) {
+                var items = batches[batchName];
+                // Sort by cavity ID
+                items.sort(function (a, b) {
+                    var na = parseFloat(a.cavity);
+                    var nb = parseFloat(b.cavity);
+                    if (!isNaN(na) && !isNaN(nb)) return na - nb;
+                    return a.cavity.localeCompare(b.cavity);
+                });
+
+                // 1. Prepare Headers (Row 1)
+                // Format: [BatchName, ProductName, ItemName, Cavity1穴, Cavity2穴...]
+                var cavityHeaders = items.map(function (i) { return i.cavity + '穴'; });
+                var row1 = ['Batch No.', extracted.productCode || 'Product', 'Data'].concat(cavityHeaders);
+
+                // 2. Prepare Specs (Row 2) - Placeholders
+                var row2 = ['Specs', 0, 0, 0];
+                while (row2.length < row1.length) row2.push('');
+
+                // 3. Prepare Data (Row 3)
+                var values = items.map(function (i) { return i.value; });
+                var row3 = [batchName, '', ''].concat(values);
+
+                var aoa = [row1, row2, row3];
+                var ws = XLSX.utils.aoa_to_sheet(aoa);
+                XLSX.utils.book_append_sheet(wb, ws, batchName);
+            });
+
+            // If no data, create a summary sheet
+            if (wb.SheetNames.length === 0) {
+                var ws = XLSX.utils.json_to_sheet(extracted.data || []);
+                XLSX.utils.book_append_sheet(wb, ws, "RawData");
+            }
+
+            XLSX.writeFile(wb, (this.fileName || 'result').replace(/\.[^/.]+$/, '') + '_extracted.xlsx');
+
         } catch (error) {
+            console.error(error);
             alert('下載失敗: ' + error.message);
         }
     },

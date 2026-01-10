@@ -586,19 +586,19 @@ var SPCApp = {
             // Compact Dashboard metrics
             html = '<div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">' +
                 '<div class="saas-card p-4 flex flex-col justify-center">' +
-                '<div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">' + this.t('模穴數 (n)', 'Cavity Count') + '</div>' +
+                '<div class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">' + this.t('模穴數 (n)', 'Cavity Count') + '</div>' +
                 '<div class="text-xl font-bold text-slate-900">' + data.xbarR.summary.n + '</div>' +
                 '</div>' +
                 '<div class="saas-card p-4 flex flex-col justify-center">' +
-                '<div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">' + this.t('總記錄數', 'Total Batches') + '</div>' +
+                '<div class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">' + this.t('總記錄數', 'Total Batches') + '</div>' +
                 '<div class="text-xl font-bold text-slate-900">' + totalBatches + '</div>' +
                 '</div>' +
                 '<div class="saas-card p-4 flex flex-col justify-center">' +
-                '<div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">' + this.t('製程能力 (Cpk)', 'Process Cpk') + '</div>' +
+                '<div class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">' + this.t('製程能力 (Cpk)', 'Process Cpk') + '</div>' +
                 '<div class="text-xl font-bold text-indigo-600">' + SPCEngine.round(data.xbarR.summary.Cpk, 3) + '</div>' +
                 '</div>' +
                 '<div class="saas-card p-4 flex flex-col justify-center">' +
-                '<div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">' + this.t('異常狀態', 'Status') + '</div>' +
+                '<div class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">' + this.t('異常狀態', 'Status') + '</div>' +
                 '<div class="flex items-center space-x-2">' +
                 '<div class="w-2 h-2 rounded-full ' + (data.xbarR.xBar.violations.length > 0 ? 'anomaly-pulse' : 'bg-success') + '"></div>' +
                 '<span class="text-sm font-semibold ' + (data.xbarR.xBar.violations.length > 0 ? 'text-rose-600' : 'text-emerald-600') + '">' +
@@ -609,7 +609,7 @@ var SPCApp = {
 
             if (totalPages > 1) {
                 html += '<div class="flex items-center justify-between mb-4 bg-white p-3 rounded-lg border border-slate-100 shadow-sm">' +
-                    '<div class="text-xs font-medium text-slate-500" id="pageInfo">' + this.t('頁次 ', 'Page ') + '1 / ' + totalPages + '</div>' +
+                    '<div class="text-xs font-medium text-slate-600" id="pageInfo">' + this.t('頁次 ', 'Page ') + '1 / ' + totalPages + '</div>' +
                     '<div class="flex gap-2">' +
                     '<button id="prevPageBtn" class="px-4 py-1.5 text-xs font-bold border border-slate-200 rounded-md hover:bg-slate-50 transition-all disabled:opacity-30 disabled:cursor-not-allowed">' + this.t('上一頁', 'Prev') + '</button>' +
                     '<button id="nextPageBtn" class="px-4 py-1.5 text-xs font-bold text-white bg-indigo-600 rounded-md hover:bg-indigo-700 transition-all disabled:opacity-30 disabled:cursor-not-allowed">' + this.t('下一頁', 'Next') + '</button>' +
@@ -625,14 +625,14 @@ var SPCApp = {
                 '<div class="saas-card p-8">' +
                 '<div class="flex justify-between items-center mb-6">' +
                 '<h3 class="text-base font-bold text-slate-800">' + this.t('X̄ 管制圖 (均值)', 'X-Bar Control Chart') + '</h3>' +
-                '<span class="px-2 py-0.5 bg-slate-100 text-slate-500 text-[10px] font-bold rounded uppercase">SVG Vector</span>' +
+                '<span class="px-2 py-0.5 bg-slate-100 text-slate-600 text-[10px] font-bold rounded uppercase tracking-wider">SVG Vector</span>' +
                 '</div>' +
                 '<div id="xbarChart" class="h-96"></div>' +
                 '</div>' +
                 '<div class="saas-card p-8">' +
                 '<div class="flex justify-between items-center mb-6">' +
                 '<h3 class="text-base font-bold text-slate-800">' + this.t('R 管制圖 (全距)', 'R Control Chart') + '</h3>' +
-                '<span class="px-2 py-0.5 bg-slate-100 text-slate-500 text-[10px] font-bold rounded uppercase">SVG Vector</span>' +
+                '<span class="px-2 py-0.5 bg-slate-100 text-slate-600 text-[10px] font-bold rounded uppercase tracking-wider">SVG Vector</span>' +
                 '</div>' +
                 '<div id="rChart" class="h-80"></div>' +
                 '</div>' +
@@ -660,7 +660,7 @@ var SPCApp = {
                 '</div>' +
                 '<div class="overflow-x-auto">' +
                 '<table class="w-full text-sm text-left">' +
-                '<thead class="text-[11px] text-slate-400 uppercase bg-slate-50/50">' +
+                '<thead class="text-[11px] text-slate-500 uppercase bg-slate-50/50">' +
                 '<tr>' +
                 '<th class="px-8 py-4 font-bold">Cavity Name</th>' +
                 '<th class="px-8 py-4 text-center">Mean</th>' +
@@ -678,7 +678,7 @@ var SPCApp = {
                         (s.Cpk < 1.0 ? 'bg-rose-50 text-rose-600' : 'bg-emerald-50 text-emerald-600') + '">' +
                         SPCEngine.round(s.Cpk, 3) + '</span>' +
                         '</td>' +
-                        '<td class="px-8 py-4 text-center text-slate-500 font-mono">' + s.count + '</td>' +
+                        '<td class="px-8 py-4 text-center text-slate-600 font-mono">' + s.count + '</td>' +
                         '</tr>';
                 }).join('') +
                 '</tbody>' +
@@ -890,7 +890,8 @@ var SPCApp = {
                 ],
                 colors: ['#4f46e5', '#f43f5e', '#10b981', '#f43f5e'],
                 stroke: { width: [3, 1.5, 1.5, 1.5], dashArray: [0, 6, 0, 6], curve: 'straight' },
-                xaxis: { categories: pageLabels, labels: { style: { colors: '#94a3b8', fontSize: '10px' } } },
+                xaxis: { categories: pageLabels, labels: { style: { colors: '#64748b', fontSize: '10px' } } },
+                tooltip: { y: { formatter: function (val) { return val.toFixed(4); } } },
                 markers: {
                     size: 4,
                     discrete: pageXbarR.xBar.violations.map(function (v) {
@@ -921,7 +922,8 @@ var SPCApp = {
                 ],
                 colors: ['#64748b', '#f43f5e', '#10b981'],
                 stroke: { width: [2.5, 1, 1], dashArray: [0, 6, 0] },
-                xaxis: { categories: pageLabels, labels: { style: { colors: '#94a3b8', fontSize: '10px' } } }
+                xaxis: { categories: pageLabels, labels: { style: { colors: '#64748b', fontSize: '10px' } } },
+                tooltip: { y: { formatter: function (val) { return val.toFixed(4); } } }
             };
             var chartR = new ApexCharts(document.querySelector("#rChart"), rOptions);
             chartR.render();
@@ -935,9 +937,10 @@ var SPCApp = {
             var cpkOptions = {
                 chart: { type: 'bar', height: 350, toolbar: { show: false } },
                 series: [{ name: 'Cpk', data: cpkVals }],
-                xaxis: { categories: labels },
+                xaxis: { categories: labels, labels: { style: { colors: '#64748b' } } },
                 colors: ['#6366f1'],
-                plotOptions: { bar: { borderRadius: 6, columnWidth: '55%' } }
+                plotOptions: { bar: { borderRadius: 6, columnWidth: '55%' } },
+                tooltip: { y: { formatter: function (val) { return val.toFixed(3); } } }
             };
             var chartCpk = new ApexCharts(document.querySelector("#cpkChart"), cpkOptions);
             chartCpk.render();
@@ -949,9 +952,10 @@ var SPCApp = {
             var gOptions = {
                 chart: { type: 'area', height: 380, toolbar: { show: false } },
                 series: [{ name: 'Average', data: avgVals }],
-                xaxis: { categories: labels },
+                xaxis: { categories: labels, labels: { style: { colors: '#64748b', fontSize: '10px' } } },
                 stroke: { curve: 'smooth', width: 2 },
-                fill: { type: 'gradient', gradient: { shadeIntensity: 1, opacityFrom: 0.45, opacityTo: 0.05 } }
+                fill: { type: 'gradient', gradient: { shadeIntensity: 1, opacityFrom: 0.45, opacityTo: 0.05 } },
+                tooltip: { y: { formatter: function (val) { return val.toFixed(4); } } }
             };
             var chartG = new ApexCharts(document.querySelector("#groupChart"), gOptions);
             chartG.render();
@@ -1028,7 +1032,7 @@ var SPCApp = {
                     var cavRow = ['X' + (cav + 1)];
                     for (var b = startBatch; b < endBatch; b++) {
                         var value = data.dataMatrix && data.dataMatrix[b] ? data.dataMatrix[b][cav] : null;
-                        cavRow.push(value !== null ? SPCEngine.round(value, 4) : '');
+                        cavRow.push(value !== null ? value : '');
                     }
                     wsData.push(cavRow);
                 }
@@ -1117,7 +1121,7 @@ var SPCApp = {
         var violations = pageXbarR.xBar.violations;
 
         if (violations.length === 0) {
-            list.innerHTML = '<div class="text-center text-slate-400 mt-10 px-6">' +
+            list.innerHTML = '<div class="text-center text-slate-500 mt-10 px-6">' +
                 '<p class="text-sm font-medium">' + this.t('本頁數據全數在管制界限內。', 'All points within control limits.') + '</p>' +
                 '</div>';
             return;
@@ -1138,7 +1142,7 @@ var SPCApp = {
                 '<div class="flex-1">' +
                 '<div class="text-sm font-bold text-slate-900 mb-0.5">' + batchName + '</div>' +
                 '<div class="text-[10px] text-rose-500 font-bold uppercase tracking-wider mb-2">' + rulesText + '</div>' +
-                '<div class="text-[11px] text-slate-400 leading-relaxed">' +
+                '<div class="text-[11px] text-slate-600 leading-relaxed">' +
                 self.t('偵測到異常偏離，建議檢查該批次生產條件。', 'Deviation detected. Verify production settings for this batch.') +
                 '</div>' +
                 '</div>' +

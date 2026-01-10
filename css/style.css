@@ -1,28 +1,38 @@
 /* ============================================================================
    SPC Analysis Tool - Design System
-   Professional Navy Theme with Glassmorphism
+   Modern SaaS Dark Theme with Glassmorphism
    ============================================================================ */
 
 :root {
-    /* Color Palette */
-    --primary: #0a1628;
-    --primary-light: #1a2942;
-    --primary-dark: #050b14;
+    /* Color Palette - Dark Theme */
+    --primary: #6366f1;
+    /* Indigo 500 */
+    --primary-light: #818cf8;
+    --primary-dark: #4f46e5;
     --accent: #3b82f6;
     --accent-hover: #2563eb;
     --success: #10b981;
     --warning: #f59e0b;
     --danger: #ef4444;
-    --text-primary: #1f2937;
-    --text-secondary: #6b7280;
-    --text-light: #9ca3af;
-    --bg-primary: #f9fafb;
-    --bg-secondary: #ffffff;
-    --border: #e5e7eb;
-    --shadow: rgba(0, 0, 0, 0.1);
+
+    --text-primary: #f3f4f6;
+    /* Gray 100 */
+    --text-secondary: #9ca3af;
+    /* Gray 400 */
+    --text-light: #d1d5db;
+
+    --bg-primary: #111827;
+    /* Gray 900 */
+    --bg-secondary: #1f2937;
+    /* Gray 800 */
+    --border: rgba(255, 255, 255, 0.1);
+    --shadow: rgba(0, 0, 0, 0.3);
+
+    --card-glass: rgba(30, 41, 59, 0.7);
+    /* Slate 800 with opacity */
 
     /* Typography */
-    --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft JhengHei", "微軟正黑體", sans-serif;
+    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     --font-mono: "Consolas", "Monaco", monospace;
 
     /* Spacing */
@@ -58,72 +68,55 @@ html {
     scroll-behavior: smooth;
 }
 
+/* Body handled by Tailwind in index.html, but keeping this as backup/reset */
 body {
     font-family: var(--font-sans);
     color: var(--text-primary);
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    background-attachment: fixed;
+    background: var(--bg-primary);
     line-height: 1.6;
-    min-height: 100vh;
 }
 
 /* ============================================================================
-   Language Toggle
+   Common Components (Glassmorphism)
    ============================================================================ */
 
-.lang-toggle {
-    position: fixed;
-    top: 1rem;
-    right: 1rem;
-    z-index: 1000;
+.card {
+    background: var(--card-glass);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    margin-bottom: var(--spacing-xl);
+    overflow: hidden;
 }
 
-.lang-btn {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem 1rem;
-    background: rgba(255, 255, 255, 0.15);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: var(--radius-lg);
-    color: white;
-    font-weight: 600;
-    cursor: pointer;
-    transition: var(--transition);
+.card-header {
+    background: rgba(255, 255, 255, 0.05);
+    border-bottom: 1px solid var(--border);
+    padding: var(--spacing-lg);
 }
 
-.lang-btn:hover {
-    background: rgba(255, 255, 255, 0.25);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+.card-header h2 {
+    color: var(--text-primary);
 }
 
-.lang-icon {
-    font-size: 1.25rem;
+.card-body {
+    padding: var(--spacing-lg);
 }
 
 /* ============================================================================
-   Container & Layout
+   Excel Table (Detailed View)
    ============================================================================ */
-
-.container {
-    max-width: 98%;
-    /* Unlock width for all sections */
-    margin: 0 auto;
-    padding: 1rem;
-}
-
-#results .card-body {
-    padding: 1rem;
-    /* Reduce padding to save space */
-}
 
 /* Ultra Compact Excel Style Table */
 .excel-table {
     table-layout: fixed;
-    /* Force fixed width */
     width: auto;
+    background: white;
+    /* Keep white for readability of data */
+    color: #000;
+    /* Keep black text for contrast against white */
 }
 
 .excel-table td {
@@ -131,382 +124,17 @@ body {
     overflow: hidden;
     text-overflow: ellipsis;
     padding: 2px 4px !important;
-    /* Extremely tight padding */
     font-size: 11px !important;
-    /* Smaller font for data */
+    border-color: #d1d5db !important;
+    /* Gray 300 border */
 }
 
 .excel-table tr {
     height: 28px;
-    /* Fixed height to save vertical space */
-}
-
-#results.container {
-    max-width: 95%;
-    /* Use 95% of the screen width for results */
 }
 
 /* ============================================================================
-   Header
-   ============================================================================ */
-
-.header {
-    text-align: center;
-    margin-bottom: var(--spacing-2xl);
-    padding: var(--spacing-2xl) var(--spacing-lg);
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(20px);
-    border-radius: var(--radius-xl);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.logo {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 1rem;
-    margin-bottom: 0.5rem;
-}
-
-.logo-icon {
-    font-size: 3rem;
-    animation: float 3s ease-in-out infinite;
-}
-
-@keyframes float {
-
-    0%,
-    100% {
-        transform: translateY(0);
-    }
-
-    50% {
-        transform: translateY(-10px);
-    }
-}
-
-.logo-text {
-    font-size: 2.5rem;
-    font-weight: 700;
-    color: white;
-    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-}
-
-.subtitle {
-    color: rgba(255, 255, 255, 0.9);
-    font-size: 1.125rem;
-    font-weight: 500;
-}
-
-/* ============================================================================
-   Card Component
-   ============================================================================ */
-
-.card {
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(10px);
-    border-radius: var(--radius-xl);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-    margin-bottom: var(--spacing-2xl);
-    overflow: hidden;
-    transition: var(--transition);
-}
-
-.card:hover {
-    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
-    transform: translateY(-2px);
-}
-
-.card-header {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    padding: var(--spacing-lg) var(--spacing-xl);
-    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
-    color: white;
-}
-
-.card-header h2 {
-    font-size: 1.5rem;
-    font-weight: 600;
-}
-
-.step-number {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 2.5rem;
-    height: 2.5rem;
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 50%;
-    font-size: 1.125rem;
-    font-weight: 700;
-}
-
-.header-actions {
-    margin-left: auto;
-    display: flex;
-    gap: 0.5rem;
-}
-
-.card-body {
-    padding: var(--spacing-xl);
-}
-
-/* ============================================================================
-   File Upload Zone
-   ============================================================================ */
-
-.upload-zone {
-    border: 3px dashed var(--border);
-    border-radius: var(--radius-lg);
-    padding: var(--spacing-2xl);
-    text-align: center;
-    cursor: pointer;
-    transition: var(--transition);
-    background: var(--bg-primary);
-}
-
-.upload-zone:hover {
-    border-color: var(--accent);
-    background: rgba(59, 130, 246, 0.05);
-}
-
-.upload-zone.dragover {
-    border-color: var(--success);
-    background: rgba(16, 185, 129, 0.05);
-}
-
-.upload-content {
-    pointer-events: none;
-}
-
-.upload-icon {
-    font-size: 4rem;
-    display: block;
-    margin-bottom: 1rem;
-}
-
-.upload-text {
-    font-size: 1.125rem;
-    font-weight: 600;
-    color: var(--text-primary);
-    margin-bottom: 0.5rem;
-}
-
-.upload-hint {
-    font-size: 0.875rem;
-    color: var(--text-secondary);
-}
-
-.file-info {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    padding: 1rem;
-    background: rgba(16, 185, 129, 0.1);
-    border: 2px solid var(--success);
-    border-radius: var(--radius-lg);
-    color: var(--success);
-    font-weight: 600;
-}
-
-.info-icon {
-    font-size: 1.5rem;
-}
-
-.file-name {
-    flex: 1;
-    color: var(--text-primary);
-}
-
-/* ============================================================================
-   Item List
-   ============================================================================ */
-
-.item-list {
-    display: grid;
-    gap: 1rem;
-}
-
-.item-card {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1.5rem;
-    background: var(--bg-primary);
-    border: 2px solid var(--border);
-    border-radius: var(--radius-lg);
-    transition: var(--transition);
-    cursor: pointer;
-}
-
-.item-card:hover {
-    border-color: var(--accent);
-    background: rgba(59, 130, 246, 0.05);
-    transform: translateX(5px);
-}
-
-.item-info h3 {
-    font-size: 1.125rem;
-    font-weight: 600;
-    margin-bottom: 0.25rem;
-}
-
-.item-info p {
-    font-size: 0.875rem;
-    color: var(--text-secondary);
-}
-
-.item-badge {
-    padding: 0.5rem 1rem;
-    background: var(--accent);
-    color: white;
-    border-radius: var(--radius-md);
-    font-size: 0.875rem;
-    font-weight: 600;
-}
-
-/* ============================================================================
-   Analysis Grid
-   ============================================================================ */
-
-.analysis-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 1.5rem;
-}
-
-.analysis-card {
-    padding: 2rem;
-    background: var(--bg-primary);
-    border: 2px solid var(--border);
-    border-radius: var(--radius-lg);
-    text-align: center;
-    transition: var(--transition);
-}
-
-.analysis-card:hover {
-    border-color: var(--accent);
-    transform: translateY(-5px);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-}
-
-.analysis-icon {
-    font-size: 3rem;
-    margin-bottom: 1rem;
-}
-
-.analysis-card h3 {
-    font-size: 1.25rem;
-    font-weight: 600;
-    margin-bottom: 0.5rem;
-}
-
-.analysis-card p {
-    color: var(--text-secondary);
-    margin-bottom: 1.5rem;
-    min-height: 3rem;
-}
-
-/* ============================================================================
-   Buttons
-   ============================================================================ */
-
-.btn-primary,
-.btn-secondary,
-.btn-reset {
-    padding: 0.75rem 1.5rem;
-    border: none;
-    border-radius: var(--radius-md);
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: var(--transition);
-    font-family: var(--font-sans);
-}
-
-.btn-primary {
-    background: var(--accent);
-    color: white;
-    width: 100%;
-}
-
-.btn-primary:hover {
-    background: var(--accent-hover);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-}
-
-.btn-secondary {
-    background: white;
-    color: var(--accent);
-    border: 2px solid var(--accent);
-}
-
-.btn-secondary:hover {
-    background: var(--accent);
-    color: white;
-}
-
-.btn-reset {
-    background: rgba(239, 68, 68, 0.1);
-    color: var(--danger);
-    border: 2px solid var(--danger);
-}
-
-.btn-reset:hover {
-    background: var(--danger);
-    color: white;
-}
-
-/* ============================================================================
-   Loading Overlay
-   ============================================================================ */
-
-.loading-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.7);
-    backdrop-filter: blur(5px);
-    display: none;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-    z-index: 2000;
-}
-
-.loading-overlay.active {
-    display: flex;
-}
-
-.spinner {
-    width: 4rem;
-    height: 4rem;
-    border: 4px solid rgba(255, 255, 255, 0.3);
-    border-top-color: white;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-    to {
-        transform: rotate(360deg);
-    }
-}
-
-.loading-overlay p {
-    color: white;
-    font-size: 1.125rem;
-    font-weight: 600;
-    margin-top: 1rem;
-}
-
-/* ============================================================================
-   Results Section
+   Results Section Components
    ============================================================================ */
 
 .results-summary {
@@ -518,134 +146,59 @@ body {
 
 .stat-card {
     padding: 1.5rem;
-    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+    background: rgba(255, 255, 255, 0.05);
+    /* Glass style */
+    border: 1px solid var(--border);
+    backdrop-filter: blur(5px);
     color: white;
     border-radius: var(--radius-lg);
     text-align: center;
+    transition: var(--transition);
+}
+
+.stat-card:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-2px);
 }
 
 .stat-label {
     font-size: 0.875rem;
-    opacity: 0.9;
+    color: var(--text-secondary);
     margin-bottom: 0.5rem;
 }
 
 .stat-value {
     font-size: 2rem;
     font-weight: 700;
+    color: var(--text-primary);
 }
 
 .chart-container {
     margin: 2rem 0;
-    padding: 2rem;
-    background: white;
+    padding: 1.5rem;
+    background: rgba(255, 255, 255, 0.95);
+    /* Light bg for charts for now */
     border-radius: var(--radius-lg);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .chart-title {
     font-size: 1.25rem;
     font-weight: 600;
     margin-bottom: 1rem;
-    color: var(--text-primary);
+    color: #1f2937;
+    /* Dark text for light chart bg */
 }
 
-.data-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin: 2rem 0;
-    background: white;
-    border-radius: var(--radius-lg);
-    overflow: hidden;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-}
-
-.data-table th {
-    background: var(--primary);
-    color: white;
-    padding: 1rem;
-    text-align: left;
-    font-weight: 600;
-}
-
-.data-table td {
-    padding: 0.75rem 1rem;
-    border-bottom: 1px solid var(--border);
-}
-
-.data-table tr:nth-child(even) {
-    background: var(--bg-primary);
-}
-
-.data-table tr:hover {
-    background: rgba(59, 130, 246, 0.05);
-}
-
-/* ============================================================================
-   Footer
-   ============================================================================ */
-
-.footer {
-    text-align: center;
-    padding: 2rem;
-    color: rgba(255, 255, 255, 0.8);
-    font-size: 0.875rem;
-}
-
-/* ============================================================================
-   Responsive Design
-   ============================================================================ */
-
-@media (max-width: 768px) {
-    .logo-text {
-        font-size: 1.75rem;
-    }
-
-    .analysis-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .card-header {
-        flex-direction: column;
-        text-align: center;
-    }
-
-    .header-actions {
-        margin-left: 0;
-        margin-top: 1rem;
-        flex-direction: column;
-        width: 100%;
-    }
-
-    .btn-secondary {
-        width: 100%;
-    }
-}
-
-/* ============================================================================
-   Utility Classes
-   ============================================================================ */
-
+/* Legacy Utility Classes */
 .text-center {
     text-align: center;
 }
 
-.text-success {
-    color: var(--success);
-}
-
-.text-warning {
-    color: var(--warning);
-}
-
-.text-danger {
-    color: var(--danger);
-}
-
 .mt-2 {
-    margin-top: 2rem;
+    margin-top: 1rem;
 }
 
 .mb-2 {
-    margin-bottom: 2rem;
+    margin-bottom: 1rem;
 }

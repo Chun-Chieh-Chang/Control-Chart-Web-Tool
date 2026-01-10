@@ -60,3 +60,23 @@ var colWidths = {
 ### 5. 其他注意事項
 *   CSS `overflow: hidden` 和 `white-space: nowrap` 必須同時存在，否則破版問題會再次出現。
 *   彙總欄位的 `text-align: center` 建議加上 `!important`，以防止外部 CSS (如 `style.css`) 的設定覆蓋。
+
+## 2026-01-10 UI Redesign (SaaS Theme Integration)
+
+### Overview
+Implemented a modern SaaS-style dashboard layout based on the "Stitch" design folder.
+- **Layout**: Transitioned from a single-column layout to a "Sidebar + Main Workspace" structure.
+- **Theme**: Dark "Navy/Indigo" theme with Glassmorphism effects (semi-transparent cards, blur filters).
+- **Framework**: Integrated Tailwind CSS (via CDN) for layout and typography, while retaining `style.css` for component-specific styling and legacy support.
+
+### Key Changes
+1.  **Sidebar Navigation**: Added a fixed left sidebar for navigation and user profile.
+2.  **Glassmorphism**: Applied `backdrop-filter: blur()` and transparent backgrounds to cards and upload zones.
+3.  **Anomaly Insights**: Added a `renderAnomalySidebar` feature in `spc-all.js` that auto-populates a right-side panel with Out-of-Control points when Batch Analysis is run.
+4.  **Table Compatibility**: Updated `.excel-table` in `style.css` to ensure data readability (white bg, black text) against the dark app background.
+5.  **Responsive**: Sidebar and layout rely on Flexbox; further mobile optimization (hamburger menu) may be needed.
+
+### Files Modified
+- `index.html`: Complete rewrite of DOM structure.
+- `css/style.css`: Updated variables and component styles.
+- `js/spc-all.js`: Added anomaly detection hook in `renderCharts`.

@@ -897,6 +897,10 @@ var SPCApp = {
                     }
                 }
             }));
+
+            // Populate Anomaly Sidebar (New UI Feature)
+            this.renderAnomalySidebar(pageXbarR, pageLabels);
+
         } else if (data.type === 'cavity') {
             var labels = [], cpkValues = [], colors = [];
             for (var i = 0; i < data.cavityStats.length; i++) {
@@ -1106,6 +1110,61 @@ var SPCApp = {
 
     hideLoading: function () {
         document.getElementById('loadingOverlay').classList.remove('active');
+    },
+
+    renderAnomalySidebar: function (pageXbarR, labels) {
+        var sidebar = document.getElementById('anomalySidebar');
+        var list = document.getElementById('anomalyList');
+        if (!sidebar || !list) return;
+
+        list.innerHTML = ''; // Clear previous content
+        var count = 0;
+
+        // Helper to create card HTML
+        function createCard(title, label, valText, badgeColor, badgeText) {
+            return '<div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm border-l-4 ' +
+                (badgeColor === 'red' ? 'border-l-red-500 hover:border-red-500' : 'border-l-yellow-500 hover:border-yellow-500') +
+                ' transition-all cursor-pointer group">' +
+                '<div class="flex justify-between items-start mb-2">' +
+                '<div><span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">' + title + '</span>' +
+                '<p class="font-mono font-bold text-gray-700">' + label + '</p></div>' +
+                '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold ' +
+                (badgeColor === 'red' ? 'bg-red-50 text-red-600' : 'bg-yellow-50 text-yellow-600') +
+                ' uppercase">' + badgeText + '</span></div>' +
+                '<p class="text-xs text-gray-500 mb-4">' + valText + '</p></div>';
+        }
+
+        // X-bar Violations
+        if (pageXbarR.xBar && pageXbarR.xBar.violations) {
+            pageXbarR.xBar.violations.forEach(function (v) {
+                count++;
+                var label = labels[v.index] || 'Batch ' + (v.index + 1);
+                var valText = 'Value: ' + SPCEngine.round(v.value, 4);
+                list.insertAdjacentHTML('beforeend', createCard('Batch ID', label, valText, 'red', 'X-Bar Out'));
+            });
+        }
+
+        // R Violations
+        if (pageXbarR.R && pageXbarR.R.data) {
+            pageXbarR.R.data.forEach(function (rVal, idx) {
+                if (rVal > pageXbarR.R.UCL) {
+                    count++;
+                    var label = labels[idx] || 'Batch ' + (idx + 1);
+                    var valText = 'Range: ' + SPCEngine.round(rVal, 4) + ' > ' + SPCEngine.round(pageXbarR.R.UCL, 4);
+                    list.insertAdjacentHTML('beforeend', createCard('Batch ID', label, valText, 'red', 'R Chart Out'));
+                }
+            });
+        }
+
+        if (count > 0) {
+            sidebar.classList.remove('hidden');
+        } else {
+            // Show empty state inside sidebar, but keep sidebar visible for now if we want "Dashboard"-like feel, 
+            // Or hide it to give more space to main content.
+            // Let's show it with "No Anomalies" to confirm the feature works.
+            sidebar.classList.remove('hidden');
+            list.innerHTML = '<div class="text-center text-gray-500 mt-10"><p>No anomalies detected</p></div>';
+        }
     },
 
     resetApp: function () {

@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SPC Data Import</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        sidebar: '#2c2e4e',
+                        main: '#48566b',
+                        'main-gradient-start': '#3b435b',
+                        'main-gradient-end': '#4b5a75',
+                        'active-nav': '#444c68',
+                        'card-bg': 'rgba(40, 48, 70, 0.6)',
+                        'accent-green': '#51cf66',
+                        'accent-cyan': '#22b8cf',
+                        'progress-bg': '#373a52',
+                        'progress-fill': '#5c7cfa', // Gradient actually
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+<style data-purpose="custom-styles">
+        /* Glassmorphism effect for the upload card */
+        .glass-card {
+            background: rgba(45, 50, 75, 0.4);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        /* The glowing border effect for the upload area */
+        .glow-border {
+            position: relative;
+            z-index: 1;
+        }
+
+        .glow-border::before {
+            content: "";
+            position: absolute;
+            inset: -2px;
+            z-index: -1;
+            background: linear-gradient(90deg, #4facfe 0%, #00f2fe 100%);
+            border-radius: 1.7rem; /* slightly larger than parent */
+            opacity: 0.5;
+            filter: blur(5px);
+        }
+        
+        /* Specific gradient border look from image */
+        .gradient-border-box {
+            border: 2px solid transparent;
+            background-image: linear-gradient(#2d334d, #2d334d), linear-gradient(to right, #4338ca, #34d399);
+            background-origin: border-box;
+            background-clip: content-box, border-box;
+        }
+
+        /* Custom scrollbar to match dark theme if needed */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #2c2e4e; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #4b5563; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #6b7280; 
+        }
+    </style>
+<!-- Importing Google Fonts for cleaner typography -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&amp;display=swap" rel="stylesheet"/>
+</head>
+<body class="font-sans antialiased text-gray-100 flex h-screen overflow-hidden">
+<!-- BEGIN: Sidebar -->
+<aside class="w-64 flex-shrink-0 flex flex-col justify-between border-r border-gray-700/30 bg-gradient-to-b from-[#2b3252] to-[#1a1f3c]">
+<!-- Top Section: Logo & Nav -->
+<div>
+<!-- Branding -->
+<div class="p-6 flex items-center space-x-3">
+<div class="w-10 h-10 rounded-lg flex items-center justify-center text-sm font-bold tracking-wider text-white bg-[#3E5C65]">
+                    SPC
+                </div>
+<div>
+<h1 class="text-lg font-bold leading-none">SPC</h1>
+<p class="text-xs text-gray-400 mt-1">統計製程管制</p>
+</div>
+</div>
+<!-- Navigation -->
+<nav class="mt-4 px-4 space-y-2">
+<a class="flex items-center space-x-3 px-4 py-3 text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors" href="#">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span>Dashboard</span>
+</a>
+<!-- Active Item -->
+<a class="flex items-center space-x-3 px-4 py-3 text-white bg-active-nav rounded-lg shadow-sm" href="#">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span>Data Import</span>
+</a>
+<a class="flex items-center space-x-3 px-4 py-3 text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors" href="#">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span>Analysis</span>
+</a>
+<a class="flex items-center space-x-3 px-4 py-3 text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors" href="#">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span>Reports</span>
+</a>
+</nav>
+</div>
+<!-- Bottom Section: Illustration & Profile -->
+<div class="p-4">
+<!-- Illustration Placeholder -->
+<div class="mb-6 px-2">
+<img alt="Isometric Illustration" class="w-full h-auto opacity-80 mix-blend-screen" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAG2Dn_Zmtz-EBJz2woT3BQP80IlPAqHuUhzs-p5pq4BiL7BBr3l_CxZknWfhTNsRFDbmlrB6OkslxD8QpUk3wYGinPAZ7T2b5uSUQb4cFzIV6QE9kKpnOYo5vxVt26Y0coItRiVxLqXAMy8jrKSGtRGMSESS5ckSGqM07ktVCQehMX0BXIJ2kZPS3O-HGmAYTmniPN09R6dZsI3Nz4WLcerJKjc6xh77q2tlAGN9-DMxsINBMetrTp4N8hm5KFrwvZvRTXmmL0eUvq"/>
+<!-- NOTE: Replaced 'TEMP_SIDEBAR_ILLUSTRATION' with a functional placeholder as requested in 'Missing Images' logic if unavailable, 
+                     but since prompt specifically asks to use provided placeholders, I will assume the prompt meant strictly provided URLs.
+                     Since no URL was provided for TEMP_SIDEBAR_ILLUSTRATION in the 'Requested Data' section (only IMAGE_1 was provided), 
+                     I am using a generic placeholder here to fulfill the visual requirement. -->
+</div>
+<!-- User Profile -->
+<div class="flex items-center justify-between pt-4 border-t border-gray-700/50">
+<div class="flex items-center space-x-3">
+<div class="w-8 h-8 rounded-full bg-gray-400 flex items-center justify-center text-gray-800">
+<svg class="w-5 h-5" fill="currentColor" viewbox="0 0 20 20"><path clip-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" fill-rule="evenodd"></path></svg>
+</div>
+<span class="text-sm font-medium">主員</span>
+</div>
+<button class="text-gray-500 hover:text-white transition-colors">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</button>
+</div>
+</div>
+</aside>
+<!-- END: Sidebar -->
+<!-- BEGIN: Main Content -->
+<main class="flex-1 bg-gradient-to-br from-[#3a4161] to-[#2c3350] overflow-y-auto relative">
+<div class="p-10 max-w-6xl mx-auto h-full flex flex-col">
+<!-- Page Header -->
+<header class="mb-8">
+<h2 class="text-3xl font-bold tracking-wide text-gray-100">資料上傳工作區</h2>
+</header>
+<!-- BEGIN: Upload Area -->
+<!-- Glassmorphism Card with Glow Border -->
+<section class="relative flex-shrink-0 mb-12">
+<!-- Background glow/border container -->
+<!-- Main Card -->
+<div class="relative rounded-3xl p-[2px] bg-gradient-to-r from-[#42e695] to-[#3bb2b8] shadow-[0_0_15px_rgba(66,230,149,0.3)]">
+<div class="rounded-[22px] bg-[#283046]/90 backdrop-blur-md p-12 text-center h-full w-full flex flex-col items-center justify-center gap-6">
+<!-- File Icons -->
+<div class="flex justify-center items-center gap-6">
+<!-- Excel Icon -->
+<div class="relative group">
+<img alt="Excel File" class="w-20 h-20 drop-shadow-lg" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAIcEzGdW1FIwiO_QVHSQulUUhg7eLJ3-eN27kNrsPSCel8HoS7hvxoRruMqBgDsKJuNb7wcYQrvIz80zNwo2rRqSSnEg-2d_lwDzekbDd8g7pXShKodvQagIghrjyu3IrqOgxK9lyf4AYIrCxqRopYllWKSnHBeJ54luJ4TPU7srhX6qgjQZ6VM-ALDIPhs8kFsZTRs3NA4tsTDtYLz9DYdhkEhZr7P6WkpcSU_ZAOE_DaOeJ1GWyIxV3N7pmtDbcb0x22lp1wkSwE"/>
+</div>
+<!-- CSV Icon -->
+<div class="relative group">
+<img alt="CSV File" class="w-20 h-20 drop-shadow-lg" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB7OyqvrydYXBriRxZoIT9uvQAOQ88tmhtByEE4TacQO_o_UZsi4BBq7XWOTi2wsnlIVtv2Gk5AY9dNdt_vinAHj_MvEcc2YydB7qsWcZE78mpsweJp7V2XLnHoEz59OO0TcMHOfyvkwB02FzMSze0Cc6Z2XpiOsIA5KvZkRqluD8CsxAov5uuzESbo0cwcYBOiY1URpnXH3nfT3FZiUDlVBC1S4xS3HlI3GMC6BxgHwv00CzOSPM7JKbztfn5Tx4jk9ygvPcan2snT"/>
+</div>
+</div>
+<!-- Progress Bar -->
+<div class="w-full max-w-md mx-auto">
+<div class="bg-gray-700/50 rounded-full overflow-hidden relative h-2.5">
+<div class="absolute top-0 left-0 h-full bg-gradient-to-r from-blue-700 to-cyan-400 w-[65%] rounded-full shadow-[0_0_10px_rgba(45,212,191,0.5)]"></div>
+</div>
+</div>
+<p class="text-sm text-gray-300 font-mono">Uploading... 65%</p>
+<!-- Instructions -->
+<h3 class="text-xl text-gray-200 font-light">Click or Drag Excel or CSV files here</h3>
+<!-- Action Button -->
+<button class="px-10 py-3 w-48 bg-[#b0b8c8] hover:bg-gray-300 text-gray-800 font-semibold rounded shadow transition-colors duration-200">
+                            Select Files
+                        </button>
+</div>
+</div>
+</section>
+<!-- END: Upload Area -->
+<!-- BEGIN: Recent Uploads -->
+<section class="bg-white/5 rounded-xl border border-white/5 flex-1 flex flex-col min-h-0 backdrop-blur-sm">
+<div class="p-6 border-b border-white/10">
+<h3 class="font-semibold text-gray-200 text-xl">Recent Uploads</h3>
+</div>
+<div class="overflow-auto flex-1 p-2">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="text-gray-400 text-sm border-b border-white/5">
+<th class="py-3 px-4 font-medium">Filename</th>
+<th class="py-3 px-4 font-medium">Date</th>
+<th class="py-3 px-4 font-medium">Status</th>
+<th class="py-3 px-4 font-medium text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="text-sm text-gray-300">
+<!-- Row 1 -->
+<tr class="hover:bg-white/5 transition-colors group border-b border-white/10">
+<td class="py-4 px-4">
+<div class="flex items-center space-x-3">
+<img alt="XLS" class="w-6 h-6" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAIcEzGdW1FIwiO_QVHSQulUUhg7eLJ3-eN27kNrsPSCel8HoS7hvxoRruMqBgDsKJuNb7wcYQrvIz80zNwo2rRqSSnEg-2d_lwDzekbDd8g7pXShKodvQagIghrjyu3IrqOgxK9lyf4AYIrCxqRopYllWKSnHBeJ54luJ4TPU7srhX6qgjQZ6VM-ALDIPhs8kFsZTRs3NA4tsTDtYLz9DYdhkEhZr7P6WkpcSU_ZAOE_DaOeJ1GWyIxV3N7pmtDbcb0x22lp1wkSwE"/>
+<span>Excel_Cheat_Storage-1.xlsx</span>
+</div>
+</td>
+<td class="py-4 px-4 text-gray-400">2024-08-11 17:03</td>
+<td class="py-4 px-4">
+<span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium text-green-400 bg-green-400/10 border border-green-400/20">
+<span class="w-1.5 h-1.5 rounded-full bg-green-400 mr-2"></span>
+                                        Completed
+                                    </span>
+</td>
+<td class="py-4 px-4 text-right">
+<div class="flex items-center justify-end space-x-3 text-gray-500"><button class="hover:text-cyan-400 transition-colors"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg></button>
+<button class="hover:text-red-400 transition-colors"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg></button></div>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-white/5 transition-colors group border-white/10">
+<td class="py-4 px-4">
+<div class="flex items-center space-x-3">
+<img alt="CSV" class="w-6 h-6" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB7OyqvrydYXBriRxZoIT9uvQAOQ88tmhtByEE4TacQO_o_UZsi4BBq7XWOTi2wsnlIVtv2Gk5AY9dNdt_vinAHj_MvEcc2YydB7qsWcZE78mpsweJp7V2XLnHoEz59OO0TcMHOfyvkwB02FzMSze0Cc6Z2XpiOsIA5KvZkRqluD8CsxAov5uuzESbo0cwcYBOiY1URpnXH3nfT3FZiUDlVBC1S4xS3HlI3GMC6BxgHwv00CzOSPM7JKbztfn5Tx4jk9ygvPcan2snT"/>
+<span>Excel_Cheat_Storage-2.xsv</span>
+</div>
+</td>
+<td class="py-4 px-4 text-gray-400">2024-07-22 10:37</td>
+<td class="py-4 px-4">
+<span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium text-teal-400 bg-teal-400/10 border border-teal-400/20">
+<span class="w-1.5 h-1.5 rounded-full bg-teal-400 mr-2"></span>
+                                        Update
+                                    </span>
+</td>
+<td class="py-4 px-4 text-right">
+<div class="flex items-center justify-end space-x-3 text-gray-500"><button class="hover:text-cyan-400 transition-colors"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg></button>
+<button class="hover:text-red-400 transition-colors"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg></button></div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<!-- END: Recent Uploads -->
+</div>
+</main>
+<!-- END: Main Content -->
+</body></html>

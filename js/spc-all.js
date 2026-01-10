@@ -583,12 +583,9 @@ var SPCApp = {
                     '</div>';
             }
 
-            // Detailed Data Table Container (Excel Style)
             html += '<div id="detailedTableContainer" style="margin-bottom:30px; overflow-x:auto;"></div>';
-
             html += '<div id="pageLimitsContainer"></div>';
             html += '<div id="diagnosticContainer" style="margin-top:20px;"></div>';
-
             html += '<div id="batchChartsContainer">' +
                 '<div class="chart-container"><h3 class="chart-title">' + this.t('X̄ 管制圖', 'X-Bar Chart') + '</h3><canvas id="xbarChart"></canvas></div>' +
                 '<div class="chart-container"><h3 class="chart-title">' + this.t('R 管制圖', 'R Chart') + '</h3><canvas id="rChart"></canvas></div>' +
@@ -599,11 +596,10 @@ var SPCApp = {
             for (var i = 0; i < data.cavityStats.length; i++) {
                 var s = data.cavityStats[i];
                 var c = SPCEngine.getCapabilityColor(s.Cpk);
-                // Badge style for Cpk
                 var badgeClass = '';
-                if (c.text === '#155724') badgeClass = 'bg-green-100 text-green-800 border-green-200'; // Good
-                else if (c.text === '#856404') badgeClass = 'bg-yellow-100 text-yellow-800 border-yellow-200'; // Warning
-                else badgeClass = 'bg-red-100 text-red-800 border-red-200'; // Danger
+                if (c.text === '#155724') badgeClass = 'bg-green-100 text-green-800 border-green-200';
+                else if (c.text === '#856404') badgeClass = 'bg-yellow-100 text-yellow-800 border-yellow-200';
+                else badgeClass = 'bg-red-100 text-red-800 border-red-200';
 
                 rows += '<tr class="border-b border-gray-700/50 hover:bg-white/5 transition-colors">' +
                     '<td class="px-6 py-4 font-medium text-white">' + s.name + '</td>' +
@@ -621,26 +617,18 @@ var SPCApp = {
             }
 
             html = '<div class="grid grid-cols-1 gap-12">' +
-
-                // Cpk Comparison Chart
                 '<div class="bg-[#1e293b]/80 backdrop-blur-md rounded-2xl border border-white/10 p-6 shadow-xl">' +
                 '<h3 class="text-lg font-semibold text-white mb-6 pl-4 border-l-4 border-pink-500">' + this.t('Cpk 比較', 'Cpk Comparison') + '</h3>' +
                 '<div class="h-96"><canvas id="cpkChart"></canvas></div>' +
                 '</div>' +
-
-                // Mean Comparison Chart
                 '<div class="bg-[#1e293b]/80 backdrop-blur-md rounded-2xl border border-white/10 p-6 shadow-xl">' +
                 '<h3 class="text-lg font-semibold text-white mb-6 pl-4 border-l-4 border-blue-500">' + this.t('平均值比較', 'Mean Comparison') + '</h3>' +
                 '<div class="h-96"><canvas id="meanChart"></canvas></div>' +
                 '</div>' +
-
-                // Standard Deviation Comparison Chart
                 '<div class="bg-[#1e293b]/80 backdrop-blur-md rounded-2xl border border-white/10 p-6 shadow-xl">' +
                 '<h3 class="text-lg font-semibold text-white mb-6 pl-4 border-l-4 border-yellow-500">' + this.t('標準差比較 (Overall)', 'Standard Deviation Comparison (Overall)') + '</h3>' +
                 '<div class="h-96"><canvas id="stdDevChart"></canvas></div>' +
                 '</div>' +
-
-                // Detailed Table
                 '<div class="bg-[#1e293b]/80 backdrop-blur-md rounded-2xl border border-white/10 p-6 shadow-xl">' +
                 '<h3 class="text-lg font-semibold text-white mb-6 pl-4 border-l-4 border-indigo-500">' + this.t('模穴統計', 'Cavity Statistics') + '</h3>' +
                 '<div class="overflow-x-auto rounded-lg border border-gray-700">' +
@@ -663,6 +651,7 @@ var SPCApp = {
                 '</div>' +
                 '</div>' +
                 '</div>';
+
         } else if (data.type === 'group') {
             var rows = '';
             for (var i = 0; i < data.groupStats.length; i++) {
@@ -677,12 +666,15 @@ var SPCApp = {
                     '</tr>';
             }
 
-            html = '<div class="grid grid-cols-1 gap-8">' +
+            html = '<div class="grid grid-cols-1 gap-12">' +
                 '<div class="bg-[#1e293b]/80 backdrop-blur-md rounded-2xl border border-white/10 p-6 shadow-xl">' +
-                '<h3 class="text-lg font-semibold text-white mb-6 pl-4 border-l-4 border-yellow-500">' + this.t('Min-Max-Avg 圖', 'Min-Max-Avg Chart') + '</h3>' +
-                '<div class="h-64"><canvas id="groupChart"></canvas></div>' +
+                '<h3 class="text-lg font-semibold text-white mb-6 pl-4 border-l-4 border-green-500">' + this.t('Min-Max-Avg 圖', 'Min-Max-Avg Chart') + '</h3>' +
+                '<div class="h-96"><canvas id="groupChart"></canvas></div>' +
                 '</div>' +
-
+                '<div class="bg-[#1e293b]/80 backdrop-blur-md rounded-2xl border border-white/10 p-6 shadow-xl">' +
+                '<h3 class="text-lg font-semibold text-white mb-6 pl-4 border-l-4 border-orange-500">' + this.t('模穴間變異圖 (Range)', 'Variation Between Cavities (Range)') + '</h3>' +
+                '<div class="h-96"><canvas id="groupVarChart"></canvas></div>' +
+                '</div>' +
                 '<div class="bg-[#1e293b]/80 backdrop-blur-md rounded-2xl border border-white/10 p-6 shadow-xl">' +
                 '<h3 class="text-lg font-semibold text-white mb-6 pl-4 border-l-4 border-indigo-500">' + this.t('群組統計', 'Group Statistics') + '</h3>' +
                 '<div class="overflow-x-auto rounded-lg border border-gray-700">' +
@@ -704,701 +696,679 @@ var SPCApp = {
                 '</div>';
         }
 
+        resultsContent.innerHTML = html;
+        document.getElementById('results').style.display = 'block';
 
+        if (data.type === 'batch' && this.batchPagination.totalPages > 1) {
+            document.getElementById('prevPageBtn').addEventListener('click', function () { self.changeBatchPage(-1); });
+            document.getElementById('nextPageBtn').addEventListener('click', function () { self.changeBatchPage(1); });
+            this.updatePaginationButtons();
+        }
 
-        // Detailed Table
-
-
-        '<div class="overflow-x-auto rounded-lg border border-gray-700">' +
-            '<table class="w-full text-sm text-left">' +
-            '<thead class="text-xs text-gray-400 uppercase bg-gray-800/50">' +
-            '<tr>' +
-            '<th class="px-6 py-4 font-bold tracking-wider">Batch</th>' +
-            '<th class="px-6 py-4 text-right">Avg</th>' +
-            '<th class="px-6 py-4 text-right">Max</th>' +
-            '<th class="px-6 py-4 text-right">Min</th>' +
-            '<th class="px-6 py-4 text-right">Range</th>' +
-            '<th class="px-6 py-4 text-right">n</th>' +
-            '</tr>' +
-            '</thead>' +
-            '<tbody class="divide-y divide-gray-700">' + rows + '</tbody>' +
-            '</table>' +
-            '</div>' +
-            '</div>' +
-            '</div>';
-    }
-
-resultsContent.innerHTML = html;
-    document.getElementById('results').style.display = 'block';
-
-    // Setup pagination event listeners
-    if(data.type === 'batch' && this.batchPagination.totalPages > 1) {
-        document.getElementById('prevPageBtn').addEventListener('click', function () { self.changeBatchPage(-1); });
-document.getElementById('nextPageBtn').addEventListener('click', function () { self.changeBatchPage(1); });
-this.updatePaginationButtons();
-}
-
-setTimeout(function () { self.renderCharts(); document.getElementById('results').scrollIntoView({ behavior: 'smooth' }); }, 100);
+        setTimeout(function () {
+            self.renderCharts();
+            document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+        }, 100);
     },
 
-changeBatchPage: function (delta) {
-    var p = this.batchPagination;
-    var newPage = p.currentPage + delta;
-    if (newPage >= 1 && newPage <= p.totalPages) {
-        p.currentPage = newPage;
-        this.updatePaginationButtons();
-        this.renderCharts();
-    }
-},
-
-updatePaginationButtons: function () {
-    var p = this.batchPagination;
-    document.getElementById('pageInfo').textContent = this.t('第 ', 'Page ') + p.currentPage + ' / ' + p.totalPages + this.t(' 頁', '');
-    document.getElementById('prevPageBtn').disabled = (p.currentPage <= 1);
-    document.getElementById('nextPageBtn').disabled = (p.currentPage >= p.totalPages);
-},
-
-renderDetailedDataTable: function (pageLabels, pageDataMatrix, pageXbarR) {
-    var data = this.analysisResults;
-    var info = data.productInfo;
-    var specs = data.specs;
-    var cavityCount = data.xbarR.summary.n;
-
-    var colWidths = {
-        label: 60,
-        batch: 58,     // 生產批號欄位寬度
-        summary: 30    // 彙總基礎欄寬 (總寬度 = 30 * 4 = 120px)
-    };
-    // Calculate total width explicitly to force horizontal scrolling
-    // Total = Label(1) + Batch(25) + Summary(4)
-    var totalWidth = colWidths.label + (25 * colWidths.batch) + (4 * colWidths.summary);
-
-    var html = '<table class="excel-table" style="width:' + totalWidth + 'px; border-collapse:collapse; font-size:10px; font-family:sans-serif; border:2px solid #000; table-layout:fixed;">';
-
-    html += '<colgroup>';
-    html += '<col style="width:' + colWidths.label + 'px;">';
-    for (var c = 0; c < 25; c++) html += '<col style="width:' + colWidths.batch + 'px;">';
-    html += '<col style="width:' + colWidths.summary + 'px;"><col style="width:' + colWidths.summary + 'px;"><col style="width:' + colWidths.summary + 'px;"><col style="width:' + colWidths.summary + 'px;">';
-    html += '</colgroup>';
-
-
-    // --- Row 1: Header ---
-    html += '<tr style="background:#f3f4f6;"><td colspan="30" style="border:1px solid #000; text-align:center; font-weight:bold; font-size:14px; padding:3px;">X̄ - R 管制圖</td></tr>';
-
-    // --- Row 2-5: Metadata & Limits (Re-distributed colspans out of 30) ---
-    var rows = [
-        { l1: '商品名稱', v1: info.name, l2: '規格', v2: '標準', l3: '管制圖', v3: 'X̄', v4: 'R', l4: '製造部門', v4_val: info.dept },
-        { l1: '商品料號', v1: info.item, l2: '最大值', v2: SPCEngine.round(specs.usl, 4), l3: '上限', v3: SPCEngine.round(pageXbarR.xBar.UCL, 4), v4: SPCEngine.round(pageXbarR.R.UCL, 4), l4: '檢驗人員', v4_val: info.inspector },
-        { l1: '測量單位', v1: info.unit, l2: '目標值', v2: SPCEngine.round(specs.target, 4), l3: '中心值', v3: SPCEngine.round(pageXbarR.xBar.CL, 4), v4: SPCEngine.round(pageXbarR.R.CL, 4), l4: '管制特性', v4_val: info.char },
-        { l1: '檢驗日期', v1: info.batchRange || '-', l2: '最小值', v2: SPCEngine.round(specs.lsl, 4), l3: '下限', v3: SPCEngine.round(pageXbarR.xBar.LCL, 4), v4: '-', l4: '圖表編號', v4_val: info.chartNo || '-' }
-    ];
-
-    rows.forEach(function (r) {
-        html += '<tr>' +
-            '<td colspan="2" style="border:1px solid #000; padding:1px 1px; font-weight:bold; background:#f9fafb; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;">' + r.l1 + '</td>' +
-            '<td colspan="7" style="border:1px solid #000; padding:1px 1px; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;">' + r.v1 + '</td>' +
-            '<td colspan="2" style="border:1px solid #000; padding:1px 1px; font-weight:bold; background:#f9fafb; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;">' + r.l2 + '</td>' +
-            '<td colspan="2" style="border:1px solid #000; padding:1px 1px; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;">' + r.v2 + '</td>' +
-            '<td colspan="2" style="border:1px solid #000; padding:1px 1px; font-weight:bold; background:#f9fafb; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;">' + r.l3 + '</td>' +
-            '<td colspan="3" style="border:1px solid #000; padding:1px 1px; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;">' + r.v3 + '</td>' +
-            '<td colspan="3" style="border:1px solid #000; padding:1px 1px; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;">' + (r.v4 || '') + '</td>' +
-            '<td colspan="2" style="border:1px solid #000; padding:1px 1px; font-weight:bold; background:#f9fafb; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;">' + (r.l4 || '') + '</td>' +
-            '<td colspan="7" style="border:1px solid #000; padding:1px 1px; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;">' + (r.v4_val || '') + '</td>' +
-            '</tr>';
-    });
-
-    // --- Data Header: Batch Names ---
-    html += '<tr style="background:#e5e7eb; font-weight:bold;">' +
-        '<td style="border:1px solid #000; text-align:center;">批號</td>';
-    pageLabels.forEach(function (name) {
-        html += '<td style="border:1px solid #000; text-align:center; height:35px; overflow:hidden; font-size:10px; white-space:nowrap; text-overflow:ellipsis; width:' + colWidths.batch + 'px; max-width:' + colWidths.batch + 'px; min-width:' + colWidths.batch + 'px; padding:0;">' + name + '</td>';
-    });
-    // Fill empty if less than 25 batches
-    for (var f = pageLabels.length; f < 25; f++) html += '<td style="border:1px solid #000; width:' + colWidths.batch + 'px; max-width:' + colWidths.batch + 'px; min-width:' + colWidths.batch + 'px;"></td>';
-
-    html += '<td colspan="4" style="border:1px solid #000; text-align:center;">彙總</td></tr>';
-
-    // --- Main Data Rows: Cavities ---
-    for (var i = 0; i < cavityCount; i++) {
-        html += '<tr><td style="border:1px solid #000; text-align:center; font-weight:bold;">X' + (i + 1) + '</td>';
-        for (var j = 0; j < 25; j++) {
-            var val = (pageDataMatrix[j] && pageDataMatrix[j][i] !== undefined) ? pageDataMatrix[j][i] : null;
-            html += '<td style="border:1px solid #000; text-align:center; padding:0; overflow:hidden; white-space:nowrap; width:' + colWidths.batch + 'px; max-width:' + colWidths.batch + 'px; min-width:' + colWidths.batch + 'px;">' + (val !== null ? val : '') + '</td>';
+    changeBatchPage: function (delta) {
+        var p = this.batchPagination;
+        var newPage = p.currentPage + delta;
+        if (newPage >= 1 && newPage <= p.totalPages) {
+            p.currentPage = newPage;
+            this.updatePaginationButtons();
+            this.renderCharts();
         }
+    },
 
-        // Sidebar summary on first few rows
-        if (i === 0) html += '<td colspan="4" rowspan="2" style="border:1px solid #000; text-align:center !important; font-weight:bold; background:#fefefe; font-size:10px;">ΣX̄ = ' + SPCEngine.round(pageXbarR.summary.xBarSum, 4) + '</td>';
-        else if (i === 2) html += '<td colspan="4" rowspan="2" style="border:1px solid #000; text-align:center !important; font-weight:bold; background:#fefefe; font-size:10px;">X̿ = ' + SPCEngine.round(pageXbarR.summary.xDoubleBar, 4) + '</td>';
-        else if (i === 4) html += '<td colspan="4" rowspan="2" style="border:1px solid #000; text-align:center !important; font-weight:bold; background:#fefefe; font-size:10px;">ΣR = ' + SPCEngine.round(pageXbarR.summary.rSum, 4) + '</td>';
-        else if (i === 6) html += '<td colspan="4" rowspan="2" style="border:1px solid #000; text-align:center !important; font-weight:bold; background:#fefefe; font-size:10px;">R̄ = ' + SPCEngine.round(pageXbarR.summary.rBar, 4) + '</td>';
-        else if (i >= 8) html += '<td colspan="4" style="border:1px solid #000; background:#fcfcfc;"></td>';
-        html += '</tr>';
-    }
+    updatePaginationButtons: function () {
+        var p = this.batchPagination;
+        document.getElementById('pageInfo').textContent = this.t('第 ', 'Page ') + p.currentPage + ' / ' + p.totalPages + this.t(' 頁', '');
+        document.getElementById('prevPageBtn').disabled = (p.currentPage <= 1);
+        document.getElementById('nextPageBtn').disabled = (p.currentPage >= p.totalPages);
+    },
 
-    // --- Footer Rows: ΣX, X̄, R ---
-    // ΣX Row
-    html += '<tr style="background:#f9fafb;"><td style="border:1px solid #000; text-align:center; font-weight:bold;">ΣX</td>';
-    for (var b = 0; b < 25; b++) {
-        var val = '';
-        if (pageDataMatrix[b]) {
-            var sum = pageDataMatrix[b].reduce(function (a, b) { return a + (b || 0); }, 0);
-            val = SPCEngine.round(sum, 4);
-        }
-        html += '<td style="border:1px solid #000; text-align:center;">' + val + '</td>';
-    }
-    html += '<td colspan="4" style="border:1px solid #000; background:#f9fafb;"></td></tr>';
+    renderDetailedDataTable: function (pageLabels, pageDataMatrix, pageXbarR) {
+        var data = this.analysisResults;
+        var info = data.productInfo;
+        var specs = data.specs;
+        var cavityCount = data.xbarR.summary.n;
 
-    // X̄ Row (with yellow highlighting)
-    html += '<tr style="background:#f9fafb;"><td style="border:1px solid #000; text-align:center; font-weight:bold;">X̄</td>';
-    for (var k = 0; k < 25; k++) {
-        var val = '', style = '';
-        if (pageXbarR.xBar.data[k] !== undefined) {
-            var v = pageXbarR.xBar.data[k];
-            val = SPCEngine.round(v, 4);
-            if (v > pageXbarR.xBar.UCL || v < pageXbarR.xBar.LCL) style = 'background:yellow;';
-        }
-        html += '<td style="border:1px solid #000; text-align:center;' + style + '">' + val + '</td>';
-    }
-    html += '<td colspan="4" style="border:1px solid #000; background:#f9fafb;"></td></tr>';
+        var colWidths = {
+            label: 60,
+            batch: 58,     // 生產批號欄位寬度
+            summary: 30    // 彙總基礎欄寬 (總寬度 = 30 * 4 = 120px)
+        };
+        // Calculate total width explicitly to force horizontal scrolling
+        // Total = Label(1) + Batch(25) + Summary(4)
+        var totalWidth = colWidths.label + (25 * colWidths.batch) + (4 * colWidths.summary);
 
-    // R Row
-    html += '<tr style="background:#f9fafb;"><td style="border:1px solid #000; text-align:center; font-weight:bold;">R</td>';
-    for (var k = 0; k < 25; k++) {
-        var val = '', style = '';
-        if (pageXbarR.R.data[k] !== undefined) {
-            var v = pageXbarR.R.data[k];
-            val = SPCEngine.round(v, 4);
-            if (v > pageXbarR.R.UCL) style = 'background:yellow;';
-        }
-        html += '<td style="border:1px solid #000; text-align:center;' + style + '">' + val + '</td>';
-    }
-    html += '<td colspan="4" style="border:1px solid #000; background:#f9fafb;"></td></tr>';
+        var html = '<table class="excel-table" style="width:' + totalWidth + 'px; border-collapse:collapse; font-size:10px; font-family:sans-serif; border:2px solid #000; table-layout:fixed;">';
 
-    html += '</table>';
-    document.getElementById('detailedTableContainer').innerHTML = html;
-},
+        html += '<colgroup>';
+        html += '<col style="width:' + colWidths.label + 'px;">';
+        for (var c = 0; c < 25; c++) html += '<col style="width:' + colWidths.batch + 'px;">';
+        html += '<col style="width:' + colWidths.summary + 'px;"><col style="width:' + colWidths.summary + 'px;"><col style="width:' + colWidths.summary + 'px;"><col style="width:' + colWidths.summary + 'px;">';
+        html += '</colgroup>';
 
 
+        // --- Row 1: Header ---
+        html += '<tr style="background:#f3f4f6;"><td colspan="30" style="border:1px solid #000; text-align:center; font-weight:bold; font-size:14px; padding:3px;">X̄ - R 管制圖</td></tr>';
 
+        // --- Row 2-5: Metadata & Limits (Re-distributed colspans out of 30) ---
+        var rows = [
+            { l1: '商品名稱', v1: info.name, l2: '規格', v2: '標準', l3: '管制圖', v3: 'X̄', v4: 'R', l4: '製造部門', v4_val: info.dept },
+            { l1: '商品料號', v1: info.item, l2: '最大值', v2: SPCEngine.round(specs.usl, 4), l3: '上限', v3: SPCEngine.round(pageXbarR.xBar.UCL, 4), v4: SPCEngine.round(pageXbarR.R.UCL, 4), l4: '檢驗人員', v4_val: info.inspector },
+            { l1: '測量單位', v1: info.unit, l2: '目標值', v2: SPCEngine.round(specs.target, 4), l3: '中心值', v3: SPCEngine.round(pageXbarR.xBar.CL, 4), v4: SPCEngine.round(pageXbarR.R.CL, 4), l4: '管制特性', v4_val: info.char },
+            { l1: '檢驗日期', v1: info.batchRange || '-', l2: '最小值', v2: SPCEngine.round(specs.lsl, 4), l3: '下限', v3: SPCEngine.round(pageXbarR.xBar.LCL, 4), v4: '-', l4: '圖表編號', v4_val: info.chartNo || '-' }
+        ];
 
-renderCharts: function () {
-    var data = this.analysisResults;
+        rows.forEach(function (r) {
+            html += '<tr>' +
+                '<td colspan="2" style="border:1px solid #000; padding:1px 1px; font-weight:bold; background:#f9fafb; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;">' + r.l1 + '</td>' +
+                '<td colspan="7" style="border:1px solid #000; padding:1px 1px; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;">' + r.v1 + '</td>' +
+                '<td colspan="2" style="border:1px solid #000; padding:1px 1px; font-weight:bold; background:#f9fafb; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;">' + r.l2 + '</td>' +
+                '<td colspan="2" style="border:1px solid #000; padding:1px 1px; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;">' + r.v2 + '</td>' +
+                '<td colspan="2" style="border:1px solid #000; padding:1px 1px; font-weight:bold; background:#f9fafb; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;">' + r.l3 + '</td>' +
+                '<td colspan="3" style="border:1px solid #000; padding:1px 1px; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;">' + r.v3 + '</td>' +
+                '<td colspan="3" style="border:1px solid #000; padding:1px 1px; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;">' + (r.v4 || '') + '</td>' +
+                '<td colspan="2" style="border:1px solid #000; padding:1px 1px; font-weight:bold; background:#f9fafb; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;">' + (r.l4 || '') + '</td>' +
+                '<td colspan="7" style="border:1px solid #000; padding:1px 1px; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;">' + (r.v4_val || '') + '</td>' +
+                '</tr>';
+        });
 
-    // Destroy existing charts
-    for (var i = 0; i < this.chartInstances.length; i++) {
-        this.chartInstances[i].destroy();
-    }
-    this.chartInstances = [];
+        // --- Data Header: Batch Names ---
+        html += '<tr style="background:#e5e7eb; font-weight:bold;">' +
+            '<td style="border:1px solid #000; text-align:center;">批號</td>';
+        pageLabels.forEach(function (name) {
+            html += '<td style="border:1px solid #000; text-align:center; height:35px; overflow:hidden; font-size:10px; white-space:nowrap; text-overflow:ellipsis; width:' + colWidths.batch + 'px; max-width:' + colWidths.batch + 'px; min-width:' + colWidths.batch + 'px; padding:0;">' + name + '</td>';
+        });
+        // Fill empty if less than 25 batches
+        for (var f = pageLabels.length; f < 25; f++) html += '<td style="border:1px solid #000; width:' + colWidths.batch + 'px; max-width:' + colWidths.batch + 'px; min-width:' + colWidths.batch + 'px;"></td>';
 
-    if (data.type === 'batch') {
-        // Get pagination info
-        var p = this.batchPagination || { currentPage: 1, maxPerPage: 25, totalBatches: data.batchNames.length };
-        var startIdx = (p.currentPage - 1) * p.maxPerPage;
-        var endIdx = Math.min(startIdx + p.maxPerPage, p.totalBatches);
+        html += '<td colspan="4" style="border:1px solid #000; text-align:center;">彙總</td></tr>';
 
-        // Slice data for current page
-        var pageLabels = data.batchNames.slice(startIdx, endIdx);
-        var pageDataMatrix = data.dataMatrix.slice(startIdx, endIdx);
-
-        // Calculate control limits for this page's data (VBA style - each page has its own limits)
-        var pageXbarR = SPCEngine.calculateXBarRLimits(pageDataMatrix);
-
-        // Add sums for detailed table display
-        pageXbarR.summary.xBarSum = pageXbarR.xBar.data.reduce(function (a, b) { return a + b; }, 0);
-        pageXbarR.summary.rSum = pageXbarR.R.data.reduce(function (a, b) { return a + b; }, 0);
-
-        // Render detailed data table
-        this.renderDetailedDataTable(pageLabels, pageDataMatrix, pageXbarR);
-
-        // Update page limits display
-        var limitsHtml = '<div class="results-summary" style="margin-top:15px;">' +
-            '<div class="stat-card"><div class="stat-label">' + this.t('本頁批號數 (k)', 'Page Batches') + '</div><div class="stat-value">' + pageXbarR.summary.k + '</div></div>' +
-            '<div class="stat-card"><div class="stat-label">X̿</div><div class="stat-value">' + SPCEngine.round(pageXbarR.summary.xDoubleBar, 4) + '</div></div>' +
-            '<div class="stat-card"><div class="stat-label">R̄</div><div class="stat-value">' + SPCEngine.round(pageXbarR.summary.rBar, 4) + '</div></div>' +
-            '</div>' +
-            '<h3 class="chart-title">' + this.t('管制界限 (本頁)', 'Control Limits (This Page)') + '</h3>' +
-            '<table class="data-table"><thead><tr><th>Chart</th><th>UCL</th><th>CL</th><th>LCL</th></tr></thead><tbody>' +
-            '<tr><td>X̄</td><td>' + SPCEngine.round(pageXbarR.xBar.UCL, 4) + '</td><td>' + SPCEngine.round(pageXbarR.xBar.CL, 4) + '</td><td>' + SPCEngine.round(pageXbarR.xBar.LCL, 4) + '</td></tr>' +
-            '<tr><td>R</td><td>' + SPCEngine.round(pageXbarR.R.UCL, 4) + '</td><td>' + SPCEngine.round(pageXbarR.R.CL, 4) + '</td><td>' + SPCEngine.round(pageXbarR.R.LCL, 4) + '</td></tr></tbody></table>';
-        document.getElementById('pageLimitsContainer').innerHTML = limitsHtml;
-
-        var diagnosticHtml = '<div class="diagnostic-panel" style="background:#fff; border-radius:8px; padding:15px; margin-top:20px; border:1px solid #e2e8f0;">' +
-            '<h3 style="margin-top:0; color:#1e293b; border-bottom:2px solid #3b82f6; padding-bottom:8px; margin-bottom:12px;">' +
-            this.t('異常診斷 (Nelson Rules)', 'Abnormality Diagnostic') + '</h3>';
-
-        if (pageXbarR.xBar.violations.length === 0) {
-            diagnosticHtml += '<p style="color:#10b981; font-weight:bold;">✅ ' + this.t('本頁數據未發現明顯異常趨勢。', 'No obvious abnormal trends found.') + '</p>';
-        } else {
-            diagnosticHtml += '<ul style="padding-left:20px; color:#475569;">';
-            var ruleDescs = {
-                1: this.t('法則 1: 超出管制界限 (3σ)', 'Rule 1: Outside 3σ'),
-                2: this.t('法則 2: 連續 9 點在中心線同一側', 'Rule 2: 9 pts on one side'),
-                3: this.t('法則 3: 連續 6 點持續上升或下降', 'Rule 3: 6 pts trending'),
-                4: this.t('法則 4: 連續 14 點交互升降', 'Rule 4: 14 pts alternating'),
-                5: this.t('法則 5: 3 點中有 2 點在 2σ 外', 'Rule 5: 2/3 outside 2σ'),
-                6: this.t('法則 6: 5 點中有 4 點在 1σ 外', 'Rule 6: 4/5 outside 1σ')
-            };
-            pageXbarR.xBar.violations.forEach(function (v) {
-                diagnosticHtml += '<li style="margin-bottom:8px;"><strong style="color:#ef4444;">[' + pageLabels[v.index] + ']</strong>: ' +
-                    v.rules.map(function (r) { return ruleDescs[r]; }).join(', ') + '</li>';
-            });
-            diagnosticHtml += '</ul>';
-        }
-        diagnosticHtml += '</div>';
-
-        // Ensure diagnosticContainer exists or create it
-        var diagDiv = document.getElementById('diagnosticContainer');
-        if (!diagDiv) {
-            diagDiv = document.createElement('div');
-            diagDiv.id = 'diagnosticContainer';
-            document.getElementById('batchChartsContainer').parentNode.insertBefore(diagDiv, document.getElementById('batchChartsContainer'));
-        }
-        diagDiv.innerHTML = diagnosticHtml;
-
-        var fillUCL = [], fillCL = [], fillLCL = [];
-        var xbarColors = [], rColors = [];
-
-        var vMap = {};
-        pageXbarR.xBar.violations.forEach(function (v) { vMap[v.index] = true; });
-
-        for (var i = 0; i < pageLabels.length; i++) {
-            fillUCL.push(pageXbarR.xBar.UCL);
-            fillCL.push(pageXbarR.xBar.CL);
-            fillLCL.push(pageXbarR.xBar.LCL);
-
-            if (vMap[i]) {
-                xbarColors.push('#ef4444');
-            } else {
-                xbarColors.push('#3b82f6');
+        // --- Main Data Rows: Cavities ---
+        for (var i = 0; i < cavityCount; i++) {
+            html += '<tr><td style="border:1px solid #000; text-align:center; font-weight:bold;">X' + (i + 1) + '</td>';
+            for (var j = 0; j < 25; j++) {
+                var val = (pageDataMatrix[j] && pageDataMatrix[j][i] !== undefined) ? pageDataMatrix[j][i] : null;
+                html += '<td style="border:1px solid #000; text-align:center; padding:0; overflow:hidden; white-space:nowrap; width:' + colWidths.batch + 'px; max-width:' + colWidths.batch + 'px; min-width:' + colWidths.batch + 'px;">' + (val !== null ? val : '') + '</td>';
             }
 
-            var rVal = pageXbarR.R.data[i];
-            if (rVal > pageXbarR.R.UCL) {
-                rColors.push('#ef4444');
-            } else {
-                rColors.push('#3b82f6');
-            }
+            // Sidebar summary on first few rows
+            if (i === 0) html += '<td colspan="4" rowspan="2" style="border:1px solid #000; text-align:center !important; font-weight:bold; background:#fefefe; font-size:10px;">ΣX̄ = ' + SPCEngine.round(pageXbarR.summary.xBarSum, 4) + '</td>';
+            else if (i === 2) html += '<td colspan="4" rowspan="2" style="border:1px solid #000; text-align:center !important; font-weight:bold; background:#fefefe; font-size:10px;">X̿ = ' + SPCEngine.round(pageXbarR.summary.xDoubleBar, 4) + '</td>';
+            else if (i === 4) html += '<td colspan="4" rowspan="2" style="border:1px solid #000; text-align:center !important; font-weight:bold; background:#fefefe; font-size:10px;">ΣR = ' + SPCEngine.round(pageXbarR.summary.rSum, 4) + '</td>';
+            else if (i === 6) html += '<td colspan="4" rowspan="2" style="border:1px solid #000; text-align:center !important; font-weight:bold; background:#fefefe; font-size:10px;">R̄ = ' + SPCEngine.round(pageXbarR.summary.rBar, 4) + '</td>';
+            else if (i >= 8) html += '<td colspan="4" style="border:1px solid #000; background:#fcfcfc;"></td>';
+            html += '</tr>';
         }
 
-        this.chartInstances.push(new Chart(document.getElementById('xbarChart'), {
-            type: 'line',
-            data: {
-                labels: pageLabels, datasets: [
-                    {
-                        label: 'X̄',
-                        data: pageXbarR.xBar.data,
-                        borderColor: '#3b82f6',
-                        borderWidth: 2,
-                        pointBackgroundColor: xbarColors,
-                        pointBorderColor: xbarColors,
-                        pointRadius: 4,
-                        pointHoverRadius: 6,
-                        tension: 0,
-                        fill: false
-                    },
-                    { label: 'UCL', data: fillUCL, borderColor: '#ef4444', borderWidth: 1.5, borderDash: [6, 4], pointRadius: 0, fill: false },
-                    { label: 'CL', data: fillCL, borderColor: '#10b981', borderWidth: 1.5, pointRadius: 0, fill: false },
-                    { label: 'LCL', data: fillLCL, borderColor: '#ef4444', borderWidth: 1.5, borderDash: [6, 4], pointRadius: 0, fill: false }
-                ]
-            },
-            options: {
-                responsive: true,
-                aspectRatio: 4, // More compact vertical
-                plugins: {
-                    legend: { position: 'top', labels: { boxWidth: 10, padding: 10, font: { size: 12 } } }
-                },
-                scales: {
-                    x: { grid: { display: false } },
-                    y: { grid: { color: 'rgba(0,0,0,0.08)' } }
+        // --- Footer Rows: ΣX, X̄, R ---
+        // ΣX Row
+        html += '<tr style="background:#f9fafb;"><td style="border:1px solid #000; text-align:center; font-weight:bold;">ΣX</td>';
+        for (var b = 0; b < 25; b++) {
+            var val = '';
+            if (pageDataMatrix[b]) {
+                var sum = pageDataMatrix[b].reduce(function (a, b) { return a + (b || 0); }, 0);
+                val = SPCEngine.round(sum, 4);
+            }
+            html += '<td style="border:1px solid #000; text-align:center;">' + val + '</td>';
+        }
+        html += '<td colspan="4" style="border:1px solid #000; background:#f9fafb;"></td></tr>';
+
+        // X̄ Row (with yellow highlighting)
+        html += '<tr style="background:#f9fafb;"><td style="border:1px solid #000; text-align:center; font-weight:bold;">X̄</td>';
+        for (var k = 0; k < 25; k++) {
+            var val = '', style = '';
+            if (pageXbarR.xBar.data[k] !== undefined) {
+                var v = pageXbarR.xBar.data[k];
+                val = SPCEngine.round(v, 4);
+                if (v > pageXbarR.xBar.UCL || v < pageXbarR.xBar.LCL) style = 'background:yellow;';
+            }
+            html += '<td style="border:1px solid #000; text-align:center;' + style + '">' + val + '</td>';
+        }
+        html += '<td colspan="4" style="border:1px solid #000; background:#f9fafb;"></td></tr>';
+
+        // R Row
+        html += '<tr style="background:#f9fafb;"><td style="border:1px solid #000; text-align:center; font-weight:bold;">R</td>';
+        for (var k = 0; k < 25; k++) {
+            var val = '', style = '';
+            if (pageXbarR.R.data[k] !== undefined) {
+                var v = pageXbarR.R.data[k];
+                val = SPCEngine.round(v, 4);
+                if (v > pageXbarR.R.UCL) style = 'background:yellow;';
+            }
+            html += '<td style="border:1px solid #000; text-align:center;' + style + '">' + val + '</td>';
+        }
+        html += '<td colspan="4" style="border:1px solid #000; background:#f9fafb;"></td></tr>';
+
+        html += '</table>';
+        document.getElementById('detailedTableContainer').innerHTML = html;
+    },
+
+
+
+
+    renderCharts: function () {
+        var data = this.analysisResults;
+
+        // Destroy existing charts
+        for (var i = 0; i < this.chartInstances.length; i++) {
+            this.chartInstances[i].destroy();
+        }
+        this.chartInstances = [];
+
+        if (data.type === 'batch') {
+            // Get pagination info
+            var p = this.batchPagination || { currentPage: 1, maxPerPage: 25, totalBatches: data.batchNames.length };
+            var startIdx = (p.currentPage - 1) * p.maxPerPage;
+            var endIdx = Math.min(startIdx + p.maxPerPage, p.totalBatches);
+
+            // Slice data for current page
+            var pageLabels = data.batchNames.slice(startIdx, endIdx);
+            var pageDataMatrix = data.dataMatrix.slice(startIdx, endIdx);
+
+            // Calculate control limits for this page's data (VBA style - each page has its own limits)
+            var pageXbarR = SPCEngine.calculateXBarRLimits(pageDataMatrix);
+
+            // Add sums for detailed table display
+            pageXbarR.summary.xBarSum = pageXbarR.xBar.data.reduce(function (a, b) { return a + b; }, 0);
+            pageXbarR.summary.rSum = pageXbarR.R.data.reduce(function (a, b) { return a + b; }, 0);
+
+            // Render detailed data table
+            this.renderDetailedDataTable(pageLabels, pageDataMatrix, pageXbarR);
+
+            // Update page limits display
+            var limitsHtml = '<div class="results-summary" style="margin-top:15px;">' +
+                '<div class="stat-card"><div class="stat-label">' + this.t('本頁批號數 (k)', 'Page Batches') + '</div><div class="stat-value">' + pageXbarR.summary.k + '</div></div>' +
+                '<div class="stat-card"><div class="stat-label">X̿</div><div class="stat-value">' + SPCEngine.round(pageXbarR.summary.xDoubleBar, 4) + '</div></div>' +
+                '<div class="stat-card"><div class="stat-label">R̄</div><div class="stat-value">' + SPCEngine.round(pageXbarR.summary.rBar, 4) + '</div></div>' +
+                '</div>' +
+                '<h3 class="chart-title">' + this.t('管制界限 (本頁)', 'Control Limits (This Page)') + '</h3>' +
+                '<table class="data-table"><thead><tr><th>Chart</th><th>UCL</th><th>CL</th><th>LCL</th></tr></thead><tbody>' +
+                '<tr><td>X̄</td><td>' + SPCEngine.round(pageXbarR.xBar.UCL, 4) + '</td><td>' + SPCEngine.round(pageXbarR.xBar.CL, 4) + '</td><td>' + SPCEngine.round(pageXbarR.xBar.LCL, 4) + '</td></tr>' +
+                '<tr><td>R</td><td>' + SPCEngine.round(pageXbarR.R.UCL, 4) + '</td><td>' + SPCEngine.round(pageXbarR.R.CL, 4) + '</td><td>' + SPCEngine.round(pageXbarR.R.LCL, 4) + '</td></tr></tbody></table>';
+            document.getElementById('pageLimitsContainer').innerHTML = limitsHtml;
+
+            var diagnosticHtml = '<div class="diagnostic-panel" style="background:#fff; border-radius:8px; padding:15px; margin-top:20px; border:1px solid #e2e8f0;">' +
+                '<h3 style="margin-top:0; color:#1e293b; border-bottom:2px solid #3b82f6; padding-bottom:8px; margin-bottom:12px;">' +
+                this.t('異常診斷 (Nelson Rules)', 'Abnormality Diagnostic') + '</h3>';
+
+            if (pageXbarR.xBar.violations.length === 0) {
+                diagnosticHtml += '<p style="color:#10b981; font-weight:bold;">✅ ' + this.t('本頁數據未發現明顯異常趨勢。', 'No obvious abnormal trends found.') + '</p>';
+            } else {
+                diagnosticHtml += '<ul style="padding-left:20px; color:#475569;">';
+                var ruleDescs = {
+                    1: this.t('法則 1: 超出管制界限 (3σ)', 'Rule 1: Outside 3σ'),
+                    2: this.t('法則 2: 連續 9 點在中心線同一側', 'Rule 2: 9 pts on one side'),
+                    3: this.t('法則 3: 連續 6 點持續上升或下降', 'Rule 3: 6 pts trending'),
+                    4: this.t('法則 4: 連續 14 點交互升降', 'Rule 4: 14 pts alternating'),
+                    5: this.t('法則 5: 3 點中有 2 點在 2σ 外', 'Rule 5: 2/3 outside 2σ'),
+                    6: this.t('法則 6: 5 點中有 4 點在 1σ 外', 'Rule 6: 4/5 outside 1σ')
+                };
+                pageXbarR.xBar.violations.forEach(function (v) {
+                    diagnosticHtml += '<li style="margin-bottom:8px;"><strong style="color:#ef4444;">[' + pageLabels[v.index] + ']</strong>: ' +
+                        v.rules.map(function (r) { return ruleDescs[r]; }).join(', ') + '</li>';
+                });
+                diagnosticHtml += '</ul>';
+            }
+            diagnosticHtml += '</div>';
+
+            // Ensure diagnosticContainer exists or create it
+            var diagDiv = document.getElementById('diagnosticContainer');
+            if (!diagDiv) {
+                diagDiv = document.createElement('div');
+                diagDiv.id = 'diagnosticContainer';
+                document.getElementById('batchChartsContainer').parentNode.insertBefore(diagDiv, document.getElementById('batchChartsContainer'));
+            }
+            diagDiv.innerHTML = diagnosticHtml;
+
+            var fillUCL = [], fillCL = [], fillLCL = [];
+            var xbarColors = [], rColors = [];
+
+            var vMap = {};
+            pageXbarR.xBar.violations.forEach(function (v) { vMap[v.index] = true; });
+
+            for (var i = 0; i < pageLabels.length; i++) {
+                fillUCL.push(pageXbarR.xBar.UCL);
+                fillCL.push(pageXbarR.xBar.CL);
+                fillLCL.push(pageXbarR.xBar.LCL);
+
+                if (vMap[i]) {
+                    xbarColors.push('#ef4444');
+                } else {
+                    xbarColors.push('#3b82f6');
+                }
+
+                var rVal = pageXbarR.R.data[i];
+                if (rVal > pageXbarR.R.UCL) {
+                    rColors.push('#ef4444');
+                } else {
+                    rColors.push('#3b82f6');
                 }
             }
-        }));
 
-        var rUCL = [], rCL = [];
-        for (var i = 0; i < pageLabels.length; i++) { rUCL.push(pageXbarR.R.UCL); rCL.push(pageXbarR.R.CL); }
-        this.chartInstances.push(new Chart(document.getElementById('rChart'), {
-            type: 'line',
-            data: {
-                labels: pageLabels, datasets: [
-                    {
-                        label: 'R',
-                        data: pageXbarR.R.data,
-                        borderColor: '#3b82f6',
-                        borderWidth: 2,
-                        pointBackgroundColor: rColors,
-                        pointBorderColor: rColors,
-                        pointRadius: 4,
-                        pointHoverRadius: 6,
-                        tension: 0,
-                        fill: false
-                    },
-                    { label: 'UCL', data: rUCL, borderColor: '#ef4444', borderWidth: 1.5, borderDash: [6, 4], pointRadius: 0, fill: false },
-                    { label: 'CL', data: rCL, borderColor: '#10b981', borderWidth: 1.5, pointRadius: 0, fill: false }
-                ]
-            },
-            options: {
-                responsive: true,
-                aspectRatio: 4,
-                plugins: {
-                    legend: { position: 'top', labels: { boxWidth: 10, padding: 10, font: { size: 12 } } }
+            this.chartInstances.push(new Chart(document.getElementById('xbarChart'), {
+                type: 'line',
+                data: {
+                    labels: pageLabels, datasets: [
+                        {
+                            label: 'X̄',
+                            data: pageXbarR.xBar.data,
+                            borderColor: '#3b82f6',
+                            borderWidth: 2,
+                            pointBackgroundColor: xbarColors,
+                            pointBorderColor: xbarColors,
+                            pointRadius: 4,
+                            pointHoverRadius: 6,
+                            tension: 0,
+                            fill: false
+                        },
+                        { label: 'UCL', data: fillUCL, borderColor: '#ef4444', borderWidth: 1.5, borderDash: [6, 4], pointRadius: 0, fill: false },
+                        { label: 'CL', data: fillCL, borderColor: '#10b981', borderWidth: 1.5, pointRadius: 0, fill: false },
+                        { label: 'LCL', data: fillLCL, borderColor: '#ef4444', borderWidth: 1.5, borderDash: [6, 4], pointRadius: 0, fill: false }
+                    ]
                 },
-                scales: {
-                    x: { grid: { display: false } },
-                    y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.08)' } }
+                options: {
+                    responsive: true,
+                    aspectRatio: 4, // More compact vertical
+                    plugins: {
+                        legend: { position: 'top', labels: { boxWidth: 10, padding: 10, font: { size: 12 } } }
+                    },
+                    scales: {
+                        x: { grid: { display: false } },
+                        y: { grid: { color: 'rgba(0,0,0,0.08)' } }
+                    }
                 }
+            }));
+
+            var rUCL = [], rCL = [];
+            for (var i = 0; i < pageLabels.length; i++) { rUCL.push(pageXbarR.R.UCL); rCL.push(pageXbarR.R.CL); }
+            this.chartInstances.push(new Chart(document.getElementById('rChart'), {
+                type: 'line',
+                data: {
+                    labels: pageLabels, datasets: [
+                        {
+                            label: 'R',
+                            data: pageXbarR.R.data,
+                            borderColor: '#3b82f6',
+                            borderWidth: 2,
+                            pointBackgroundColor: rColors,
+                            pointBorderColor: rColors,
+                            pointRadius: 4,
+                            pointHoverRadius: 6,
+                            tension: 0,
+                            fill: false
+                        },
+                        { label: 'UCL', data: rUCL, borderColor: '#ef4444', borderWidth: 1.5, borderDash: [6, 4], pointRadius: 0, fill: false },
+                        { label: 'CL', data: rCL, borderColor: '#10b981', borderWidth: 1.5, pointRadius: 0, fill: false }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    aspectRatio: 4,
+                    plugins: {
+                        legend: { position: 'top', labels: { boxWidth: 10, padding: 10, font: { size: 12 } } }
+                    },
+                    scales: {
+                        x: { grid: { display: false } },
+                        y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.08)' } }
+                    }
+                }
+            }));
+
+            // Populate Anomaly Sidebar (New UI Feature)
+            this.renderAnomalySidebar(pageXbarR, pageLabels);
+
+        } else if (data.type === 'cavity') {
+            var labels = [], cpkValues = [], colors = [];
+            for (var i = 0; i < data.cavityStats.length; i++) {
+                labels.push(data.cavityStats[i].name);
+                cpkValues.push(data.cavityStats[i].Cpk);
+                colors.push(SPCEngine.getCapabilityColor(data.cavityStats[i].Cpk).bg);
             }
-        }));
+            var line167 = [], line133 = [], line100 = [];
+            for (var i = 0; i < labels.length; i++) { line167.push(1.67); line133.push(1.33); line100.push(1.0); }
 
-        // Populate Anomaly Sidebar (New UI Feature)
-        this.renderAnomalySidebar(pageXbarR, pageLabels);
+            this.chartInstances.push(new Chart(document.getElementById('cpkChart'), {
+                type: 'bar',
+                data: {
+                    labels: labels, datasets: [
+                        { label: 'Cpk', data: cpkValues, backgroundColor: colors, borderWidth: 0, barPercentage: 0.7 },
+                        { label: '1.67', data: line167, type: 'line', borderColor: '#10b981', borderWidth: 1.5, borderDash: [6, 4], pointRadius: 0, fill: false },
+                        { label: '1.33', data: line133, type: 'line', borderColor: '#f59e0b', borderWidth: 1.5, borderDash: [6, 4], pointRadius: 0, fill: false },
+                        { label: '1.0', data: line100, type: 'line', borderColor: '#ef4444', borderWidth: 1.5, borderDash: [6, 4], pointRadius: 0, fill: false }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'top', labels: { boxWidth: 12, padding: 20, font: { size: 14 } } } },
+                    scales: { x: { grid: { display: false } }, y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.08)' } } }
+                }
+            }));
 
-    } else if (data.type === 'cavity') {
-        var labels = [], cpkValues = [], colors = [];
-        for (var i = 0; i < data.cavityStats.length; i++) {
-            labels.push(data.cavityStats[i].name);
-            cpkValues.push(data.cavityStats[i].Cpk);
-            colors.push(SPCEngine.getCapabilityColor(data.cavityStats[i].Cpk).bg);
+            // Prepare data for Mean and StdDev charts
+            var meanValues = [], stdDevValues = [];
+
+            // Calculate Grand Mean for reference line
+            var totalMean = 0;
+            for (var i = 0; i < data.cavityStats.length; i++) {
+                meanValues.push(data.cavityStats[i].mean);
+                stdDevValues.push(data.cavityStats[i].overallStdDev);
+                totalMean += data.cavityStats[i].mean;
+            }
+            var grandMean = totalMean / data.cavityStats.length;
+            var grandMeanLine = new Array(labels.length).fill(grandMean);
+
+            // Mean Chart
+            this.chartInstances.push(new Chart(document.getElementById('meanChart'), {
+                type: 'bar',
+                data: {
+                    labels: labels, datasets: [
+                        { label: 'Mean', data: meanValues, backgroundColor: '#3b82f6', borderWidth: 0, barPercentage: 0.7 },
+                        { label: 'Grand Mean', data: grandMeanLine, type: 'line', borderColor: '#ef4444', borderWidth: 2, pointRadius: 0, fill: false }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'top', labels: { boxWidth: 12, padding: 20, font: { size: 14 } } } },
+                    scales: { x: { grid: { display: false } }, y: { beginAtZero: false, grid: { color: 'rgba(0,0,0,0.08)' } } } // Mean often far from zero
+                }
+            }));
+
+            // StdDev Chart
+            this.chartInstances.push(new Chart(document.getElementById('stdDevChart'), {
+                type: 'bar',
+                data: {
+                    labels: labels, datasets: [
+                        { label: 'StdDev (Overall)', data: stdDevValues, backgroundColor: '#f59e0b', borderWidth: 0, barPercentage: 0.7 }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'top', labels: { boxWidth: 12, padding: 20, font: { size: 14 } } } },
+                    scales: { x: { grid: { display: false } }, y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.08)' } } }
+                }
+            }));
+        } else if (data.type === 'group') {
+            var labels = [], maxVals = [], avgVals = [], minVals = [];
+            var uslLine = [], tgtLine = [], lslLine = [];
+            for (var i = 0; i < data.groupStats.length; i++) {
+                labels.push(data.groupStats[i].batch);
+                maxVals.push(data.groupStats[i].max);
+                avgVals.push(data.groupStats[i].avg);
+                minVals.push(data.groupStats[i].min);
+                uslLine.push(data.specs.usl);
+                tgtLine.push(data.specs.target);
+                lslLine.push(data.specs.lsl);
+            }
+
+            this.chartInstances.push(new Chart(document.getElementById('groupChart'), {
+                type: 'line',
+                data: {
+                    labels: labels, datasets: [
+                        { label: 'Max', data: maxVals, borderColor: '#f87171', borderWidth: 1.5, pointRadius: 0, fill: false },
+                        { label: 'Avg', data: avgVals, borderColor: '#3b82f6', borderWidth: 2, pointRadius: 3, pointHoverRadius: 5, fill: false },
+                        { label: 'Min', data: minVals, borderColor: '#f87171', borderWidth: 1.5, pointRadius: 0, fill: false },
+                        { label: 'USL', data: uslLine, borderColor: '#ff9800', borderWidth: 1.5, borderDash: [6, 4], pointRadius: 0, fill: false },
+                        { label: 'Target', data: tgtLine, borderColor: '#10b981', borderWidth: 1.5, pointRadius: 0, fill: false },
+                        { label: 'LSL', data: lslLine, borderColor: '#ff9800', borderWidth: 1.5, borderDash: [6, 4], pointRadius: 0, fill: false }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'top', labels: { boxWidth: 12, padding: 20, font: { size: 14 } } } },
+                    scales: { x: { grid: { display: false } }, y: { grid: { color: 'rgba(0,0,0,0.08)' } } }
+                }
+            }));
+
+            // Group Variation Chart
+            var rangeVals = [];
+            for (var i = 0; i < data.groupStats.length; i++) {
+                rangeVals.push(data.groupStats[i].range);
+            }
+
+            this.chartInstances.push(new Chart(document.getElementById('groupVarChart'), {
+                type: 'line',
+                data: {
+                    labels: labels, datasets: [
+                        { label: 'Range (Max - Min)', data: rangeVals, borderColor: '#f97316', backgroundColor: 'rgba(249, 115, 22, 0.1)', borderWidth: 2, pointRadius: 3, pointHoverRadius: 5, fill: true },
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'top', labels: { boxWidth: 12, padding: 20, font: { size: 14 } } } },
+                    scales: { x: { grid: { display: false } }, y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.08)' } } }
+                }
+            }));
         }
-        var line167 = [], line133 = [], line100 = [];
-        for (var i = 0; i < labels.length; i++) { line167.push(1.67); line133.push(1.33); line100.push(1.0); }
+    },
 
-        this.chartInstances.push(new Chart(document.getElementById('cpkChart'), {
-            type: 'bar',
-            data: {
-                labels: labels, datasets: [
-                    { label: 'Cpk', data: cpkValues, backgroundColor: colors, borderWidth: 0, barPercentage: 0.7 },
-                    { label: '1.67', data: line167, type: 'line', borderColor: '#10b981', borderWidth: 1.5, borderDash: [6, 4], pointRadius: 0, fill: false },
-                    { label: '1.33', data: line133, type: 'line', borderColor: '#f59e0b', borderWidth: 1.5, borderDash: [6, 4], pointRadius: 0, fill: false },
-                    { label: '1.0', data: line100, type: 'line', borderColor: '#ef4444', borderWidth: 1.5, borderDash: [6, 4], pointRadius: 0, fill: false }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { legend: { position: 'top', labels: { boxWidth: 12, padding: 20, font: { size: 14 } } } },
-                scales: { x: { grid: { display: false } }, y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.08)' } } }
-            }
-        }));
+    downloadExcel: function () {
+        var self = this;
+        var data = this.analysisResults;
+        var wb = XLSX.utils.book_new();
+        var maxBatchesPerSheet = 25;
 
-        // Prepare data for Mean and StdDev charts
-        var meanValues = [], stdDevValues = [];
+        if (data.type === 'batch') {
+            // VBA style: Horizontal layout with batches as columns
+            var totalBatches = Math.min(data.batchNames.length, data.xbarR.xBar.data.length);
+            var totalSheets = Math.ceil(totalBatches / maxBatchesPerSheet);
+            var cavityCount = data.cavityNames ? data.cavityNames.length : data.xbarR.summary.n;
 
-        // Calculate Grand Mean for reference line
-        var totalMean = 0;
-        for (var i = 0; i < data.cavityStats.length; i++) {
-            meanValues.push(data.cavityStats[i].mean);
-            stdDevValues.push(data.cavityStats[i].overallStdDev);
-            totalMean += data.cavityStats[i].mean;
-        }
-        var grandMean = totalMean / data.cavityStats.length;
-        var grandMeanLine = new Array(labels.length).fill(grandMean);
+            for (var sheetIdx = 0; sheetIdx < totalSheets; sheetIdx++) {
+                var startBatch = sheetIdx * maxBatchesPerSheet;
+                var endBatch = Math.min((sheetIdx + 1) * maxBatchesPerSheet, totalBatches);
+                var batchCount = endBatch - startBatch;
+                var wsData = [];
 
-        // Mean Chart
-        this.chartInstances.push(new Chart(document.getElementById('meanChart'), {
-            type: 'bar',
-            data: {
-                labels: labels, datasets: [
-                    { label: 'Mean', data: meanValues, backgroundColor: '#3b82f6', borderWidth: 0, barPercentage: 0.7 },
-                    { label: 'Grand Mean', data: grandMeanLine, type: 'line', borderColor: '#ef4444', borderWidth: 2, pointRadius: 0, fill: false }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { legend: { position: 'top', labels: { boxWidth: 12, padding: 20, font: { size: 14 } } } },
-                scales: { x: { grid: { display: false } }, y: { beginAtZero: false, grid: { color: 'rgba(0,0,0,0.08)' } } } // Mean often far from zero
-            }
-        }));
+                // Row 1: Title
+                var row1 = [this.t('X̄ - R 管制圖', 'X-Bar R Control Chart')];
+                for (var c = 0; c < batchCount + 5; c++) row1.push('');
+                wsData.push(row1);
 
-        // StdDev Chart
-        this.chartInstances.push(new Chart(document.getElementById('stdDevChart'), {
-            type: 'bar',
-            data: {
-                labels: labels, datasets: [
-                    { label: 'StdDev (Overall)', data: stdDevValues, backgroundColor: '#f59e0b', borderWidth: 0, barPercentage: 0.7 }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { legend: { position: 'top', labels: { boxWidth: 12, padding: 20, font: { size: 14 } } } },
-                scales: { x: { grid: { display: false } }, y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.08)' } } }
-            }
-        }));
-    } else if (data.type === 'group') {
-        var labels = [], maxVals = [], avgVals = [], minVals = [];
-        var uslLine = [], tgtLine = [], lslLine = [];
-        for (var i = 0; i < data.groupStats.length; i++) {
-            labels.push(data.groupStats[i].batch);
-            maxVals.push(data.groupStats[i].max);
-            avgVals.push(data.groupStats[i].avg);
-            minVals.push(data.groupStats[i].min);
-            uslLine.push(data.specs.usl);
-            tgtLine.push(data.specs.target);
-            lslLine.push(data.specs.lsl);
-        }
+                // Row 2: Product info header
+                var row2 = [this.t('產品名稱', 'Product'), '', '', '', this.t('規格', 'Spec'), '', '', this.t('管制界限', 'Limits'), '', '', '', this.t('彙總', 'Summary')];
+                wsData.push(row2);
 
-        this.chartInstances.push(new Chart(document.getElementById('groupChart'), {
-            type: 'line',
-            data: {
-                labels: labels, datasets: [
-                    { label: 'Max', data: maxVals, borderColor: '#f87171', borderWidth: 1.5, pointRadius: 0, fill: false },
-                    { label: 'Avg', data: avgVals, borderColor: '#3b82f6', borderWidth: 2, pointRadius: 3, pointHoverRadius: 5, fill: false },
-                    { label: 'Min', data: minVals, borderColor: '#f87171', borderWidth: 1.5, pointRadius: 0, fill: false },
-                    { label: 'USL', data: uslLine, borderColor: '#ff9800', borderWidth: 1.5, borderDash: [6, 4], pointRadius: 0, fill: false },
-                    { label: 'Target', data: tgtLine, borderColor: '#10b981', borderWidth: 1.5, pointRadius: 0, fill: false },
-                    { label: 'LSL', data: lslLine, borderColor: '#ff9800', borderWidth: 1.5, borderDash: [6, 4], pointRadius: 0, fill: false }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { legend: { position: 'top', labels: { boxWidth: 12, padding: 20, font: { size: 14 } } } },
-                scales: { x: { grid: { display: false } }, y: { grid: { color: 'rgba(0,0,0,0.08)' } } }
-            }
-        }));
+                // Row 3: Specs and limits
+                var row3 = [this.t('檢驗項目', 'Item'), this.selectedItem, '', '',
+                    'Target', data.specs.target, '',
+                    'UCL', SPCEngine.round(data.xbarR.xBar.UCL, 4), '', '',
+                    'ΣX̄', SPCEngine.round(data.xbarR.summary.xDoubleBar * data.xbarR.summary.k, 4)];
+                wsData.push(row3);
 
-        // Group Variation Chart
-        var rangeVals = [];
-        for (var i = 0; i < data.groupStats.length; i++) {
-            rangeVals.push(data.groupStats[i].range);
-        }
+                // Row 4: More specs
+                var row4 = [this.t('模穴數', 'Cavities'), cavityCount, '', '',
+                    'USL', data.specs.usl, '',
+                    'CL', SPCEngine.round(data.xbarR.xBar.CL, 4), '', '',
+                    'X̿', SPCEngine.round(data.xbarR.summary.xDoubleBar, 4)];
+                wsData.push(row4);
 
-        this.chartInstances.push(new Chart(document.getElementById('groupVarChart'), {
-            type: 'line',
-            data: {
-                labels: labels, datasets: [
-                    { label: 'Range (Max - Min)', data: rangeVals, borderColor: '#f97316', backgroundColor: 'rgba(249, 115, 22, 0.1)', borderWidth: 2, pointRadius: 3, pointHoverRadius: 5, fill: true },
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { legend: { position: 'top', labels: { boxWidth: 12, padding: 20, font: { size: 14 } } } },
-                scales: { x: { grid: { display: false } }, y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.08)' } } }
-            }
-        }));
-    }
-},
+                // Row 5: More info
+                var row5 = [this.t('批號數', 'Batches'), data.xbarR.summary.k, '', '',
+                    'LSL', data.specs.lsl, '',
+                    'LCL', SPCEngine.round(data.xbarR.xBar.LCL, 4), '', '',
+                    'ΣR', SPCEngine.round(data.xbarR.summary.rBar * data.xbarR.summary.k, 4)];
+                wsData.push(row5);
 
-downloadExcel: function () {
-    var self = this;
-    var data = this.analysisResults;
-    var wb = XLSX.utils.book_new();
-    var maxBatchesPerSheet = 25;
+                // Row 6: R chart limits
+                var row6 = ['', '', '', '', '', '', '',
+                    'R_UCL', SPCEngine.round(data.xbarR.R.UCL, 4), '', '',
+                    'R̄', SPCEngine.round(data.xbarR.summary.rBar, 4)];
+                wsData.push(row6);
 
-    if (data.type === 'batch') {
-        // VBA style: Horizontal layout with batches as columns
-        var totalBatches = Math.min(data.batchNames.length, data.xbarR.xBar.data.length);
-        var totalSheets = Math.ceil(totalBatches / maxBatchesPerSheet);
-        var cavityCount = data.cavityNames ? data.cavityNames.length : data.xbarR.summary.n;
+                // Empty row
+                wsData.push([]);
 
-        for (var sheetIdx = 0; sheetIdx < totalSheets; sheetIdx++) {
-            var startBatch = sheetIdx * maxBatchesPerSheet;
-            var endBatch = Math.min((sheetIdx + 1) * maxBatchesPerSheet, totalBatches);
-            var batchCount = endBatch - startBatch;
-            var wsData = [];
-
-            // Row 1: Title
-            var row1 = [this.t('X̄ - R 管制圖', 'X-Bar R Control Chart')];
-            for (var c = 0; c < batchCount + 5; c++) row1.push('');
-            wsData.push(row1);
-
-            // Row 2: Product info header
-            var row2 = [this.t('產品名稱', 'Product'), '', '', '', this.t('規格', 'Spec'), '', '', this.t('管制界限', 'Limits'), '', '', '', this.t('彙總', 'Summary')];
-            wsData.push(row2);
-
-            // Row 3: Specs and limits
-            var row3 = [this.t('檢驗項目', 'Item'), this.selectedItem, '', '',
-                'Target', data.specs.target, '',
-                'UCL', SPCEngine.round(data.xbarR.xBar.UCL, 4), '', '',
-                'ΣX̄', SPCEngine.round(data.xbarR.summary.xDoubleBar * data.xbarR.summary.k, 4)];
-            wsData.push(row3);
-
-            // Row 4: More specs
-            var row4 = [this.t('模穴數', 'Cavities'), cavityCount, '', '',
-                'USL', data.specs.usl, '',
-                'CL', SPCEngine.round(data.xbarR.xBar.CL, 4), '', '',
-                'X̿', SPCEngine.round(data.xbarR.summary.xDoubleBar, 4)];
-            wsData.push(row4);
-
-            // Row 5: More info
-            var row5 = [this.t('批號數', 'Batches'), data.xbarR.summary.k, '', '',
-                'LSL', data.specs.lsl, '',
-                'LCL', SPCEngine.round(data.xbarR.xBar.LCL, 4), '', '',
-                'ΣR', SPCEngine.round(data.xbarR.summary.rBar * data.xbarR.summary.k, 4)];
-            wsData.push(row5);
-
-            // Row 6: R chart limits
-            var row6 = ['', '', '', '', '', '', '',
-                'R_UCL', SPCEngine.round(data.xbarR.R.UCL, 4), '', '',
-                'R̄', SPCEngine.round(data.xbarR.summary.rBar, 4)];
-            wsData.push(row6);
-
-            // Empty row
-            wsData.push([]);
-
-            // Row 8: Data table header - batch names
-            var headerRow = [this.t('檢驗批號', 'Batch No.')];
-            for (var b = startBatch; b < endBatch; b++) {
-                headerRow.push(data.batchNames[b] || 'B' + (b + 1));
-            }
-            wsData.push(headerRow);
-
-            // Rows for each cavity (X1, X2, X3...)
-            for (var cav = 0; cav < cavityCount; cav++) {
-                var cavRow = ['X' + (cav + 1)];
+                // Row 8: Data table header - batch names
+                var headerRow = [this.t('檢驗批號', 'Batch No.')];
                 for (var b = startBatch; b < endBatch; b++) {
-                    var value = data.dataMatrix && data.dataMatrix[b] ? data.dataMatrix[b][cav] : null;
-                    cavRow.push(value !== null ? SPCEngine.round(value, 4) : '');
+                    headerRow.push(data.batchNames[b] || 'B' + (b + 1));
                 }
-                wsData.push(cavRow);
+                wsData.push(headerRow);
+
+                // Rows for each cavity (X1, X2, X3...)
+                for (var cav = 0; cav < cavityCount; cav++) {
+                    var cavRow = ['X' + (cav + 1)];
+                    for (var b = startBatch; b < endBatch; b++) {
+                        var value = data.dataMatrix && data.dataMatrix[b] ? data.dataMatrix[b][cav] : null;
+                        cavRow.push(value !== null ? SPCEngine.round(value, 4) : '');
+                    }
+                    wsData.push(cavRow);
+                }
+
+                // X-bar row
+                var xbarRow = ['X̄'];
+                for (var b = startBatch; b < endBatch; b++) {
+                    xbarRow.push(SPCEngine.round(data.xbarR.xBar.data[b], 4));
+                }
+                wsData.push(xbarRow);
+
+                // R row
+                var rRow = ['R'];
+                for (var b = startBatch; b < endBatch; b++) {
+                    rRow.push(SPCEngine.round(data.xbarR.R.data[b], 4));
+                }
+                wsData.push(rRow);
+
+                // Create worksheet
+                var ws = XLSX.utils.aoa_to_sheet(wsData);
+
+                // Set column widths
+                var cols = [{ wch: 12 }];
+                for (var c = 0; c < batchCount + 12; c++) cols.push({ wch: 10 });
+                ws['!cols'] = cols;
+
+                var sheetName = this.selectedItem.substring(0, 25) + '-' + String(sheetIdx + 1).padStart(3, '0');
+                XLSX.utils.book_append_sheet(wb, ws, sheetName);
             }
 
-            // X-bar row
-            var xbarRow = ['X̄'];
-            for (var b = startBatch; b < endBatch; b++) {
-                xbarRow.push(SPCEngine.round(data.xbarR.xBar.data[b], 4));
-            }
-            wsData.push(xbarRow);
 
-            // R row
-            var rRow = ['R'];
-            for (var b = startBatch; b < endBatch; b++) {
-                rRow.push(SPCEngine.round(data.xbarR.R.data[b], 4));
-            }
-            wsData.push(rRow);
+        } else if (data.type === 'cavity') {
+            var wsData = [];
+            wsData.push([this.t('模穴分析', 'Cavity Analysis'), '', '', '', '', this.t('檢驗項目', 'Inspection Item') + ': ' + this.selectedItem]);
+            wsData.push([]);
+            wsData.push(['Target', data.specs.target, 'USL', data.specs.usl, 'LSL', data.specs.lsl]);
+            wsData.push([]);
+            wsData.push([this.t('模穴', 'Cavity'), this.t('平均', 'Mean'), 'σ_within', 'σ_overall', 'Cp', 'Cpk', 'Pp', 'Ppk', 'n']);
 
-            // Create worksheet
+            for (var i = 0; i < data.cavityStats.length; i++) {
+                var s = data.cavityStats[i];
+                wsData.push([s.name, SPCEngine.round(s.mean, 4), SPCEngine.round(s.withinStdDev, 4), SPCEngine.round(s.overallStdDev, 4), SPCEngine.round(s.Cp, 3), SPCEngine.round(s.Cpk, 3), SPCEngine.round(s.Pp, 3), SPCEngine.round(s.Ppk, 3), s.count]);
+            }
+
             var ws = XLSX.utils.aoa_to_sheet(wsData);
+            ws['!cols'] = [{ wch: 12 }, { wch: 12 }, { wch: 12 }, { wch: 12 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 8 }];
+            XLSX.utils.book_append_sheet(wb, ws, this.t('模穴分析', 'CavityAnalysis'));
 
-            // Set column widths
-            var cols = [{ wch: 12 }];
-            for (var c = 0; c < batchCount + 12; c++) cols.push({ wch: 10 });
-            ws['!cols'] = cols;
+        } else if (data.type === 'group') {
+            var wsData = [];
+            wsData.push([this.t('群組分析 (Min-Max-Avg)', 'Group Analysis (Min-Max-Avg)'), '', '', '', '', this.t('檢驗項目', 'Inspection Item') + ': ' + this.selectedItem]);
+            wsData.push([]);
+            wsData.push(['Target', data.specs.target, 'USL', data.specs.usl, 'LSL', data.specs.lsl]);
+            wsData.push([]);
+            wsData.push([this.t('批號', 'Batch'), this.t('平均', 'Avg'), this.t('最大', 'Max'), this.t('最小', 'Min'), this.t('全距', 'Range'), 'n']);
 
-            var sheetName = this.selectedItem.substring(0, 25) + '-' + String(sheetIdx + 1).padStart(3, '0');
-            XLSX.utils.book_append_sheet(wb, ws, sheetName);
-        }
-
-
-    } else if (data.type === 'cavity') {
-        var wsData = [];
-        wsData.push([this.t('模穴分析', 'Cavity Analysis'), '', '', '', '', this.t('檢驗項目', 'Inspection Item') + ': ' + this.selectedItem]);
-        wsData.push([]);
-        wsData.push(['Target', data.specs.target, 'USL', data.specs.usl, 'LSL', data.specs.lsl]);
-        wsData.push([]);
-        wsData.push([this.t('模穴', 'Cavity'), this.t('平均', 'Mean'), 'σ_within', 'σ_overall', 'Cp', 'Cpk', 'Pp', 'Ppk', 'n']);
-
-        for (var i = 0; i < data.cavityStats.length; i++) {
-            var s = data.cavityStats[i];
-            wsData.push([s.name, SPCEngine.round(s.mean, 4), SPCEngine.round(s.withinStdDev, 4), SPCEngine.round(s.overallStdDev, 4), SPCEngine.round(s.Cp, 3), SPCEngine.round(s.Cpk, 3), SPCEngine.round(s.Pp, 3), SPCEngine.round(s.Ppk, 3), s.count]);
-        }
-
-        var ws = XLSX.utils.aoa_to_sheet(wsData);
-        ws['!cols'] = [{ wch: 12 }, { wch: 12 }, { wch: 12 }, { wch: 12 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 8 }];
-        XLSX.utils.book_append_sheet(wb, ws, this.t('模穴分析', 'CavityAnalysis'));
-
-    } else if (data.type === 'group') {
-        var wsData = [];
-        wsData.push([this.t('群組分析 (Min-Max-Avg)', 'Group Analysis (Min-Max-Avg)'), '', '', '', '', this.t('檢驗項目', 'Inspection Item') + ': ' + this.selectedItem]);
-        wsData.push([]);
-        wsData.push(['Target', data.specs.target, 'USL', data.specs.usl, 'LSL', data.specs.lsl]);
-        wsData.push([]);
-        wsData.push([this.t('批號', 'Batch'), this.t('平均', 'Avg'), this.t('最大', 'Max'), this.t('最小', 'Min'), this.t('全距', 'Range'), 'n']);
-
-        for (var i = 0; i < data.groupStats.length; i++) {
-            var s = data.groupStats[i];
-            wsData.push([s.batch, SPCEngine.round(s.avg, 4), SPCEngine.round(s.max, 4), SPCEngine.round(s.min, 4), SPCEngine.round(s.range, 4), s.count]);
-        }
-
-        var ws = XLSX.utils.aoa_to_sheet(wsData);
-        ws['!cols'] = [{ wch: 18 }, { wch: 12 }, { wch: 12 }, { wch: 12 }, { wch: 12 }, { wch: 8 }];
-        XLSX.utils.book_append_sheet(wb, ws, this.t('群組分析', 'GroupAnalysis'));
-    }
-
-    var filename = 'SPC_' + data.type + '_' + this.selectedItem + '.xlsx';
-    XLSX.writeFile(wb, filename);
-},
-
-showLoading: function (text) {
-    document.getElementById('loadingText').textContent = text;
-    document.getElementById('loadingOverlay').classList.add('active');
-},
-
-hideLoading: function () {
-    document.getElementById('loadingOverlay').classList.remove('active');
-},
-
-renderAnomalySidebar: function (pageXbarR, labels) {
-    var sidebar = document.getElementById('anomalySidebar');
-    var list = document.getElementById('anomalyList');
-    if (!sidebar || !list) return;
-
-    list.innerHTML = ''; // Clear previous content
-    var count = 0;
-
-    // Helper to create card HTML
-    function createCard(title, label, valText, badgeColor, badgeText) {
-        return '<div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm border-l-4 ' +
-            (badgeColor === 'red' ? 'border-l-red-500 hover:border-red-500' : 'border-l-yellow-500 hover:border-yellow-500') +
-            ' transition-all cursor-pointer group">' +
-            '<div class="flex justify-between items-start mb-2">' +
-            '<div><span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">' + title + '</span>' +
-            '<p class="font-mono font-bold text-gray-700">' + label + '</p></div>' +
-            '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold ' +
-            (badgeColor === 'red' ? 'bg-red-50 text-red-600' : 'bg-yellow-50 text-yellow-600') +
-            ' uppercase">' + badgeText + '</span></div>' +
-            '<p class="text-xs text-gray-500 mb-4">' + valText + '</p></div>';
-    }
-
-    // X-bar Violations
-    if (pageXbarR.xBar && pageXbarR.xBar.violations) {
-        pageXbarR.xBar.violations.forEach(function (v) {
-            count++;
-            var label = labels[v.index] || 'Batch ' + (v.index + 1);
-            var valText = 'Value: ' + SPCEngine.round(v.value, 4);
-            list.insertAdjacentHTML('beforeend', createCard('Batch ID', label, valText, 'red', 'X-Bar Out'));
-        });
-    }
-
-    // R Violations
-    if (pageXbarR.R && pageXbarR.R.data) {
-        pageXbarR.R.data.forEach(function (rVal, idx) {
-            if (rVal > pageXbarR.R.UCL) {
-                count++;
-                var label = labels[idx] || 'Batch ' + (idx + 1);
-                var valText = 'Range: ' + SPCEngine.round(rVal, 4) + ' > ' + SPCEngine.round(pageXbarR.R.UCL, 4);
-                list.insertAdjacentHTML('beforeend', createCard('Batch ID', label, valText, 'red', 'R Chart Out'));
+            for (var i = 0; i < data.groupStats.length; i++) {
+                var s = data.groupStats[i];
+                wsData.push([s.batch, SPCEngine.round(s.avg, 4), SPCEngine.round(s.max, 4), SPCEngine.round(s.min, 4), SPCEngine.round(s.range, 4), s.count]);
             }
-        });
-    }
 
-    if (count > 0) {
-        sidebar.classList.remove('hidden');
-    } else {
-        // Show empty state inside sidebar, but keep sidebar visible for now if we want "Dashboard"-like feel, 
-        // Or hide it to give more space to main content.
-        // Let's show it with "No Anomalies" to confirm the feature works.
-        sidebar.classList.remove('hidden');
-        list.innerHTML = '<div class="text-center text-gray-500 mt-10"><p>No anomalies detected</p></div>';
-    }
-},
+            var ws = XLSX.utils.aoa_to_sheet(wsData);
+            ws['!cols'] = [{ wch: 18 }, { wch: 12 }, { wch: 12 }, { wch: 12 }, { wch: 12 }, { wch: 8 }];
+            XLSX.utils.book_append_sheet(wb, ws, this.t('群組分析', 'GroupAnalysis'));
+        }
 
-resetApp: function () {
-    this.workbook = null;
-    this.selectedItem = null;
-    this.analysisResults = null;
-    for (var i = 0; i < this.chartInstances.length; i++) this.chartInstances[i].destroy();
-    this.chartInstances = [];
-    document.getElementById('fileInput').value = '';
-    document.getElementById('uploadZone').style.display = 'block';
-    document.getElementById('fileInfo').style.display = 'none';
-    document.getElementById('step2').style.display = 'none';
-    document.getElementById('step3').style.display = 'none';
-    document.getElementById('results').style.display = 'none';
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-}
+        var filename = 'SPC_' + data.type + '_' + this.selectedItem + '.xlsx';
+        XLSX.writeFile(wb, filename);
+    },
+
+    showLoading: function (text) {
+        document.getElementById('loadingText').textContent = text;
+        document.getElementById('loadingOverlay').classList.add('active');
+    },
+
+    hideLoading: function () {
+        document.getElementById('loadingOverlay').classList.remove('active');
+    },
+
+    renderAnomalySidebar: function (pageXbarR, labels) {
+        var sidebar = document.getElementById('anomalySidebar');
+        var list = document.getElementById('anomalyList');
+        if (!sidebar || !list) return;
+
+        list.innerHTML = ''; // Clear previous content
+        var count = 0;
+
+        // Helper to create card HTML
+        function createCard(title, label, valText, badgeColor, badgeText) {
+            return '<div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm border-l-4 ' +
+                (badgeColor === 'red' ? 'border-l-red-500 hover:border-red-500' : 'border-l-yellow-500 hover:border-yellow-500') +
+                ' transition-all cursor-pointer group">' +
+                '<div class="flex justify-between items-start mb-2">' +
+                '<div><span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">' + title + '</span>' +
+                '<p class="font-mono font-bold text-gray-700">' + label + '</p></div>' +
+                '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold ' +
+                (badgeColor === 'red' ? 'bg-red-50 text-red-600' : 'bg-yellow-50 text-yellow-600') +
+                ' uppercase">' + badgeText + '</span></div>' +
+                '<p class="text-xs text-gray-500 mb-4">' + valText + '</p></div>';
+        }
+
+        // X-bar Violations
+        if (pageXbarR.xBar && pageXbarR.xBar.violations) {
+            pageXbarR.xBar.violations.forEach(function (v) {
+                count++;
+                var label = labels[v.index] || 'Batch ' + (v.index + 1);
+                var valText = 'Value: ' + SPCEngine.round(v.value, 4);
+                list.insertAdjacentHTML('beforeend', createCard('Batch ID', label, valText, 'red', 'X-Bar Out'));
+            });
+        }
+
+        // R Violations
+        if (pageXbarR.R && pageXbarR.R.data) {
+            pageXbarR.R.data.forEach(function (rVal, idx) {
+                if (rVal > pageXbarR.R.UCL) {
+                    count++;
+                    var label = labels[idx] || 'Batch ' + (idx + 1);
+                    var valText = 'Range: ' + SPCEngine.round(rVal, 4) + ' > ' + SPCEngine.round(pageXbarR.R.UCL, 4);
+                    list.insertAdjacentHTML('beforeend', createCard('Batch ID', label, valText, 'red', 'R Chart Out'));
+                }
+            });
+        }
+
+        if (count > 0) {
+            sidebar.classList.remove('hidden');
+        } else {
+            // Show empty state inside sidebar, but keep sidebar visible for now if we want "Dashboard"-like feel, 
+            // Or hide it to give more space to main content.
+            // Let's show it with "No Anomalies" to confirm the feature works.
+            sidebar.classList.remove('hidden');
+            list.innerHTML = '<div class="text-center text-gray-500 mt-10"><p>No anomalies detected</p></div>';
+        }
+    },
+
+    resetApp: function () {
+        this.workbook = null;
+        this.selectedItem = null;
+        this.analysisResults = null;
+        for (var i = 0; i < this.chartInstances.length; i++) this.chartInstances[i].destroy();
+        this.chartInstances = [];
+        document.getElementById('fileInput').value = '';
+        document.getElementById('uploadZone').style.display = 'block';
+        document.getElementById('fileInfo').style.display = 'none';
+        document.getElementById('step2').style.display = 'none';
+        document.getElementById('step3').style.display = 'none';
+        document.getElementById('results').style.display = 'none';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
 };
 
 document.addEventListener('DOMContentLoaded', function () { SPCApp.init(); });

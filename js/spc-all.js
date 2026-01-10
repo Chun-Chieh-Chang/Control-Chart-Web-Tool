@@ -616,10 +616,10 @@ var SPCApp = {
         // Total 30 virtual columns: 1 (Labels) + 25 (Batches) + 4 (Summary Sidebar)
         var html = '<table class="excel-table" style="width:max-content; border-collapse:collapse; font-size:10px; font-family:sans-serif; border:2px solid #000; table-layout:fixed;">';
 
-        // Fixed Widths: Label 60px, Batch 110px, Summary 80px
+        // Fixed Widths: Label 60px, Batch 150px, Summary 80px
         html += '<colgroup>';
         html += '<col style="width:60px;">';
-        for (var c = 0; c < 25; c++) html += '<col style="width:110px;">';
+        for (var c = 0; c < 25; c++) html += '<col style="width:150px;">';
         html += '<col style="width:80px;"><col style="width:80px;"><col style="width:80px;"><col style="width:80px;">';
         html += '</colgroup>';
 
@@ -630,9 +630,9 @@ var SPCApp = {
         // --- Row 2-5: Metadata & Limits (Re-distributed colspans out of 30) ---
         var rows = [
             { l1: '商品名稱', v1: info.name, l2: '規格', v2: '標準', l3: '管制圖', v3: 'X̄', v4: 'R', l4: '製造部門', v4_val: info.dept },
-            { l1: '商品料號', v1: info.item, l2: '最大值', v2: specs.usl, l3: '上限', v3: SPCEngine.round(pageXbarR.xBar.UCL, 4), v4: SPCEngine.round(pageXbarR.R.UCL, 4), l4: '檢驗人員', v4_val: info.inspector },
-            { l1: '測量單位', v1: info.unit, l2: '目標值', v2: specs.target, l3: '中心值', v3: SPCEngine.round(pageXbarR.xBar.CL, 4), v4: SPCEngine.round(pageXbarR.R.CL, 4), l4: '管制特性', v4_val: info.char },
-            { l1: '檢驗日期', v1: info.batchRange || '-', l2: '最小值', v2: specs.lsl, l3: '下限', v3: SPCEngine.round(pageXbarR.xBar.LCL, 4), v4: '-', l4: '圖表編號', v4_val: info.chartNo || '-' }
+            { l1: '商品料號', v1: info.item, l2: '最大值', v2: SPCEngine.round(specs.usl, 4), l3: '上限', v3: SPCEngine.round(pageXbarR.xBar.UCL, 4), v4: SPCEngine.round(pageXbarR.R.UCL, 4), l4: '檢驗人員', v4_val: info.inspector },
+            { l1: '測量單位', v1: info.unit, l2: '目標值', v2: SPCEngine.round(specs.target, 4), l3: '中心值', v3: SPCEngine.round(pageXbarR.xBar.CL, 4), v4: SPCEngine.round(pageXbarR.R.CL, 4), l4: '管制特性', v4_val: info.char },
+            { l1: '檢驗日期', v1: info.batchRange || '-', l2: '最小值', v2: SPCEngine.round(specs.lsl, 4), l3: '下限', v3: SPCEngine.round(pageXbarR.xBar.LCL, 4), v4: '-', l4: '圖表編號', v4_val: info.chartNo || '-' }
         ];
 
         rows.forEach(function (r) {

@@ -1244,7 +1244,7 @@ var SPCApp = {
         }
     },
 
-    downloadExcel: function () {
+    downloadExcel: async function () {
         var self = this;
         var data = this.analysisResults;
         var wb = XLSX.utils.book_new();
@@ -1380,8 +1380,33 @@ var SPCApp = {
             XLSX.utils.book_append_sheet(wb, ws, this.t('群組分析', 'GroupAnalysis'));
         }
 
-        var filename = 'SPC_' + data.type + '_' + this.selectedItem + '.xlsx';
-        XLSX.writeFile(wb, filename);
+        var now = new Date();
+        var ts = now.getFullYear() + String(now.getMonth() + 1).padStart(2, '0') + String(now.getDate()).padStart(2, '0') + '_' +
+            String(now.getHours()).padStart(2, '0') + String(now.getMinutes()).padStart(2, '0');
+        var filename = 'SPC_Report_' + data.type + '_' + this.selectedItem + '_' + ts + '.xlsx';
+
+        if (window.showSaveFilePicker) {
+            try {
+                const handle = await window.showSaveFilePicker({
+                    suggestedName: filename,
+                    types: [{
+                        description: 'Excel Workbooks',
+                        accept: { 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.xlsx'] }
+                    }]
+                });
+                const writable = await handle.createWritable();
+                const out = XLSX.write(wb, { type: 'array', bookType: 'xlsx' });
+                await writable.write(out);
+                await writable.close();
+            } catch (err) {
+                if (err.name !== 'AbortError') {
+                    console.error('File picker error, falling back', err);
+                    XLSX.writeFile(wb, filename);
+                }
+            }
+        } else {
+            XLSX.writeFile(wb, filename);
+        }
     },
 
     showLoading: function (text) {

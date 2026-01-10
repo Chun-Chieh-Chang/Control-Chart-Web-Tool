@@ -337,6 +337,7 @@ var SPCApp = {
         this.setupFileUpload();
         this.setupEventListeners();
         this.updateLanguage();
+        this.loadFromHistory();
         console.log('SPC Analysis Tool initialized');
     },
 
@@ -400,8 +401,101 @@ var SPCApp = {
 
 
 
+    history: [],
+
+    saveToHistory: function (file, analysisType, item) {
+        if (!file) return;
+        var entry = {
+            name: file.name,
+            size: (file.size / 1024).toFixed(1) + ' KB',
+            type: analysisType,
+            item: item,
+            time: new Date().toISOString(),
+            id: Date.now()
+        };
+        this.history.unshift(entry);
+        if (this.history.length > 20) this.history.pop();
+
+        localStorage.setItem('spc_history', JSON.stringify(this.history));
+        this.renderRecentFiles();
+    },
+
+    loadFromHistory: function () {
+        var saved = localStorage.getItem('spc_history');
+        if (saved) {
+            try {
+                this.history = JSON.parse(saved);
+                this.renderRecentFiles();
+            } catch (e) {
+                console.error('History load error', e);
+            }
+        }
+    },
+
+    clearHistory: function () {
+        this.history = [];
+        localStorage.removeItem('spc_history');
+        this.renderRecentFiles();
+        this.renderHistoryView();
+    },
+
+    renderRecentFiles: function () {
+        var container = document.getElementById('recentFilesContainer');
+        if (!container) return;
+
+        if (this.history.length === 0) {
+            container.innerHTML = '<div class="text-[10px] text-slate-400 py-4 text-center italic" data-en="No recent activities" data-zh="尚無近期活動">' +
+                this.t('尚無近期活動', 'No recent activities') + '</div>';
+            return;
+        }
+
+        var html = this.history.slice(0, 5).map(function (h) {
+            var d = new Date(h.time);
+            var timeStr = d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            return '<div class="flex items-center group cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50 p-2 rounded-lg transition-all">' +
+                '<div class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-700 flex items-center justify-center mr-3 group-hover:bg-primary/10 transition-colors">' +
+                '<span class="material-icons-outlined text-sm text-slate-400 group-hover:text-primary transition-colors">description</span>' +
+                '</div>' +
+                '<div class="flex-1 min-w-0">' +
+                '<div class="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">' + h.name + '</div>' +
+                '<div class="text-[10px] text-slate-400">' + h.size + ' • ' + timeStr + '</div>' +
+                '</div>' +
+                '</div>';
+        }).join('');
+        container.innerHTML = html;
+    },
+
+    renderHistoryView: function () {
+        var body = document.getElementById('historyTableBody');
+        if (!body) return;
+
+        if (this.history.length === 0) {
+            body.innerHTML = '<tr><td colspan="5" class="px-6 py-12 text-center text-slate-400 italic">No history records found</td></tr>';
+            return;
+        }
+
+        var self = this;
+        body.innerHTML = this.history.map(function (h) {
+            var d = new Date(h.time);
+            var dateStr = d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            return '<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">' +
+                '<td class="px-6 py-4 font-medium text-slate-900 dark:text-white">' + h.name + '</td>' +
+                '<td class="px-6 py-4">' +
+                '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ' + (h.type === 'batch' ? 'bg-indigo-50 text-indigo-600' : h.type === 'cavity' ? 'bg-rose-50 text-rose-600' : 'bg-amber-50 text-amber-600') + '">' + h.type + '</span>' +
+                '</td>' +
+                '<td class="px-6 py-4 text-xs font-mono text-slate-500">' + h.item + '</td>' +
+                '<td class="px-6 py-4 text-xs text-slate-500">' + dateStr + '</td>' +
+                '<td class="px-6 py-4 text-center">' +
+                '<button class="text-primary hover:text-indigo-700 font-bold text-xs">View Log</button>' +
+                '</td>' +
+                '</tr>';
+        }).join('');
+    },
+
+    selectedFile: null,
     handleFile: function (file) {
         var self = this;
+        this.selectedFile = file;
         if (!file.name.match(/\.(xlsx|xls)$/i)) {
             alert(this.t('請選擇 Excel 檔案', 'Please select an Excel file'));
             return;
@@ -497,10 +591,7 @@ var SPCApp = {
         var clearBtn = document.getElementById('clearRecentBtn');
         if (clearBtn) {
             clearBtn.addEventListener('click', function () {
-                var container = this.closest('.saas-card').querySelector('.space-y-4');
-                if (container) {
-                    container.innerHTML = '<div class="text-[10px] text-slate-400 py-4 text-center italic">No recent activities</div>';
-                }
+                self.clearHistory();
             });
         }
 
@@ -523,19 +614,25 @@ var SPCApp = {
             'dashboard': 'view-import',
             'import': 'view-import',
             'analysis': 'view-analysis',
-            'history': 'view-import',
+            'history': 'view-history',
             'settings': 'view-import'
         };
 
         var targetId = viewMap[viewId] || 'view-import';
         var vImport = document.getElementById('view-import');
         var vAnalysis = document.getElementById('view-analysis');
+        var vHistory = document.getElementById('view-history');
 
         if (vImport) vImport.classList.add('hidden');
         if (vAnalysis) vAnalysis.classList.add('hidden');
+        if (vHistory) vHistory.classList.add('hidden');
 
         var targetEl = document.getElementById(targetId);
         if (targetEl) targetEl.classList.remove('hidden');
+
+        if (viewId === 'history') {
+            this.renderHistoryView();
+        }
 
         // Update sidebar links
         var navLinks = document.querySelectorAll('#main-nav .nav-link');
@@ -642,6 +739,7 @@ var SPCApp = {
                 }
 
                 self.analysisResults = results;
+                self.saveToHistory(self.selectedFile, type, self.selectedItem);
                 self.displayResults();
                 self.hideLoading();
             } catch (error) {

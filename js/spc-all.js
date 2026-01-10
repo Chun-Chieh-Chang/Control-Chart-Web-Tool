@@ -663,11 +663,11 @@ var SPCApp = {
                 '</div>' +
                 '<div class="grid grid-cols-1 md:grid-cols-2 gap-6">' +
                 '<div class="saas-card p-8">' +
-                '<h3 class="text-base font-bold text-slate-800 dark:text-white mb-6 flex items-center gap-2"><span class="material-icons-outlined text-primary text-lg">insights</span>' + this.t('平均值分佈', 'Mean Distribution') + '</h3>' +
+                '<h3 class="text-base font-bold text-slate-800 dark:text-white mb-6 flex items-center gap-2"><span class="material-icons-outlined text-primary text-lg">insights</span>' + this.t('模穴平均值比較', 'Cavity Mean Comparison') + '</h3>' +
                 '<div id="meanChart" class="h-80"></div>' +
                 '</div>' +
                 '<div class="saas-card p-8">' +
-                '<h3 class="text-base font-bold text-slate-800 dark:text-white mb-6 flex items-center gap-2"><span class="material-icons-outlined text-primary text-lg">scatter_plot</span>' + this.t('標準差分佈', 'StdDev Distribution') + '</h3>' +
+                '<h3 class="text-base font-bold text-slate-800 dark:text-white mb-6 flex items-center gap-2"><span class="material-icons-outlined text-primary text-lg">scatter_plot</span>' + this.t('模穴標準差比較', 'Cavity StdDev Comparison') + '</h3>' +
                 '<div id="stdDevChart" class="h-80"></div>' +
                 '</div>' +
                 '</div>' +
@@ -976,7 +976,8 @@ var SPCApp = {
             var labels = data.cavityStats.map(function (s) { return s.name; });
             var cpkVals = data.cavityStats.map(function (s) { return s.Cpk; });
             var meanVals = data.cavityStats.map(function (s) { return s.mean; });
-            var stdVals = data.cavityStats.map(function (s) { return s.overallStdDev; });
+            var stdOverallVals = data.cavityStats.map(function (s) { return s.overallStdDev; });
+            var stdWithinVals = data.cavityStats.map(function (s) { return s.withinStdDev; });
 
             // Cpk Performance Chart
             var cpkOptions = {
@@ -985,8 +986,8 @@ var SPCApp = {
                 xaxis: { categories: labels, labels: { style: { colors: '#64748b', fontSize: '11px' } } },
                 yaxis: { labels: { formatter: function (v) { return v.toFixed(3); }, style: { colors: '#64748b' } } },
                 colors: ['#4f46e5'],
-                plotOptions: { bar: { borderRadius: 6, columnWidth: '55%', dataLabels: { position: 'top' } } },
-                dataLabels: { enabled: false }, // User requested to hide data point values on bars
+                plotOptions: { bar: { borderRadius: 6, columnWidth: '55%' } },
+                dataLabels: { enabled: false },
                 tooltip: { y: { formatter: function (val) { return val.toFixed(3); } } }
             };
             var chartCpk = new ApexCharts(document.querySelector("#cpkChart"), cpkOptions);
@@ -994,15 +995,20 @@ var SPCApp = {
             this.chartInstances.push(chartCpk);
             document.querySelector("#cpkChart").addEventListener('dblclick', function () { chartCpk.resetSeries(); });
 
-            // Mean Distribution Chart
+            // Mean Comparison Chart (Line)
             var meanOpt = {
-                chart: { type: 'bar', height: 350, toolbar: { show: false } },
-                series: [{ name: 'Mean', data: meanVals }],
+                chart: { type: 'line', height: 350, toolbar: { show: false } },
+                series: [
+                    { name: this.t('平均值', 'Mean'), data: meanVals },
+                    { name: this.t('目標值', 'Target'), data: new Array(labels.length).fill(data.specs.target) },
+                    { name: 'USL', data: new Array(labels.length).fill(data.specs.usl) },
+                    { name: 'LSL', data: new Array(labels.length).fill(data.specs.lsl) }
+                ],
+                stroke: { width: [3, 2, 1.5, 1.5], dashArray: [0, 0, 8, 8], curve: 'straight' },
+                colors: ['#007bff', '#28a745', '#dc3545', '#dc3545'], // Match image colors
                 xaxis: { categories: labels, labels: { style: { colors: '#64748b', fontSize: '10px' } } },
                 yaxis: { labels: { formatter: function (v) { return v.toFixed(4); }, style: { colors: '#64748b' } } },
-                colors: ['#10b981'],
-                plotOptions: { bar: { borderRadius: 4, columnWidth: '50%' } },
-                dataLabels: { enabled: false },
+                markers: { size: [5, 0, 0, 0] },
                 tooltip: { y: { formatter: function (val) { return val.toFixed(4); } } }
             };
             var chartMean = new ApexCharts(document.querySelector("#meanChart"), meanOpt);
@@ -1010,16 +1016,19 @@ var SPCApp = {
             this.chartInstances.push(chartMean);
             document.querySelector("#meanChart").addEventListener('dblclick', function () { chartMean.resetSeries(); });
 
-            // StdDev Distribution Chart
+            // StdDev Comparison Chart (Line)
             var stdOpt = {
-                chart: { type: 'bar', height: 350, toolbar: { show: false } },
-                series: [{ name: 'StdDev', data: stdVals }],
+                chart: { type: 'line', height: 350, toolbar: { show: false } },
+                series: [
+                    { name: this.t('整體標準差 (s)', 'Overall StdDev'), data: stdOverallVals },
+                    { name: this.t('組內標準差 (σ)', 'Within StdDev'), data: stdWithinVals }
+                ],
+                stroke: { width: 3, curve: 'straight' },
+                colors: ['#dc3545', '#007bff'], // Red square-ish vs Blue circle-ish mapping
                 xaxis: { categories: labels, labels: { style: { colors: '#64748b', fontSize: '10px' } } },
-                yaxis: { labels: { formatter: function (v) { return v.toFixed(4); }, style: { colors: '#64748b' } } },
-                colors: ['#f59e0b'],
-                plotOptions: { bar: { borderRadius: 4, columnWidth: '50%' } },
-                dataLabels: { enabled: false },
-                tooltip: { y: { formatter: function (val) { return val.toFixed(4); } } }
+                yaxis: { labels: { formatter: function (v) { return v.toFixed(5); }, style: { colors: '#64748b' } } },
+                markers: { size: 5, shape: ['square', 'circle'] },
+                tooltip: { y: { formatter: function (val) { return val.toFixed(5); } } }
             };
             var chartStd = new ApexCharts(document.querySelector("#stdDevChart"), stdOpt);
             chartStd.render();

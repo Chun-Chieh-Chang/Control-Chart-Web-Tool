@@ -109,7 +109,9 @@ var QIPExtractApp = {
         reader.onload = function (e) {
             try {
                 var data = new Uint8Array(e.target.result);
-                self.workbook = XLSX.read(data, { type: 'array' });
+                // Specifically verify that merges are parsed
+                self.workbook = XLSX.read(data, { type: 'array', cellStyles: true });
+                console.log('Workbook loaded. Sheets:', self.workbook.SheetNames);
                 self.fileName = file.name;
 
                 self.els.uploadZone.classList.add('hidden');
@@ -244,6 +246,39 @@ var QIPExtractApp = {
         var range = XLSX.utils.decode_range(ws['!ref'] || 'A1');
         var maxRows = Math.min(range.e.r + 1, 100);
         var maxCols = Math.min(range.e.c + 1, 50);
+        var merges = ws['!merges'] || [];
+
+        // Debug info in UI
+        var selectionTypeEl = document.getElementById('qip-selection-type');
+        if (selectionTypeEl) {
+            var currentText = selectionTypeEl.innerText;
+            // Append debug info only if not already there
+            if (!currentText.includes('Merged')) {
+                // selectionTypeEl.innerText += ' (Merged areas: ' + merges.length + ')';
+            }
+        }
+        console.log('Rendering preview. Merged areas count:', merges.length);
+
+        // Pre-calculate skip map for merged cells
+        var skipMap = {}; // key: "r,c", val: true if skipped
+        var mergeMap = {}; // key: "r,c", val: {rowspan, colspan} for top-left cell
+
+        merges.forEach(function (m) {
+            // Mark top-left cell
+            var key = m.s.r + ',' + m.s.c;
+            mergeMap[key] = {
+                rowspan: m.e.r - m.s.r + 1,
+                colspan: m.e.c - m.s.c + 1
+            };
+
+            // Mark other cells to skip
+            for (var r = m.s.r; r <= m.e.r; r++) {
+                for (var c = m.s.c; c <= m.e.c; c++) {
+                    if (r === m.s.r && c === m.s.c) continue;
+                    skipMap[r + ',' + c] = true;
+                }
+            }
+        });
 
         var html = '<table class="qip-preview-table" style="border-collapse: collapse; font-size: 10px; width: 100%;">';
 
@@ -259,11 +294,20 @@ var QIPExtractApp = {
         for (var r = 0; r < maxRows; r++) {
             html += '<tr><th style="border: 1px solid #cbd5e1; padding: 4px; background: #f1f5f9; font-weight: bold;">' + (r + 1) + '</th>';
             for (var c = 0; c < maxCols; c++) {
+                if (skipMap[r + ',' + c]) continue;
+
                 var cellAddr = XLSX.utils.encode_cell({ r: r, c: c });
                 var cell = ws[cellAddr];
                 var value = cell ? (cell.w || cell.v || '') : '';
-                html += '<td class="qip-cell" data-row="' + r + '" data-col="' + c + '" data-addr="' + cellAddr + '" ' +
-                    'style="border: 1px solid #cbd5e1; padding: 4px; cursor: pointer; background: white; user-select: none;">' +
+
+                var mergeAttr = '';
+                var m = mergeMap[r + ',' + c];
+                if (m) {
+                    mergeAttr = ' rowspan="' + m.rowspan + '" colspan="' + m.colspan + '"';
+                }
+
+                html += '<td class="qip-cell" data-row="' + r + '" data-col="' + c + '" data-addr="' + cellAddr + '"' + mergeAttr +
+                    ' style="border: 1px solid #cbd5e1; padding: 4px; cursor: pointer; background: white; user-select: none;">' +
                     value + '</td>';
             }
             html += '</tr>';
@@ -532,9 +576,30 @@ var QIPExtractApp = {
                     var values = self.getValuesFromRange(ws, group.dataRange);
 
                     if (ids.length === 0 && values.length === 0) continue;
+
+                    // Smart correction for layout mismatch (e.g. user selected merged rows expanded)
                     if (ids.length !== values.length) {
-                        results.errors.push('工作表 [' + sheetName + '] 第 ' + i + ' 組設定錯誤：穴號數量(' + ids.length + ')與數據數量(' + values.length + ')不符');
-                        continue;
+                        var ratio = values.length / ids.length;
+                        // If values are multiple of ids (e.g. 3 rows for 1 row of headers)
+                        if (values.length > ids.length && Number.isInteger(ratio)) {
+                            console.warn('Data range mismatch detected. Attempting smart fix (Ratio: ' + ratio + ')');
+                            // Take only the first row's worth of data? 
+                            // Or assuming horizontal scan, we might have picked up extra columns?
+                            // Usually QIP mismatch is selecting multiple rows for single row header.
+                            // With "row-first" scan in getValuesFromRange, values are [r1c1, r1c2... r2c1, r2c2...]
+                            // We should take the first N values.
+                            // Wait, getValuesFromRange iterates r then c. 
+                            // So if range is K4:Y6 (3 rows), and K3:Y3 (1 row, 15 cols).
+                            // values will be K4..Y4, K5..Y5, K6..Y6.
+                            // We should take first 15 (first row).
+
+                            // Let's try to assume first row is the correct data
+                            values = values.slice(0, ids.length);
+                            results.errors.push('提示：工作表 [' + sheetName + '] 第 ' + i + ' 組數據範圍過大，已自動修正為首行數據。');
+                        } else {
+                            results.errors.push('工作表 [' + sheetName + '] 第 ' + i + ' 組設定錯誤：穴號數量(' + ids.length + ')與數據數量(' + values.length + ')不符');
+                            continue;
+                        }
                     }
 
                     for (var k = 0; k < ids.length; k++) {

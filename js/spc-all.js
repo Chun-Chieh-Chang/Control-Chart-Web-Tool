@@ -614,13 +614,13 @@ var SPCApp = {
         var cavityCount = data.xbarR.summary.n;
 
         // Total 30 virtual columns: 1 (Labels) + 25 (Batches) + 4 (Summary Sidebar)
-        var html = '<table class="excel-table" style="width:100\%; border-collapse:collapse; font-size:10px; font-family:sans-serif; border:2px solid #000; table-layout:fixed;">';
+        var html = '<table class="excel-table" style="width:max-content; border-collapse:collapse; font-size:10px; font-family:sans-serif; border:2px solid #000; table-layout:fixed;">';
 
-        // Balanced Widths: Label 4%, Batch 3.4%*25=85%, Summary 11% (approx 2.75% each)
+        // Fixed Widths: Label 60px, Batch 110px, Summary 80px
         html += '<colgroup>';
-        html += '<col style="width:4\%;">';
-        for (var c = 0; c < 25; c++) html += '<col style="width:3.4\%;">';
-        html += '<col style="width:2.7\%;"><col style="width:2.7\%;"><col style="width:2.7\%;"><col style="width:2.9\%;">';
+        html += '<col style="width:60px;">';
+        for (var c = 0; c < 25; c++) html += '<col style="width:110px;">';
+        html += '<col style="width:80px;"><col style="width:80px;"><col style="width:80px;"><col style="width:80px;">';
         html += '</colgroup>';
 
 
@@ -653,7 +653,7 @@ var SPCApp = {
         html += '<tr style="background:#e5e7eb; font-weight:bold;">' +
             '<td style="border:1px solid #000; text-align:center;">批號</td>';
         pageLabels.forEach(function (name) {
-            html += '<td style="border:1px solid #000; text-align:center; height:35px; overflow:hidden; font-size:9px; word-break:break-all;">' + name + '</td>';
+            html += '<td style="border:1px solid #000; text-align:center; height:35px; overflow:hidden; font-size:10px; white-space:nowrap; text-overflow:ellipsis;">' + name + '</td>';
         });
         // Fill empty if less than 25 batches
         for (var f = pageLabels.length; f < 25; f++) html += '<td style="border:1px solid #000;"></td>';

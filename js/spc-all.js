@@ -976,7 +976,7 @@ var SPCApp = {
             var labels = data.cavityStats.map(function (s) { return s.name; });
             var cpkVals = data.cavityStats.map(function (s) { return s.Cpk; });
             var meanVals = data.cavityStats.map(function (s) { return s.mean; });
-            var stdVals = data.cavityStats.map(function (s) { return s.stdDev; });
+            var stdVals = data.cavityStats.map(function (s) { return s.overallStdDev; });
 
             // Cpk Performance Chart
             var cpkOptions = {

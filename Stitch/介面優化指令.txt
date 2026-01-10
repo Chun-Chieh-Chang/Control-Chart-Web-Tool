@@ -1,78 +1,206 @@
- SPC 系統界面優化修訂指令 (Prompt)
-【目標】：將現有的 SPC 數據分析頁面重構成「現代 SaaS 風格」，提升專業感、視覺呼吸感與操作效率。
-
-1. 視覺風格與佈局 (Visual & Layout)：
-
-佈局重構：將原本死板的表格/區塊改為「側邊導航欄 + 主工作區」的結構。使用 gap: 1.5rem 增加元素間距。
-設計語彙：採用 SaaS 現代風格：使用純白卡片背景 (bg-white)、圓角設計 (rounded-xl) 以及細膩的柔和陰影 (shadow-sm)。
-配色方案：主色調使用深靛藍 (Indigo-600) 與 湖水藍 (Teal-500)，異常警示統一使用紅色 (Red-500)。
-2. 核心功能組件優化 (Components)：
-
-控制圖 (X-bar Chart)：
-使用動態繪圖庫（如 Recharts 或 ECharts）。
-管制線：加入紅色虛線表示 UCL/LCL，實線表示 Mean。
-異常點自動辨識：若點位超出界限，點位顏色需自動轉為紅色並放大顯示。
-雙側功能面板：
-左側篩選器 (Filter Sidebar)：加入折疊式面板，包含日期選擇器、批次篩選、操作員多選。
-右側異常導航 (Anomaly List)：建立一個「異常點快速列表」，點擊後圖表需具備平滑滾動/聚焦至該點位的互動效果。
-3. 互動邏輯 (Interaction)：
-
-數據匯入：優化 Excel 上傳區，增加拖放 (Drag & Drop) 視覺回饋與檔案格式預覽。
-響應式：確保側邊欄在縮小時自動收摺，保持中間圖表區的最大可視範圍。
-
- ### 1. 導航欄主容器 (Sidebar Container) 這部分負責整體的身高、寬度、背景顏色與佈局。 * **類名配置**：`h-screen w-64 bg-slate-900 flex flex-col border-r border-slate-800 sticky top-0 left-0` * **關鍵點**：使用 `h-screen` 確保頂天立地，`bg-slate-900` 營造專業感，`sticky` 讓它在滾動內容時保持固定。 ### 2. 導航項目 (Nav Item) 這是每一個按鈕的基礎樣式，包含間距與懸停效果。 * **類名配置**：`flex items-center gap-3 px-4 py-3 mx-2 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white transition-all duration-200 cursor-pointer` * **關鍵點**：`transition-all` 讓滑鼠移入時的顏色變化更平滑，`mx-2` (左右外距) 配合 `rounded-lg` 能做出懸浮卡片的感覺，而不是死板的填滿。 ### 3. 啟動/選中狀態 (Active State) 當使用者目前在該頁面時的視覺標記。 * **類名配置**：`bg-indigo-600/10 text-indigo-400 border-l-4 border-indigo-500 font-medium` * **關鍵點**：`bg-indigo-600/10` 是帶透明度的背景，配合左側的 `border-l-4` (4像素左邊框)，是標準的高級 SaaS 設計語彙。 --- ### 具體 HTML/Tailwind 範例： ```html <!-- Sidebar Container --> <aside class="h-screen w-64 bg-slate-900 flex flex-col text-slate-300"> <!-- Logo Section --> <div class="p-6 mb-4"> <div class="flex items-center gap-2"> <div class="w-8 h-8 bg-indigo-500 rounded-lg"></div> <span class="text-xl font-bold text-white tracking-tight">SPC Pro</span> </div> </div> <!-- Navigation Links --> <nav class="flex-1 space-y-1"> <!-- Active Item --> <div class="flex items-center gap-3 px-4 py-3 mx-3 rounded-xl bg-indigo-600/20 text-indigo-400 border-l-4 border-indigo-500"> <svg class="w-5 h-5">...</svg> <span class="text-sm">數據分析儀表板</span> </div> <!-- Default Item --> <div class="flex items-center gap-3 px-4 py-3 mx-3 rounded-xl hover:bg-slate-800 hover:text-white transition-colors cursor-pointer text-slate-400"> <svg class="w-5 h-5">...</svg> <span class="text-sm">歷史數據匯入</span> </div> <div class="flex items-center gap-3 px-4 py-3 mx-3 rounded-xl hover:bg-slate-800 hover:text-white transition-colors cursor-pointer text-slate-400"> <svg class="w-5 h-5">...</svg> <span class="text-sm">系統偏好設定</span> </div> </nav> <!-- User Section (Bottom) --> <div class="p-4 border-t border-slate-800"> <div class="flex items-center gap-3 p-2 rounded-lg hover:bg-slate-800 cursor-pointer"> <div class="w-10 h-10 rounded-full bg-slate-700"></div> <div class="flex-1 overflow-hidden"> <p class="text-sm font-medium text-white truncate">Quality Admin</p> <p class="text-xs text-slate-500 truncate">admin@company.com</p> </div> </div> </div> </aside> 
- 
- 這是一個專為「異常洞察」設計的 Tailwind CSS 配置。它的設計重點在於視覺分級：讓異常點一目了然，同時提供明確的互動操作。
-
-1. 列表容器 (List Container)
-類名配置：flex flex-col gap-3 p-4 bg-slate-50 border-l border-slate-200 h-full w-80 overflow-y-auto
-關鍵點：使用 w-80 固定寬度，並加上 overflow-y-auto 確保在異常點很多時可以獨立捲動。
-2. 異常卡片項目 (Anomaly Card Item)
-基礎樣式：bg-white p-4 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow group border-l-4 border-l-red-500
-關鍵點：border-l-4 border-l-red-500 是核心，利用左側紅色粗邊框立即標示這是一個「警示項目」。
-3. 標籤與按鈕 (Badges & Buttons)
-狀態標籤：px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-50 text-red-600 uppercase
-定位按鈕：p-2 rounded-lg bg-slate-50 text-slate-400 hover:bg-indigo-50 hover:text-indigo-600 transition-colors
-具體 HTML/Tailwind 範例：
-<!-- Anomaly Insights Sidebar -->
-<div class="w-80 bg-slate-50 border-l border-slate-200 flex flex-col h-full">
-  <div class="p-4 border-b border-slate-200 bg-white">
-    <h3 class="font-bold text-slate-800 flex items-center gap-2">
-      <span class="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
-      異常洞察 (8)
-    </h3>
-  </div>
-
-  <div class="flex-1 overflow-y-auto p-4 space-y-3">
-    
-    <!-- Anomaly Item Card -->
-    <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm border-l-4 border-l-red-500 hover:border-red-500 transition-all cursor-pointer group">
-      <div class="flex justify-between items-start mb-2">
-        <div>
-          <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Sample ID</span>
-          <p class="font-mono font-bold text-slate-700">#S-2045</p>
-        </div>
-        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-50 text-red-600 uppercase">超出 3-Sigma</span>
-      </div>
-      
-      <p class="text-xs text-slate-500 mb-4">量測值 12.45 略高於管制上限 (12.00)</p>
-      
-      <div class="flex justify-between items-center">
-        <span class="text-[10px] text-slate-400">2023-10-24 14:30</span>
-        <button class="flex items-center gap-1 text-xs font-bold text-indigo-600 hover:text-indigo-800 transition-colors">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-            <path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-          </svg>
-          快速定位
-        </button>
-      </div>
-    </div>
-
-    <!-- 更多項目... -->
-
-  </div>
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SPC Data Workspace</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet"/>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#4F46E5", // Indigo 600
+                        "background-light": "#F3F4F6", // Gray 100
+                        "background-dark": "#0F172A", // Slate 900
+                        "surface-light": "#FFFFFF",
+                        "surface-dark": "#1E293B", // Slate 800
+                    },
+                    fontFamily: {
+                        display: ["Inter", "sans-serif"],
+                    },
+                    borderRadius: {
+                        DEFAULT: "0.5rem",
+                    },
+                },
+            },
+        };
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-800 dark:text-slate-200 h-screen overflow-hidden flex transition-colors duration-300">
+<aside class="w-64 bg-slate-900 dark:bg-slate-950 text-slate-300 flex-shrink-0 hidden md:flex flex-col border-r border-slate-700 dark:border-slate-800">
+<div class="h-16 flex items-center px-6 border-b border-slate-800">
+<div class="flex items-center gap-3">
+<span class="material-icons-outlined text-primary text-3xl">analytics</span>
+<span class="font-bold text-white text-lg tracking-tight">SPC Analytics</span>
 </div>
-整合建議：
-動畫提示：在標題處加入一個 animate-pulse 的紅色小點，能增加「實時監控」的動態感。
-與圖表連動：當使用者點擊這個卡片時，您可以觸發圖表套件（如 ECharts）的 dispatchAction 來高亮顯示對應的數據點。
+</div>
+<nav class="flex-1 px-4 py-6 space-y-1 overflow-y-auto">
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium hover:bg-slate-800 hover:text-white transition-colors" href="#">
+<span class="material-icons-outlined text-xl">dashboard</span>
+                Dashboard
+            </a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium bg-primary text-white shadow-lg shadow-primary/20" href="#">
+<span class="material-icons-outlined text-xl">cloud_upload</span>
+                Data Upload
+            </a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium hover:bg-slate-800 hover:text-white transition-colors" href="#">
+<span class="material-icons-outlined text-xl">history</span>
+                History
+            </a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium hover:bg-slate-800 hover:text-white transition-colors" href="#">
+<span class="material-icons-outlined text-xl">insights</span>
+                Reports
+            </a>
+<div class="pt-6 pb-2">
+<p class="px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Settings</p>
+</div>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium hover:bg-slate-800 hover:text-white transition-colors" href="#">
+<span class="material-icons-outlined text-xl">settings</span>
+                Preferences
+            </a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium hover:bg-slate-800 hover:text-white transition-colors" href="#">
+<span class="material-icons-outlined text-xl">group</span>
+                Team
+            </a>
+</nav>
+<div class="p-4 border-t border-slate-800">
+<div class="flex items-center gap-3">
+<img alt="User Avatar" class="w-9 h-9 rounded-full bg-slate-700" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDKHzMcSoSN2MjgseygUvi02eTLml1q6-kdw3Tjck7edGTkc9Dt1rTlel2bju_f3N8xPzNeHasQOHoVZBCyOsMyoxWMi4aw3aeQMJOz1PDnsVGfa0zDyj9Q7PEoT43tRy1FwnIR8JGE4bv5oQ5bdsN4jpWmfodF6lOFV9jhDf1AgaixEPCBu2RJKbjbZkyqsi-avVwgcOBqPUpolNDYQ-Ejys3reHlEmp4hHFo61-RAlXV7AWrnpgzkXqw5mquMEhLGgXTXCw7f8Ydm"/>
+<div class="flex-1 min-w-0">
+<p class="text-sm font-medium text-white truncate">Admin User</p>
+<p class="text-xs text-slate-500 truncate">admin@spc-tool.com</p>
+</div>
+</div>
+</div>
+</aside>
+<div class="flex-1 flex flex-col h-full overflow-hidden">
+<header class="h-16 bg-surface-light dark:bg-surface-dark border-b border-slate-200 dark:border-slate-700 flex items-center justify-between px-6 shadow-sm z-10">
+<div class="flex items-center text-sm text-slate-500 dark:text-slate-400">
+<span class="hover:text-primary cursor-pointer transition-colors">Analysis</span>
+<span class="mx-2 text-slate-300 dark:text-slate-600">/</span>
+<span class="font-medium text-slate-800 dark:text-slate-200">Data Import</span>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative hidden sm:block">
+<span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+<span class="material-icons-outlined text-slate-400 text-lg">search</span>
+</span>
+<input class="pl-10 pr-4 py-2 border border-slate-200 dark:border-slate-600 rounded-lg text-sm bg-gray-50 dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary text-slate-800 dark:text-slate-200 w-64 transition-all" placeholder="Search files..." type="text"/>
+</div>
+<button class="p-2 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
+<span class="material-icons-outlined text-xl">notifications</span>
+</button>
+<div class="h-8 w-px bg-slate-200 dark:bg-slate-700 mx-1"></div>
+<button class="flex items-center gap-2 px-3 py-1.5 border border-slate-200 dark:border-slate-600 rounded-md text-sm font-medium hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
+<span class="material-icons-outlined text-lg">language</span>
+<span>EN</span>
+</button>
+</div>
+</header>
+<main class="flex-1 overflow-y-auto p-6 md:p-8 relative">
+<div class="max-w-5xl mx-auto space-y-8">
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+<div>
+<h1 class="text-2xl font-bold text-slate-900 dark:text-white">Statistical Analysis Workspace</h1>
+<p class="mt-1 text-slate-500 dark:text-slate-400">Upload reports to generate real-time SPC data insights.</p>
+</div>
+<button class="bg-surface-light dark:bg-surface-dark border border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 shadow-sm transition-all">
+<span class="material-icons-outlined text-lg">download</span>
+                        Download Template
+                    </button>
+</div>
+<div class="bg-surface-light dark:bg-surface-dark rounded-xl shadow-lg border border-slate-200 dark:border-slate-700 p-8 text-center transition-all">
+<div class="border-2 border-dashed border-primary/30 dark:border-primary/40 bg-slate-50/50 dark:bg-slate-800/30 rounded-xl p-12 flex flex-col items-center justify-center group hover:border-primary hover:bg-primary/5 dark:hover:bg-primary/10 transition-all cursor-pointer relative overflow-hidden">
+<div class="absolute inset-0 bg-gradient-to-tr from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
+<div class="w-16 h-16 bg-white dark:bg-slate-700 rounded-2xl shadow-md flex items-center justify-center mb-6 group-hover:scale-110 group-hover:shadow-xl transition-all duration-300 z-10">
+<span class="material-icons-outlined text-primary text-4xl">cloud_upload</span>
+</div>
+<h3 class="text-lg font-semibold text-slate-900 dark:text-white mb-2 z-10">Import Data File</h3>
+<p class="text-slate-500 dark:text-slate-400 mb-6 max-w-sm z-10">Drag &amp; drop your Excel file here, or click to browse. We support .xlsx and .xls formats.</p>
+<button class="bg-primary hover:bg-indigo-700 text-white px-6 py-2.5 rounded-lg font-medium shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5 z-10 flex items-center gap-2">
+<span>Select File</span>
+</button>
+</div>
+<div class="mt-6 flex justify-center gap-8 text-xs text-slate-400 dark:text-slate-500">
+<span class="flex items-center gap-1"><span class="material-icons-outlined text-sm">check_circle</span> Max size 50MB</span>
+<span class="flex items-center gap-1"><span class="material-icons-outlined text-sm">check_circle</span> Secure transfer</span>
+<span class="flex items-center gap-1"><span class="material-icons-outlined text-sm">check_circle</span> Auto-validation</span>
+</div>
+</div>
+<div>
+<div class="flex items-center justify-between mb-4">
+<h2 class="text-lg font-semibold text-slate-900 dark:text-white flex items-center gap-2">
+<span class="material-icons-outlined text-slate-400">history</span>
+                            Recent Imports
+                        </h2>
+<a class="text-sm text-primary hover:text-indigo-400 font-medium" href="#">View all history</a>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+<div class="bg-surface-light dark:bg-surface-dark p-4 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-primary/50 dark:hover:border-primary/50 shadow-sm hover:shadow-md transition-all cursor-pointer group">
+<div class="flex items-start justify-between mb-3">
+<div class="p-2 bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 rounded-lg">
+<span class="material-icons-outlined text-xl">table_view</span>
+</div>
+<span class="text-xs text-slate-400">2 hrs ago</span>
+</div>
+<h4 class="font-medium text-slate-800 dark:text-slate-200 truncate group-hover:text-primary transition-colors">Production_Batch_2023_Q4.xlsx</h4>
+<p class="text-xs text-slate-500 mt-1">2.4 MB • Complete</p>
+<div class="mt-3 flex items-center gap-2">
+<span class="px-2 py-0.5 rounded text-[10px] font-medium bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300 border border-green-200 dark:border-green-800">Analyzed</span>
+</div>
+</div>
+<div class="bg-surface-light dark:bg-surface-dark p-4 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-primary/50 dark:hover:border-primary/50 shadow-sm hover:shadow-md transition-all cursor-pointer group">
+<div class="flex items-start justify-between mb-3">
+<div class="p-2 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-lg">
+<span class="material-icons-outlined text-xl">analytics</span>
+</div>
+<span class="text-xs text-slate-400">Yesterday</span>
+</div>
+<h4 class="font-medium text-slate-800 dark:text-slate-200 truncate group-hover:text-primary transition-colors">QC_Report_Line_A.xlsx</h4>
+<p class="text-xs text-slate-500 mt-1">1.8 MB • Complete</p>
+<div class="mt-3 flex items-center gap-2">
+<span class="px-2 py-0.5 rounded text-[10px] font-medium bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800">Processing</span>
+</div>
+</div>
+<div class="bg-surface-light dark:bg-surface-dark p-4 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-primary/50 dark:hover:border-primary/50 shadow-sm hover:shadow-md transition-all cursor-pointer group">
+<div class="flex items-start justify-between mb-3">
+<div class="p-2 bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 rounded-lg">
+<span class="material-icons-outlined text-xl">warning_amber</span>
+</div>
+<span class="text-xs text-slate-400">Oct 24</span>
+</div>
+<h4 class="font-medium text-slate-800 dark:text-slate-200 truncate group-hover:text-primary transition-colors">Raw_Material_Tests.xlsx</h4>
+<p class="text-xs text-slate-500 mt-1">5.1 MB • Error</p>
+<div class="mt-3 flex items-center gap-2">
+<span class="px-2 py-0.5 rounded text-[10px] font-medium bg-orange-100 dark:bg-orange-900/40 text-orange-700 dark:text-orange-300 border border-orange-200 dark:border-orange-800">Review Needed</span>
+</div>
+</div>
+</div>
+</div>
+<div class="border-t border-slate-200 dark:border-slate-800 pt-6 mt-8 flex flex-col md:flex-row justify-between items-center text-sm text-slate-500 dark:text-slate-400">
+<p>SPC Analysis Tool v2.1 | © 2023 All Rights Reserved</p>
+<div class="flex gap-6 mt-4 md:mt-0">
+<span class="hover:text-primary cursor-pointer">Documentation</span>
+<span class="hover:text-primary cursor-pointer">Support</span>
+<span class="hover:text-primary cursor-pointer">Privacy</span>
+</div>
+</div>
+</div>
+</main>
+</div>
+<div class="fixed bottom-6 right-6 z-50">
+<button class="bg-slate-800 text-white p-3 rounded-full shadow-lg hover:bg-slate-700 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-900" onclick="document.documentElement.classList.toggle('dark')">
+<span class="material-icons-outlined block dark:hidden">dark_mode</span>
+<span class="material-icons-outlined hidden dark:block">light_mode</span>
+</button>
+</div>
+
+</body></html>

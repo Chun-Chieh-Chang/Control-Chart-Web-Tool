@@ -442,22 +442,22 @@ var SPCApp = {
             var target = data[1] && data[1][1] ? data[1][1] : 'N/A';
 
             var card = document.createElement('div');
-            // Clean SaaS Light style for selection cards
-            card.className = 'saas-card p-6 cursor-pointer hover:border-indigo-400 hover:shadow-xl hover:shadow-indigo-50 transition-all group relative overflow-hidden';
+            // Material SaaS Selection Card
+            card.className = 'saas-card p-6 cursor-pointer hover:border-primary hover:shadow-xl hover:shadow-indigo-50 dark:hover:shadow-none transition-all group relative overflow-hidden';
 
             card.innerHTML =
                 '<div class="relative z-10">' +
                 '<div class="flex justify-between items-start mb-4">' +
-                '<h3 class="text-base font-bold text-slate-900 group-hover:text-indigo-600 transition-colors">' + sheetName + '</h3>' +
-                '<span class="px-2 py-0.5 bg-slate-100 text-slate-500 text-[10px] font-bold rounded uppercase tracking-wider group-hover:bg-indigo-600 group-hover:text-white transition-all">Select</span>' +
+                '<h3 class="text-base font-bold text-slate-900 dark:text-white group-hover:text-primary transition-colors">' + sheetName + '</h3>' +
+                '<span class="material-icons-outlined text-slate-400 group-hover:text-primary transition-colors">check_circle_outline</span>' +
                 '</div>' +
-                '<div class="flex flex-col space-y-1">' +
+                '<div class="flex flex-col space-y-2">' +
                 '<div class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">' + this.t('目標值', 'Target Value') + '</div>' +
-                '<div class="text-sm font-mono font-bold text-slate-700">' + target + '</div>' +
+                '<div class="text-sm font-mono font-bold text-slate-700 dark:text-slate-300">' + target + '</div>' +
                 '</div>' +
                 '</div>' +
-                '<div class="absolute -right-2 -bottom-2 opacity-[0.03] group-hover:opacity-[0.08] transition-opacity">' +
-                '<svg class="w-16 h-16" fill="currentColor" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zM6 20V4h7v5h5v11H6z"/></svg>' +
+                '<div class="absolute -right-2 -bottom-2 opacity-[0.05] group-hover:opacity-[0.1] transition-opacity">' +
+                '<span class="material-icons-outlined text-7xl">table_view</span>' +
                 '</div>';
 
             card.dataset.sheet = sheetName;
@@ -593,52 +593,52 @@ var SPCApp = {
             html = '<div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">' +
                 '<div class="saas-card p-4 flex flex-col justify-center">' +
                 '<div class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">' + this.t('模穴數 (n)', 'Cavity Count') + '</div>' +
-                '<div class="text-xl font-bold text-slate-900">' + data.xbarR.summary.n + '</div>' +
+                '<div class="text-xl font-bold text-slate-900 dark:text-white">' + data.xbarR.summary.n + '</div>' +
                 '</div>' +
                 '<div class="saas-card p-4 flex flex-col justify-center">' +
                 '<div class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">' + this.t('總記錄數', 'Total Batches') + '</div>' +
-                '<div class="text-xl font-bold text-slate-900">' + totalBatches + '</div>' +
+                '<div class="text-xl font-bold text-slate-900 dark:text-white">' + totalBatches + '</div>' +
                 '</div>' +
                 '<div class="saas-card p-4 flex flex-col justify-center">' +
                 '<div class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">' + this.t('製程能力 (Cpk)', 'Process Cpk') + '</div>' +
-                '<div class="text-xl font-bold text-indigo-600">' + SPCEngine.round(data.xbarR.summary.Cpk, 3) + '</div>' +
+                '<div class="text-xl font-bold text-primary">' + SPCEngine.round(data.xbarR.summary.Cpk, 3) + '</div>' +
                 '</div>' +
-                '<div class="saas-card p-4 flex flex-col justify-center">' +
-                '<div class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">' + this.t('異常狀態', 'Status') + '</div>' +
+                '<div class="saas-card p-4 flex flex-col justify-center dark:bg-slate-800">' +
+                '<div class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-1">' + this.t('異常狀態', 'Status') + '</div>' +
                 '<div class="flex items-center space-x-2">' +
-                '<div class="w-2 h-2 rounded-full ' + (data.xbarR.xBar.violations.length > 0 ? 'anomaly-pulse' : 'bg-success') + '"></div>' +
-                '<span class="text-sm font-semibold ' + (data.xbarR.xBar.violations.length > 0 ? 'text-rose-600' : 'text-emerald-600') + '">' +
+                '<span class="material-icons-outlined text-sm ' + (data.xbarR.xBar.violations.length > 0 ? 'text-rose-500' : 'text-emerald-500') + '">' + (data.xbarR.xBar.violations.length > 0 ? 'warning' : 'check_circle') + '</span>' +
+                '<span class="text-sm font-semibold ' + (data.xbarR.xBar.violations.length > 0 ? 'text-rose-600 dark:text-rose-400' : 'text-emerald-600 dark:text-emerald-400') + '">' +
                 (data.xbarR.xBar.violations.length > 0 ? this.t('偵測到異常', 'Alert') : this.t('系統受控', 'Normal')) + '</span>' +
                 '</div>' +
                 '</div>' +
                 '</div>';
 
             if (totalPages > 1) {
-                html += '<div class="flex items-center justify-between mb-4 bg-white p-3 rounded-lg border border-slate-100 shadow-sm">' +
-                    '<div class="text-xs font-medium text-slate-600" id="pageInfo">' + this.t('頁次 ', 'Page ') + '1 / ' + totalPages + '</div>' +
+                html += '<div class="flex items-center justify-between mb-4 bg-white dark:bg-slate-800 p-3 rounded-lg border border-slate-100 dark:border-slate-700 shadow-sm">' +
+                    '<div class="text-xs font-medium text-slate-600 dark:text-slate-400" id="pageInfo">' + this.t('頁次 ', 'Page ') + '1 / ' + totalPages + '</div>' +
                     '<div class="flex gap-2">' +
-                    '<button id="prevPageBtn" class="px-4 py-1.5 text-xs font-bold border border-slate-200 rounded-md hover:bg-slate-50 transition-all disabled:opacity-30 disabled:cursor-not-allowed">' + this.t('上一頁', 'Prev') + '</button>' +
-                    '<button id="nextPageBtn" class="px-4 py-1.5 text-xs font-bold text-white bg-indigo-600 rounded-md hover:bg-indigo-700 transition-all disabled:opacity-30 disabled:cursor-not-allowed">' + this.t('下一頁', 'Next') + '</button>' +
+                    '<button id="prevPageBtn" class="px-4 py-1.5 text-xs font-bold border border-slate-200 dark:border-slate-600 dark:text-white rounded-md hover:bg-slate-50 dark:hover:bg-slate-700 transition-all disabled:opacity-30 disabled:cursor-not-allowed">' + this.t('上一頁', 'Prev') + '</button>' +
+                    '<button id="nextPageBtn" class="px-4 py-1.5 text-xs font-bold text-white bg-primary rounded-md hover:bg-indigo-700 transition-all disabled:opacity-30 disabled:cursor-not-allowed">' + this.t('下一頁', 'Next') + '</button>' +
                     '</div>' +
                     '</div>';
             }
 
-            html += '<div id="detailedTableContainer" class="mb-10 overflow-x-auto rounded-xl border border-slate-200 shadow-sm"></div>';
+            html += '<div id="detailedTableContainer" class="mb-10 overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm"></div>';
             html += '<div id="pageLimitsContainer"></div>';
             html += '<div id="diagnosticContainer"></div>';
 
             html += '<div class="grid grid-cols-1 gap-8">' +
                 '<div class="saas-card p-8">' +
                 '<div class="flex justify-between items-center mb-6">' +
-                '<h3 class="text-base font-bold text-slate-800">' + this.t('X̄ 管制圖 (均值)', 'X-Bar Control Chart') + '</h3>' +
-                '<span class="px-2 py-0.5 bg-slate-100 text-slate-600 text-[10px] font-bold rounded uppercase tracking-wider">SVG Vector</span>' +
+                '<h3 class="text-base font-bold text-slate-800 dark:text-white flex items-center gap-2"><span class="material-icons-outlined text-primary text-lg">bar_chart</span>' + this.t('X̄ 管制圖 (均值)', 'X-Bar Control Chart') + '</h3>' +
+                '<span class="px-2 py-0.5 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 text-[10px] font-bold rounded uppercase tracking-wider">SVG Vector</span>' +
                 '</div>' +
                 '<div id="xbarChart" class="h-96"></div>' +
                 '</div>' +
                 '<div class="saas-card p-8">' +
                 '<div class="flex justify-between items-center mb-6">' +
-                '<h3 class="text-base font-bold text-slate-800">' + this.t('R 管制圖 (全距)', 'R Control Chart') + '</h3>' +
-                '<span class="px-2 py-0.5 bg-slate-100 text-slate-600 text-[10px] font-bold rounded uppercase tracking-wider">SVG Vector</span>' +
+                '<h3 class="text-base font-bold text-slate-800 dark:text-white flex items-center gap-2"><span class="material-icons-outlined text-primary text-lg">show_chart</span>' + this.t('R 管制圖 (全距)', 'R Control Chart') + '</h3>' +
+                '<span class="px-2 py-0.5 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 text-[10px] font-bold rounded uppercase tracking-wider">SVG Vector</span>' +
                 '</div>' +
                 '<div id="rChart" class="h-80"></div>' +
                 '</div>' +
@@ -647,26 +647,26 @@ var SPCApp = {
         } else if (data.type === 'cavity') {
             html = '<div class="grid grid-cols-1 gap-8">' +
                 '<div class="saas-card p-8">' +
-                '<h3 class="text-base font-bold text-slate-800 mb-6">' + this.t('模穴 Cpk 效能比較', 'Cavity Cpk Performance') + '</h3>' +
+                '<h3 class="text-base font-bold text-slate-800 dark:text-white mb-6 flex items-center gap-2"><span class="material-icons-outlined text-primary text-lg">pie_chart</span>' + this.t('模穴 Cpk 效能比較', 'Cavity Cpk Performance') + '</h3>' +
                 '<div id="cpkChart" class="h-96"></div>' +
                 '</div>' +
                 '<div class="grid grid-cols-1 md:grid-cols-2 gap-6">' +
                 '<div class="saas-card p-8">' +
-                '<h3 class="text-base font-bold text-slate-800 mb-6">' + this.t('平均值分佈', 'Mean Distribution') + '</h3>' +
+                '<h3 class="text-base font-bold text-slate-800 dark:text-white mb-6 flex items-center gap-2"><span class="material-icons-outlined text-primary text-lg">insights</span>' + this.t('平均值分佈', 'Mean Distribution') + '</h3>' +
                 '<div id="meanChart" class="h-80"></div>' +
                 '</div>' +
                 '<div class="saas-card p-8">' +
-                '<h3 class="text-base font-bold text-slate-800 mb-6">' + this.t('標準差分佈', 'StdDev Distribution') + '</h3>' +
+                '<h3 class="text-base font-bold text-slate-800 dark:text-white mb-6 flex items-center gap-2"><span class="material-icons-outlined text-primary text-lg">scatter_plot</span>' + this.t('標準差分佈', 'StdDev Distribution') + '</h3>' +
                 '<div id="stdDevChart" class="h-80"></div>' +
                 '</div>' +
                 '</div>' +
                 '<div class="saas-card overflow-hidden">' +
-                '<div class="p-6 border-b border-slate-50 flex justify-between items-center">' +
-                '<h3 class="text-base font-bold text-slate-800">' + this.t('模穴細節統計', 'Cavity Details') + '</h3>' +
+                '<div class="p-6 border-b border-slate-50 dark:border-slate-700 flex justify-between items-center">' +
+                '<h3 class="text-base font-bold text-slate-800 dark:text-white flex items-center gap-2"><span class="material-icons-outlined text-primary text-lg">table_chart</span>' + this.t('模穴細節統計', 'Cavity Details') + '</h3>' +
                 '</div>' +
                 '<div class="overflow-x-auto">' +
                 '<table class="w-full text-sm text-left">' +
-                '<thead class="text-[11px] text-slate-500 uppercase bg-slate-50/50">' +
+                '<thead class="text-[11px] text-slate-500 dark:text-slate-400 uppercase bg-slate-50/50 dark:bg-slate-700/50">' +
                 '<tr>' +
                 '<th class="px-8 py-4 font-bold">Cavity Name</th>' +
                 '<th class="px-8 py-4 text-center">Mean</th>' +
@@ -674,17 +674,17 @@ var SPCApp = {
                 '<th class="px-8 py-4 text-center">n</th>' +
                 '</tr>' +
                 '</thead>' +
-                '<tbody class="divide-y divide-slate-100">' +
+                '<tbody class="divide-y divide-slate-100 dark:divide-slate-700">' +
                 data.cavityStats.map(function (s) {
                     return '<tr>' +
-                        '<td class="px-8 py-4 font-bold text-slate-700">' + s.name + '</td>' +
-                        '<td class="px-8 py-4 text-center font-mono">' + SPCEngine.round(s.mean, 4) + '</td>' +
+                        '<td class="px-8 py-4 font-bold text-slate-700 dark:text-slate-300">' + s.name + '</td>' +
+                        '<td class="px-8 py-4 text-center font-mono text-slate-700 dark:text-slate-300">' + SPCEngine.round(s.mean, 4) + '</td>' +
                         '<td class="px-8 py-4 text-center">' +
                         '<span class="inline-block px-3 py-1 rounded-full text-xs font-bold ' +
-                        (s.Cpk < 1.0 ? 'bg-rose-50 text-rose-600' : 'bg-emerald-50 text-emerald-600') + '">' +
+                        (s.Cpk < 1.0 ? 'bg-rose-50 text-rose-600 dark:bg-rose-900/30 dark:text-rose-400' : 'bg-emerald-50 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400') + '">' +
                         SPCEngine.round(s.Cpk, 3) + '</span>' +
                         '</td>' +
-                        '<td class="px-8 py-4 text-center text-slate-600 font-mono">' + s.count + '</td>' +
+                        '<td class="px-8 py-4 text-center text-slate-600 dark:text-slate-400 font-mono">' + s.count + '</td>' +
                         '</tr>';
                 }).join('') +
                 '</tbody>' +
@@ -696,11 +696,11 @@ var SPCApp = {
         } else if (data.type === 'group') {
             html = '<div class="grid grid-cols-1 gap-12">' +
                 '<div class="saas-card p-8">' +
-                '<h3 class="text-base font-bold text-slate-800 mb-6">' + this.t('群組數據趨勢 (Min-Max-Avg)', 'Group Trend Analysis') + '</h3>' +
+                '<h3 class="text-base font-bold text-slate-800 dark:text-white mb-6 flex items-center gap-2"><span class="material-icons-outlined text-primary text-lg">trending_up</span>' + this.t('群組數據趨勢 (Min-Max-Avg)', 'Group Trend Analysis') + '</h3>' +
                 '<div id="groupChart" class="h-96"></div>' +
                 '</div>' +
                 '<div class="saas-card p-8">' +
-                '<h3 class="text-base font-bold text-slate-800 mb-6">' + this.t('模穴間變異 (Range)', 'Inter-Cavity Variation') + '</h3>' +
+                '<h3 class="text-base font-bold text-slate-800 dark:text-white mb-6 flex items-center gap-2"><span class="material-icons-outlined text-primary text-lg">compare_arrows</span>' + this.t('模穴間變異 (Range)', 'Inter-Cavity Variation') + '</h3>' +
                 '<div id="groupVarChart" class="h-96"></div>' +
                 '</div>' +
                 '</div>';
@@ -812,9 +812,9 @@ var SPCApp = {
             }
 
             // Sidebar summary on first few rows
-            if (i === 0) html += '<td colspan="4" rowspan="2" style="border:1px solid #000; text-align:center !important; font-weight:bold; background:#fefefe; font-size:10px;">ΣX̄ = ' + SPCEngine.round(pageXbarR.summary.xBarSum, 4) + '</td>';
+            if (i === 0) html += '<td colspan="4" rowspan="2" style="border:1px solid #000; text-align:center !important; font-weight:bold; background:#fefefe; font-size:10px;">ΣX̄ = ' + SPCEngine.round(pageXbarR.summary.xDoubleBar * pageXbarR.xBar.data.length, 4) + '</td>';
             else if (i === 2) html += '<td colspan="4" rowspan="2" style="border:1px solid #000; text-align:center !important; font-weight:bold; background:#fefefe; font-size:10px;">X̿ = ' + SPCEngine.round(pageXbarR.summary.xDoubleBar, 4) + '</td>';
-            else if (i === 4) html += '<td colspan="4" rowspan="2" style="border:1px solid #000; text-align:center !important; font-weight:bold; background:#fefefe; font-size:10px;">ΣR = ' + SPCEngine.round(pageXbarR.summary.rSum, 4) + '</td>';
+            else if (i === 4) html += '<td colspan="4" rowspan="2" style="border:1px solid #000; text-align:center !important; font-weight:bold; background:#fefefe; font-size:10px;">ΣR = ' + SPCEngine.round(pageXbarR.summary.rBar * pageXbarR.R.data.length, 4) + '</td>';
             else if (i === 6) html += '<td colspan="4" rowspan="2" style="border:1px solid #000; text-align:center !important; font-weight:bold; background:#fefefe; font-size:10px;">R̄ = ' + SPCEngine.round(pageXbarR.summary.rBar, 4) + '</td>';
             else if (i >= 8) html += '<td colspan="4" style="border:1px solid #000; background:#fcfcfc;"></td>';
             html += '</tr>';
@@ -1084,7 +1084,7 @@ var SPCApp = {
             }
 
             var ws = XLSX.utils.aoa_to_sheet(wsData);
-            ws['!cols'] = [{ wch: 12 }, { wch: 12 }, { wch: 12 }, { wch: 12 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 8 }];
+            ws['!cols'] = [{ wch: 18 }, { wch: 12 }, { wch: 12 }, { wch: 12 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 8 }];
             XLSX.utils.book_append_sheet(wb, ws, this.t('模穴分析', 'CavityAnalysis'));
 
         } else if (data.type === 'group') {
@@ -1127,7 +1127,7 @@ var SPCApp = {
         var violations = pageXbarR.xBar.violations;
 
         if (violations.length === 0) {
-            list.innerHTML = '<div class="text-center text-slate-500 mt-10 px-6">' +
+            list.innerHTML = '<div class="text-center text-slate-500 dark:text-slate-400 mt-10 px-6">' +
                 '<p class="text-sm font-medium">' + this.t('本頁數據全數在管制界限內。', 'All points within control limits.') + '</p>' +
                 '</div>';
             return;
@@ -1136,19 +1136,19 @@ var SPCApp = {
         violations.forEach(function (v) {
             var batchName = pageLabels[v.index] || 'Batch ' + (v.index + 1);
             var card = document.createElement('div');
-            card.className = 'bg-white border border-slate-100 p-5 rounded-xl shadow-sm hover:border-rose-200 hover:shadow-md transition-all cursor-pointer group mb-3 mx-4';
+            card.className = 'bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 p-5 rounded-xl shadow-sm hover:border-rose-200 dark:hover:border-rose-700 hover:shadow-md transition-all cursor-pointer group mb-3 mx-4';
 
             var rulesText = v.rules.map(function (r) { return 'Rule ' + r; }).join(', ');
 
             card.innerHTML =
                 '<div class="flex items-start gap-4">' +
-                '<div class="w-8 h-8 rounded-lg bg-rose-50 flex items-center justify-center flex-shrink-0">' +
-                '<div class="w-2 h-2 anomaly-pulse"></div>' +
+                '<div class="w-8 h-8 rounded-lg bg-rose-50 dark:bg-rose-900/30 flex items-center justify-center flex-shrink-0">' +
+                '<span class="material-icons-outlined text-rose-500 text-lg">error_outline</span>' +
                 '</div>' +
                 '<div class="flex-1">' +
-                '<div class="text-sm font-bold text-slate-900 mb-0.5">' + batchName + '</div>' +
+                '<div class="text-sm font-bold text-slate-900 dark:text-white mb-0.5">' + batchName + '</div>' +
                 '<div class="text-[10px] text-rose-500 font-bold uppercase tracking-wider mb-2">' + rulesText + '</div>' +
-                '<div class="text-[11px] text-slate-600 leading-relaxed">' +
+                '<div class="text-[11px] text-slate-500 dark:text-slate-400 font-medium leading-relaxed">' +
                 self.t('偵測到異常偏離，建議檢查該批次生產條件。', 'Deviation detected. Verify production settings for this batch.') +
                 '</div>' +
                 '</div>' +

@@ -80,3 +80,22 @@ Implemented a modern SaaS-style dashboard layout based on the "Stitch" design fo
 - `index.html`: Complete rewrite of DOM structure.
 - `css/style.css`: Updated variables and component styles.
 - `js/spc-all.js`: Added anomaly detection hook in `renderCharts`.
+
+## 2026-01-10 Chart & Table Optimization
+
+### Overview
+Addressed visual layout issues in analysis results and clarified statistical terminology.
+
+### Key Optimizations
+1.  **Chart Aspect Ratio**:
+    *   **Problem**: Charts in 'Cavity' and 'Group' analysis were not utilizing the full container height, leaving wasteful empty space.
+    *   **Solution**: Disabled `maintainAspectRatio` (set to `false`) in Chart.js options to allow charts to fill their parent flex/grid containers completely.
+    
+2.  **Statistical Terminology**:
+    *   **Change**: Replaced the ambiguous 'σ' (Sigma) symbol in table headers with explicit text labels: `StdDev (within)` and `StdDev (overall)`.
+    *   **Reason**: To avoid confusion with the Summation symbol (Σ) and provide clearer professional terminology.
+
+3.  **Table Styling**:
+    *   **Upgrade**: Converted 'Cavity' and 'Group' analysis tables to use the new "Glassmorphism DataGrid" style (Tailwind CSS), matching the main UI's aesthetic (Dark mode, transparent borders, zebra striping).
+    *   **Visual Cues**: Added color-coded badges (Green/Yellow/Red) for Cpk values to instantly indicate process capability levels.
+

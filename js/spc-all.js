@@ -504,11 +504,24 @@ var SPCApp = {
                 if (type === 'batch') {
                     var dataMatrix = dataInput.getDataMatrix();
                     var xbarR = SPCEngine.calculateXBarRLimits(dataMatrix);
+
+                    // Flatten data matrix for global Cpk calculation
+                    var allValues = [];
+                    for (var i = 0; i < dataMatrix.length; i++) {
+                        for (var j = 0; j < dataMatrix[i].length; j++) {
+                            if (dataMatrix[i][j] !== null) allValues.push(dataMatrix[i][j]);
+                        }
+                    }
+                    var specs = dataInput.getSpecs();
+                    var capability = SPCEngine.calculateProcessCapability(allValues, specs.usl, specs.lsl);
+                    xbarR.summary.Cpk = capability.Cpk;
+                    xbarR.summary.Ppk = capability.Ppk;
+
                     results = {
                         type: 'batch',
                         xbarR: xbarR,
                         batchNames: dataInput.batchNames,
-                        specs: dataInput.getSpecs(),
+                        specs: specs,
                         dataMatrix: dataMatrix,
                         cavityNames: dataInput.getCavityNames(),
                         productInfo: dataInput.getProductInfo()
@@ -570,128 +583,119 @@ var SPCApp = {
                 totalBatches: totalBatches
             };
 
-            html = '<div class="results-summary">' +
-                '<div class="stat-card"><div class="stat-label">' + this.t('模穴數 (n)', 'Cavity Count') + '</div><div class="stat-value">' + data.xbarR.summary.n + '</div></div>' +
-                '<div class="stat-card"><div class="stat-label">' + this.t('總批號數', 'Total Batches') + '</div><div class="stat-value">' + totalBatches + '</div></div>' +
+            // Compact Dashboard metrics
+            html = '<div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">' +
+                '<div class="saas-card p-4 flex flex-col justify-center">' +
+                '<div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">' + this.t('模穴數 (n)', 'Cavity Count') + '</div>' +
+                '<div class="text-xl font-bold text-slate-900">' + data.xbarR.summary.n + '</div>' +
+                '</div>' +
+                '<div class="saas-card p-4 flex flex-col justify-center">' +
+                '<div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">' + this.t('總記錄數', 'Total Batches') + '</div>' +
+                '<div class="text-xl font-bold text-slate-900">' + totalBatches + '</div>' +
+                '</div>' +
+                '<div class="saas-card p-4 flex flex-col justify-center">' +
+                '<div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">' + this.t('製程能力 (Cpk)', 'Process Cpk') + '</div>' +
+                '<div class="text-xl font-bold text-indigo-600">' + SPCEngine.round(data.xbarR.summary.Cpk, 3) + '</div>' +
+                '</div>' +
+                '<div class="saas-card p-4 flex flex-col justify-center">' +
+                '<div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">' + this.t('異常狀態', 'Status') + '</div>' +
+                '<div class="flex items-center space-x-2">' +
+                '<div class="w-2 h-2 rounded-full ' + (data.xbarR.xBar.violations.length > 0 ? 'anomaly-pulse' : 'bg-success') + '"></div>' +
+                '<span class="text-sm font-semibold ' + (data.xbarR.xBar.violations.length > 0 ? 'text-rose-600' : 'text-emerald-600') + '">' +
+                (data.xbarR.xBar.violations.length > 0 ? this.t('偵測到異常', 'Alert') : this.t('系統受控', 'Normal')) + '</span>' +
+                '</div>' +
+                '</div>' +
                 '</div>';
 
             if (totalPages > 1) {
-                html += '<div class="pagination-controls" style="display:flex;justify-content:center;align-items:center;gap:15px;margin:20px 0;">' +
-                    '<button id="prevPageBtn" class="btn-secondary" style="padding:8px 16px;">' + this.t('上一頁', 'Prev') + '</button>' +
-                    '<span id="pageInfo" style="font-weight:bold;">' + this.t('第 ', 'Page ') + '1 / ' + totalPages + this.t(' 頁', '') + '</span>' +
-                    '<button id="nextPageBtn" class="btn-secondary" style="padding:8px 16px;">' + this.t('下一頁', 'Next') + '</button>' +
+                html += '<div class="flex items-center justify-between mb-4 bg-white p-3 rounded-lg border border-slate-100 shadow-sm">' +
+                    '<div class="text-xs font-medium text-slate-500" id="pageInfo">' + this.t('頁次 ', 'Page ') + '1 / ' + totalPages + '</div>' +
+                    '<div class="flex gap-2">' +
+                    '<button id="prevPageBtn" class="px-4 py-1.5 text-xs font-bold border border-slate-200 rounded-md hover:bg-slate-50 transition-all disabled:opacity-30 disabled:cursor-not-allowed">' + this.t('上一頁', 'Prev') + '</button>' +
+                    '<button id="nextPageBtn" class="px-4 py-1.5 text-xs font-bold text-white bg-indigo-600 rounded-md hover:bg-indigo-700 transition-all disabled:opacity-30 disabled:cursor-not-allowed">' + this.t('下一頁', 'Next') + '</button>' +
+                    '</div>' +
                     '</div>';
             }
 
-            html += '<div id="detailedTableContainer" style="margin-bottom:30px; overflow-x:auto;"></div>';
+            html += '<div id="detailedTableContainer" class="mb-10 overflow-x-auto rounded-xl border border-slate-200 shadow-sm"></div>';
             html += '<div id="pageLimitsContainer"></div>';
-            html += '<div id="diagnosticContainer" style="margin-top:20px;"></div>';
-            html += '<div id="batchChartsContainer">' +
-                '<div class="chart-container"><h3 class="chart-title">' + this.t('X̄ 管制圖', 'X-Bar Chart') + '</h3><canvas id="xbarChart"></canvas></div>' +
-                '<div class="chart-container"><h3 class="chart-title">' + this.t('R 管制圖', 'R Chart') + '</h3><canvas id="rChart"></canvas></div>' +
+            html += '<div id="diagnosticContainer"></div>';
+
+            html += '<div class="grid grid-cols-1 gap-8">' +
+                '<div class="saas-card p-8">' +
+                '<div class="flex justify-between items-center mb-6">' +
+                '<h3 class="text-base font-bold text-slate-800">' + this.t('X̄ 管制圖 (均值)', 'X-Bar Control Chart') + '</h3>' +
+                '<span class="px-2 py-0.5 bg-slate-100 text-slate-500 text-[10px] font-bold rounded uppercase">SVG Vector</span>' +
+                '</div>' +
+                '<div id="xbarChart" class="h-96"></div>' +
+                '</div>' +
+                '<div class="saas-card p-8">' +
+                '<div class="flex justify-between items-center mb-6">' +
+                '<h3 class="text-base font-bold text-slate-800">' + this.t('R 管制圖 (全距)', 'R Control Chart') + '</h3>' +
+                '<span class="px-2 py-0.5 bg-slate-100 text-slate-500 text-[10px] font-bold rounded uppercase">SVG Vector</span>' +
+                '</div>' +
+                '<div id="rChart" class="h-80"></div>' +
+                '</div>' +
                 '</div>';
 
         } else if (data.type === 'cavity') {
-            var rows = '';
-            for (var i = 0; i < data.cavityStats.length; i++) {
-                var s = data.cavityStats[i];
-                var c = SPCEngine.getCapabilityColor(s.Cpk);
-                var badgeClass = '';
-                if (c.text === '#155724') badgeClass = 'bg-green-100 text-green-800 border-green-200';
-                else if (c.text === '#856404') badgeClass = 'bg-yellow-100 text-yellow-800 border-yellow-200';
-                else badgeClass = 'bg-red-100 text-red-800 border-red-200';
-
-                rows += '<tr class="border-b border-gray-700/50 hover:bg-white/5 transition-colors">' +
-                    '<td class="px-6 py-4 font-medium text-white">' + s.name + '</td>' +
-                    '<td class="px-6 py-4 text-gray-300 font-mono text-center">' + SPCEngine.round(s.mean, 4) + '</td>' +
-                    '<td class="px-6 py-4 text-gray-300 font-mono text-center">' + SPCEngine.round(s.withinStdDev, 4) + '</td>' +
-                    '<td class="px-6 py-4 text-gray-300 font-mono text-center">' + SPCEngine.round(s.overallStdDev, 4) + '</td>' +
-                    '<td class="px-6 py-4 text-gray-300 font-mono text-center">' + SPCEngine.round(s.Cp, 3) + '</td>' +
-                    '<td class="px-6 py-4 text-center">' +
-                    '<span class="px-3 py-1 rounded-full text-xs font-bold border ' + badgeClass + '">' + SPCEngine.round(s.Cpk, 3) + '</span>' +
-                    '</td>' +
-                    '<td class="px-6 py-4 text-gray-300 font-mono text-center">' + SPCEngine.round(s.Pp, 3) + '</td>' +
-                    '<td class="px-6 py-4 text-gray-300 font-mono text-center">' + SPCEngine.round(s.Ppk, 3) + '</td>' +
-                    '<td class="px-6 py-4 text-gray-300 font-mono text-center">' + s.count + '</td>' +
-                    '</tr>';
-            }
-
-            html = '<div class="grid grid-cols-1 gap-12">' +
-                '<div class="bg-[#1e293b]/80 backdrop-blur-md rounded-2xl border border-white/10 p-6 shadow-xl">' +
-                '<h3 class="text-lg font-semibold text-white mb-6 pl-4 border-l-4 border-pink-500">' + this.t('Cpk 比較', 'Cpk Comparison') + '</h3>' +
-                '<div class="h-96"><canvas id="cpkChart"></canvas></div>' +
+            html = '<div class="grid grid-cols-1 gap-8">' +
+                '<div class="saas-card p-8">' +
+                '<h3 class="text-base font-bold text-slate-800 mb-6">' + this.t('模穴 Cpk 效能比較', 'Cavity Cpk Performance') + '</h3>' +
+                '<div id="cpkChart" class="h-96"></div>' +
                 '</div>' +
-                '<div class="bg-[#1e293b]/80 backdrop-blur-md rounded-2xl border border-white/10 p-6 shadow-xl">' +
-                '<h3 class="text-lg font-semibold text-white mb-6 pl-4 border-l-4 border-blue-500">' + this.t('平均值比較', 'Mean Comparison') + '</h3>' +
-                '<div class="h-96"><canvas id="meanChart"></canvas></div>' +
+                '<div class="grid grid-cols-1 md:grid-cols-2 gap-6">' +
+                '<div class="saas-card p-8">' +
+                '<h3 class="text-base font-bold text-slate-800 mb-6">' + this.t('平均值分佈', 'Mean Distribution') + '</h3>' +
+                '<div id="meanChart" class="h-80"></div>' +
                 '</div>' +
-                '<div class="bg-[#1e293b]/80 backdrop-blur-md rounded-2xl border border-white/10 p-6 shadow-xl">' +
-                '<h3 class="text-lg font-semibold text-white mb-6 pl-4 border-l-4 border-yellow-500">' + this.t('標準差比較 (Overall)', 'Standard Deviation Comparison (Overall)') + '</h3>' +
-                '<div class="h-96"><canvas id="stdDevChart"></canvas></div>' +
+                '<div class="saas-card p-8">' +
+                '<h3 class="text-base font-bold text-slate-800 mb-6">' + this.t('標準差分佈', 'StdDev Distribution') + '</h3>' +
+                '<div id="stdDevChart" class="h-80"></div>' +
                 '</div>' +
-                '<div class="bg-[#1e293b]/80 backdrop-blur-md rounded-2xl border border-white/10 p-6 shadow-xl">' +
-                '<h3 class="text-lg font-semibold text-white mb-6 pl-4 border-l-4 border-indigo-500">' + this.t('模穴統計', 'Cavity Statistics') + '</h3>' +
-                '<div class="overflow-x-auto rounded-lg border border-gray-700">' +
+                '</div>' +
+                '<div class="saas-card overflow-hidden">' +
+                '<div class="p-6 border-b border-slate-50 flex justify-between items-center">' +
+                '<h3 class="text-base font-bold text-slate-800">' + this.t('模穴細節統計', 'Cavity Details') + '</h3>' +
+                '</div>' +
+                '<div class="overflow-x-auto">' +
                 '<table class="w-full text-sm text-left">' +
-                '<thead class="text-xs text-gray-400 uppercase bg-gray-800/50">' +
+                '<thead class="text-[11px] text-slate-400 uppercase bg-slate-50/50">' +
                 '<tr>' +
-                '<th class="px-6 py-4 font-bold tracking-wider">Cavity</th>' +
-                '<th class="px-6 py-4 text-center">Mean</th>' +
-                '<th class="px-6 py-4 text-center">StdDev (within)</th>' +
-                '<th class="px-6 py-4 text-center">StdDev (overall)</th>' +
-                '<th class="px-6 py-4 text-center">Cp</th>' +
-                '<th class="px-6 py-4 text-center">Cpk</th>' +
-                '<th class="px-6 py-4 text-center">Pp</th>' +
-                '<th class="px-6 py-4 text-center">Ppk</th>' +
-                '<th class="px-6 py-4 text-center">Count</th>' +
+                '<th class="px-8 py-4 font-bold">Cavity Name</th>' +
+                '<th class="px-8 py-4 text-center">Mean</th>' +
+                '<th class="px-8 py-4 text-center">Cpk</th>' +
+                '<th class="px-8 py-4 text-center">n</th>' +
                 '</tr>' +
                 '</thead>' +
-                '<tbody class="divide-y divide-gray-700">' + rows + '</tbody>' +
+                '<tbody class="divide-y divide-slate-100">' +
+                data.cavityStats.map(function (s) {
+                    return '<tr>' +
+                        '<td class="px-8 py-4 font-bold text-slate-700">' + s.name + '</td>' +
+                        '<td class="px-8 py-4 text-center font-mono">' + SPCEngine.round(s.mean, 4) + '</td>' +
+                        '<td class="px-8 py-4 text-center">' +
+                        '<span class="inline-block px-3 py-1 rounded-full text-xs font-bold ' +
+                        (s.Cpk < 1.0 ? 'bg-rose-50 text-rose-600' : 'bg-emerald-50 text-emerald-600') + '">' +
+                        SPCEngine.round(s.Cpk, 3) + '</span>' +
+                        '</td>' +
+                        '<td class="px-8 py-4 text-center text-slate-500 font-mono">' + s.count + '</td>' +
+                        '</tr>';
+                }).join('') +
+                '</tbody>' +
                 '</table>' +
                 '</div>' +
                 '</div>' +
                 '</div>';
 
         } else if (data.type === 'group') {
-            var rows = '';
-            for (var i = 0; i < data.groupStats.length; i++) {
-                var s = data.groupStats[i];
-                rows += '<tr class="border-b border-gray-700/50 hover:bg-white/5 transition-colors">' +
-                    '<td class="px-6 py-4 font-medium text-white">' + s.batch + '</td>' +
-                    '<td class="px-6 py-4 text-gray-300 font-mono text-right">' + SPCEngine.round(s.avg, 4) + '</td>' +
-                    '<td class="px-6 py-4 text-gray-300 font-mono text-right">' + SPCEngine.round(s.max, 4) + '</td>' +
-                    '<td class="px-6 py-4 text-gray-300 font-mono text-right">' + SPCEngine.round(s.min, 4) + '</td>' +
-                    '<td class="px-6 py-4 text-gray-300 font-mono text-right">' + SPCEngine.round(s.range, 4) + '</td>' +
-                    '<td class="px-6 py-4 text-gray-300 font-mono text-right">' + s.count + '</td>' +
-                    '</tr>';
-            }
-
             html = '<div class="grid grid-cols-1 gap-12">' +
-                '<div class="bg-[#1e293b]/80 backdrop-blur-md rounded-2xl border border-white/10 p-6 shadow-xl">' +
-                '<h3 class="text-lg font-semibold text-white mb-6 pl-4 border-l-4 border-green-500">' + this.t('Min-Max-Avg 圖', 'Min-Max-Avg Chart') + '</h3>' +
-                '<div class="h-96"><canvas id="groupChart"></canvas></div>' +
+                '<div class="saas-card p-8">' +
+                '<h3 class="text-base font-bold text-slate-800 mb-6">' + this.t('群組數據趨勢 (Min-Max-Avg)', 'Group Trend Analysis') + '</h3>' +
+                '<div id="groupChart" class="h-96"></div>' +
                 '</div>' +
-                '<div class="bg-[#1e293b]/80 backdrop-blur-md rounded-2xl border border-white/10 p-6 shadow-xl">' +
-                '<h3 class="text-lg font-semibold text-white mb-6 pl-4 border-l-4 border-orange-500">' + this.t('模穴間變異圖 (Range)', 'Variation Between Cavities (Range)') + '</h3>' +
-                '<div class="h-96"><canvas id="groupVarChart"></canvas></div>' +
-                '</div>' +
-                '<div class="bg-[#1e293b]/80 backdrop-blur-md rounded-2xl border border-white/10 p-6 shadow-xl">' +
-                '<h3 class="text-lg font-semibold text-white mb-6 pl-4 border-l-4 border-indigo-500">' + this.t('群組統計', 'Group Statistics') + '</h3>' +
-                '<div class="overflow-x-auto rounded-lg border border-gray-700">' +
-                '<table class="w-full text-sm text-left">' +
-                '<thead class="text-xs text-gray-400 uppercase bg-gray-800/50">' +
-                '<tr>' +
-                '<th class="px-6 py-4 font-bold tracking-wider">Batch</th>' +
-                '<th class="px-6 py-4 text-right">Avg</th>' +
-                '<th class="px-6 py-4 text-right">Max</th>' +
-                '<th class="px-6 py-4 text-right">Min</th>' +
-                '<th class="px-6 py-4 text-right">Range</th>' +
-                '<th class="px-6 py-4 text-right">n</th>' +
-                '</tr>' +
-                '</thead>' +
-                '<tbody class="divide-y divide-gray-700">' + rows + '</tbody>' +
-                '</table>' +
-                '</div>' +
+                '<div class="saas-card p-8">' +
+                '<h3 class="text-base font-bold text-slate-800 mb-6">' + this.t('模穴間變異 (Range)', 'Inter-Cavity Variation') + '</h3>' +
+                '<div id="groupVarChart" class="h-96"></div>' +
                 '</div>' +
                 '</div>';
         }
@@ -699,15 +703,20 @@ var SPCApp = {
         resultsContent.innerHTML = html;
         document.getElementById('results').style.display = 'block';
 
-        if (data.type === 'batch' && this.batchPagination.totalPages > 1) {
-            document.getElementById('prevPageBtn').addEventListener('click', function () { self.changeBatchPage(-1); });
-            document.getElementById('nextPageBtn').addEventListener('click', function () { self.changeBatchPage(1); });
-            this.updatePaginationButtons();
+        if (data.type === 'batch') {
+            if (this.batchPagination.totalPages > 1) {
+                document.getElementById('prevPageBtn').addEventListener('click', function () { self.changeBatchPage(-1); });
+                document.getElementById('nextPageBtn').addEventListener('click', function () { self.changeBatchPage(1); });
+                this.updatePaginationButtons();
+            }
         }
 
         setTimeout(function () {
             self.renderCharts();
             document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+            var sidebar = document.getElementById('anomalySidebar');
+            if (data.type === 'batch') sidebar.classList.remove('hidden');
+            else sidebar.classList.add('hidden');
         }, 100);
     },
 
@@ -852,302 +861,101 @@ var SPCApp = {
 
 
     renderCharts: function () {
+        var self = this;
         var data = this.analysisResults;
-
-        // Destroy existing charts
-        for (var i = 0; i < this.chartInstances.length; i++) {
-            this.chartInstances[i].destroy();
-        }
+        this.chartInstances.forEach(function (c) { if (c && c.destroy) c.destroy(); });
         this.chartInstances = [];
 
         if (data.type === 'batch') {
-            // Get pagination info
             var p = this.batchPagination || { currentPage: 1, maxPerPage: 25, totalBatches: data.batchNames.length };
             var startIdx = (p.currentPage - 1) * p.maxPerPage;
             var endIdx = Math.min(startIdx + p.maxPerPage, p.totalBatches);
 
-            // Slice data for current page
             var pageLabels = data.batchNames.slice(startIdx, endIdx);
             var pageDataMatrix = data.dataMatrix.slice(startIdx, endIdx);
-
-            // Calculate control limits for this page's data (VBA style - each page has its own limits)
             var pageXbarR = SPCEngine.calculateXBarRLimits(pageDataMatrix);
-
-            // Add sums for detailed table display
             pageXbarR.summary.xBarSum = pageXbarR.xBar.data.reduce(function (a, b) { return a + b; }, 0);
             pageXbarR.summary.rSum = pageXbarR.R.data.reduce(function (a, b) { return a + b; }, 0);
 
-            // Render detailed data table
             this.renderDetailedDataTable(pageLabels, pageDataMatrix, pageXbarR);
 
-            // Update page limits display
-            var limitsHtml = '<div class="results-summary" style="margin-top:15px;">' +
-                '<div class="stat-card"><div class="stat-label">' + this.t('本頁批號數 (k)', 'Page Batches') + '</div><div class="stat-value">' + pageXbarR.summary.k + '</div></div>' +
-                '<div class="stat-card"><div class="stat-label">X̿</div><div class="stat-value">' + SPCEngine.round(pageXbarR.summary.xDoubleBar, 4) + '</div></div>' +
-                '<div class="stat-card"><div class="stat-label">R̄</div><div class="stat-value">' + SPCEngine.round(pageXbarR.summary.rBar, 4) + '</div></div>' +
-                '</div>' +
-                '<h3 class="chart-title">' + this.t('管制界限 (本頁)', 'Control Limits (This Page)') + '</h3>' +
-                '<table class="data-table"><thead><tr><th>Chart</th><th>UCL</th><th>CL</th><th>LCL</th></tr></thead><tbody>' +
-                '<tr><td>X̄</td><td>' + SPCEngine.round(pageXbarR.xBar.UCL, 4) + '</td><td>' + SPCEngine.round(pageXbarR.xBar.CL, 4) + '</td><td>' + SPCEngine.round(pageXbarR.xBar.LCL, 4) + '</td></tr>' +
-                '<tr><td>R</td><td>' + SPCEngine.round(pageXbarR.R.UCL, 4) + '</td><td>' + SPCEngine.round(pageXbarR.R.CL, 4) + '</td><td>' + SPCEngine.round(pageXbarR.R.LCL, 4) + '</td></tr></tbody></table>';
-            document.getElementById('pageLimitsContainer').innerHTML = limitsHtml;
-
-            var diagnosticHtml = '<div class="diagnostic-panel" style="background:#fff; border-radius:8px; padding:15px; margin-top:20px; border:1px solid #e2e8f0;">' +
-                '<h3 style="margin-top:0; color:#1e293b; border-bottom:2px solid #3b82f6; padding-bottom:8px; margin-bottom:12px;">' +
-                this.t('異常診斷 (Nelson Rules)', 'Abnormality Diagnostic') + '</h3>';
-
-            if (pageXbarR.xBar.violations.length === 0) {
-                diagnosticHtml += '<p style="color:#10b981; font-weight:bold;">✅ ' + this.t('本頁數據未發現明顯異常趨勢。', 'No obvious abnormal trends found.') + '</p>';
-            } else {
-                diagnosticHtml += '<ul style="padding-left:20px; color:#475569;">';
-                var ruleDescs = {
-                    1: this.t('法則 1: 超出管制界限 (3σ)', 'Rule 1: Outside 3σ'),
-                    2: this.t('法則 2: 連續 9 點在中心線同一側', 'Rule 2: 9 pts on one side'),
-                    3: this.t('法則 3: 連續 6 點持續上升或下降', 'Rule 3: 6 pts trending'),
-                    4: this.t('法則 4: 連續 14 點交互升降', 'Rule 4: 14 pts alternating'),
-                    5: this.t('法則 5: 3 點中有 2 點在 2σ 外', 'Rule 5: 2/3 outside 2σ'),
-                    6: this.t('法則 6: 5 點中有 4 點在 1σ 外', 'Rule 6: 4/5 outside 1σ')
-                };
-                pageXbarR.xBar.violations.forEach(function (v) {
-                    diagnosticHtml += '<li style="margin-bottom:8px;"><strong style="color:#ef4444;">[' + pageLabels[v.index] + ']</strong>: ' +
-                        v.rules.map(function (r) { return ruleDescs[r]; }).join(', ') + '</li>';
-                });
-                diagnosticHtml += '</ul>';
-            }
-            diagnosticHtml += '</div>';
-
-            // Ensure diagnosticContainer exists or create it
-            var diagDiv = document.getElementById('diagnosticContainer');
-            if (!diagDiv) {
-                diagDiv = document.createElement('div');
-                diagDiv.id = 'diagnosticContainer';
-                document.getElementById('batchChartsContainer').parentNode.insertBefore(diagDiv, document.getElementById('batchChartsContainer'));
-            }
-            diagDiv.innerHTML = diagnosticHtml;
-
-            var fillUCL = [], fillCL = [], fillLCL = [];
-            var xbarColors = [], rColors = [];
-
-            var vMap = {};
-            pageXbarR.xBar.violations.forEach(function (v) { vMap[v.index] = true; });
-
-            for (var i = 0; i < pageLabels.length; i++) {
-                fillUCL.push(pageXbarR.xBar.UCL);
-                fillCL.push(pageXbarR.xBar.CL);
-                fillLCL.push(pageXbarR.xBar.LCL);
-
-                if (vMap[i]) {
-                    xbarColors.push('#ef4444');
-                } else {
-                    xbarColors.push('#3b82f6');
-                }
-
-                var rVal = pageXbarR.R.data[i];
-                if (rVal > pageXbarR.R.UCL) {
-                    rColors.push('#ef4444');
-                } else {
-                    rColors.push('#3b82f6');
-                }
-            }
-
-            this.chartInstances.push(new Chart(document.getElementById('xbarChart'), {
-                type: 'line',
-                data: {
-                    labels: pageLabels, datasets: [
-                        {
-                            label: 'X̄',
-                            data: pageXbarR.xBar.data,
-                            borderColor: '#3b82f6',
-                            borderWidth: 2,
-                            pointBackgroundColor: xbarColors,
-                            pointBorderColor: xbarColors,
-                            pointRadius: 4,
-                            pointHoverRadius: 6,
-                            tension: 0,
-                            fill: false
-                        },
-                        { label: 'UCL', data: fillUCL, borderColor: '#ef4444', borderWidth: 1.5, borderDash: [6, 4], pointRadius: 0, fill: false },
-                        { label: 'CL', data: fillCL, borderColor: '#10b981', borderWidth: 1.5, pointRadius: 0, fill: false },
-                        { label: 'LCL', data: fillLCL, borderColor: '#ef4444', borderWidth: 1.5, borderDash: [6, 4], pointRadius: 0, fill: false }
-                    ]
+            // X-Bar Apex Chart
+            var xOptions = {
+                chart: { type: 'line', height: 380, toolbar: { show: false }, background: 'transparent' },
+                series: [
+                    { name: 'X-Bar', data: pageXbarR.xBar.data },
+                    { name: 'UCL', data: new Array(pageLabels.length).fill(pageXbarR.xBar.UCL) },
+                    { name: 'CL', data: new Array(pageLabels.length).fill(pageXbarR.xBar.CL) },
+                    { name: 'LCL', data: new Array(pageLabels.length).fill(pageXbarR.xBar.LCL) }
+                ],
+                colors: ['#4f46e5', '#f43f5e', '#10b981', '#f43f5e'],
+                stroke: { width: [3, 1.5, 1.5, 1.5], dashArray: [0, 6, 0, 6], curve: 'straight' },
+                xaxis: { categories: pageLabels, labels: { style: { colors: '#94a3b8', fontSize: '10px' } } },
+                markers: {
+                    size: 4,
+                    discrete: pageXbarR.xBar.violations.map(function (v) {
+                        return { seriesIndex: 0, dataPointIndex: v.index, fillColor: '#f43f5e', strokeColor: '#fff', size: 6 };
+                    })
                 },
-                options: {
-                    responsive: true,
-                    aspectRatio: 4, // More compact vertical
-                    plugins: {
-                        legend: { position: 'top', labels: { boxWidth: 10, padding: 10, font: { size: 12 } } }
-                    },
-                    scales: {
-                        x: { grid: { display: false } },
-                        y: { grid: { color: 'rgba(0,0,0,0.08)' } }
-                    }
-                }
-            }));
-
-            var rUCL = [], rCL = [];
-            for (var i = 0; i < pageLabels.length; i++) { rUCL.push(pageXbarR.R.UCL); rCL.push(pageXbarR.R.CL); }
-            this.chartInstances.push(new Chart(document.getElementById('rChart'), {
-                type: 'line',
-                data: {
-                    labels: pageLabels, datasets: [
-                        {
-                            label: 'R',
-                            data: pageXbarR.R.data,
-                            borderColor: '#3b82f6',
-                            borderWidth: 2,
-                            pointBackgroundColor: rColors,
-                            pointBorderColor: rColors,
-                            pointRadius: 4,
-                            pointHoverRadius: 6,
-                            tension: 0,
-                            fill: false
-                        },
-                        { label: 'UCL', data: rUCL, borderColor: '#ef4444', borderWidth: 1.5, borderDash: [6, 4], pointRadius: 0, fill: false },
-                        { label: 'CL', data: rCL, borderColor: '#10b981', borderWidth: 1.5, pointRadius: 0, fill: false }
-                    ]
+                annotations: {
+                    points: pageXbarR.xBar.violations.map(function (v) {
+                        return {
+                            x: pageLabels[v.index], y: pageXbarR.xBar.data[v.index],
+                            marker: { size: 0 },
+                            label: { borderColor: '#f43f5e', style: { color: '#fff', background: '#f43f5e' }, text: 'OOC' }
+                        };
+                    })
                 },
-                options: {
-                    responsive: true,
-                    aspectRatio: 4,
-                    plugins: {
-                        legend: { position: 'top', labels: { boxWidth: 10, padding: 10, font: { size: 12 } } }
-                    },
-                    scales: {
-                        x: { grid: { display: false } },
-                        y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.08)' } }
-                    }
-                }
-            }));
+            };
+            var chartX = new ApexCharts(document.querySelector("#xbarChart"), xOptions);
+            chartX.render();
+            this.chartInstances.push(chartX);
 
-            // Populate Anomaly Sidebar (New UI Feature)
+            // R Apex Chart
+            var rOptions = {
+                chart: { type: 'line', height: 300, toolbar: { show: false } },
+                series: [
+                    { name: 'Range', data: pageXbarR.R.data },
+                    { name: 'UCL', data: new Array(pageLabels.length).fill(pageXbarR.R.UCL) },
+                    { name: 'CL', data: new Array(pageLabels.length).fill(pageXbarR.R.CL) }
+                ],
+                colors: ['#64748b', '#f43f5e', '#10b981'],
+                stroke: { width: [2.5, 1, 1], dashArray: [0, 6, 0] },
+                xaxis: { categories: pageLabels, labels: { style: { colors: '#94a3b8', fontSize: '10px' } } }
+            };
+            var chartR = new ApexCharts(document.querySelector("#rChart"), rOptions);
+            chartR.render();
+            this.chartInstances.push(chartR);
+
             this.renderAnomalySidebar(pageXbarR, pageLabels);
 
         } else if (data.type === 'cavity') {
-            var labels = [], cpkValues = [], colors = [];
-            for (var i = 0; i < data.cavityStats.length; i++) {
-                labels.push(data.cavityStats[i].name);
-                cpkValues.push(data.cavityStats[i].Cpk);
-                colors.push(SPCEngine.getCapabilityColor(data.cavityStats[i].Cpk).bg);
-            }
-            var line167 = [], line133 = [], line100 = [];
-            for (var i = 0; i < labels.length; i++) { line167.push(1.67); line133.push(1.33); line100.push(1.0); }
+            var labels = data.cavityStats.map(function (s) { return s.name; });
+            var cpkVals = data.cavityStats.map(function (s) { return s.Cpk; });
+            var cpkOptions = {
+                chart: { type: 'bar', height: 350, toolbar: { show: false } },
+                series: [{ name: 'Cpk', data: cpkVals }],
+                xaxis: { categories: labels },
+                colors: ['#6366f1'],
+                plotOptions: { bar: { borderRadius: 6, columnWidth: '55%' } }
+            };
+            var chartCpk = new ApexCharts(document.querySelector("#cpkChart"), cpkOptions);
+            chartCpk.render();
+            this.chartInstances.push(chartCpk);
 
-            this.chartInstances.push(new Chart(document.getElementById('cpkChart'), {
-                type: 'bar',
-                data: {
-                    labels: labels, datasets: [
-                        { label: 'Cpk', data: cpkValues, backgroundColor: colors, borderWidth: 0, barPercentage: 0.7 },
-                        { label: '1.67', data: line167, type: 'line', borderColor: '#10b981', borderWidth: 1.5, borderDash: [6, 4], pointRadius: 0, fill: false },
-                        { label: '1.33', data: line133, type: 'line', borderColor: '#f59e0b', borderWidth: 1.5, borderDash: [6, 4], pointRadius: 0, fill: false },
-                        { label: '1.0', data: line100, type: 'line', borderColor: '#ef4444', borderWidth: 1.5, borderDash: [6, 4], pointRadius: 0, fill: false }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { position: 'top', labels: { boxWidth: 12, padding: 20, font: { size: 14 } } } },
-                    scales: { x: { grid: { display: false } }, y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.08)' } } }
-                }
-            }));
-
-            // Prepare data for Mean and StdDev charts
-            var meanValues = [], stdDevValues = [];
-
-            // Calculate Grand Mean for reference line
-            var totalMean = 0;
-            for (var i = 0; i < data.cavityStats.length; i++) {
-                meanValues.push(data.cavityStats[i].mean);
-                stdDevValues.push(data.cavityStats[i].overallStdDev);
-                totalMean += data.cavityStats[i].mean;
-            }
-            var grandMean = totalMean / data.cavityStats.length;
-            var grandMeanLine = new Array(labels.length).fill(grandMean);
-
-            // Mean Chart
-            this.chartInstances.push(new Chart(document.getElementById('meanChart'), {
-                type: 'bar',
-                data: {
-                    labels: labels, datasets: [
-                        { label: 'Mean', data: meanValues, backgroundColor: '#3b82f6', borderWidth: 0, barPercentage: 0.7 },
-                        { label: 'Grand Mean', data: grandMeanLine, type: 'line', borderColor: '#ef4444', borderWidth: 2, pointRadius: 0, fill: false }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { position: 'top', labels: { boxWidth: 12, padding: 20, font: { size: 14 } } } },
-                    scales: { x: { grid: { display: false } }, y: { beginAtZero: false, grid: { color: 'rgba(0,0,0,0.08)' } } } // Mean often far from zero
-                }
-            }));
-
-            // StdDev Chart
-            this.chartInstances.push(new Chart(document.getElementById('stdDevChart'), {
-                type: 'bar',
-                data: {
-                    labels: labels, datasets: [
-                        { label: 'StdDev (Overall)', data: stdDevValues, backgroundColor: '#f59e0b', borderWidth: 0, barPercentage: 0.7 }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { position: 'top', labels: { boxWidth: 12, padding: 20, font: { size: 14 } } } },
-                    scales: { x: { grid: { display: false } }, y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.08)' } } }
-                }
-            }));
         } else if (data.type === 'group') {
-            var labels = [], maxVals = [], avgVals = [], minVals = [];
-            var uslLine = [], tgtLine = [], lslLine = [];
-            for (var i = 0; i < data.groupStats.length; i++) {
-                labels.push(data.groupStats[i].batch);
-                maxVals.push(data.groupStats[i].max);
-                avgVals.push(data.groupStats[i].avg);
-                minVals.push(data.groupStats[i].min);
-                uslLine.push(data.specs.usl);
-                tgtLine.push(data.specs.target);
-                lslLine.push(data.specs.lsl);
-            }
-
-            this.chartInstances.push(new Chart(document.getElementById('groupChart'), {
-                type: 'line',
-                data: {
-                    labels: labels, datasets: [
-                        { label: 'Max', data: maxVals, borderColor: '#f87171', borderWidth: 1.5, pointRadius: 0, fill: false },
-                        { label: 'Avg', data: avgVals, borderColor: '#3b82f6', borderWidth: 2, pointRadius: 3, pointHoverRadius: 5, fill: false },
-                        { label: 'Min', data: minVals, borderColor: '#f87171', borderWidth: 1.5, pointRadius: 0, fill: false },
-                        { label: 'USL', data: uslLine, borderColor: '#ff9800', borderWidth: 1.5, borderDash: [6, 4], pointRadius: 0, fill: false },
-                        { label: 'Target', data: tgtLine, borderColor: '#10b981', borderWidth: 1.5, pointRadius: 0, fill: false },
-                        { label: 'LSL', data: lslLine, borderColor: '#ff9800', borderWidth: 1.5, borderDash: [6, 4], pointRadius: 0, fill: false }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { position: 'top', labels: { boxWidth: 12, padding: 20, font: { size: 14 } } } },
-                    scales: { x: { grid: { display: false } }, y: { grid: { color: 'rgba(0,0,0,0.08)' } } }
-                }
-            }));
-
-            // Group Variation Chart
-            var rangeVals = [];
-            for (var i = 0; i < data.groupStats.length; i++) {
-                rangeVals.push(data.groupStats[i].range);
-            }
-
-            this.chartInstances.push(new Chart(document.getElementById('groupVarChart'), {
-                type: 'line',
-                data: {
-                    labels: labels, datasets: [
-                        { label: 'Range (Max - Min)', data: rangeVals, borderColor: '#f97316', backgroundColor: 'rgba(249, 115, 22, 0.1)', borderWidth: 2, pointRadius: 3, pointHoverRadius: 5, fill: true },
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { position: 'top', labels: { boxWidth: 12, padding: 20, font: { size: 14 } } } },
-                    scales: { x: { grid: { display: false } }, y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.08)' } } }
-                }
-            }));
+            var labels = data.groupStats.map(function (s) { return s.batch; });
+            var avgVals = data.groupStats.map(function (s) { return s.avg; });
+            var gOptions = {
+                chart: { type: 'area', height: 380, toolbar: { show: false } },
+                series: [{ name: 'Average', data: avgVals }],
+                xaxis: { categories: labels },
+                stroke: { curve: 'smooth', width: 2 },
+                fill: { type: 'gradient', gradient: { shadeIntensity: 1, opacityFrom: 0.45, opacityTo: 0.05 } }
+            };
+            var chartG = new ApexCharts(document.querySelector("#groupChart"), gOptions);
+            chartG.render();
+            this.chartInstances.push(chartG);
         }
     },
 
@@ -1300,59 +1108,44 @@ var SPCApp = {
         document.getElementById('loadingOverlay').classList.remove('active');
     },
 
-    renderAnomalySidebar: function (pageXbarR, labels) {
+    renderAnomalySidebar: function (pageXbarR, pageLabels) {
         var sidebar = document.getElementById('anomalySidebar');
         var list = document.getElementById('anomalyList');
-        if (!sidebar || !list) return;
+        var self = this;
 
-        list.innerHTML = ''; // Clear previous content
-        var count = 0;
+        list.innerHTML = '';
+        var violations = pageXbarR.xBar.violations;
 
-        // Helper to create card HTML
-        function createCard(title, label, valText, badgeColor, badgeText) {
-            return '<div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm border-l-4 ' +
-                (badgeColor === 'red' ? 'border-l-red-500 hover:border-red-500' : 'border-l-yellow-500 hover:border-yellow-500') +
-                ' transition-all cursor-pointer group">' +
-                '<div class="flex justify-between items-start mb-2">' +
-                '<div><span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">' + title + '</span>' +
-                '<p class="font-mono font-bold text-gray-700">' + label + '</p></div>' +
-                '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold ' +
-                (badgeColor === 'red' ? 'bg-red-50 text-red-600' : 'bg-yellow-50 text-yellow-600') +
-                ' uppercase">' + badgeText + '</span></div>' +
-                '<p class="text-xs text-gray-500 mb-4">' + valText + '</p></div>';
+        if (violations.length === 0) {
+            list.innerHTML = '<div class="text-center text-slate-400 mt-10 px-6">' +
+                '<p class="text-sm font-medium">' + this.t('本頁數據全數在管制界限內。', 'All points within control limits.') + '</p>' +
+                '</div>';
+            return;
         }
 
-        // X-bar Violations
-        if (pageXbarR.xBar && pageXbarR.xBar.violations) {
-            pageXbarR.xBar.violations.forEach(function (v) {
-                count++;
-                var label = labels[v.index] || 'Batch ' + (v.index + 1);
-                var valText = 'Value: ' + SPCEngine.round(v.value, 4);
-                list.insertAdjacentHTML('beforeend', createCard('Batch ID', label, valText, 'red', 'X-Bar Out'));
-            });
-        }
+        violations.forEach(function (v) {
+            var batchName = pageLabels[v.index] || 'Batch ' + (v.index + 1);
+            var card = document.createElement('div');
+            card.className = 'bg-white border border-slate-100 p-5 rounded-xl shadow-sm hover:border-rose-200 hover:shadow-md transition-all cursor-pointer group mb-3 mx-4';
 
-        // R Violations
-        if (pageXbarR.R && pageXbarR.R.data) {
-            pageXbarR.R.data.forEach(function (rVal, idx) {
-                if (rVal > pageXbarR.R.UCL) {
-                    count++;
-                    var label = labels[idx] || 'Batch ' + (idx + 1);
-                    var valText = 'Range: ' + SPCEngine.round(rVal, 4) + ' > ' + SPCEngine.round(pageXbarR.R.UCL, 4);
-                    list.insertAdjacentHTML('beforeend', createCard('Batch ID', label, valText, 'red', 'R Chart Out'));
-                }
-            });
-        }
+            var rulesText = v.rules.map(function (r) { return 'Rule ' + r; }).join(', ');
 
-        if (count > 0) {
-            sidebar.classList.remove('hidden');
-        } else {
-            // Show empty state inside sidebar, but keep sidebar visible for now if we want "Dashboard"-like feel, 
-            // Or hide it to give more space to main content.
-            // Let's show it with "No Anomalies" to confirm the feature works.
-            sidebar.classList.remove('hidden');
-            list.innerHTML = '<div class="text-center text-gray-500 mt-10"><p>No anomalies detected</p></div>';
-        }
+            card.innerHTML =
+                '<div class="flex items-start gap-4">' +
+                '<div class="w-8 h-8 rounded-lg bg-rose-50 flex items-center justify-center flex-shrink-0">' +
+                '<div class="w-2 h-2 anomaly-pulse"></div>' +
+                '</div>' +
+                '<div class="flex-1">' +
+                '<div class="text-sm font-bold text-slate-900 mb-0.5">' + batchName + '</div>' +
+                '<div class="text-[10px] text-rose-500 font-bold uppercase tracking-wider mb-2">' + rulesText + '</div>' +
+                '<div class="text-[11px] text-slate-400 leading-relaxed">' +
+                self.t('偵測到異常偏離，建議檢查該批次生產條件。', 'Deviation detected. Verify production settings for this batch.') +
+                '</div>' +
+                '</div>' +
+                '</div>';
+
+            list.appendChild(card);
+        });
     },
 
     resetApp: function () {

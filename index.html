@@ -15,16 +15,13 @@
             theme: {
                 extend: {
                     colors: {
-                        sidebar: '#2c2e4e',
-                        main: '#48566b',
-                        'main-gradient-start': '#3b435b',
-                        'main-gradient-end': '#4b5a75',
-                        'active-nav': '#444c68',
-                        'card-bg': 'rgba(40, 48, 70, 0.6)',
-                        'accent-green': '#51cf66',
-                        'accent-cyan': '#22b8cf',
-                        'progress-bg': '#373a52',
-                        'progress-fill': '#5c7cfa',
+                        primary: '#4f46e5', // Indigo 600
+                        'primary-light': '#818cf8',
+                        danger: '#f43f5e', // Rose 500
+                        success: '#10b981', // Emerald 500
+                        surface: '#ffffff',
+                        background: '#f8fafc', // Slate 50
+                        'border-light': '#f1f5f9', // Slate 100
                     },
                     fontFamily: {
                         sans: ['Inter', 'sans-serif'],
@@ -34,34 +31,53 @@
         }
     </script>
 
-    <!-- Custom Styles & Glassmorphism -->
+    <!-- Custom Styles & SaaS Aesthetic -->
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
-        /* Glassmorphism effect */
-        .glass-card {
-            background: rgba(45, 50, 75, 0.4);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        body {
+            background-color: #f8fafc;
+            color: #1e293b;
         }
 
-        /* Glow Border */
-        .glow-border {
-            position: relative;
-            z-index: 1;
+        /* SaaS Card Style */
+        .saas-card {
+            background: #ffffff;
+            border: 1px solid #f1f5f9;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            border-radius: 12px;
+            transition: all 0.2s ease;
         }
 
-        .glow-border::before {
-            content: "";
-            position: absolute;
-            inset: -2px;
-            z-index: -1;
-            background: linear-gradient(90deg, #4facfe 0%, #00f2fe 100%);
-            border-radius: 1.7rem;
-            opacity: 0.5;
-            filter: blur(5px);
+        .saas-card:hover {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        /* Anomaly Pulse Animation */
+        @keyframes pulse-red {
+            0% {
+                transform: scale(1);
+                opacity: 0.8;
+                box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.7);
+            }
+
+            70% {
+                transform: scale(1.2);
+                opacity: 1;
+                box-shadow: 0 0 0 10px rgba(244, 63, 94, 0);
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 0.8;
+                box-shadow: 0 0 0 0 rgba(244, 63, 94, 0);
+            }
+        }
+
+        .anomaly-pulse {
+            animation: pulse-red 2s infinite;
+            background-color: #f43f5e;
+            border-radius: 50%;
         }
 
         /* Loading Spinner */
@@ -71,7 +87,8 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.7);
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(4px);
             display: none;
             justify-content: center;
             align-items: center;
@@ -80,12 +97,12 @@
         }
 
         .spinner {
-            border: 4px solid rgba(255, 255, 255, 0.3);
-            border-top: 4px solid #fff;
+            border: 3px solid #f1f5f9;
+            border-top: 3px solid #6366f1;
             border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
+            width: 32px;
+            height: 32px;
+            animation: spin 0.8s linear infinite;
         }
 
         @keyframes spin {
@@ -100,29 +117,26 @@
 
         /* Scrollbar */
         ::-webkit-scrollbar {
-            width: 8px;
+            width: 6px;
         }
 
         ::-webkit-scrollbar-track {
-            background: #2c2e4e;
+            background: #f8fafc;
         }
 
         ::-webkit-scrollbar-thumb {
-            background: #4b5563;
-            border-radius: 4px;
+            background: #cbd5e1;
+            border-radius: 10px;
         }
 
         ::-webkit-scrollbar-thumb:hover {
-            background: #6b7280;
+            background: #94a3b8;
         }
     </style>
 
-    <!-- Legacy Style (for specific table adjustments if needed) -->
-    <link rel="stylesheet" href="css/style.css">
-
     <!-- External Libraries -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 </head>
 
 <body class="font-sans antialiased text-gray-100 flex h-screen overflow-hidden bg-[#1a1f3c]">
@@ -130,60 +144,50 @@
     <!-- Sidebar removed -->
 
     <!-- Main Content -->
-    <main class="flex-1 bg-gradient-to-br from-[#3a4161] to-[#2c3350] overflow-y-auto relative">
-        <div class="p-10 max-w-7xl mx-auto h-full flex flex-col">
+    <main class="flex-1 bg-slate-50 overflow-y-auto relative">
+        <div class="p-8 max-w-7xl mx-auto h-full flex flex-col">
 
             <!-- Page Header -->
-            <header class="mb-8 flex justify-between items-end">
+            <header class="mb-6 flex justify-between items-end">
                 <div>
-                    <h2 class="text-3xl font-bold tracking-wide text-gray-100" data-en="Data Upload Workspace"
-                        data-zh="資料上傳工作區">資料上傳工作區</h2>
-                    <p class="text-gray-400 mt-2 text-sm" data-en="Upload your excel files to begin SPC analysis."
-                        data-zh="上傳您的 Excel 檔案以開始 SPC 分析。">上傳您的 Excel 檔案以開始 SPC 分析。</p>
+                    <h2 class="text-2xl font-bold tracking-tight text-slate-800" data-en="Analysis Workspace"
+                        data-zh="統計分析工作區">統計分析工作區</h2>
+                    <p class="text-slate-500 mt-1 text-sm"
+                        data-en="Upload documents to generate real-time SPC insights." data-zh="上傳報表以產生即時 SPC 數據洞察。">
+                        上傳報表以產生即時 SPC 數據洞察。</p>
                 </div>
                 <!-- Language Toggle Button relocated here -->
                 <button id="langBtn"
-                    class="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg transition-colors flex items-center space-x-2 border border-white/10"
+                    class="bg-white hover:bg-slate-50 text-slate-700 px-4 py-2 rounded-lg transition-all flex items-center space-x-2 border border-slate-200 shadow-sm"
                     title="Switch Language">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-400" fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" />
                     </svg>
-                    <span id="langText">EN</span>
+                    <span id="langText" class="font-medium text-xs tracking-wider">EN</span>
                 </button>
             </header>
 
             <!-- STEP 1: Upload Zone -->
             <section id="step1">
-                <div
-                    class="relative rounded-3xl p-[2px] bg-gradient-to-r from-[#42e695] to-[#3bb2b8] shadow-[0_0_15px_rgba(66,230,149,0.3)] mb-12">
-                    <div class="rounded-[22px] bg-[#283046]/90 backdrop-blur-md p-12 text-center w-full flex flex-col items-center justify-center gap-6"
+                <div class="relative rounded-2xl p-[1px] bg-slate-200 shadow-sm mb-10 overflow-hidden">
+                    <div class="rounded-[15px] bg-white p-10 text-center w-full flex flex-col items-center justify-center gap-4 hover:bg-slate-50 transition-colors cursor-pointer"
                         id="uploadZone">
 
-                        <!-- Hidden Input -->
                         <input type="file" id="fileInput" accept=".xlsx,.xls" hidden>
 
-                        <!-- Icons -->
-                        <div class="flex justify-center items-center gap-6 mb-4">
-                            <svg class="w-16 h-16 text-green-500" fill="currentColor" viewBox="0 0 24 24">
-                                <path
-                                    d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z" />
+                        <div class="w-14 h-14 rounded-2xl bg-indigo-50 flex items-center justify-center mb-2">
+                            <svg class="w-7 h-7 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                             </svg>
                         </div>
 
-                        <!-- Instructions -->
-                        <h3 class="text-xl text-gray-200 font-light" data-en="Click or Drag Excel files here"
-                            data-zh="點擊或拖曳 Excel 檔案至此">點擊或拖曳 Excel 檔案至此</h3>
-                        <p class="text-sm text-gray-400 font-mono" data-en="Supports .xlsx and .xls formats"
-                            data-zh="支援 .xlsx 和 .xls 格式">支援 .xlsx 和 .xls 格式</p>
-
-                        <!-- Button (Trigger file input) -->
-                        <button
-                            class="px-10 py-3 mt-4 w-48 bg-gray-200 hover:bg-white text-gray-800 font-bold rounded shadow transition-colors duration-200"
-                            onclick="document.getElementById('fileInput').click()">
-                            Select File
-                        </button>
+                        <h3 class="text-lg text-slate-800 font-semibold" data-en="Import Data File" data-zh="導入數據檔案">
+                            導入數據檔案</h3>
+                        <p class="text-xs text-slate-400" data-en="Drag & drop your Excel report here or browse"
+                            data-zh="拖曳 Excel 報表至此，或點擊瀏覽">拖曳 Excel 報表至此，或點擊瀏覽</p>
                     </div>
                 </div>
 

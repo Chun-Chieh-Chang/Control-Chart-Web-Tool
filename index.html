@@ -37,6 +37,20 @@
     <!-- Dependency Libraries -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <style>
+        .qip-selected {
+            background-color: #dbeafe !important;
+            border: 2px solid #3b82f6 !important;
+        }
+
+        .qip-preview-table th,
+        .qip-preview-table td {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 150px;
+        }
+    </style>
 </head>
 
 <body class="font-sans antialiased text-slate-800 flex h-screen overflow-hidden bg-slate-50">
@@ -492,13 +506,30 @@
                                     </div>
                                 </div>
 
-                                <!-- Hint for manual range input -->
+                                <!-- Worksheet Selection for Preview -->
+                                <div id="qip-worksheet-select-group" class="hidden">
+                                    <label class="text-xs font-bold text-slate-500 uppercase mb-1 block"
+                                        data-en="Worksheet" data-zh="工作表">工作表</label>
+                                    <div class="flex gap-2">
+                                        <select id="qip-worksheet-select"
+                                            class="flex-1 px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-white">
+                                            <option value="">-- 請選擇工作表 --</option>
+                                        </select>
+                                        <button id="qip-preview-btn"
+                                            class="px-4 py-2 bg-emerald-600 text-white rounded-lg text-sm font-medium hover:bg-emerald-700 transition-all flex items-center gap-2">
+                                            <span class="material-icons-outlined text-base">visibility</span>
+                                            <span data-en="Preview" data-zh="預覽">預覽</span>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Hint for mouse range selection -->
                                 <div
                                     class="p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
                                     <div class="flex items-start gap-2">
                                         <span class="material-icons-outlined text-blue-600 text-lg">info</span>
                                         <div class="text-xs text-blue-700 dark:text-blue-300">
-                                            <strong>提示：</strong>請在Excel中打開檔案，查看工作表後直接輸入範圍（如：K3:R3）
+                                            <strong>操作提示：</strong>1) 點擊「預覽」查看工作表 → 2) 點擊「📍 選擇」按鈕 → 3) 在表格中拖曳滑鼠選擇範圍
                                         </div>
                                     </div>
                                 </div>

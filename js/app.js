@@ -386,7 +386,7 @@ var SPCApp = {
         });
 
         this.workbook = wb;
-        this.renderItemList();
+        this.showInspectionItems();
 
         // Update UI state to show loaded
         var fileInfo = document.getElementById('file-info');

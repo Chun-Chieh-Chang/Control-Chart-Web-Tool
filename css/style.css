@@ -130,10 +130,10 @@ body {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    padding: 0px 1px !important;
-    /* Minimal padding */
-    font-size: 13px !important;
-    /* Larger font for data */
+    padding: 2px 4px !important;
+    /* Extremely tight padding */
+    font-size: 11px !important;
+    /* Smaller font for data */
 }
 
 .excel-table tr {

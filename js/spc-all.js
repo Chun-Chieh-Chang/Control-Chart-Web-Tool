@@ -613,15 +613,21 @@ var SPCApp = {
         var specs = data.specs;
         var cavityCount = data.xbarR.summary.n;
 
-        // Total 30 virtual columns: 1 (Labels) + 25 (Batches) + 4 (Summary Sidebar)
-        // Explicit total width: 60 + (25 * 120) + (4 * 150) = 3660px
-        var html = '<table class="excel-table" style="width:3660px; border-collapse:collapse; font-size:13px; font-family:sans-serif; border:2px solid #000; table-layout:fixed;">';
+        var colWidths = {
+            label: 60,
+            batch: 100,    // 生產批號欄位寬度 (獨立調整)
+            summary: 120   // 彙總欄位寬度 (獨立調整，一次控制4欄)
+        };
+        // Calculate total width explicitly to force horizontal scrolling
+        // Total = Label(1) + Batch(25) + Summary(4)
+        var totalWidth = colWidths.label + (25 * colWidths.batch) + (4 * colWidths.summary);
 
-        // Fixed Widths: Label 60px, Batch 120px, Summary 150px
+        var html = '<table class="excel-table" style="width:' + totalWidth + 'px; border-collapse:collapse; font-size:10px; font-family:sans-serif; border:2px solid #000; table-layout:fixed;">';
+
         html += '<colgroup>';
-        html += '<col style="width:60px;">';
-        for (var c = 0; c < 25; c++) html += '<col style="width:120px;">';
-        html += '<col style="width:150px;"><col style="width:150px;"><col style="width:150px;"><col style="width:150px;">';
+        html += '<col style="width:' + colWidths.label + 'px;">';
+        for (var c = 0; c < 25; c++) html += '<col style="width:' + colWidths.batch + 'px;">';
+        html += '<col style="width:' + colWidths.summary + 'px;"><col style="width:' + colWidths.summary + 'px;"><col style="width:' + colWidths.summary + 'px;"><col style="width:' + colWidths.summary + 'px;">';
         html += '</colgroup>';
 
 

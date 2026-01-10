@@ -143,12 +143,6 @@
             box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.2);
         }
 
-        .dark .saas-card {
-            background: #1e293b;
-            border-color: #334155;
-            color: #f1f5f9;
-        }
-
         :root {
             --table-border: #000;
             --table-bg: #fff;
@@ -158,23 +152,33 @@
             --table-data-header-bg: #e5e7eb;
             --table-ooc-bg: yellow;
             --table-ooc-text: #000;
+
+            --card-bg: #ffffff;
         }
 
-        .dark {
-            --table-border: #475569;
-            --table-bg: #0f172a;
-            --table-text: #f1f5f9;
-            --table-header-bg: #1e293b;
-            --table-label-bg: #334155;
-            --table-data-header-bg: #1e293b;
-            --table-ooc-bg: #991b1b;
-            --table-ooc-text: #fff;
+        html.dark {
+            --table-border: #475569 !important;
+            --table-bg: #0f172a !important;
+            --table-text: #f1f5f9 !important;
+            --table-header-bg: #1e293b !important;
+            --table-label-bg: #334155 !important;
+            --table-data-header-bg: #1e293b !important;
+            --table-ooc-bg: #991b1b !important;
+            --table-ooc-text: #ffffff !important;
+
+            --card-bg: #1e293b;
         }
 
         .excel-table {
-            background-color: var(--table-bg);
-            color: var(--table-text);
+            background-color: var(--table-bg) !important;
+            color: var(--table-text) !important;
             border-color: var(--table-border) !important;
+        }
+
+        .excel-table td,
+        .excel-table th {
+            border-color: var(--table-border) !important;
+            color: inherit !important;
         }
 
         .dark body {
@@ -182,11 +186,16 @@
         }
 
         .dark header {
-            background-color: rgba(30, 41, 59, 0.8);
-            border-color: #334155;
+            background-color: rgba(30, 41, 59, 0.8) !important;
+            border-color: #334155 !important;
         }
 
-        /* Fix visibility of generic slate text in dark mode */
+        .dark .saas-card {
+            background-color: #1e293b !important;
+            border-color: #334155 !important;
+            color: #f1f5f9 !important;
+        }
+
         .dark .text-slate-900 {
             color: #f1f5f9 !important;
         }
@@ -227,7 +236,6 @@
             border-color: #334155 !important;
         }
 
-        /* ApexCharts Tooltip Dark Mode Fix */
         .dark .apexcharts-tooltip {
             background: #1e293b !important;
             border-color: #334155 !important;

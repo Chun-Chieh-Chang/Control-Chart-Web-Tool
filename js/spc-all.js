@@ -1020,15 +1020,15 @@ var SPCApp = {
 
         rows.forEach(function (r) {
             html += '<tr>' +
-                '<td colspan="2" style="border:1px solid var(--table-border); padding:1px 1px; font-weight:bold; background:var(--table-label-bg); overflow:hidden; white-space:nowrap; text-overflow:ellipsis;">' + r.l1 + '</td>' +
-                '<td colspan="7" style="border:1px solid var(--table-border); padding:1px 1px; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;">' + r.v1 + '</td>' +
-                '<td colspan="2" style="border:1px solid var(--table-border); padding:1px 1px; font-weight:bold; background:var(--table-label-bg); overflow:hidden; white-space:nowrap; text-overflow:ellipsis;">' + r.l2 + '</td>' +
-                '<td colspan="2" style="border:1px solid var(--table-border); padding:1px 1px; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;">' + r.v2 + '</td>' +
-                '<td colspan="2" style="border:1px solid var(--table-border); padding:1px 1px; font-weight:bold; background:var(--table-label-bg); overflow:hidden; white-space:nowrap; text-overflow:ellipsis;">' + r.l3 + '</td>' +
-                '<td colspan="3" style="border:1px solid var(--table-border); padding:1px 1px; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;">' + r.v3 + '</td>' +
-                '<td colspan="3" style="border:1px solid var(--table-border); padding:1px 1px; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;">' + (r.v4 || '') + '</td>' +
-                '<td colspan="2" style="border:1px solid var(--table-border); padding:1px 1px; font-weight:bold; background:var(--table-label-bg); overflow:hidden; white-space:nowrap; text-overflow:ellipsis;">' + (r.l4 || '') + '</td>' +
-                '<td colspan="7" style="border:1px solid var(--table-border); padding:1px 1px; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;">' + (r.v4_val || '') + '</td>' +
+                '<td colspan="2" style="border:1px solid var(--table-border); padding:1px 1px; font-weight:bold; background:var(--table-label-bg); color:inherit; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;">' + r.l1 + '</td>' +
+                '<td colspan="7" style="border:1px solid var(--table-border); padding:1px 1px; background:var(--table-bg); color:inherit; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;">' + (r.v1 || '') + '</td>' +
+                '<td colspan="2" style="border:1px solid var(--table-border); padding:1px 1px; font-weight:bold; background:var(--table-label-bg); color:inherit; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;">' + r.l2 + '</td>' +
+                '<td colspan="2" style="border:1px solid var(--table-border); padding:1px 1px; background:var(--table-bg); color:inherit; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;">' + (r.v2 || '') + '</td>' +
+                '<td colspan="2" style="border:1px solid var(--table-border); padding:1px 1px; font-weight:bold; background:var(--table-label-bg); color:inherit; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;">' + r.l3 + '</td>' +
+                '<td colspan="3" style="border:1px solid var(--table-border); padding:1px 1px; background:var(--table-bg); color:inherit; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;">' + (r.v3 || '') + '</td>' +
+                '<td colspan="3" style="border:1px solid var(--table-border); padding:1px 1px; background:var(--table-bg); color:inherit; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;">' + (r.v4 || '') + '</td>' +
+                '<td colspan="2" style="border:1px solid var(--table-border); padding:1px 1px; font-weight:bold; background:var(--table-label-bg); color:inherit; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;">' + (r.l4 || '') + '</td>' +
+                '<td colspan="7" style="border:1px solid var(--table-border); padding:1px 1px; background:var(--table-bg); color:inherit; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;">' + (r.v4_val || '') + '</td>' +
                 '</tr>';
         });
 
@@ -1045,10 +1045,10 @@ var SPCApp = {
 
         // --- Main Data Rows: Cavities ---
         for (var i = 0; i < cavityCount; i++) {
-            html += '<tr><td style="border:1px solid var(--table-border); text-align:center; font-weight:bold; background:var(--table-label-bg);">X' + (i + 1) + '</td>';
+            html += '<tr><td style="border:1px solid var(--table-border); text-align:center; font-weight:bold; background:var(--table-label-bg); color:inherit;">X' + (i + 1) + '</td>';
             for (var j = 0; j < 25; j++) {
                 var val = (pageDataMatrix[j] && pageDataMatrix[j][i] !== undefined) ? pageDataMatrix[j][i] : null;
-                html += '<td style="border:1px solid var(--table-border); text-align:center; padding:0; overflow:hidden; white-space:nowrap; width:' + colWidths.batch + 'px; max-width:' + colWidths.batch + 'px; min-width:' + colWidths.batch + 'px;">' + (val !== null ? val : '') + '</td>';
+                html += '<td style="border:1px solid var(--table-border); text-align:center; padding:0; overflow:hidden; white-space:nowrap; background:var(--table-bg); color:inherit; width:' + colWidths.batch + 'px; max-width:' + colWidths.batch + 'px; min-width:' + colWidths.batch + 'px;">' + (val !== null ? val : '') + '</td>';
             }
 
             // Sidebar summary on first few rows
@@ -1062,19 +1062,19 @@ var SPCApp = {
 
         // --- Footer Rows: ΣX, X̄, R ---
         // ΣX Row
-        html += '<tr style="background:var(--table-header-bg);"><td style="border:1px solid var(--table-border); text-align:center; font-weight:bold;">ΣX</td>';
+        html += '<tr style="background:var(--table-header-bg); color:inherit;"><td style="border:1px solid var(--table-border); text-align:center; font-weight:bold;">ΣX</td>';
         for (var b = 0; b < 25; b++) {
             var val = '';
             if (pageDataMatrix[b]) {
                 var sum = pageDataMatrix[b].reduce(function (a, b) { return a + (b || 0); }, 0);
                 val = SPCEngine.round(sum, 4);
             }
-            html += '<td style="border:1px solid var(--table-border); text-align:center;">' + val + '</td>';
+            html += '<td style="border:1px solid var(--table-border); text-align:center; background:inherit; color:inherit;">' + val + '</td>';
         }
-        html += '<td colspan="4" style="border:1px solid var(--table-border);"></td></tr>';
+        html += '<td colspan="4" style="border:1px solid var(--table-border); background:inherit; color:inherit;"></td></tr>';
 
         // X̄ Row (with yellow highlighting)
-        html += '<tr style="background:var(--table-header-bg);"><td style="border:1px solid var(--table-border); text-align:center; font-weight:bold;">X̄</td>';
+        html += '<tr style="background:var(--table-header-bg); color:inherit;"><td style="border:1px solid var(--table-border); text-align:center; font-weight:bold;">X̄</td>';
         for (var k = 0; k < 25; k++) {
             var val = '', style = '';
             if (pageXbarR.xBar.data[k] !== undefined) {
@@ -1082,12 +1082,12 @@ var SPCApp = {
                 val = SPCEngine.round(v, 4);
                 if (v > pageXbarR.xBar.UCL || v < pageXbarR.xBar.LCL) style = 'background:var(--table-ooc-bg); color:var(--table-ooc-text);';
             }
-            html += '<td style="border:1px solid var(--table-border); text-align:center;' + style + '">' + val + '</td>';
+            html += '<td style="border:1px solid var(--table-border); text-align:center; ' + style + '">' + val + '</td>';
         }
-        html += '<td colspan="4" style="border:1px solid var(--table-border);"></td></tr>';
+        html += '<td colspan="4" style="border:1px solid var(--table-border); background:inherit; color:inherit;"></td></tr>';
 
         // R Row
-        html += '<tr style="background:var(--table-header-bg);"><td style="border:1px solid var(--table-border); text-align:center; font-weight:bold;">R</td>';
+        html += '<tr style="background:var(--table-header-bg); color:inherit;"><td style="border:1px solid var(--table-border); text-align:center; font-weight:bold;">R</td>';
         for (var k = 0; k < 25; k++) {
             var val = '', style = '';
             if (pageXbarR.R.data[k] !== undefined) {
@@ -1095,9 +1095,9 @@ var SPCApp = {
                 val = SPCEngine.round(v, 4);
                 if (v > pageXbarR.R.UCL) style = 'background:var(--table-ooc-bg); color:var(--table-ooc-text);';
             }
-            html += '<td style="border:1px solid var(--table-border); text-align:center;' + style + '">' + val + '</td>';
+            html += '<td style="border:1px solid var(--table-border); text-align:center; ' + style + '">' + val + '</td>';
         }
-        html += '<td colspan="4" style="border:1px solid var(--table-border);"></td></tr>';
+        html += '<td colspan="4" style="border:1px solid var(--table-border); background:inherit; color:inherit;"></td></tr>';
 
         html += '</table>';
         document.getElementById('detailedTableContainer').innerHTML = html;

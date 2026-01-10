@@ -314,6 +314,17 @@ var SPCApp = {
 
         if (viewId === 'history') this.renderHistoryView();
 
+        // Check for extracted QIP data when switching to import view
+        if ((viewId === 'import' || viewId === 'dashboard') && window.qipExtractedData) {
+            try {
+                this.loadExtractedData(window.qipExtractedData);
+                window.qipExtractedData = null; // Consume data
+            } catch (e) {
+                console.error('Failed to load extracted data', e);
+                alert('載入提取數據失敗: ' + e.message);
+            }
+        }
+
         document.querySelectorAll('#main-nav .nav-link').forEach(function (link) {
             link.className = 'nav-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800 transition-all';
         });
@@ -332,6 +343,61 @@ var SPCApp = {
             if (viewId === 'analysis' && this.analysisResults) side.classList.remove('hidden');
             else side.classList.add('hidden');
         }
+    },
+
+    // Convert QIP Extracted JSON to Virtual Workbook for SPC
+    loadExtractedData: function (extracted) {
+        console.log('Loading extracted data into SPC...', extracted);
+        var self = this;
+        var wb = XLSX.utils.book_new();
+
+        // Group by batch (sheet name)
+        var batches = {};
+        extracted.data.forEach(function (item) {
+            if (!batches[item.batch]) batches[item.batch] = [];
+            batches[item.batch].push(item);
+        });
+
+        // Create a sheet for each batch
+        Object.keys(batches).forEach(function (batchName) {
+            var items = batches[batchName];
+            // Sort by cavity ID (assuming numeric if possible)
+            items.sort(function (a, b) {
+                var na = parseFloat(a.cavity);
+                var nb = parseFloat(b.cavity);
+                if (!isNaN(na) && !isNaN(nb)) return na - nb;
+                return a.cavity.localeCompare(b.cavity);
+            });
+
+            // Construct AOA (Array of Arrays)
+            // Row 1: Headers (Cavity IDs)
+            // Row 2: Values
+            var headers = items.map(function (i) { return i.cavity; });
+            var values = items.map(function (i) { return i.value; });
+
+            // Add some metadata headers if standard logic expects specific row?
+            // Existing logic in DataInput parses headers (cavity ID) and data. 
+            // Usually assumes Layout: Cavity IDs in one row, Data in subsequent rows.
+            // Let's create a standard clean sheet.
+
+            var aoa = [headers, values];
+            var ws = XLSX.utils.aoa_to_sheet(aoa);
+            XLSX.utils.book_append_sheet(wb, ws, batchName);
+        });
+
+        this.workbook = wb;
+        this.renderItemList();
+
+        // Update UI state to show loaded
+        var fileInfo = document.getElementById('file-info');
+        var uploadArea = document.getElementById('upload-area');
+        if (fileInfo && uploadArea) {
+            fileInfo.classList.remove('hidden');
+            uploadArea.classList.add('hidden');
+            document.getElementById('filename').textContent = 'QIP_Extracted_' + (extracted.productCode || 'Data');
+        }
+
+        alert(this.t('提取數據已載入，共 ' + extracted.data.length + ' 筆。請選擇項目進行分析。', 'Extracted data loaded. Please select an item to analyze.'));
     },
 
     executeAnalysis: function (type) {

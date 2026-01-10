@@ -696,11 +696,6 @@ var SPCApp = {
             var labels = data.cavityStats.map(s => s.name);
             var cpkVal = data.cavityStats.map(s => s.Cpk);
 
-            // Cpk Chart with color coding and rules
-        } else if (data.type === 'cavity') {
-            var labels = data.cavityStats.map(s => s.name);
-            var cpkVal = data.cavityStats.map(s => s.Cpk);
-
             // 1. Cpk Comparison Chart (Matches VBA + Old Chart.js color scheme)
             var cpkOpt = {
                 chart: { type: 'bar', height: 350, toolbar: { show: false }, background: 'transparent' },

@@ -378,10 +378,42 @@ var QIPExtractApp = {
         var minCol = Math.min(c1, c2);
         var maxCol = Math.max(c1, c2);
 
+        // Auto-expand selection to include full merged cells
+        // Using SheetJS workbook if available, or we need to access the cached merge info
+        // Since we don't have easy access to ws here, we can infer from DOM or re-fetch
+        // Best way: use the current sheet from workbook
+        var sheetName = this.els.worksheetSelect.value;
+        if (sheetName && this.workbook) {
+            var ws = this.workbook.Sheets[sheetName];
+            var merges = ws['!merges'] || [];
+
+            var changed = true;
+            while (changed) {
+                changed = false;
+                for (var i = 0; i < merges.length; i++) {
+                    var m = merges[i];
+                    // Check if merge block overlaps with current selection
+                    // Overlap logic: not (m.e.c < minCol || m.s.c > maxCol || m.e.r < minRow || m.s.r > maxRow)
+                    if (!(m.e.c < minCol || m.s.c > maxCol || m.e.r < minRow || m.s.r > maxRow)) {
+                        // Check if we need to expand
+                        if (m.s.r < minRow) { minRow = m.s.r; changed = true; }
+                        if (m.e.r > maxRow) { maxRow = m.e.r; changed = true; }
+                        if (m.s.c < minCol) { minCol = m.s.c; changed = true; }
+                        if (m.e.c > maxCol) { maxCol = m.e.c; changed = true; }
+                    }
+                }
+            }
+        }
+
+        // Store the effective selection range for confirmation
+        this.selectionStart = { row: minRow, col: minCol };
+        this.selectionEnd = { row: maxRow, col: maxCol };
+
         var cells = this.els.previewContent.querySelectorAll('.qip-cell');
         cells.forEach(function (cell) {
             var r = parseInt(cell.dataset.row);
             var c = parseInt(cell.dataset.col);
+            // Check if cell is within range
             if (r >= minRow && r <= maxRow && c >= minCol && c <= maxCol) {
                 cell.classList.add('qip-selected');
             }
@@ -396,8 +428,26 @@ var QIPExtractApp = {
     },
 
     confirmRangeSelection: function (start, end) {
-        var startAddr = start.addr;
-        var endAddr = end.addr;
+        // Use the calculated expanded range from highlightRange if available
+        // otherwise fall back to raw start/end
+
+        var sRow, sCol, eRow, eCol;
+
+        if (this.selectionStart && this.selectionEnd) {
+            sRow = this.selectionStart.row;
+            sCol = this.selectionStart.col;
+            eRow = this.selectionEnd.row;
+            eCol = this.selectionEnd.col;
+        } else {
+            sRow = start.row;
+            sCol = start.col;
+            eRow = end.row;
+            eCol = end.col;
+        }
+
+        var startAddr = XLSX.utils.encode_cell({ r: sRow, c: sCol });
+        var endAddr = XLSX.utils.encode_cell({ r: eRow, c: eCol });
+
         var rangeStr = startAddr === endAddr ? startAddr : startAddr + ':' + endAddr;
 
         var input = document.getElementById(this.selectionTarget);
@@ -408,9 +458,13 @@ var QIPExtractApp = {
 
         this.selectionTarget = null;
         this.selectionType = null;
+        this.selectionStart = null;
+        this.selectionEnd = null;
+
         if (this.els.selectionModeIndic) {
             this.els.selectionModeIndic.classList.add('hidden');
         }
+        this.clearSelection();
     },
 
     switchSheet: function (offset) {

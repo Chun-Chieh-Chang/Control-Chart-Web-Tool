@@ -660,10 +660,10 @@ var SPCApp = {
         html += '<tr style="background:#e5e7eb; font-weight:bold;">' +
             '<td style="border:1px solid #000; text-align:center;">批號</td>';
         pageLabels.forEach(function (name) {
-            html += '<td style="border:1px solid #000; text-align:center; height:35px; overflow:hidden; font-size:10px; white-space:nowrap; text-overflow:ellipsis; width:' + colWidths.batch + 'px; max-width:' + colWidths.batch + 'px;">' + name + '</td>';
+            html += '<td style="border:1px solid #000; text-align:center; height:35px; overflow:hidden; font-size:10px; white-space:nowrap; text-overflow:ellipsis; width:' + colWidths.batch + 'px; max-width:' + colWidths.batch + 'px; min-width:' + colWidths.batch + 'px; padding:0;">' + name + '</td>';
         });
         // Fill empty if less than 25 batches
-        for (var f = pageLabels.length; f < 25; f++) html += '<td style="border:1px solid #000; width:' + colWidths.batch + 'px; max-width:' + colWidths.batch + 'px;"></td>';
+        for (var f = pageLabels.length; f < 25; f++) html += '<td style="border:1px solid #000; width:' + colWidths.batch + 'px; max-width:' + colWidths.batch + 'px; min-width:' + colWidths.batch + 'px;"></td>';
 
         html += '<td colspan="4" style="border:1px solid #000; text-align:center;">彙總</td></tr>';
 
@@ -672,7 +672,7 @@ var SPCApp = {
             html += '<tr><td style="border:1px solid #000; text-align:center; font-weight:bold;">X' + (i + 1) + '</td>';
             for (var j = 0; j < 25; j++) {
                 var val = (pageDataMatrix[j] && pageDataMatrix[j][i] !== undefined) ? pageDataMatrix[j][i] : null;
-                html += '<td style="border:1px solid #000; text-align:center;">' + (val !== null ? val : '') + '</td>';
+                html += '<td style="border:1px solid #000; text-align:center; padding:0; overflow:hidden; white-space:nowrap; width:' + colWidths.batch + 'px; max-width:' + colWidths.batch + 'px; min-width:' + colWidths.batch + 'px;">' + (val !== null ? val : '') + '</td>';
             }
 
             // Sidebar summary on first few rows

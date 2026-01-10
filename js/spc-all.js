@@ -704,67 +704,21 @@ var SPCApp = {
                 '</div>';
         }
 
-        // RE-ASSIGN FOR CAVITY (Previous block was group, wait... no)
-        // Actually, the previous tool call messed up the logic flow.
-        // It inserted "html = ..." inside the string concatenation of the previous block?
-        // Let's look at line 680-683. That looks like Group Table Header.
-        // But the code inserted is for Cavity?
-        // Ah, the user asked to "increase height" for both.
-        // The previous replace chunk 1 targeted lines 684. 
-        // Line 680-683 is `Min`, `Range`, `n` headers. This is GROUP table.
-        // Wait, line 684 was `</thead>`.
-        // My replacement chunk 1 replaced `</thead>...` with `html = ...`.
-        // This effectively broke the Group table string construction if it was inside the Group block.
-        // But wait, the replacement content starts with `html = '<div class="grid...`. 
-        // This implies it's starting a NEW assignment.
-        // If line 684 was inside the `else if (type === 'group')` block, then `html` is being reassigned?
-        // Let's check the context of line 680. "Min", "Range", "n". That is DEFINITELY Group table.
-        // So I was editing the GROUP table section, but I pasted the CAVITY table code?
-        // Yes! "Cpk Comparison" is Cavity stuff.
-        // I pasted Cavity HTML generation into the Group section. That's a logic error.
 
-        // I need to find where the Cavity section is and where the Group section is.
-        // Lines 690: `} else if (data.type === 'group') {`.
-        // So the block BEFORE 690 is Cavity?
 
-        // Let's Look at the file again.
-        // I need to see the `if (data.type === 'cavity')` block.
-        // I will read lines 600-800 to be sure.
+        // Detailed Table
 
-        // Cpk Comparison Chart
-        '<div class="bg-[#1e293b]/80 backdrop-blur-md rounded-2xl border border-white/10 p-6 shadow-xl">' +
-            '<h3 class="text-lg font-semibold text-white mb-6 pl-4 border-l-4 border-pink-500">' + this.t('Cpk 比較', 'Cpk Comparison') + '</h3>' +
-            '<div class="h-96"><canvas id="cpkChart"></canvas></div>' +
-            '</div>' +
 
-            // Mean Comparison Chart
-            '<div class="bg-[#1e293b]/80 backdrop-blur-md rounded-2xl border border-white/10 p-6 shadow-xl">' +
-            '<h3 class="text-lg font-semibold text-white mb-6 pl-4 border-l-4 border-blue-500">' + this.t('平均值比較', 'Mean Comparison') + '</h3>' +
-            '<div class="h-96"><canvas id="meanChart"></canvas></div>' +
-            '</div>' +
-
-            // Standard Deviation Comparison Chart
-            '<div class="bg-[#1e293b]/80 backdrop-blur-md rounded-2xl border border-white/10 p-6 shadow-xl">' +
-            '<h3 class="text-lg font-semibold text-white mb-6 pl-4 border-l-4 border-yellow-500">' + this.t('標準差比較 (Overall)', 'Standard Deviation Comparison (Overall)') + '</h3>' +
-            '<div class="h-96"><canvas id="stdDevChart"></canvas></div>' +
-            '</div>' +
-
-            // Detailed Table
-            '<div class="bg-[#1e293b]/80 backdrop-blur-md rounded-2xl border border-white/10 p-6 shadow-xl">' +
-            '<h3 class="text-lg font-semibold text-white mb-6 pl-4 border-l-4 border-indigo-500">' + this.t('模穴統計', 'Cavity Statistics') + '</h3>' +
-            '<div class="overflow-x-auto rounded-lg border border-gray-700">' +
+        '<div class="overflow-x-auto rounded-lg border border-gray-700">' +
             '<table class="w-full text-sm text-left">' +
             '<thead class="text-xs text-gray-400 uppercase bg-gray-800/50">' +
             '<tr>' +
-            '<th class="px-6 py-4 font-bold tracking-wider">Cavity</th>' +
-            '<th class="px-6 py-4 text-center">Mean</th>' +
-            '<th class="px-6 py-4 text-center">StdDev (within)</th>' +
-            '<th class="px-6 py-4 text-center">StdDev (overall)</th>' +
-            '<th class="px-6 py-4 text-center">Cp</th>' +
-            '<th class="px-6 py-4 text-center">Cpk</th>' +
-            '<th class="px-6 py-4 text-center">Pp</th>' +
-            '<th class="px-6 py-4 text-center">Ppk</th>' +
-            '<th class="px-6 py-4 text-center">Count</th>' +
+            '<th class="px-6 py-4 font-bold tracking-wider">Batch</th>' +
+            '<th class="px-6 py-4 text-right">Avg</th>' +
+            '<th class="px-6 py-4 text-right">Max</th>' +
+            '<th class="px-6 py-4 text-right">Min</th>' +
+            '<th class="px-6 py-4 text-right">Range</th>' +
+            '<th class="px-6 py-4 text-right">n</th>' +
             '</tr>' +
             '</thead>' +
             '<tbody class="divide-y divide-gray-700">' + rows + '</tbody>' +
@@ -772,63 +726,16 @@ var SPCApp = {
             '</div>' +
             '</div>' +
             '</div>';
-    } else if(data.type === 'group') {
-        var rows = '';
-for (var i = 0; i < data.groupStats.length; i++) {
-    var s = data.groupStats[i];
-    rows += '<tr class="border-b border-gray-700/50 hover:bg-white/5 transition-colors">' +
-        '<td class="px-6 py-4 font-medium text-white">' + s.batch + '</td>' +
-        '<td class="px-6 py-4 text-gray-300 font-mono text-right">' + SPCEngine.round(s.avg, 4) + '</td>' +
-        '<td class="px-6 py-4 text-gray-300 font-mono text-right">' + SPCEngine.round(s.max, 4) + '</td>' +
-        '<td class="px-6 py-4 text-gray-300 font-mono text-right">' + SPCEngine.round(s.min, 4) + '</td>' +
-        '<td class="px-6 py-4 text-gray-300 font-mono text-right">' + SPCEngine.round(s.range, 4) + '</td>' +
-        '<td class="px-6 py-4 text-gray-300 font-mono text-right">' + s.count + '</td>' +
-        '</tr>';
-}
-
-html = '<div class="grid grid-cols-1 gap-12">' +
-    // Min-Max-Avg Chart
-    '<div class="bg-[#1e293b]/80 backdrop-blur-md rounded-2xl border border-white/10 p-6 shadow-xl">' +
-    '<h3 class="text-lg font-semibold text-white mb-6 pl-4 border-l-4 border-green-500">' + this.t('Min-Max-Avg 圖', 'Min-Max-Avg Chart') + '</h3>' +
-    '<div class="h-96"><canvas id="groupChart"></canvas></div>' +
-    '</div>' +
-
-    // Variation (Range) Chart
-    '<div class="bg-[#1e293b]/80 backdrop-blur-md rounded-2xl border border-white/10 p-6 shadow-xl">' +
-    '<h3 class="text-lg font-semibold text-white mb-6 pl-4 border-l-4 border-orange-500">' + this.t('模穴間變異圖 (Range)', 'Variation Between Cavities (Range)') + '</h3>' +
-    '<div class="h-96"><canvas id="groupVarChart"></canvas></div>' +
-    '</div>' +
-
-    // Detailed Table
-    '<div class="bg-[#1e293b]/80 backdrop-blur-md rounded-2xl border border-white/10 p-6 shadow-xl">' +
-    '<h3 class="text-lg font-semibold text-white mb-6 pl-4 border-l-4 border-indigo-500">' + this.t('群組統計', 'Group Statistics') + '</h3>' +
-    '<div class="overflow-x-auto rounded-lg border border-gray-700">' +
-    '<table class="w-full text-sm text-left">' +
-    '<thead class="text-xs text-gray-400 uppercase bg-gray-800/50">' +
-    '<tr>' +
-    '<th class="px-6 py-4 font-bold tracking-wider">Batch</th>' +
-    '<th class="px-6 py-4 text-right">Avg</th>' +
-    '<th class="px-6 py-4 text-right">Max</th>' +
-    '<th class="px-6 py-4 text-right">Min</th>' +
-    '<th class="px-6 py-4 text-right">Range</th>' +
-    '<th class="px-6 py-4 text-right">n</th>' +
-    '</tr>' +
-    '</thead>' +
-    '<tbody class="divide-y divide-gray-700">' + rows + '</tbody>' +
-    '</table>' +
-    '</div>' +
-    '</div>' +
-    '</div>';
-        }
+    }
 
 resultsContent.innerHTML = html;
-document.getElementById('results').style.display = 'block';
+    document.getElementById('results').style.display = 'block';
 
-// Setup pagination event listeners
-if (data.type === 'batch' && this.batchPagination.totalPages > 1) {
-    document.getElementById('prevPageBtn').addEventListener('click', function () { self.changeBatchPage(-1); });
-    document.getElementById('nextPageBtn').addEventListener('click', function () { self.changeBatchPage(1); });
-    this.updatePaginationButtons();
+    // Setup pagination event listeners
+    if(data.type === 'batch' && this.batchPagination.totalPages > 1) {
+        document.getElementById('prevPageBtn').addEventListener('click', function () { self.changeBatchPage(-1); });
+document.getElementById('nextPageBtn').addEventListener('click', function () { self.changeBatchPage(1); });
+this.updatePaginationButtons();
 }
 
 setTimeout(function () { self.renderCharts(); document.getElementById('results').scrollIntoView({ behavior: 'smooth' }); }, 100);

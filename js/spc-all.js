@@ -616,11 +616,11 @@ var SPCApp = {
         // Total 30 virtual columns: 1 (Labels) + 25 (Batches) + 4 (Summary Sidebar)
         var html = '<table class="excel-table" style="width:max-content; border-collapse:collapse; font-size:10px; font-family:sans-serif; border:2px solid #000; table-layout:fixed;">';
 
-        // Fixed Widths: Label 60px, Batch 150px, Summary 80px
+        // Fixed Widths: Label 60px, Batch 120px, Summary 150px
         html += '<colgroup>';
         html += '<col style="width:60px;">';
-        for (var c = 0; c < 25; c++) html += '<col style="width:150px;">';
-        html += '<col style="width:80px;"><col style="width:80px;"><col style="width:80px;"><col style="width:80px;">';
+        for (var c = 0; c < 25; c++) html += '<col style="width:120px;">';
+        html += '<col style="width:150px;"><col style="width:150px;"><col style="width:150px;"><col style="width:150px;">';
         html += '</colgroup>';
 
 

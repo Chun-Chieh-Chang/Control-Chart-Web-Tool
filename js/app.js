@@ -261,10 +261,27 @@ var SPCApp = {
             try {
                 var data = new Uint8Array(e.target.result);
                 self.workbook = XLSX.read(data, { type: 'array' });
-                document.getElementById('uploadZone').style.display = 'none';
-                document.getElementById('fileInfo').style.display = 'flex';
-                document.getElementById('fileName').textContent = file.name;
+
+                // UI Updates
+                var uploadZone = document.getElementById('uploadZone');
+                var fileInfo = document.getElementById('fileInfo');
+                if (uploadZone) uploadZone.style.display = 'none';
+                if (fileInfo) fileInfo.style.display = 'flex';
+
+                var fileNameEl = document.getElementById('fileName');
+                if (fileNameEl) fileNameEl.textContent = file.name;
+
+                var sheetCount = self.workbook.SheetNames.length;
+                var fileMetaEl = document.getElementById('fileMeta');
+                if (fileMetaEl) fileMetaEl.textContent = sheetCount + ' Inspection items detected';
+
                 self.showInspectionItems();
+
+                // Show preview of the first sheet
+                if (sheetCount > 0) {
+                    self.renderDataPreview(self.workbook.SheetNames[0]);
+                }
+
                 self.hideLoading();
             } catch (error) {
                 self.hideLoading();
@@ -272,6 +289,43 @@ var SPCApp = {
             }
         };
         reader.readAsArrayBuffer(file);
+    },
+
+    renderDataPreview: function (sheetName) {
+        var previewSection = document.getElementById('dataPreviewSection');
+        var header = document.getElementById('previewHeader');
+        var body = document.getElementById('previewBody');
+        if (!previewSection || !header || !body) return;
+
+        previewSection.style.display = 'block';
+        header.innerHTML = '';
+        body.innerHTML = '';
+
+        var ws = this.workbook.Sheets[sheetName];
+        var data = XLSX.utils.sheet_to_json(ws, { header: 1 });
+        if (data.length === 0) return;
+
+        // Render Header
+        var firstRow = data[0] || [];
+        firstRow.forEach(function (col) {
+            var th = document.createElement('th');
+            th.className = 'px-4 py-3 bg-slate-50 dark:bg-slate-800/80';
+            th.textContent = col || '-';
+            header.appendChild(th);
+        });
+
+        // Render Rows (Max 5)
+        for (var i = 1; i < Math.min(data.length, 6); i++) {
+            var tr = document.createElement('tr');
+            tr.className = 'divide-x divide-slate-50 dark:divide-slate-800';
+            data[i].forEach(function (val) {
+                var td = document.createElement('td');
+                td.className = 'px-4 py-2 dark:text-slate-400';
+                td.textContent = (val !== null && val !== undefined) ? val : '';
+                tr.appendChild(td);
+            });
+            body.appendChild(tr);
+        }
     },
 
     showInspectionItems: function () {
@@ -284,28 +338,42 @@ var SPCApp = {
         sheets.forEach(function (sheetName) {
             var ws = self.workbook.Sheets[sheetName];
             var data = XLSX.utils.sheet_to_json(ws, { header: 1 });
-            var target = data[1] && data[1][1] ? data[1][1] : 'N/A';
+
+            // Try to find Specs and target from typical SPC format
+            var target = 'N/A';
+            var sampleCount = 0;
+            if (data.length > 1) {
+                target = data[1] && data[1][1] ? data[1][1] : 'N/A';
+                sampleCount = data.length - 1;
+            }
 
             var card = document.createElement('div');
-            card.className = 'saas-card p-6 cursor-pointer hover:border-primary hover:shadow-xl hover:shadow-indigo-50 dark:hover:shadow-none transition-all group relative overflow-hidden';
+            card.className = 'saas-card p-6 cursor-pointer hover:border-indigo-400 hover:bg-indigo-50/20 dark:hover:bg-indigo-900/10 transition-all group relative overflow-hidden active:scale-95';
             card.innerHTML =
                 '<div class="relative z-10">' +
                 '<div class="flex justify-between items-start mb-4">' +
-                '<h3 class="text-base font-bold text-slate-900 dark:text-white group-hover:text-primary transition-colors">' + sheetName + '</h3>' +
-                '<span class="material-icons-outlined text-slate-400 group-hover:text-primary transition-colors">check_circle_outline</span>' +
+                '<div class="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-700 flex items-center justify-center group-hover:bg-indigo-600 group-hover:text-white transition-all">' +
+                '<span class="material-icons-outlined text-sm">precision_manufacturing</span>' +
                 '</div>' +
-                '<div class="flex flex-col space-y-2">' +
-                '<div class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">' + self.t('目標值', 'Target Value') + '</div>' +
-                '<div class="text-sm font-mono font-bold text-slate-700 dark:text-slate-300">' + target + '</div>' +
+                '<span class="material-icons-outlined text-slate-200 group-hover:text-indigo-400 transition-colors">check_circle</span>' +
+                '</div>' +
+                '<div>' +
+                '<h3 class="text-sm font-bold text-slate-900 dark:text-white truncate mb-4">' + sheetName + '</h3>' +
+                '<div class="grid grid-cols-2 gap-2">' +
+                '<div><p class="text-[9px] text-slate-400 uppercase font-bold">' + self.t('目標值', 'Target') + '</p><p class="text-xs font-mono font-bold text-slate-600 dark:text-slate-300">' + target + '</p></div>' +
+                '<div><p class="text-[9px] text-slate-400 uppercase font-bold">' + self.t('樣本數', 'Samples') + '</p><p class="text-xs font-mono font-bold text-slate-600 dark:text-slate-300">' + sampleCount + '</p></div>' +
                 '</div>' +
                 '</div>' +
-                '<div class="absolute -right-2 -bottom-2 opacity-[0.05] group-hover:opacity-[0.1] transition-opacity">' +
-                '<span class="material-icons-outlined text-7xl">table_view</span>' +
                 '</div>';
 
             card.dataset.sheet = sheetName;
             card.addEventListener('click', function () {
+                // Update active state
+                document.querySelectorAll('#itemList .saas-card').forEach(c => c.classList.remove('border-indigo-500', 'bg-indigo-50/50', 'ring-2', 'ring-indigo-100'));
+                this.classList.add('border-indigo-500', 'bg-indigo-50/50', 'ring-2', 'ring-indigo-100');
+
                 self.selectedItem = this.dataset.sheet;
+                self.renderDataPreview(this.dataset.sheet);
                 self.showAnalysisOptions();
             });
             itemList.appendChild(card);
@@ -450,6 +518,8 @@ var SPCApp = {
 
     // Convert QIP Extracted JSON to Virtual Workbook for SPC
     // Updated to use the professional ExcelExporter which matches VBA format
+    // Convert QIP Extracted JSON to Virtual Workbook for SPC
+    // Updated to use the professional ExcelExporter which matches VBA format
     loadExtractedData: function (results) {
         console.log('Loading extracted data into SPC...', results);
 
@@ -466,20 +536,27 @@ var SPCApp = {
             // Set the workbook for SPC analysis
             this.workbook = exporter.workbook;
 
-            // Trigger UI update
-            this.showInspectionItems();
-
             // Update UI state to show loaded
             var fileInfo = document.getElementById('fileInfo');
             var uploadZone = document.getElementById('uploadZone');
+            var dataPreview = document.getElementById('dataPreviewSection');
+
             if (fileInfo && uploadZone) {
                 fileInfo.style.display = 'flex';
                 uploadZone.style.display = 'none';
-                document.getElementById('fileName').textContent = 'QIP_Extracted_' + (results.productCode || 'Data');
+                document.getElementById('fileName').textContent = (results.productInfo.productName || 'QIP_Extracted') + ' (' + (results.productCode || 'Data') + ')';
+                var meta = document.getElementById('fileMeta');
+                if (meta) meta.textContent = results.itemCount + ' items extracted. Effective batches: ' + results.totalBatches;
             }
 
-            alert(this.t('提取數據已載入，共 ' + results.itemCount + ' 個項目。請選擇項目進行分析。',
-                'Extracted data loaded. ' + results.itemCount + ' items found. Please select an item to analyze.'));
+            // Trigger UI update
+            this.showInspectionItems();
+
+            // Show preview of the first item
+            if (this.workbook.SheetNames.length > 0) {
+                this.renderDataPreview(this.workbook.SheetNames[0]);
+            }
+
         } catch (e) {
             console.error('Failed to load extracted data', e);
             throw e;
@@ -1083,9 +1160,11 @@ var SPCApp = {
         this.chartInstances.forEach(c => { if (c.destroy) c.destroy(); });
         this.chartInstances = [];
         document.getElementById('fileInput').value = '';
-        document.getElementById('uploadZone').style.display = 'block';
-        document.getElementById('fileInfo').style.display = 'none';
-        ['step2', 'step3', 'results'].forEach(id => { var el = document.getElementById(id); if (el) el.style.display = 'none'; });
+        var uploadZone = document.getElementById('uploadZone');
+        if (uploadZone) uploadZone.style.display = 'block';
+        var fileInfo = document.getElementById('fileInfo');
+        if (fileInfo) fileInfo.style.display = 'none';
+        ['step2', 'step3', 'results', 'dataPreviewSection'].forEach(id => { var el = document.getElementById(id); if (el) el.style.display = 'none'; });
         window.scrollTo({ top: 0, behavior: 'smooth' });
     },
 

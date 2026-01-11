@@ -185,7 +185,7 @@ var QIPExtractApp = {
                 '<div class="flex items-center justify-between border-b border-slate-50 dark:border-slate-700/50 pb-2">' +
                 '<div class="text-sm font-bold text-slate-400 uppercase tracking-widest">Cavities ' + start + '-' + end + '</div>' +
                 (i > 1 ? '<div class="flex items-center gap-2 font-mono"><span class="text-sm text-slate-400">OFFSET:</span>' +
-                    '<input type="number" id="qip-offset-' + i + '" class="w-12 px-2 py-0.5 bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-700 rounded-lg text-sm font-bold text-indigo-500 text-center focus:outline-indigo-500" value="1" min="1" max="10"></div>' : '') +
+                    '<input type="number" id="qip-offset-' + i + '" class="w-16 px-1.5 py-0.5 bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-700 rounded-lg text-sm font-bold text-indigo-500 text-center focus:outline-indigo-500" value="1" min="1" max="100"></div>' : '') +
                 '</div>' +
 
                 '<div class="grid grid-cols-1 gap-3">' +

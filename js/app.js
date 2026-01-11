@@ -994,7 +994,7 @@ var SPCApp = {
                             ranges: [
                                 { from: 0, to: 0.999, color: '#ef4444' },
                                 { from: 1.0, to: (this.settings.cpkThreshold - 0.001), color: '#f59e0b' },
-                                { from: this.settings.cpkThreshold, to: 99, color: '#10b981' }
+                                { from: this.settings.cpkThreshold, to: 99, color: '#38bdf8' }
                             ]
                         }
                     }

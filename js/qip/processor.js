@@ -219,20 +219,28 @@ class QIPProcessor {
                 allCavities: new Set(),
                 specification: null
             };
+            console.log(`[QIP] 新增檢驗項目: ${inspectionItem}`);
         }
 
         const item = this.results.inspectionItems[inspectionItem];
+        const cavityIds = Object.keys(data);
 
         // 如果批次已存在，合併數據
         if (item.batches[batchName]) {
+            const existingCavities = Object.keys(item.batches[batchName]);
             Object.assign(item.batches[batchName], data);
+            const mergedCavities = Object.keys(item.batches[batchName]);
+            console.log(`[QIP] 合併數據 - 項目: ${inspectionItem}, 批次: ${batchName}`);
+            console.log(`  ├─ 現有穴號: [${existingCavities.join(', ')}]`);
+            console.log(`  ├─ 新增穴號: [${cavityIds.join(', ')}]`);
+            console.log(`  └─ 合併後總穴數: ${mergedCavities.length} (穴號: [${mergedCavities.sort((a, b) => parseInt(a) - parseInt(b)).join(', ')}])`);
         } else {
             item.batches[batchName] = { ...data };
-            this.results.totalBatches++;
+            console.log(`[QIP] 新增批次 - 項目: ${inspectionItem}, 批次: ${batchName}, 穴號: [${cavityIds.join(', ')}]`);
         }
 
         // 記錄所有穴號
-        for (const cavityId of Object.keys(data)) {
+        for (const cavityId of cavityIds) {
             item.allCavities.add(cavityId);
         }
 
@@ -323,11 +331,25 @@ class QIPProcessor {
      * @returns {Object}
      */
     getResults() {
+        // 計算實際的唯一批次數（從所有檢驗項目中收集所有唯一批次名稱）
+        const allUniqueBatches = new Set();
+        for (const itemName of Object.keys(this.results.inspectionItems)) {
+            const item = this.results.inspectionItems[itemName];
+            for (const batchName of Object.keys(item.batches)) {
+                allUniqueBatches.add(batchName);
+            }
+        }
+        const actualTotalBatches = allUniqueBatches.size;
+
+        console.log(`[QIP] 處理結果統計:`);
+        console.log(`  ├─ 檢驗項目數: ${Object.keys(this.results.inspectionItems).length}`);
+        console.log(`  ├─ 總批次數: ${actualTotalBatches}`);
+        console.log(`  ├─ 最大穴數: ${this.results.totalCavities}`);
+        console.log(`  └─ 處理工作表數: ${this.results.processedSheets}`);
+
         return {
             inspectionItems: this.results.inspectionItems,
-            totalBatches: this.results.totalBatches,
-            totalCavities: this.results.totalCavities,
-            totalBatches: this.results.totalBatches,
+            totalBatches: actualTotalBatches,
             totalCavities: this.results.totalCavities,
             processedSheets: this.results.processedSheets,
             productInfo: this.results.productInfo,

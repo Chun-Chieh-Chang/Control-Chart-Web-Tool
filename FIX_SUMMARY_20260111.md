@@ -46,3 +46,6 @@
 ## 下一步建議
 - 建議使用者刷新瀏覽器緩存 (Ctrl+F5) 以確保加載最新的 JavaScript 文件。
 - 使用實際的 QIP 報表進行端到端測試，驗證提取的 USL/LSL 數值是否與 Excel 顯示一致。
+
+## �̲ת��A�T�{ (Final Verification)
+- �Ҧ��״_�N�X�w�� 2026-01-11 17:46 �T�{�ô���C

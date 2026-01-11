@@ -640,8 +640,13 @@ var QIPExtractApp = {
 
 
     showResults: function (results) {
-        this.els.progressBar.style.width = '100%';
-        this.els.progressText.textContent = 'Extraction Complete';
+        var self = this;
+        // 使用 setTimeout 確保這是在任何懸掛的進度更新之後執行
+        setTimeout(function () {
+            if (self.els.progressBar) self.els.progressBar.style.width = '100%';
+            if (self.els.progressText) self.els.progressText.textContent = 'Extraction Complete';
+        }, 100);
+
         this.els.resultSection.classList.remove('hidden');
 
         var summary = '<div class="space-y-3">' +

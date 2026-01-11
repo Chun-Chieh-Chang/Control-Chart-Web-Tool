@@ -1162,7 +1162,119 @@
                 </div>
             </div>
 
-            <!-- Other views placeholders -->
+            <!-- View: Settings (New) -->
+            <div id="view-settings" class="p-8 max-w-5xl mx-auto space-y-12 hidden">
+                <header class="flex items-center gap-4 mb-8">
+                    <div
+                        class="w-12 h-12 rounded-2xl bg-slate-800 text-white flex items-center justify-center shadow-lg">
+                        <span class="material-icons-outlined text-2xl">settings</span>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-bold text-slate-900 dark:text-white" data-en="System Settings"
+                            data-zh="系統設定管理">系統設定管理</h2>
+                        <p class="text-sm text-slate-500 dark:text-slate-400">Manage your preferences, data backups, and
+                            saved configurations.</p>
+                    </div>
+                </header>
+
+                <!-- Section: Backup & Migration -->
+                <section class="space-y-6">
+                    <div class="flex items-center gap-2 text-indigo-600 dark:text-indigo-400">
+                        <span class="material-icons-outlined">backup</span>
+                        <h3 class="text-lg font-bold uppercase tracking-wider">數據備份與遷移</h3>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="saas-card p-6 border-l-4 border-l-indigo-500">
+                            <h4 class="font-bold mb-2">匯出 QIP 配置檔</h4>
+                            <p class="text-sm text-slate-500 mb-6">將所有已儲存的 QIP 提取參數（Layouts）匯出為 JSON 檔案，以便在其他裝置上還原。</p>
+                            <button id="exportConfigsBtn"
+                                class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-bold shadow-lg shadow-indigo-100 flex items-center gap-2 transition-all active:scale-95">
+                                <span class="material-icons-outlined">download</span>
+                                立即匯出備份
+                            </button>
+                        </div>
+                        <div class="saas-card p-6 border-l-4 border-l-emerald-500">
+                            <h4 class="font-bold mb-2">匯入 QIP 配置檔</h4>
+                            <p class="text-sm text-slate-500 mb-6">選擇先前備份的 JSON 檔案來恢復您的 QIP 提取參數清單。這將會合併現有數據。</p>
+                            <div class="flex items-center gap-3">
+                                <button onclick="document.getElementById('importConfigsInput').click()"
+                                    class="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-sm font-bold shadow-lg shadow-emerald-100 flex items-center gap-2 transition-all active:scale-95">
+                                    <span class="material-icons-outlined">upload_file</span>
+                                    讀取備份檔
+                                </button>
+                                <input type="file" id="importConfigsInput" accept=".json" class="hidden">
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Section: Saved Layouts Management -->
+                <section class="space-y-6">
+                    <div class="flex items-center gap-2 text-amber-600 dark:text-amber-400">
+                        <span class="material-icons-outlined">inventory_2</span>
+                        <h3 class="text-lg font-bold uppercase tracking-wider">QIP 提取清單管理</h3>
+                    </div>
+                    <div class="saas-card overflow-hidden">
+                        <table class="w-full text-sm text-left">
+                            <thead
+                                class="bg-slate-50 dark:bg-slate-800/50 text-slate-500 uppercase font-bold text-[11px] tracking-widest">
+                                <tr>
+                                    <th class="px-6 py-4">配置名稱</th>
+                                    <th class="px-6 py-4">穴數</th>
+                                    <th class="px-6 py-4">儲存日期</th>
+                                    <th class="px-6 py-4 text-right">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="settings-config-list" class="divide-y divide-slate-100 dark:divide-slate-800">
+                                <!-- JS injected rows -->
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- Section: Appearance & Defaults -->
+                <section class="space-y-6">
+                    <div class="flex items-center gap-2 text-slate-600 dark:text-slate-400">
+                        <span class="material-icons-outlined">tune</span>
+                        <h3 class="text-lg font-bold uppercase tracking-wider">個人化與預設值</h3>
+                    </div>
+                    <div class="saas-card p-6 grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div class="space-y-2">
+                            <label class="block text-sm font-bold text-slate-700 dark:text-slate-200">系統主要語言</label>
+                            <select id="setting-lang"
+                                class="w-full px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-sm">
+                                <option value="zh">繁體中文 (Traditional Chinese)</option>
+                                <option value="en">English (US)</option>
+                            </select>
+                        </div>
+                        <div class="space-y-2">
+                            <label class="block text-sm font-bold text-slate-700 dark:text-slate-200">Cpk 預警門檻</label>
+                            <div class="flex items-center gap-3">
+                                <input type="number" id="setting-cpk-warn" step="0.01"
+                                    class="w-full px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-sm"
+                                    value="1.33">
+                                <span class="text-xs text-slate-400 font-bold">預設 1.33</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Clear Data -->
+                <section class="pt-10 border-t border-slate-200 dark:border-slate-800">
+                    <div
+                        class="bg-rose-50 dark:bg-rose-900/10 border border-rose-100 dark:border-rose-900/20 rounded-2xl p-6 flex flex-col md:flex-row items-center justify-between gap-6">
+                        <div>
+                            <h4 class="font-bold text-rose-600 dark:text-rose-400 mb-1">清除快取數據</h4>
+                            <p class="text-sm text-slate-500 dark:text-slate-400">這將刪除所有歷史紀錄與 QIP 配置，操作無法復原。建議先匯出備份。</p>
+                        </div>
+                        <button onclick="SPCApp.resetSystem()"
+                            class="px-6 py-2.5 bg-rose-500 hover:bg-rose-600 text-white rounded-xl text-sm font-bold transition-all flex items-center gap-2">
+                            <span class="material-icons-outlined">delete_forever</span>
+                            立即清除所有數據
+                        </button>
+                    </div>
+                </section>
+            </div>
         </main>
     </div>
 

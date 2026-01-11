@@ -20,8 +20,13 @@ var SPCApp = {
         7: { m: "分層現象：多模穴流動平衡不佳。", q: "數據過於集中 (Hugging Center)，可能變異數估算錯誤。" },
         8: { m: "混合分佈：兩台機器混料或雙模穴差異大。", q: "雙峰分佈 (Mixture)，避開了中心區域。" }
     },
+    settings: {
+        cpkThreshold: 1.33,
+        autoSave: true
+    },
 
     init: function () {
+        this.loadSettings();
         this.setupLanguageToggle();
         this.setupFileUpload();
         this.setupEventListeners();
@@ -470,11 +475,11 @@ var SPCApp = {
             'history': 'view-history',
             'qip-extract': 'view-qip-extract',
             'nelson': 'view-nelson',
-            'settings': 'view-import'
+            'settings': 'view-settings'
         };
         var targetId = viewMap[viewId] || 'view-import';
 
-        ['view-dashboard', 'view-import', 'view-analysis', 'view-history', 'view-qip-extract', 'view-nelson'].forEach(function (id) {
+        ['view-dashboard', 'view-import', 'view-analysis', 'view-history', 'view-qip-extract', 'view-nelson', 'view-settings'].forEach(function (id) {
             var el = document.getElementById(id);
             if (el) el.classList.add('hidden');
         });
@@ -484,6 +489,7 @@ var SPCApp = {
 
         if (viewId === 'dashboard') this.renderDashboard();
         if (viewId === 'history') this.renderHistoryView();
+        if (viewId === 'settings') this.renderSettings();
 
         // Check for extracted QIP data when switching to import view
         if ((viewId === 'import' || viewId === 'dashboard') && window.qipExtractedData) {
@@ -901,10 +907,9 @@ var SPCApp = {
                         borderRadius: 4,
                         colors: {
                             ranges: [
-                                { from: 0, to: 0.999, color: '#ef4444' },     // Red-500 < 1.0
-                                { from: 1.0, to: 1.329, color: '#f59e0b' },   // Amber-500 1.0 - 1.33
-                                { from: 1.33, to: 1.669, color: '#10b981' },  // Emerald-500 1.33 - 1.67
-                                { from: 1.67, to: 99, color: '#10b981' }      // Emerald-500 > 1.67
+                                { from: 0, to: 0.999, color: '#ef4444' },
+                                { from: 1.0, to: (this.settings.cpkThreshold - 0.001), color: '#f59e0b' },
+                                { from: this.settings.cpkThreshold, to: 99, color: '#10b981' }
                             ]
                         }
                     }
@@ -913,8 +918,7 @@ var SPCApp = {
                 annotations: {
                     yaxis: [
                         { y: 1.0, borderColor: '#f59e0b', strokeDashArray: 4, label: { text: '1.0' } },
-                        { y: 1.33, borderColor: '#10b981', strokeDashArray: 4, label: { text: '1.33' } },
-                        { y: 1.67, borderColor: '#10b981', strokeDashArray: 4, label: { text: '1.67' } }
+                        { y: this.settings.cpkThreshold, borderColor: '#10b981', strokeDashArray: 4, strokeWidth: 2, label: { text: 'Target: ' + this.settings.cpkThreshold, style: { background: '#10b981', color: '#fff' } } }
                     ]
                 }
             };
@@ -1153,6 +1157,138 @@ var SPCApp = {
 
             list.appendChild(card);
         });
+    },
+
+    // --- Settings View Logic ---
+    renderSettings: function () {
+        var self = this;
+        var configList = document.getElementById('settings-config-list');
+        var configs = JSON.parse(localStorage.getItem('qip_configs') || '[]');
+
+        configList.innerHTML = configs.length === 0 ?
+            '<tr><td colspan="4" class="px-6 py-8 text-center text-slate-400 italic">尚未儲存任何 QIP 提取配置</td></tr>' : '';
+
+        configs.forEach(function (config, index) {
+            var row = document.createElement('tr');
+            row.className = 'hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors';
+            var date = config.savedAt ? new Date(config.savedAt).toLocaleDateString() : 'N/A';
+
+            row.innerHTML = `
+                <td class="px-6 py-4 font-bold text-slate-700 dark:text-slate-300">${config.name}</td>
+                <td class="px-6 py-4 text-slate-500">${config.cavityCount}</td>
+                <td class="px-6 py-4 text-slate-500">${date}</td>
+                <td class="px-6 py-4 text-right">
+                    <button class="delete-config-btn p-2 text-slate-300 hover:text-rose-500 transition-colors" data-index="${index}">
+                        <span class="material-icons-outlined">delete</span>
+                    </button>
+                </td>
+            `;
+            configList.appendChild(row);
+        });
+
+        // Event: Delete Config
+        configList.querySelectorAll('.delete-config-btn').forEach(btn => {
+            btn.addEventListener('click', function () {
+                if (confirm('確定要刪除此配置嗎？')) {
+                    var idx = parseInt(this.dataset.index);
+                    configs.splice(idx, 1);
+                    localStorage.setItem('qip_configs', JSON.stringify(configs));
+                    self.renderSettings();
+                }
+            });
+        });
+
+        // Setup Buttons (Idempotent check)
+        var exportBtn = document.getElementById('exportConfigsBtn');
+        if (exportBtn && !exportBtn.dataset.bound) {
+            exportBtn.dataset.bound = "true";
+            exportBtn.addEventListener('click', function () { self.exportConfigurations(); });
+        }
+
+        var importInput = document.getElementById('importConfigsInput');
+        if (importInput && !importInput.dataset.bound) {
+            importInput.dataset.bound = "true";
+            importInput.addEventListener('change', function (e) { self.importConfigurations(e); });
+        }
+
+        // Language setting sync
+        var langSelect = document.getElementById('setting-lang');
+        if (langSelect) {
+            langSelect.value = this.currentLanguage;
+            langSelect.onchange = function () {
+                self.currentLanguage = this.value;
+                self.updateLanguage();
+                var langText = document.getElementById('langText');
+                if (langText) langText.textContent = self.currentLanguage === 'zh' ? 'EN' : '中文';
+            };
+        }
+
+        // Cpk Threshold sync
+        var cpkInput = document.getElementById('setting-cpk-warn');
+        if (cpkInput) {
+            cpkInput.value = this.settings.cpkThreshold;
+            cpkInput.onchange = function () {
+                self.settings.cpkThreshold = parseFloat(this.value) || 1.33;
+                self.saveSettings();
+            };
+        }
+    },
+
+    saveSettings: function () {
+        localStorage.setItem('spc_settings', JSON.stringify(this.settings));
+    },
+
+    loadSettings: function () {
+        var saved = localStorage.getItem('spc_settings');
+        if (saved) {
+            this.settings = Object.assign(this.settings, JSON.parse(saved));
+        }
+    },
+
+    exportConfigurations: function () {
+        var configs = localStorage.getItem('qip_configs') || '[]';
+        var blob = new Blob([configs], { type: 'application/json' });
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement('a');
+        a.href = url;
+        var date = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+        a.download = `SPC_QIP_Configs_Backup_${date}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    },
+
+    importConfigurations: function (event) {
+        var self = this;
+        var file = event.target.files[0];
+        if (!file) return;
+
+        var reader = new FileReader();
+        reader.onload = function (e) {
+            try {
+                var imported = JSON.parse(e.target.result);
+                if (!Array.isArray(imported)) throw new Error('Invalid format');
+
+                var existing = JSON.parse(localStorage.getItem('qip_configs') || '[]');
+                // Simple merge: avoid duplicates by name
+                var merged = [...existing];
+                imported.forEach(imp => {
+                    if (!merged.find(m => m.name === imp.name)) {
+                        merged.push(imp);
+                    }
+                });
+
+                localStorage.setItem('qip_configs', JSON.stringify(merged));
+                alert(`成功讀取！已匯入 ${imported.length} 組配置。`);
+                self.renderSettings();
+                event.target.value = ''; // Reset input
+            } catch (err) {
+                alert('讀取失敗：檔案格式不正確');
+                console.error(err);
+            }
+        };
+        reader.readAsText(file);
     },
 
     resetApp: function () {

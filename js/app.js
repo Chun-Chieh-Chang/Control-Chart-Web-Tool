@@ -360,69 +360,41 @@ var SPCApp = {
     },
 
     // Convert QIP Extracted JSON to Virtual Workbook for SPC
-    // Updated to match DataInput standard format (Header row with metadata, Spec row, Data rows)
-    loadExtractedData: function (extracted) {
-        console.log('Loading extracted data into SPC...', extracted);
-        var self = this;
-        var wb = XLSX.utils.book_new();
+    // Updated to use the professional ExcelExporter which matches VBA format
+    loadExtractedData: function (results) {
+        console.log('Loading extracted data into SPC...', results);
 
-        // Group by batch (sheet name)
-        var batches = {};
-        extracted.data.forEach(function (item) {
-            if (!batches[item.batch]) batches[item.batch] = [];
-            batches[item.batch].push(item);
-        });
-
-        // Create a sheet for each batch
-        Object.keys(batches).forEach(function (batchName) {
-            var items = batches[batchName];
-            // Sort by cavity ID
-            items.sort(function (a, b) {
-                var na = parseFloat(a.cavity);
-                var nb = parseFloat(b.cavity);
-                if (!isNaN(na) && !isNaN(nb)) return na - nb;
-                return a.cavity.localeCompare(b.cavity);
-            });
-
-            // 1. Prepare Headers (Row 1)
-            // Format: [BatchName, ProductName, ItemName, Cavity1穴, Cavity2穴...]
-            // DataInput expects '穴' in cavity headers
-            var cavityHeaders = items.map(function (i) { return i.cavity + '穴'; });
-            var row1 = ['Batch No.', extracted.productCode || 'QIP-Product', 'QIP-Data'].concat(cavityHeaders);
-
-            // 2. Prepare Specs (Row 2) - Placeholders
-            // Format: [Label, Target, USL, LSL, ...]
-            // Since we don't have extracted specs, we set them to 0 or empty
-            var row2 = ['Specs', 0, 0, 0]; // Target, USL, LSL at indices 1, 2, 3
-            // Pad remaining layout
-            while (row2.length < row1.length) row2.push('');
-
-            // 3. Prepare Data (Row 3)
-            // Format: [BatchNameStr, ..., ..., Val1, Val2...]
-            // DataInput reads batch name from Col 0
-            // DataInput reads cavity data from columns consistent with Row 1 headers
-            // Cavity starts at index 3 in Row 1.
-            var values = items.map(function (i) { return i.value; });
-            var row3 = [batchName, '', ''].concat(values);
-
-            var aoa = [row1, row2, row3];
-            var ws = XLSX.utils.aoa_to_sheet(aoa);
-            XLSX.utils.book_append_sheet(wb, ws, batchName);
-        });
-
-        this.workbook = wb;
-        this.showInspectionItems();
-
-        // Update UI state to show loaded
-        var fileInfo = document.getElementById('file-info');
-        var uploadArea = document.getElementById('upload-area');
-        if (fileInfo && uploadArea) {
-            fileInfo.classList.remove('hidden');
-            uploadArea.classList.add('hidden');
-            document.getElementById('filename').textContent = 'QIP_Extracted_' + (extracted.productCode || 'Data');
+        if (!results || !results.inspectionItems) {
+            console.error('Invalid extracted data format');
+            return;
         }
 
-        alert(this.t('提取數據已載入，共 ' + extracted.data.length + ' 筆。請選擇項目進行分析。', 'Extracted data loaded. Please select an item to analyze.'));
+        try {
+            // Use the professional exporter to build the same structure as the Excel export
+            const exporter = new ExcelExporter();
+            exporter.createFromResults(results, results.productCode);
+
+            // Set the workbook for SPC analysis
+            this.workbook = exporter.workbook;
+
+            // Trigger UI update
+            this.showInspectionItems();
+
+            // Update UI state to show loaded
+            var fileInfo = document.getElementById('fileInfo');
+            var uploadZone = document.getElementById('uploadZone');
+            if (fileInfo && uploadZone) {
+                fileInfo.style.display = 'flex';
+                uploadZone.style.display = 'none';
+                document.getElementById('fileName').textContent = 'QIP_Extracted_' + (results.productCode || 'Data');
+            }
+
+            alert(this.t('提取數據已載入，共 ' + results.itemCount + ' 個項目。請選擇項目進行分析。',
+                'Extracted data loaded. ' + results.itemCount + ' items found. Please select an item to analyze.'));
+        } catch (e) {
+            console.error('Failed to load extracted data', e);
+            throw e;
+        }
     },
 
     executeAnalysis: function (type) {

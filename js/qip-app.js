@@ -563,7 +563,7 @@ var QIPExtractApp = {
         this.els.startProcess.disabled = !(hasFile && hasCavity && hasRanges);
     },
 
-    startProcessing: function () {
+    startProcessing: async function () {
         var self = this;
         if (!this.workbook) { alert('請先上傳檔案'); return; }
 
@@ -578,163 +578,27 @@ var QIPExtractApp = {
         this.els.progress.classList.remove('hidden');
         this.els.startProcess.disabled = true;
         this.els.resultSection.classList.add('hidden');
-        this.els.progressBar.style.width = '30%';
-        this.els.progressText.textContent = '正在解析數據...';
+        this.els.progressBar.style.width = '10%';
+        this.els.progressText.textContent = '初始化處理器...';
 
-        // Use setTimeout to allow UI to update
-        setTimeout(function () {
-            try {
-                var results = self.extractDataFromWorkbook(config);
-                self.processingResults = results;
-                self.showResults(results);
-            } catch (error) {
-                console.error(error);
-                alert('處理失敗: ' + error.message);
-                self.els.progressBar.style.width = '0%';
-                self.els.progressText.textContent = '處理失敗';
-            } finally {
-                self.els.startProcess.disabled = false;
-            }
-        }, 100);
-    },
+        try {
+            // 使用新版 QIPProcessor
+            const processor = new QIPProcessor(config);
 
-    extractDataFromWorkbook: function (config) {
-        var self = this;
-        var results = {
-            productCode: config.productCode,
-            cavityCount: config.cavityCount,
-            sheets: [],
-            data: [], // Array of { batch: string, cavity: string, value: number }
-            errors: []
-        };
+            this.processingResults = await processor.processWorkbook(this.workbook, (progress) => {
+                self.els.progressBar.style.width = progress.percent + '%';
+                self.els.progressText.textContent = progress.message;
+            });
 
-        var sheetNames = this.workbook.SheetNames;
-
-        sheetNames.forEach(function (sheetName) {
-            var ws = self.workbook.Sheets[sheetName];
-
-            // Skip hidden or empty sheets if necessary (logic can be enhanced)
-            // For now, process all sheets that look like data sheets
-
-            var sheetHasData = false;
-
-            // Iterate through each configured cavity group
-            for (var i = 1; i <= 6; i++) {
-                var group = config.cavityGroups[i];
-                if (!group || !group.cavityIdRange || !group.dataRange) continue;
-
-                // Check page offset (if implemented in future logic, simplified here)
-                // For QIP, normally layout is consistent across sheets.
-
-                try {
-                    var ids = self.getValuesFromRange(ws, group.cavityIdRange);
-                    var values = self.getValuesFromRange(ws, group.dataRange);
-
-                    if (ids.length === 0 && values.length === 0) continue;
-
-                    // Smart correction for layout mismatch (e.g. user selected merged rows expanded)
-                    if (ids.length !== values.length) {
-                        var ratio = values.length / ids.length;
-                        // If values are multiple of ids (e.g. 3 rows for 1 row of headers)
-                        if (values.length > ids.length && Number.isInteger(ratio)) {
-                            console.warn('Data range mismatch detected. Attempting smart fix (Ratio: ' + ratio + ')');
-                            // Take only the first row's worth of data? 
-                            // Or assuming horizontal scan, we might have picked up extra columns?
-                            // Usually QIP mismatch is selecting multiple rows for single row header.
-                            // With "row-first" scan in getValuesFromRange, values are [r1c1, r1c2... r2c1, r2c2...]
-                            // We should take the first N values.
-                            // Wait, getValuesFromRange iterates r then c. 
-                            // So if range is K4:Y6 (3 rows), and K3:Y3 (1 row, 15 cols).
-                            // values will be K4..Y4, K5..Y5, K6..Y6.
-                            // We should take first 15 (first row).
-
-                            // Let's try to assume first row is the correct data
-                            values = values.slice(0, ids.length);
-                            // Suppress the warning for cleaner UI since this is a handled case now
-                            // results.errors.push('提示：工作表 [' + sheetName + '] 第 ' + i + ' 組數據範圍過大，已自動修正為首行數據。');
-                        } else {
-                            results.errors.push('工作表 [' + sheetName + '] 第 ' + i + ' 組設定錯誤：穴號數量(' + ids.length + ')與數據數量(' + values.length + ')不符');
-                            continue;
-                        }
-                    }
-
-                    for (var k = 0; k < ids.length; k++) {
-                        var val = parseFloat(values[k]);
-                        var cavityId = ids[k];
-
-                        // Validate: only add if we have a numeric value
-                        if (!isNaN(val)) {
-                            results.data.push({
-                                batch: sheetName, // Use sheet name as batch name
-                                cavity: String(cavityId).trim(),
-                                value: val,
-                                group: i
-                            });
-                            sheetHasData = true;
-                        }
-                    }
-                } catch (e) {
-                    console.warn('Error processing sheet ' + sheetName + ' group ' + i + ': ' + e.message);
-                }
-            }
-
-            if (sheetHasData) {
-                results.sheets.push(sheetName);
-            }
-        });
-
-        if (results.data.length === 0) {
-            results.errors.push('警告：未提取到任何有效數據。請檢查範圍設定是否正確 (例如是否包含了正確的數據列)。');
+            this.showResults(this.processingResults);
+        } catch (error) {
+            console.error(error);
+            alert('處理失敗: ' + error.message);
+            this.els.progressBar.style.width = '0%';
+            this.els.progressText.textContent = '處理失敗';
+        } finally {
+            this.els.startProcess.disabled = false;
         }
-        return results;
-    },
-
-    // Helper to get raw values from a range string (e.g., "K3:R3" or "K3")
-    // Helper to get raw values from a range string (e.g., "K3:R3" or "K3")
-    // Enhanced to handle Merged Cells correctly.
-    getValuesFromRange: function (ws, rangeStr) {
-        if (!rangeStr || !ws) return [];
-
-        var range;
-        if (rangeStr.includes(':')) {
-            range = XLSX.utils.decode_range(rangeStr);
-        } else {
-            var addr = XLSX.utils.decode_cell(rangeStr);
-            range = { s: addr, e: addr };
-        }
-
-        var values = [];
-        var merges = ws['!merges'] || [];
-
-        // Logic specifically assumes we want to capture every visual cell's value
-        // iterating row by row, then col by col.
-        for (var r = range.s.r; r <= range.e.r; r++) {
-            for (var c = range.s.c; c <= range.e.c; c++) {
-
-                // 1. Resolve effective cell address handling merges
-                var targetR = r;
-                var targetC = c;
-
-                // Check if current cell (r,c) is inside any merge range
-                for (var i = 0; i < merges.length; i++) {
-                    var m = merges[i];
-                    if (r >= m.s.r && r <= m.e.r && c >= m.s.c && c <= m.e.c) {
-                        // It is merged! Effective value is stored at top-left (s)
-                        targetR = m.s.r;
-                        targetC = m.s.c;
-                        break;
-                    }
-                }
-
-                // 2. Get value from the effective cell
-                var cellAddr = XLSX.utils.encode_cell({ r: targetR, c: targetC });
-                var cell = ws[cellAddr];
-                var val = cell ? (cell.v !== undefined ? cell.v : cell.w) : null;
-
-                values.push(val);
-            }
-        }
-        return values;
     },
 
     showResults: function (results) {
@@ -742,9 +606,11 @@ var QIPExtractApp = {
         this.els.progressText.textContent = '處理完成！';
         this.els.resultSection.classList.remove('hidden');
 
-        var summary = '<div class="text-sm"><strong>產品品號:</strong> ' + (results.productCode || '-') + '</div>' +
-            '<div class="text-sm"><strong>有效工作表:</strong> ' + (results.sheets ? results.sheets.length : 0) + ' 個</div>' +
-            '<div class="text-sm"><strong>提取數據:</strong> ' + (results.data ? results.data.length : 0) + ' 筆</div>';
+        var summary = '<div class="text-sm"><strong>產品名稱:</strong> ' + (results.productInfo.productName || '-') + '</div>' +
+            '<div class="text-sm"><strong>產品品號:</strong> ' + (results.productCode || '-') + '</div>' +
+            '<div class="text-sm"><strong>檢驗項目:</strong> ' + results.itemCount + ' 個</div>' +
+            '<div class="text-sm"><strong>有效批次:</strong> ' + results.totalBatches + ' 批</div>';
+
         this.els.resultSummary.innerHTML = summary;
 
         if (results.errors && results.errors.length > 0) {
@@ -761,55 +627,13 @@ var QIPExtractApp = {
         if (!this.processingResults) { alert('沒有可下載的結果'); return; }
 
         try {
-            var extracted = this.processingResults;
-            var wb = XLSX.utils.book_new();
+            const exporter = new ExcelExporter();
+            exporter.createFromResults(this.processingResults, this.processingResults.productCode);
 
-            // Group by batch (sheet name)
-            var batches = {};
-            if (extracted.data) {
-                extracted.data.forEach(function (item) {
-                    if (!batches[item.batch]) batches[item.batch] = [];
-                    batches[item.batch].push(item);
-                });
-            }
+            const filename = (this.els.productCode.value || 'QIP_Extract').trim();
+            exporter.download(filename);
 
-            // Create a sheet for each batch
-            Object.keys(batches).forEach(function (batchName) {
-                var items = batches[batchName];
-                // Sort by cavity ID
-                items.sort(function (a, b) {
-                    var na = parseFloat(a.cavity);
-                    var nb = parseFloat(b.cavity);
-                    if (!isNaN(na) && !isNaN(nb)) return na - nb;
-                    return a.cavity.localeCompare(b.cavity);
-                });
-
-                // 1. Prepare Headers (Row 1)
-                // Format: [BatchName, ProductName, ItemName, Cavity1穴, Cavity2穴...]
-                var cavityHeaders = items.map(function (i) { return i.cavity + '穴'; });
-                var row1 = ['Batch No.', extracted.productCode || 'Product', 'Data'].concat(cavityHeaders);
-
-                // 2. Prepare Specs (Row 2) - Placeholders
-                var row2 = ['Specs', 0, 0, 0];
-                while (row2.length < row1.length) row2.push('');
-
-                // 3. Prepare Data (Row 3)
-                var values = items.map(function (i) { return i.value; });
-                var row3 = [batchName, '', ''].concat(values);
-
-                var aoa = [row1, row2, row3];
-                var ws = XLSX.utils.aoa_to_sheet(aoa);
-                XLSX.utils.book_append_sheet(wb, ws, batchName);
-            });
-
-            // If no data, create a summary sheet
-            if (wb.SheetNames.length === 0) {
-                var ws = XLSX.utils.json_to_sheet(extracted.data || []);
-                XLSX.utils.book_append_sheet(wb, ws, "RawData");
-            }
-
-            XLSX.writeFile(wb, (this.fileName || 'result').replace(/\.[^/.]+$/, '') + '_extracted.xlsx');
-
+            console.log('Excel 導出成功');
         } catch (error) {
             console.error(error);
             alert('下載失敗: ' + error.message);

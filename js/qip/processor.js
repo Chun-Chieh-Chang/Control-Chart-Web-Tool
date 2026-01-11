@@ -331,6 +331,7 @@ class QIPProcessor {
             totalCavities: this.results.totalCavities,
             processedSheets: this.results.processedSheets,
             productInfo: this.results.productInfo,
+            productCode: this.config.productCode || '',
             itemCount: Object.keys(this.results.inspectionItems).length,
             errors: this.errorLogger.getErrors(),
             hasErrors: this.errorLogger.hasErrors()

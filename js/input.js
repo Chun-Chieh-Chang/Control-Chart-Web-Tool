@@ -27,17 +27,35 @@ DataInput.prototype.parse = function () {
     var self = this;
 
     // Extract metadata from headers or fixed positions
-    // Note: This matches the current QIP report structure (B1=Name, C1=Item, etc.)
-    this.productInfo = {
-        name: this.data[0] && this.data[0][1] ? this.data[0][1] : '',
-        item: this.data[0] && this.data[0][2] ? this.data[0][2] : '',
-        unit: 'Inch', // Default, can be refined based on QIP content
-        char: '平均值/全距',
-        dept: '品管部',
-        inspector: '品管組',
-        batchRange: '',
-        chartNo: ''
-    };
+    // Supports both old format (Row 1) and new VBA-compatible format (Row 5/6)
+    var row5 = this.data[4] || [];
+    var row6 = this.data[5] || [];
+
+    if (row5[1] === 'ProductName') {
+        // VBA-compatible format
+        this.productInfo = {
+            name: row6[1] || '',
+            item: '', // Item code usually in filename
+            unit: row6[2] || 'Inch',
+            char: '平均值/全距',
+            dept: '品管部',
+            inspector: '品管組',
+            batchRange: '',
+            chartNo: ''
+        };
+    } else {
+        // Old format / fallback
+        this.productInfo = {
+            name: this.data[0] && this.data[0][1] ? this.data[0][1] : '',
+            item: this.data[0] && this.data[0][2] ? this.data[0][2] : '',
+            unit: 'Inch',
+            char: '平均值/全距',
+            dept: '品管部',
+            inspector: '品管組',
+            batchRange: '',
+            chartNo: ''
+        };
+    }
 
     this.headers = this.data[0] || [];
     this.specs = {

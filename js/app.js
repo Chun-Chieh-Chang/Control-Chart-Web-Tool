@@ -1141,7 +1141,7 @@ var SPCApp = {
                 stroke: { width: 3 },
                 markers: { size: 4, shape: ['circle', 'rect'] },
                 xaxis: { categories: labels, labels: { style: { colors: theme.text, fontSize: '12px', fontFamily: 'Inter, sans-serif' } } },
-                dataLabels: { enabled: false }, yaxis: { labels: { formatter: function (v) { return v.toFixed(4); }, style: { colors: theme.text, fontSize: '12px', fontFamily: 'Inter, sans-serif' } }, title: { text: self.t('標準差', 'StdDev') } }, grid: { borderColor: theme.grid }
+                dataLabels: { enabled: false }, yaxis: { min: 0, labels: { formatter: function (v) { return v.toFixed(6); }, style: { colors: theme.text, fontSize: '12px', fontFamily: 'Inter, sans-serif' } }, title: { text: self.t('標準差', 'StdDev') } }, grid: { borderColor: theme.grid }
             };
             var chartStd = new ApexCharts(document.querySelector("#stdDevChart"), stdOpt);
             chartStd.render(); this.chartInstances.push(chartStd);

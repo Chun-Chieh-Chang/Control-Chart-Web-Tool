@@ -30,6 +30,7 @@ var QIPExtractApp = {
             fileInfo: document.getElementById('qip-file-info'),
             fileName: document.getElementById('qip-file-name'),
             removeFile: document.getElementById('qip-remove-file'),
+            resetFileBtn: document.getElementById('qip-reset-file-btn'), // New button cache
             workbookInfo: document.getElementById('qip-workbook-info'),
 
             productCode: document.getElementById('qip-product-code'),
@@ -81,6 +82,7 @@ var QIPExtractApp = {
         });
 
         if (this.els.removeFile) this.els.removeFile.addEventListener('click', function () { self.removeFile(); });
+        if (this.els.resetFileBtn) this.els.resetFileBtn.addEventListener('click', function () { self.removeFile(); });
 
         // Cavity count change
         if (this.els.cavityCount) this.els.cavityCount.addEventListener('change', function () { self.handleCavityCountChange(); });
@@ -147,6 +149,11 @@ var QIPExtractApp = {
         this.els.fileInput.value = '';
         this.els.uploadZone.classList.remove('hidden');
         this.els.fileInfo.classList.add('hidden');
+
+        // Reset inputs
+        this.els.productCode.value = '';
+        this.els.cavityCount.value = '';
+
         this.els.worksheetSelectGroup.classList.add('hidden');
         this.els.previewPanel.classList.add('hidden');
         this.els.cavityGroups.classList.add('hidden');

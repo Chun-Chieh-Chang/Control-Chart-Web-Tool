@@ -150,3 +150,23 @@ Addressed visual layout issues in analysis results and clarified statistical ter
 *   **è³‡è¨Šå„²å­˜**ï¼šç”¢å“åç¨±æ–¼ B5:B6ï¼Œæ¸¬é‡å–®ä½æ–¼ C5:C6ã€‚
 *   **æ•¸æ“šå°èˆª**ï¼šç¬¬ä¸€æ¬„å›ºå®šç‚ºç”Ÿç”¢æ‰¹è™Ÿï¼Œå¾ŒçºŒæ¬„ä½ä»¥ã€ŒXè™Ÿç©´ã€å‘½åã€‚
 *   **å‚³è¼¸åª’ä»‹**ï¼šä½¿ç”¨ `window.qipExtractedData` ä½œç‚ºè·¨è¦–åœ–æ•¸æ“šäº¤æ›çš„æ©‹æ¨‘ã€‚
+
+## 2026-01-11: QIP ¼Æ¾Ú´£¨ú­×´_»P­«ºc¨Æ¬G (Refactoring Incident)
+
+### 1. QIP ³W®æ´£¨ú (Specification Extraction)
+*   **°İÃD**¡GQIP ³øªí®æ¦¡¦h¼Ë¡AVBA ¥N½X©w¸qªº¦C¯Á¤Ş»P¥Î¤á´£¨Ñªº¬Y¨Ç³øªí¡]ºI¹Ï¡^¤£¤@­P¡C¥ı«e¹Á¸Õ¨Ì¾ÚºI¹Ï½Õ¾ã¯Á¤Ş¡A¾É­P¼Æ¾Ú¿ù¦ì¡C
+*   **¸Ñ¨M**¡G³Ì²×¨M©w**¦^Âk VBA ©w¸q**ªº¦C¯Á¤Ş¡]Nominal=E/F, Sign=G, Tol=H¡^¡A³o¬O³ÌÅv«Âªº°Ñ¦Ò¡C
+*   **§Ş³N¤É¯Å**¡G
+    *   ¤Ş¤J \getMergedCellValue\ ¸Ñ¨M¦X¨Ö³æ¤¸®æÅª¨ú°İÃD¡C
+    *   ­×¥¿¤½®t­pºâÅŞ¿è¡G±q VBA ªºÂ²³æ¥¿­t¸¹§ï¬°¥¿½Tªº \Target + (Sign * Value)\ ÅŞ¿è¡A¤ä´©«D¹ïºÙ¤½®t¡C
+
+### 2. ­«ºc¨Æ¬G»P±Ğ°V (The 'Clean-up' Incident)
+*   **¨Æ¬G´y­z**¡G¦b­×´_¡uÅã¥Ü¦h±ø±M®a«ØÄ³¡vªº¥\¯à®É¡A¬°¤F²M²z¥N½X¡A¨Ï¥Î \eplace_file_content\ §R°£¥¼¨Ï¥ÎªºÅÜ¼Æ«Å§i (\seenMoldingAdvice\, \seenQualityAdvice\)¡CµM¦Ó¡A**®Ö¤ßÅÜ¼Æ \card\ (UI ®e¾¹) ªºªì©l¤Æ¥N½X¤£©¯§¨¦b³o¨ÇÅÜ¼Æ¤§¶¡¡A³Q¤@¨Ö§R°£**¡C
+*   **«áªG**¡G¾É­P \ReferenceError: card is not defined\¡A°¼ÃäÄæ¥\¯à§¹¥ş±Y¼ì¡C
+*   **¤G¦¸¶Ë®`**¡G¦b¹Á¸Õ­×´_®É¡A¥Ñ©ó´£¨Ñªº¤W¤U¤å¡]©PÃä¥N½X¡^¤£°÷¿W¯S¡A¾É­P­×´_¥N½X³Q¿ù»~¦a´¡¤J¨ì¤F¥t¤@­Ó¨ç¼Æ (\enderCharts\ - Tooltip ÅŞ¿è) ¤¤¡A¯}Ãa¤F­ì¥»¥¿±`ªº Tooltip ¥\¯à¡C
+*   **²`¨è±Ğ°V (Lessons Learned)**¡G
+    1.  **Refactor »P Fix ¤ÀÂ÷**¡G­×´_ Bug ®É¤£­n¶¶¤â²M²z¥N½X¡A¨âªÌÀ³¤À¶} Commit¡A¥H­°§C­·ÀI¨Ã©ö©ó¦^ºu¡C
+    2.  **¤W¤U¤åÀË¬d (Context Verification)**¡G¨Ï¥Î \eplace_file_content\ ®É¡A¥²¶·´£¨Ñ¨¬°÷ªø¥B¨ã¦³°ß¤@©Êªº¤W¤U¤å¡A½T«O©w¦ìºë½T¡C
+    3.  **Diff ¼f®Ö**¡G¤u¨ã°õ¦æ«áªº Diff ¬O³Ì«á¨¾½u¡C°È¥²ÀË¬d¬O§_¦³·N®Æ¤§¥~ªº¬õ½u¡]§R°£¡^¡C
+    4.  **ÅÜ¼Æ¥Í©R¶g´Á**¡G¦b§R°£ÅÜ¼Æ«Å§i«e¡A¥²¶·¥ş°ì·j´M½T»{¸ÓÅÜ¼Æ¬O§_¯uªº¥¼³Q¨Ï¥Î¡A©Î¬O§_¦³°Æ§@¥Î¡]¦pªì©l¤Æ DOM ¤¸¯À¡^¡C
+

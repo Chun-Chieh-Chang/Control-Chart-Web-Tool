@@ -679,10 +679,10 @@ var SPCApp = {
 
                         // Build standard tooltip header
                         var html = '<div class="px-3 py-2 bg-slate-900 border border-slate-700 shadow-xl rounded-lg">';
-                        html += '<div class="text-[10px] text-slate-400 font-bold uppercase mb-1">' + label + '</div>';
+                        html += '<div class="text-xs text-slate-400 font-bold uppercase mb-1">' + label + '</div>';
                         html += '<div class="flex items-center gap-2 mb-2 pb-2 border-b border-slate-800">';
                         html += '<span class="w-2 h-2 rounded-full" style="background-color:' + w.globals.colors[seriesIndex] + '"></span>';
-                        html += '<span class="text-xs font-bold text-white">' + name + ': ' + val.toFixed(4) + '</span>';
+                        html += '<span class="text-sm font-bold text-white">' + name + ': ' + val.toFixed(4) + '</span>';
                         html += '</div>';
 
                         // Check if this point has a Nelson Rule violation
@@ -694,17 +694,17 @@ var SPCApp = {
 
                             html += '<div class="space-y-3 mt-2">';
                             html += '<div class="flex items-center justify-between gap-4">';
-                            html += '<div class="text-[10px] bg-rose-500/20 text-rose-400 px-2 py-0.5 rounded font-bold">' + rulesText + '</div>';
+                            html += '<div class="text-xs bg-rose-500/20 text-rose-400 px-2 py-0.5 rounded font-bold">' + rulesText + '</div>';
                             html += '</div>';
 
                             html += '<div>';
-                            html += '<div class="flex items-center gap-1.5 text-[10px] text-sky-400 font-bold"><span class="material-icons-outlined text-[12px]">precision_manufacturing</span> 成型專家</div>';
-                            html += '<div class="text-[10px] text-slate-300 leading-normal pl-4 mt-0.5">' + exp.m + '</div>';
+                            html += '<div class="flex items-center gap-1.5 text-xs text-sky-400 font-bold"><span class="material-icons-outlined text-sm">precision_manufacturing</span> 成型專家</div>';
+                            html += '<div class="text-[13px] text-slate-300 leading-normal pl-4 mt-1">' + exp.m + '</div>';
                             html += '</div>';
 
                             html += '<div>';
-                            html += '<div class="flex items-center gap-1.5 text-[10px] text-emerald-400 font-bold"><span class="material-icons-outlined text-[12px]">assignment_turned_in</span> 品管專家</div>';
-                            html += '<div class="text-[10px] text-slate-300 leading-normal pl-4 mt-0.5">' + exp.q + '</div>';
+                            html += '<div class="flex items-center gap-1.5 text-xs text-emerald-400 font-bold"><span class="material-icons-outlined text-sm">assignment_turned_in</span> 品管專家</div>';
+                            html += '<div class="text-[13px] text-slate-300 leading-normal pl-4 mt-1">' + exp.q + '</div>';
                             html += '</div>';
                             html += '</div>';
                         }
@@ -958,22 +958,22 @@ var SPCApp = {
             var rulesText = v.rules.map(function (r) { return 'Rule ' + r; }).join(', ');
 
             card.innerHTML = '<div class="flex justify-between items-start mb-2 pb-2 border-b border-slate-100 dark:border-slate-700">' +
-                '<div class="text-sm font-bold text-slate-900 dark:text-white">' + (pageLabels[v.index] || 'Batch') + '</div>' +
-                '<div class="text-[10px] font-bold text-rose-500 bg-rose-50 dark:bg-rose-900/30 px-2 py-0.5 rounded-full">' + rulesText + '</div>' +
+                '<div class="text-base font-bold text-slate-900 dark:text-white">' + (pageLabels[v.index] || 'Batch') + '</div>' +
+                '<div class="text-xs font-bold text-rose-500 bg-rose-50 dark:bg-rose-900/30 px-2 py-0.5 rounded-full">' + rulesText + '</div>' +
                 '</div>' +
-                '<div class="space-y-3">' +
+                '<div class="space-y-4">' +
                 '<div>' +
-                '<div class="flex items-center gap-1.5 text-[10px] text-sky-600 dark:text-sky-400 font-bold">' +
-                '<span class="material-icons-outlined text-[12px]">precision_manufacturing</span> 成型專家</div>' +
-                '<div class="text-[10px] text-slate-600 dark:text-slate-400 leading-normal pl-4 mt-0.5">' + exp.m + '</div>' +
+                '<div class="flex items-center gap-1.5 text-xs text-sky-600 dark:text-sky-400 font-bold mb-1">' +
+                '<span class="material-icons-outlined text-sm">precision_manufacturing</span> 成型專家</div>' +
+                '<div class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed pl-4">' + exp.m + '</div>' +
                 '</div>' +
                 '<div>' +
-                '<div class="flex items-center gap-1.5 text-[10px] text-emerald-600 dark:text-emerald-400 font-bold">' +
-                '<span class="material-icons-outlined text-[12px]">assignment_turned_in</span> 品管專家</div>' +
-                '<div class="text-[10px] text-slate-600 dark:text-slate-400 leading-normal pl-4 mt-0.5">' + exp.q + '</div>' +
+                '<div class="flex items-center gap-1.5 text-xs text-emerald-600 dark:text-emerald-400 font-bold mb-1">' +
+                '<span class="material-icons-outlined text-sm">assignment_turned_in</span> 品管專家</div>' +
+                '<div class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed pl-4">' + exp.q + '</div>' +
                 '</div>' +
                 '</div>' +
-                '<div class="text-[9px] text-slate-400 mt-2 text-right italic">Index: ' + (v.index + 1) + '</div>';
+                '<div class="text-[11px] text-slate-400 mt-2 text-right italic">Index: ' + (v.index + 1) + '</div>';
 
             // Keep the hover tooltip functionality as well
             card.addEventListener('mouseenter', function () {

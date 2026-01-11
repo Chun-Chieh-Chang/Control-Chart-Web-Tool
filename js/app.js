@@ -979,7 +979,7 @@ var SPCApp = {
                         return html;
                     }
                 },
-                markers: { size: 4, discrete: pageXbarR.xBar.violations.map(function (v) { return { seriesIndex: 0, dataPointIndex: v.index, fillColor: '#f43f5e', strokeColor: '#fff', size: 6 }; }) }
+                markers: { size: [4, 0, 0, 0], discrete: pageXbarR.xBar.violations.map(function (v) { return { seriesIndex: 0, dataPointIndex: v.index, fillColor: '#f43f5e', strokeColor: '#fff', size: 6 }; }) }
             };
             var chartX = new ApexCharts(document.querySelector("#xbarChart"), xOpt);
             chartX.render(); this.chartInstances.push(chartX);
@@ -1010,7 +1010,8 @@ var SPCApp = {
                 xaxis: { categories: pageLabels, labels: { style: { colors: theme.text, fontSize: '12px', fontFamily: 'Inter, sans-serif' } } },
                 yaxis: { labels: { formatter: function (v) { return v.toFixed(4); }, style: { colors: theme.text, fontSize: '12px', fontFamily: 'Inter, sans-serif' } } },
                 grid: { borderColor: theme.grid },
-                tooltip: { theme: theme.mode }
+                tooltip: { theme: theme.mode },
+                markers: { size: [4, 0, 0] }
             };
             var chartR = new ApexCharts(document.querySelector("#rChart"), rOpt);
             chartR.render(); this.chartInstances.push(chartR);

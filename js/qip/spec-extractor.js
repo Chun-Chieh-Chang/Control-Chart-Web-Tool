@@ -134,6 +134,40 @@ class SpecificationExtractor {
     }
 
     /**
+     * 安全地獲取合併儲存格的值
+     * @param {Object} worksheet 
+     * @param {number} row 
+     * @param {number} col 
+     * @returns {string|number|null}
+     */
+    static getMergedCellValue(worksheet, row, col) {
+        try {
+            const cellAddr = XLSX.utils.encode_cell({ r: row, c: col });
+            const cell = worksheet[cellAddr];
+            let value = cell && cell.v !== undefined ? cell.v : null;
+
+            // 如果沒有值，檢查是否是合併儲存格的一部分
+            if (value === null || value === undefined || value === '') {
+                const merges = worksheet['!merges'] || [];
+                const merge = merges.find(m =>
+                    m && m.s && m.e &&
+                    row >= m.s.r && row <= m.e.r &&
+                    col >= m.s.c && col <= m.e.c
+                );
+                if (merge) {
+                    const mergedAddr = XLSX.utils.encode_cell({ r: merge.s.r, c: merge.s.c });
+                    const mergedCell = worksheet[mergedAddr];
+                    value = mergedCell && mergedCell.v !== undefined ? mergedCell.v : null;
+                }
+            }
+            return value;
+        } catch (err) {
+            console.error(`[SpecExtractor] 讀取儲存格 (${row},${col}) 時發生錯誤:`, err);
+            return null;
+        }
+    }
+
+    /**
      * 從指定行讀取規格數據
      * @param {Object} worksheet 
      * @param {number} row - 0-indexed row
@@ -143,14 +177,6 @@ class SpecificationExtractor {
         const spec = this.createSpecificationData();
 
         try {
-            // DEBUG: 打印該行的所有內容，確認列索引
-            let rowContent = [];
-            for (let c = 0; c < 10; c++) {
-                const cell = worksheet[XLSX.utils.encode_cell({ r: row, c: c })];
-                rowContent.push(`Col${c}[${String.fromCharCode(65 + c)}]:${cell ? cell.v : 'null'}`);
-            }
-            console.log(`[SpecDebug][Row${row + 1}] 內容: `, rowContent.join(', '));
-
             // 定義欄位索引（根據用戶 QIP 報表截圖調整）
             // Row 26: (1)[A] Tool[B] 1.10[C] +[D] 0.13[E]
             // Col A = 0, Col B = 1, Col C = 2, Col D = 3, Col E = 4
@@ -161,10 +187,10 @@ class SpecificationExtractor {
 
             // 讀取基準值（C欄）
             let nominalValue = null;
-            const nominalCell = worksheet[XLSX.utils.encode_cell({ r: row, c: nominalCol })];
+            const nominalVal = this.getMergedCellValue(worksheet, row, nominalCol);
 
-            if (nominalCell && !isNaN(parseFloat(nominalCell.v))) {
-                nominalValue = parseFloat(nominalCell.v);
+            if (nominalVal !== null && !isNaN(parseFloat(nominalVal))) {
+                nominalValue = parseFloat(nominalVal);
             } else {
                 // 如果本行沒有，嘗試從合併儲存格獲取或假設與上一行相同（不太可能，通常是itemName行有target）
                 // 這裡我們假設Target值必須存在
@@ -176,15 +202,15 @@ class SpecificationExtractor {
             spec.target = nominalValue;
 
             // --- 讀取上公差 (本行: Row) ---
-            const upperSignCell = worksheet[XLSX.utils.encode_cell({ r: row, c: signCol })];
-            const upperTolCell = worksheet[XLSX.utils.encode_cell({ r: row, c: tolCol })];
+            const upperSignVal = this.getMergedCellValue(worksheet, row, signCol);
+            const upperTolValRaw = this.getMergedCellValue(worksheet, row, tolCol);
 
             let upperTolVal = 0;
-            if (upperTolCell && !isNaN(parseFloat(upperTolCell.v))) {
-                upperTolVal = Math.abs(parseFloat(upperTolCell.v));
+            if (upperTolValRaw !== null && !isNaN(parseFloat(upperTolValRaw))) {
+                upperTolVal = Math.abs(parseFloat(upperTolValRaw));
             }
 
-            const upperSign = upperSignCell ? String(upperSignCell.v).trim() : '+';
+            const upperSign = upperSignVal ? String(upperSignVal).trim() : '+';
             // 如果符號是 '-'，則為負；否則為正
             const upperActualTol = (upperSign === '-') ? -upperTolVal : upperTolVal;
 
@@ -193,15 +219,15 @@ class SpecificationExtractor {
 
             // --- 讀取下公差 (下一行: Row + 1) ---
             // 注意：下公差通常在下一行，與 Target 相同的列通常是空的
-            const lowerSignCell = worksheet[XLSX.utils.encode_cell({ r: row + 1, c: signCol })];
-            const lowerTolCell = worksheet[XLSX.utils.encode_cell({ r: row + 1, c: tolCol })];
+            const lowerSignVal = this.getMergedCellValue(worksheet, row + 1, signCol);
+            const lowerTolValRaw = this.getMergedCellValue(worksheet, row + 1, tolCol);
 
             let lowerTolVal = 0;
-            if (lowerTolCell && !isNaN(parseFloat(lowerTolCell.v))) {
-                lowerTolVal = Math.abs(parseFloat(lowerTolCell.v));
+            if (lowerTolValRaw !== null && !isNaN(parseFloat(lowerTolValRaw))) {
+                lowerTolVal = Math.abs(parseFloat(lowerTolValRaw));
             }
 
-            const lowerSign = lowerSignCell ? String(lowerSignCell.v).trim() : '-'; // 預設可能是負
+            const lowerSign = lowerSignVal ? String(lowerSignVal).trim() : '-'; // 預設可能是負
             // 下公差計算：如果是 '-' 則減去，如果是 '+' 則加上
             // LSL = Target + (Sign * Value)
             const lowerActualTol = (lowerSign === '-') ? -lowerTolVal : lowerTolVal;

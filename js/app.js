@@ -434,10 +434,10 @@ var SPCApp = {
                 '<span class="material-icons-outlined text-slate-200 group-hover:text-indigo-400 transition-colors">check_circle</span>' +
                 '</div>' +
                 '<div>' +
-                '<h3 class="text-sm font-bold text-slate-900 dark:text-white truncate mb-4">' + sheetName + '</h3>' +
+                '<h3 class="!text-lg font-bold text-slate-900 dark:text-white truncate mb-4">' + sheetName + '</h3>' +
                 '<div class="grid grid-cols-2 gap-2">' +
-                '<div><p class="text-[9px] text-slate-400 uppercase font-bold">' + self.t('目標值', 'Target') + '</p><p class="text-xs font-mono font-bold text-slate-600 dark:text-slate-300">' + target + '</p></div>' +
-                '<div><p class="text-[9px] text-slate-400 uppercase font-bold">' + self.t('樣本數', 'Samples') + '</p><p class="text-xs font-mono font-bold text-slate-600 dark:text-slate-300">' + sampleCount + '</p></div>' +
+                '<div><p class="!text-xs text-slate-400 uppercase font-bold">' + self.t('目標值', 'Target') + '</p><p class="!text-sm font-mono font-bold text-slate-600 dark:text-slate-300">' + target + '</p></div>' +
+                '<div><p class="!text-xs text-slate-400 uppercase font-bold">' + self.t('樣本數', 'Samples') + '</p><p class="!text-sm font-mono font-bold text-slate-600 dark:text-slate-300">' + sampleCount + '</p></div>' +
                 '</div>' +
                 '</div>' +
                 '</div>';

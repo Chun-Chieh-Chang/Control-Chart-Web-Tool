@@ -122,3 +122,31 @@ Addressed visual layout issues in analysis results and clarified statistical ter
     - 透過 CSS 強制覆蓋 `.apexcharts-tooltip` 在深色模式下的背景色與文字色，解決了 Tooltip 在某些情況下字體看不清的問題。
 - **全局文字顏色對齊**: 
     - 使用 Tailwind 的 `dark:` 變體全面檢查並修正了麵包屑、歡迎語、檔案資訊卡片的文字顏色對比度。
+## 2026-01-11: QIP 提取格式與 SPC 模組集成優化 (QIP & SPC Integration Success)
+
+### 1. 解決目標
+解決 QIP 數據提取工具與 VBA 原始輸出格式不一，以及轉換數據至 SPC 分析模組時出現的數據流中斷問題。
+
+### 2. 核心解決方案 (Key Solutions)
+
+1.  **引擎一體化 (Engine Unification)**：
+    *   **問題**：原先 `qip-app.js` 使用獨立簡化的提取邏輯，導致產出的 Sheet 結構與 VBA 不符（如缺乏特定的 Metadata 欄位或正確的穴號名稱）。
+    *   **解決**：將 `qip-app.js` 改為調用專業的 `QIPProcessor` 與 `ExcelExporter` 模組。這確保了無論是瀏覽器下載的 Excel，還是傳送至 SPC 模組的數據，都具備相同的「VBA 兼容」結構（B5:C6 產品資訊區塊）。
+
+2.  **數據傳輸路徑修正 (Data Serialization Fix)**：
+    *   **問題**：`sendToSPC` 函數在傳送數據時仍檢查舊版的 `.data` 屬性，而新版處理器回傳的是結構化的 `.inspectionItems` 對象，導致系統誤報「沒有可傳送的數據」。
+    *   **解決**：同步更新 `sendToSPC` 的檢查邏輯為 `Object.keys(results.inspectionItems).length`。
+
+3.  **解析器雙模支持 (Dual-mode Parser Support)**：
+    *   **問題**：前端 SPC 加載器的 `loadExtractedData` 函數原先手動拼接 AoA 資料，難以維持精細的格式要求。
+    *   **解決**：在 `loadExtractedData` 中直接調用 `ExcelExporter` 來構建「虛擬工作簿 (Virtual Workbook)」。這樣 SPC 模組處理的數據與用戶下載的 Excel 在內存中完全一致，徹底消除了解析誤差。
+
+### 3. 經驗借鑒 (Lessons Learned)
+*   **DRY 原則 (Don't Repeat Yourself)**：對於複雜的數據處理（如 QIP 提取），應封裝核心引擎（Processor），並讓 UI 操作（下載 Excel、傳送至分析）共享同一套引擎邏輯，避免重複實作導致的邏輯不對稱。
+*   **強健的偵錯日誌**：在跨模組數據傳遞（如 QIP -> SPC）時，加入詳盡的 `console.log` 追蹤對象結構，能大幅縮短定位數據流中斷點的時間。
+*   **格式感知 (Format Awareness)**：在處理像 Excel 這種靈活的載體時，`DataInput` 類應設計為能自動識別不同版本/來源的佈局（如 B1 模式 vs B5 模式），以增強系統的穩定性。
+
+### 4. 當前定案結構
+*   **資訊儲存**：產品名稱於 B5:B6，測量單位於 C5:C6。
+*   **數據導航**：第一欄固定為生產批號，後續欄位以「X號穴」命名。
+*   **傳輸媒介**：使用 `window.qipExtractedData` 作為跨視圖數據交換的橋樑。

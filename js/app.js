@@ -1271,11 +1271,16 @@ var SPCApp = {
         list.innerHTML = '';
         var violations = pageXbarR.xBar.violations;
         if (violations.length === 0) {
-            list.innerHTML = '<div class="text-center text-slate-500 mt-10 px-6">' + this.t('本頁數據全數受控', 'All points within control limits.') + '</div>';
+            list.innerHTML = '<div class="text-center text-slate-400 dark:text-slate-500 py-8 text-sm">' + this.t('本頁無異常點', 'No anomalies on this page') + '</div>';
             return;
         }
 
         violations.forEach(function (v) {
+            var card = document.createElement('div');
+            card.className = 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-4 rounded-xl mb-3 mx-4 group relative cursor-help hover:border-rose-400 dark:hover:border-rose-500 transition-colors shadow-sm';
+
+            var rulesText = v.rules.map(function (r) { return 'Rule ' + r; }).join(', ');
+
             // 收集所有違反規則的專家意見
             var allMoldingAdvice = [];
             var allQualityAdvice = [];

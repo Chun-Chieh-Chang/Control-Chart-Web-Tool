@@ -891,7 +891,14 @@ var SPCApp = {
             this.renderDetailedDataTable(pageLabels, pageData, pageXbarR);
 
             var xOpt = {
-                chart: { type: 'line', height: 380, toolbar: { show: false }, background: 'transparent', events: { dblclick: function (e, c) { c.zoomX(0, pageLabels.length); } } },
+                chart: {
+                    type: 'line',
+                    height: 380,
+                    toolbar: { show: false },
+                    background: 'transparent',
+                    zoom: { enabled: true, type: 'x' },
+                    events: { dblclick: function (e, c) { c.updateOptions({ xaxis: { min: undefined, max: undefined } }); } }
+                },
                 theme: { mode: theme.mode },
                 series: [
                     { name: 'X-Bar', data: pageXbarR.xBar.data },
@@ -958,7 +965,14 @@ var SPCApp = {
             chartX.render(); this.chartInstances.push(chartX);
 
             var rOpt = {
-                chart: { type: 'line', height: 300, toolbar: { show: false }, background: 'transparent', events: { dblclick: function (e, c) { c.zoomX(0, pageLabels.length); } } },
+                chart: {
+                    type: 'line',
+                    height: 300,
+                    toolbar: { show: false },
+                    background: 'transparent',
+                    zoom: { enabled: true, type: 'x' },
+                    events: { dblclick: function (e, c) { c.updateOptions({ xaxis: { min: undefined, max: undefined } }); } }
+                },
                 theme: { mode: theme.mode },
                 series: [
                     { name: 'Range', data: pageXbarR.R.data },
@@ -983,7 +997,14 @@ var SPCApp = {
 
             // 1. Cpk Comparison Chart (Matches VBA + Old Chart.js color scheme)
             var cpkOpt = {
-                chart: { type: 'bar', height: 350, toolbar: { show: false }, background: 'transparent', events: { dblclick: function (e, c) { c.zoomX(0, labels.length); } } },
+                chart: {
+                    type: 'bar',
+                    height: 350,
+                    toolbar: { show: false },
+                    background: 'transparent',
+                    zoom: { enabled: true, type: 'x' },
+                    events: { dblclick: function (e, c) { c.updateOptions({ xaxis: { min: undefined, max: undefined } }); } }
+                },
                 theme: { mode: theme.mode },
                 series: [{ name: 'Cpk', data: cpkVal }],
                 xaxis: { categories: labels, labels: { style: { colors: theme.text, fontSize: '12px' } } },
@@ -1012,7 +1033,14 @@ var SPCApp = {
 
             // 2. Mean Comparison Chart (Visual match to old Chart.js)
             var meanOpt = {
-                chart: { type: 'line', height: 350, toolbar: { show: false }, background: 'transparent', events: { dblclick: function (e, c) { c.zoomX(0, labels.length); } } },
+                chart: {
+                    type: 'line',
+                    height: 350,
+                    toolbar: { show: false },
+                    background: 'transparent',
+                    zoom: { enabled: true, type: 'x' },
+                    events: { dblclick: function (e, c) { c.updateOptions({ xaxis: { min: undefined, max: undefined } }); } }
+                },
                 theme: { mode: theme.mode },
                 series: [
                     { name: 'Mean', data: data.cavityStats.map(s => s.mean) },
@@ -1031,7 +1059,14 @@ var SPCApp = {
 
             // 3. StdDev Comparison Chart (Visual match to old Chart.js)
             var stdOpt = {
-                chart: { type: 'line', height: 350, toolbar: { show: false }, background: 'transparent', events: { dblclick: function (e, c) { c.zoomX(0, labels.length); } } },
+                chart: {
+                    type: 'line',
+                    height: 350,
+                    toolbar: { show: false },
+                    background: 'transparent',
+                    zoom: { enabled: true, type: 'x' },
+                    events: { dblclick: function (e, c) { c.updateOptions({ xaxis: { min: undefined, max: undefined } }); } }
+                },
                 theme: { mode: theme.mode },
                 series: [
                     { name: 'Within σ', data: data.cavityStats.map(s => s.withinStdDev) },
@@ -1051,7 +1086,13 @@ var SPCApp = {
 
             // 4. Group Trend Chart (Visual match to old Chart.js)
             var gOpt = {
-                chart: { type: 'line', height: 380, toolbar: { show: false }, events: { dblclick: function (e, c) { c.zoomX(0, labels.length); } } },
+                chart: {
+                    type: 'line',
+                    height: 380,
+                    toolbar: { show: false },
+                    zoom: { enabled: true, type: 'x' },
+                    events: { dblclick: function (e, c) { c.updateOptions({ xaxis: { min: undefined, max: undefined } }); } }
+                },
                 theme: { mode: theme.mode },
                 series: [
                     { name: 'Max', data: data.groupStats.map(s => s.max) },
@@ -1066,14 +1107,20 @@ var SPCApp = {
                 markers: { size: [0, 4, 0, 0, 0, 0], colors: ['#3b82f6'], strokeColors: '#fff' },
                 xaxis: { categories: labels, labels: { style: { colors: theme.text, fontSize: '12px' } } },
                 dataLabels: { enabled: false }, yaxis: { labels: { formatter: function (v) { return v.toFixed(4); }, style: { colors: theme.text, fontSize: '12px' } }, title: { text: self.t('測量值', 'Value') } }, grid: { borderColor: theme.grid },
-                tooltip: { followCursor: true, intersect: false, shared: true }
+                tooltip: { fixed: { enabled: true, position: 'topRight', offsetX: 0, offsetY: 0 }, shared: true, intersect: false }
             };
             var chartG = new ApexCharts(document.querySelector("#groupChart"), gOpt);
             chartG.render(); this.chartInstances.push(chartG);
 
             // 5. Variation Chart (Visual match to old Chart.js)
             var vOpt = {
-                chart: { type: 'line', height: 380, toolbar: { show: false }, events: { dblclick: function (e, c) { c.zoomX(0, labels.length); } } },
+                chart: {
+                    type: 'line',
+                    height: 380,
+                    toolbar: { show: false },
+                    zoom: { enabled: true, type: 'x' },
+                    events: { dblclick: function (e, c) { c.updateOptions({ xaxis: { min: undefined, max: undefined } }); } }
+                },
                 theme: { mode: theme.mode },
                 series: [{ name: 'Range', data: data.groupStats.map(s => s.range) }],
                 colors: ['#8b5cf6'], // Violet-500

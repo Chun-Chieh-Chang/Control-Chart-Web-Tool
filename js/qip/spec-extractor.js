@@ -177,23 +177,48 @@ class SpecificationExtractor {
         const spec = this.createSpecificationData();
 
         try {
-            // 定義欄位索引（根據用戶 QIP 報表截圖調整）
-            // Row 26: (1)[A] Tool[B] 1.10[C] +[D] 0.13[E]
-            // Col A = 0, Col B = 1, Col C = 2, Col D = 3, Col E = 4
-            // Row 27:                        -[D] 0.13[E]
-            const nominalCol = 2;   // C欄 (Col index 2)
-            const signCol = 3;      // D欄 (Col index 3)
-            const tolCol = 4;       // E欄 (Col index 4)
+            // DEBUG: 決定性的列索引診斷
+            let rowDump = [];
+            for (let c = 0; c < 15; c++) { // 掃描前15列
+                const val = this.getMergedCellValue(worksheet, row, c);
+                if (val !== null && String(val).trim() !== '') {
+                    // 轉換列索引為字母 (0->A, 1->B...)
+                    const colLetter = String.fromCharCode(65 + c);
+                    rowDump.push(`${colLetter}[${c}]:"${val}"`);
+                }
+            }
+            console.log(`[SpecExtract][Row${row + 1}] 發現數據: ${rowDump.join(', ')}`);
 
-            // 讀取基準值（C欄）
+            // 下一行的數據也打印一下（為了下公差）
+            let nextRowDump = [];
+            for (let c = 0; c < 15; c++) {
+                const val = this.getMergedCellValue(worksheet, row + 1, c);
+                if (val !== null && String(val).trim() !== '') {
+                    const colLetter = String.fromCharCode(65 + c);
+                    nextRowDump.push(`${colLetter}[${c}]:"${val}"`);
+                }
+            }
+            console.log(`[SpecExtract][Row${row + 2}] 下一行數據: ${nextRowDump.join(', ')}`);
+
+            // 定義欄位索引（回歸 VBA 定義，因為截圖可能有隱藏列）
+            // VBA: Tool=C(2), Symbol=D(3), Nominal=E(4)/F(5), Sign=G(6), Tol=H(7)
+            const nominalCol1 = 4; // E列
+            const nominalCol2 = 5; // F列
+            const signCol = 6;     // G列
+            const tolCol = 7;      // H列
+
+            // 讀取基準值（嘗試 E 列和 F 列）
             let nominalValue = null;
-            const nominalVal = this.getMergedCellValue(worksheet, row, nominalCol);
+            let nominalVal = this.getMergedCellValue(worksheet, row, nominalCol1);
 
             if (nominalVal !== null && !isNaN(parseFloat(nominalVal))) {
                 nominalValue = parseFloat(nominalVal);
             } else {
-                // 如果本行沒有，嘗試從合併儲存格獲取或假設與上一行相同（不太可能，通常是itemName行有target）
-                // 這裡我們假設Target值必須存在
+                // 嘗試 F 列
+                nominalVal = this.getMergedCellValue(worksheet, row, nominalCol2);
+                if (nominalVal !== null && !isNaN(parseFloat(nominalVal))) {
+                    nominalValue = parseFloat(nominalVal);
+                }
             }
 
             if (nominalValue === null) return spec;
@@ -218,7 +243,6 @@ class SpecificationExtractor {
             spec.usl = spec.nominalValue + spec.upperTolerance;
 
             // --- 讀取下公差 (下一行: Row + 1) ---
-            // 注意：下公差通常在下一行，與 Target 相同的列通常是空的
             const lowerSignVal = this.getMergedCellValue(worksheet, row + 1, signCol);
             const lowerTolValRaw = this.getMergedCellValue(worksheet, row + 1, tolCol);
 
@@ -227,12 +251,10 @@ class SpecificationExtractor {
                 lowerTolVal = Math.abs(parseFloat(lowerTolValRaw));
             }
 
-            const lowerSign = lowerSignVal ? String(lowerSignVal).trim() : '-'; // 預設可能是負
-            // 下公差計算：如果是 '-' 則減去，如果是 '+' 則加上
-            // LSL = Target + (Sign * Value)
+            const lowerSign = lowerSignVal ? String(lowerSignVal).trim() : '-';
             const lowerActualTol = (lowerSign === '-') ? -lowerTolVal : lowerTolVal;
 
-            spec.lowerTolerance = lowerActualTol; // 這裡存儲的是相對於 Target 的偏移量
+            spec.lowerTolerance = lowerActualTol;
             spec.lsl = spec.nominalValue + spec.lowerTolerance;
 
             spec.isValid = true;

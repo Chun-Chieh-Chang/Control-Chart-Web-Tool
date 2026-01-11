@@ -134,24 +134,60 @@ class QIPProcessor {
                 return result;
             }
 
+            // 獲取合併儲存格資訊（用於處理 VBA MergeArea 邏輯）
+            const merges = worksheet['!merges'] || [];
+
+            // 輔助函數：安全地從可能的合併儲存格中獲取值
+            const safeGetMergedValue = (row, col) => {
+                try {
+                    const cellAddr = XLSX.utils.encode_cell({ r: row, c: col });
+                    const cell = worksheet[cellAddr];
+                    let value = cell && cell.v !== undefined ? cell.v : null;
+
+                    // 如果沒有值，檢查是否是合併儲存格的一部分
+                    if (!value || value === '') {
+                        const merge = merges.find(m =>
+                            m && m.s && m.e &&
+                            row >= m.s.r && row <= m.e.r &&
+                            col >= m.s.c && col <= m.e.c
+                        );
+                        if (merge) {
+                            const mergedAddr = XLSX.utils.encode_cell({ r: merge.s.r, c: merge.s.c });
+                            const mergedCell = worksheet[mergedAddr];
+                            value = mergedCell && mergedCell.v !== undefined ? mergedCell.v : null;
+                        }
+                    }
+                    return value;
+                } catch (err) {
+                    console.error(`[QIP] 讀取儲存格 (${row},${col}) 時發生錯誤:`, err);
+                    return null;
+                }
+            };
+
             // 遍歷數據範圍的每一行（每行可能是不同的檢驗項目）
             for (let rowOffset = 0; rowOffset <= dataRangeParsed.endRow - dataRangeParsed.startRow; rowOffset++) {
                 const dataRow = dataRangeParsed.startRow - 1 + rowOffset; // 0-indexed
                 const data = {};
                 let itemName = '';
 
-                // 提取檢驗項目名稱（從 A 或 B 欄）
-                for (let c = 0; c < dataRangeParsed.startCol - 1; c++) {
-                    const cellAddr = XLSX.utils.encode_cell({ r: dataRow, c: c });
-                    const cell = worksheet[cellAddr];
+                // 提取檢驗項目名稱 - 支援合併儲存格（模仿 VBA MergeArea 邏輯）
+                // VBA: tempValue = Trim(CStr(m.Cells(1, 1).value))
+                let tempValue = safeGetMergedValue(dataRow, 0);  // 先嘗試 A 列
+                if (!tempValue || String(tempValue).trim() === '') {
+                    tempValue = safeGetMergedValue(dataRow, 1);  // 再嘗試 B 列
+                }
 
-                    if (cell && cell.v !== undefined) {
-                        const value = String(cell.v).trim().replace(/[()]/g, '');
-                        if (value && !DataExtractor.isNumericString(value)) {
-                            itemName = value;
-                            break;
-                        }
+                if (tempValue) {
+                    const cleanedValue = String(tempValue).trim().replace(/[()]/g, '');
+                    if (cleanedValue && !DataExtractor.isNumericString(cleanedValue)) {
+                        itemName = cleanedValue;
+                        console.log(`[QIP][Row${dataRow + 1}] ✓ 找到檢驗項目: "${itemName}"`);
                     }
+                }
+
+                if (!itemName) {
+                    console.warn(`[QIP][Row${dataRow + 1}] ✗ 未找到檢驗項目名稱，跳過此行`);
+                    continue;
                 }
 
                 // 提取穴號數據
@@ -161,25 +197,23 @@ class QIPProcessor {
                 for (let colOffset = 0; colOffset < idRangeParsed.endCol - idRangeParsed.startCol + 1; colOffset++) {
                     const col = idRangeParsed.startCol - 1 + colOffset;
 
-                    // 獲取穴號 ID
-                    const idCellAddr = XLSX.utils.encode_cell({ r: idRow, c: col });
-                    const idCell = worksheet[idCellAddr];
-                    let cavityId = idCell ? String(idCell.v || '').trim() : '';
-
+                    // 獲取穴號 ID（處理合併儲存格）
+                    let cavityId = safeGetMergedValue(idRow, col);
                     if (!cavityId) continue;
 
-                    // 提取穴號數字
+                    cavityId = String(cavityId).trim();
+
+                    // 提取穴號數字（支援 "1號穴"、"CAV1"、"1" 等格式）
                     const numMatch = cavityId.match(/\d+/);
                     if (numMatch) {
                         cavityId = numMatch[0];
                     }
 
-                    // 獲取數據
-                    const dataCellAddr = XLSX.utils.encode_cell({ r: dataRow, c: col });
-                    const dataCell = worksheet[dataCellAddr];
+                    // 獲取數據（處理合併儲存格）
+                    const cellValue = safeGetMergedValue(dataRow, col);
 
-                    if (dataCell && dataCell.v !== undefined) {
-                        const cleanValue = DataExtractor.cleanCellValue(dataCell.v);
+                    if (cellValue !== undefined && cellValue !== null) {
+                        const cleanValue = DataExtractor.cleanCellValue(cellValue);
                         if (cleanValue !== '' && !isNaN(parseFloat(cleanValue))) {
                             data[cavityId] = parseFloat(cleanValue);
                             hasData = true;
@@ -188,11 +222,14 @@ class QIPProcessor {
                 }
 
                 if (hasData && itemName) {
+                    const cavityIds = Object.keys(data).sort((a, b) => parseInt(a) - parseInt(b));
                     result.push({
                         inspectionItem: itemName,
                         data: data
                     });
-                    console.log(`提取檢驗項目: ${itemName}, 穴數: ${Object.keys(data).length}`);
+                    console.log(`[QIP][Row${dataRow + 1}] ✓ 提取成功: "${itemName}", 穴號: [${cavityIds.join(', ')}], 數量: ${cavityIds.length}`);
+                } else if (!hasData && itemName) {
+                    console.warn(`[QIP][Row${dataRow + 1}] ⚠ 檢驗項目 "${itemName}" 無有效數據`);
                 }
             }
 

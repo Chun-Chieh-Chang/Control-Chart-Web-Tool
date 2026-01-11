@@ -1276,44 +1276,42 @@ var SPCApp = {
         }
 
         violations.forEach(function (v) {
-            var card = document.createElement('div');
-            card.className = 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-4 rounded-xl mb-3 mx-4 group relative cursor-help hover:border-rose-400 dark:hover:border-rose-500 transition-colors shadow-sm';
-
-            var rulesText = v.rules.map(function (r) { return 'Rule ' + r; }).join(', ');
-
             // 收集所有違反規則的專家意見
             var allMoldingAdvice = [];
             var allQualityAdvice = [];
-            var seenMoldingAdvice = new Set();
-            var seenQualityAdvice = new Set();
+
+            // 收集並明確列出每個違反規則的專家意見
+            var moldingItems = [];
+            var qualityItems = [];
 
             v.rules.forEach(function (ruleId) {
-                var expPair = self.nelsonExpertise[ruleId] || {
-                    zh: { m: "請檢查製程參數。", q: "請參考標準作業程序。" },
-                    en: { m: "Please check process parameters.", q: "Please refer to SOP." }
-                };
+                var expPair = self.nelsonExpertise[ruleId];
+                // 如果找不到對應的規則建議，使用默認值
+                if (!expPair) {
+                    expPair = {
+                        zh: { m: "請檢查製程參數。", q: "請參考標準作業程序。" },
+                        en: { m: "Please check process parameters.", q: "Please refer to SOP." }
+                    };
+                }
+
                 var exp = self.settings.language === 'zh' ? expPair.zh : expPair.en;
 
-                // 避免重複的建議
-                if (!seenMoldingAdvice.has(exp.m)) {
-                    allMoldingAdvice.push(exp.m);
-                    seenMoldingAdvice.add(exp.m);
-                }
-                if (!seenQualityAdvice.has(exp.q)) {
-                    allQualityAdvice.push(exp.q);
-                    seenQualityAdvice.add(exp.q);
-                }
+                // 直接收集，不去重，確保每個規則都有對應建議
+                moldingItems.push({ id: ruleId, text: exp.m });
+                qualityItems.push({ id: ruleId, text: exp.q });
             });
 
-            // 組合所有建議
-            var moldingAdviceHTML = allMoldingAdvice.map(function (advice, idx) {
-                return '<div class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed pl-4 ' + (idx > 0 ? 'mt-2' : '') + '">' +
-                    (allMoldingAdvice.length > 1 ? '• ' : '') + advice + '</div>';
+            // 渲染成 HTML
+            var moldingAdviceHTML = moldingItems.map(function (item, idx) {
+                return '<div class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed pl-2 ' + (idx > 0 ? 'mt-2 border-t border-slate-100 dark:border-slate-700 pt-2' : '') + '">' +
+                    '<span class="inline-block text-[10px] font-bold text-slate-400 bg-slate-100 dark:bg-slate-700 px-1.5 rounded mr-1.5 min-w-[24px] text-center">R' + item.id + '</span>' +
+                    item.text + '</div>';
             }).join('');
 
-            var qualityAdviceHTML = allQualityAdvice.map(function (advice, idx) {
-                return '<div class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed pl-4 ' + (idx > 0 ? 'mt-2' : '') + '">' +
-                    (allQualityAdvice.length > 1 ? '• ' : '') + advice + '</div>';
+            var qualityAdviceHTML = qualityItems.map(function (item, idx) {
+                return '<div class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed pl-2 ' + (idx > 0 ? 'mt-2 border-t border-slate-100 dark:border-slate-700 pt-2' : '') + '">' +
+                    '<span class="inline-block text-[10px] font-bold text-slate-400 bg-slate-100 dark:bg-slate-700 px-1.5 rounded mr-1.5 min-w-[24px] text-center">R' + item.id + '</span>' +
+                    item.text + '</div>';
             }).join('');
 
             card.innerHTML = '<div class="flex justify-between items-start mb-2 pb-2 border-b border-slate-100 dark:border-slate-700">' +

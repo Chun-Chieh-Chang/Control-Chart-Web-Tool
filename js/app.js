@@ -896,7 +896,7 @@ var SPCApp = {
                     height: 380,
                     toolbar: { show: false },
                     background: 'transparent',
-                    zoom: { enabled: true, type: 'x', zoomOnScroll: false, resetIcon: { offsetX: 0, offsetY: 0 } },
+                    zoom: { enabled: false },
                     events: {
                         mounted: function (chartContext, config) {
                             chartContext.el.addEventListener('dblclick', function () {
@@ -990,7 +990,7 @@ var SPCApp = {
                     height: 300,
                     toolbar: { show: false },
                     background: 'transparent',
-                    zoom: { enabled: true, type: 'x', zoomOnScroll: false, resetIcon: { offsetX: 0, offsetY: 0 } },
+                    zoom: { enabled: false },
                     events: {
                         mounted: function (chartContext, config) {
                             chartContext.el.addEventListener('dblclick', function () {
@@ -1027,7 +1027,7 @@ var SPCApp = {
                 chart: {
                     type: 'bar',
                     height: 350,
-                    toolbar: { show: false },
+                    toolbar: { show: true },
                     background: 'transparent',
                     zoom: { enabled: true, type: 'x', zoomOnScroll: false, resetIcon: { offsetX: 0, offsetY: 0 } },
                     events: {
@@ -1069,7 +1069,7 @@ var SPCApp = {
                 chart: {
                     type: 'line',
                     height: 350,
-                    toolbar: { show: false },
+                    toolbar: { show: true },
                     background: 'transparent',
                     zoom: { enabled: true, type: 'x', zoomOnScroll: false, resetIcon: { offsetX: 0, offsetY: 0 } },
                     events: {
@@ -1101,7 +1101,7 @@ var SPCApp = {
                 chart: {
                     type: 'line',
                     height: 350,
-                    toolbar: { show: false },
+                    toolbar: { show: true },
                     background: 'transparent',
                     zoom: { enabled: true, type: 'x', zoomOnScroll: false, resetIcon: { offsetX: 0, offsetY: 0 } },
                     events: {
@@ -1134,7 +1134,7 @@ var SPCApp = {
                 chart: {
                     type: 'line',
                     height: 380,
-                    toolbar: { show: false },
+                    toolbar: { show: true },
                     zoom: { enabled: true, type: 'x', zoomOnScroll: false, resetIcon: { offsetX: 0, offsetY: 0 } },
                     events: {
                         mounted: function (chartContext, config) {
@@ -1168,7 +1168,7 @@ var SPCApp = {
                 chart: {
                     type: 'line',
                     height: 380,
-                    toolbar: { show: false },
+                    toolbar: { show: true },
                     zoom: { enabled: true, type: 'x', zoomOnScroll: false, resetIcon: { offsetX: 0, offsetY: 0 } },
                     events: {
                         mounted: function (chartContext, config) {

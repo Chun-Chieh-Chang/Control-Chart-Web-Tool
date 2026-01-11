@@ -97,8 +97,11 @@ var SPCApp = {
         var isDark = document.documentElement.classList.contains('dark');
         return {
             mode: isDark ? 'dark' : 'light',
-            text: isDark ? '#94a3b8' : '#64748b',
-            grid: isDark ? '#334155' : '#f1f5f9'
+            text: isDark ? '#f1f5f9' : '#64748b',
+            grid: isDark ? '#334155' : '#f1f5f9',
+            primary: isDark ? '#818cf8' : '#4f46e5', // Indigo-400 for dark, Indigo-600 for light
+            danger: '#f43f5e', // Rose-500 (Good on both)
+            success: '#10b981' // Emerald-500 (Good on both)
         };
     },
 
@@ -838,7 +841,7 @@ var SPCApp = {
                     { name: 'CL', data: new Array(pageLabels.length).fill(pageXbarR.xBar.CL) },
                     { name: 'LCL', data: new Array(pageLabels.length).fill(pageXbarR.xBar.LCL) }
                 ],
-                colors: ['#4f46e5', '#f43f5e', '#10b981', '#f43f5e'],
+                colors: [theme.primary, theme.danger, theme.success, theme.danger],
                 stroke: { width: [3, 1.5, 1.5, 1.5], dashArray: [0, 6, 0, 6] },
                 xaxis: { categories: pageLabels, labels: { style: { colors: theme.text, fontSize: '12px' } } },
                 yaxis: { labels: { formatter: function (v) { return v.toFixed(4); }, style: { colors: theme.text, fontSize: '12px' } } },
@@ -936,8 +939,8 @@ var SPCApp = {
                 dataLabels: { enabled: false }, yaxis: { labels: { formatter: function (v) { return v.toFixed(3); }, style: { colors: theme.text, fontSize: '12px' } }, title: { text: 'Cpk' } }, grid: { borderColor: theme.grid },
                 annotations: {
                     yaxis: [
-                        { y: 1.0, borderColor: '#f59e0b', strokeDashArray: 4, label: { text: '1.0' } },
-                        { y: this.settings.cpkThreshold, borderColor: '#10b981', strokeDashArray: 4, strokeWidth: 2, label: { text: 'Target: ' + this.settings.cpkThreshold, style: { background: '#10b981', color: '#fff' } } }
+                        { y: 1.0, borderColor: theme.danger, strokeDashArray: 4, label: { text: '1.0', style: { color: '#fff', background: theme.danger } } },
+                        { y: this.settings.cpkThreshold, borderColor: theme.success, strokeDashArray: 4, strokeWidth: 2, label: { text: 'Target: ' + this.settings.cpkThreshold, style: { background: theme.success, color: '#fff' } } }
                     ]
                 }
             };

@@ -233,23 +233,28 @@ label {
 
 /* Utility Text Colors for Dark Mode */
 .dark .text-slate-900 {
-    color: #f1f5f9 !important;
+    color: #f8fafc !important;
+    /* Slate-50 */
 }
 
 .dark .text-slate-800 {
-    color: #e2e8f0 !important;
+    color: #f1f5f9 !important;
+    /* Slate-100 */
 }
 
 .dark .text-slate-700 {
-    color: #cbd5e1 !important;
+    color: #e2e8f0 !important;
+    /* Slate-200 */
 }
 
 .dark .text-slate-600 {
-    color: #94a3b8 !important;
+    color: #cbd5e1 !important;
+    /* Slate-300 */
 }
 
 .dark .text-slate-500 {
-    color: #64748b !important;
+    color: #94a3b8 !important;
+    /* Slate-400 */
 }
 
 /* Utility Background Colors for Dark Mode */

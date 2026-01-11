@@ -895,6 +895,7 @@ var SPCApp = {
                     type: 'line',
                     height: 380,
                     toolbar: { show: false },
+                    selection: { enabled: false },
                     background: 'transparent',
                     zoom: { enabled: false },
                     events: {
@@ -989,6 +990,7 @@ var SPCApp = {
                     type: 'line',
                     height: 300,
                     toolbar: { show: false },
+                    selection: { enabled: false },
                     background: 'transparent',
                     zoom: { enabled: false },
                     events: {

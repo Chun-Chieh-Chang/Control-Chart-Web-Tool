@@ -291,15 +291,17 @@ label {
     border-bottom-color: #475569 !important;
 }
 
-/* Hide number input spinners */
-/* Restore number input spinners */
-/* Removed hidden spinner rules */
-
-/* Restore number input spinners */
-/* Removed hidden spinner rules */
-
 .dark .apexcharts-xaxistooltip {
     background: #1e293b !important;
     color: #f1f5f9 !important;
     border-color: #334155 !important;
+}
+
+/* Force Chart Axis Label Font Size */
+.apexcharts-xaxis-label,
+.apexcharts-yaxis-label,
+.apexcharts-text,
+.apexcharts-text tspan {
+    font-size: 12px !important;
+    font-family: 'Inter', sans-serif !important;
 }

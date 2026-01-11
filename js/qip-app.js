@@ -12,6 +12,10 @@ var QIPExtractApp = {
     selectionStart: null,
     selectionEnd: null,
 
+    t: function (zh, en) {
+        return (window.currentLang === 'zh') ? zh : en;
+    },
+
     init: function () {
         console.log('QIPExtractApp initializing...');
         this.cacheElements();

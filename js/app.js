@@ -267,6 +267,14 @@ var SPCApp = {
             if (el) el.addEventListener('click', function (e) { e.preventDefault(); self.switchView(id.replace('nav-', '')); });
         });
 
+        var resetNav = document.getElementById('nav-reset');
+        if (resetNav) {
+            resetNav.addEventListener('click', function (e) {
+                e.preventDefault();
+                self.resetSystem();
+            });
+        }
+
         // Event Delegation for History 'View Log'
         var historyBody = document.getElementById('historyTableBody');
         if (historyBody) {
@@ -953,6 +961,16 @@ var SPCApp = {
         document.getElementById('fileInfo').style.display = 'none';
         ['step2', 'step3', 'results'].forEach(id => { var el = document.getElementById(id); if (el) el.style.display = 'none'; });
         window.scrollTo({ top: 0, behavior: 'smooth' });
+    },
+
+    resetSystem: function () {
+        var msg = this.t('確定要重置系統嗎？這將清除所有緩存配置、歷史紀錄、QIP 設定與當前所有數據並重新整理頁面。',
+            'Are you sure you want to reset the system? This will clear all cached configs, history, QIP settings, and current data, and then refresh the page.');
+        if (confirm(msg)) {
+            localStorage.clear();
+            sessionStorage.clear();
+            window.location.reload();
+        }
     }
 };
 

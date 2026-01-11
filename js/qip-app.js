@@ -641,7 +641,7 @@ var QIPExtractApp = {
     },
 
     sendToSPC: function () {
-        if (!this.processingResults || !this.processingResults.data) {
+        if (!this.processingResults || Object.keys(this.processingResults.inspectionItems || {}).length === 0) {
             alert('沒有可傳送的數據');
             return;
         }

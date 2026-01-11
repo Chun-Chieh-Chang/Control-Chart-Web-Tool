@@ -914,8 +914,8 @@ var SPCApp = {
                 ],
                 colors: [theme.primary, theme.danger, theme.success, theme.danger],
                 stroke: { width: [3, 1.5, 1.5, 1.5], dashArray: [0, 6, 0, 6] },
-                xaxis: { categories: pageLabels, labels: { style: { colors: theme.text, fontSize: '12px' } } },
-                yaxis: { labels: { formatter: function (v) { return v.toFixed(4); }, style: { colors: theme.text, fontSize: '12px' } } },
+                xaxis: { categories: pageLabels, labels: { style: { colors: theme.text, fontSize: '12px', fontFamily: 'Inter, sans-serif' } } },
+                yaxis: { labels: { formatter: function (v) { return v.toFixed(4); }, style: { colors: theme.text, fontSize: '12px', fontFamily: 'Inter, sans-serif' } } },
                 grid: { borderColor: theme.grid },
                 tooltip: {
                     theme: theme.mode,
@@ -1007,8 +1007,8 @@ var SPCApp = {
                 ],
                 colors: ['#64748b', '#f43f5e', '#10b981'],
                 stroke: { width: [2.5, 1, 1], dashArray: [0, 6, 0] },
-                xaxis: { categories: pageLabels, labels: { style: { colors: theme.text, fontSize: '12px' } } },
-                yaxis: { labels: { formatter: function (v) { return v.toFixed(4); }, style: { colors: theme.text, fontSize: '12px' } } },
+                xaxis: { categories: pageLabels, labels: { style: { colors: theme.text, fontSize: '12px', fontFamily: 'Inter, sans-serif' } } },
+                yaxis: { labels: { formatter: function (v) { return v.toFixed(4); }, style: { colors: theme.text, fontSize: '12px', fontFamily: 'Inter, sans-serif' } } },
                 grid: { borderColor: theme.grid },
                 tooltip: { theme: theme.mode }
             };
@@ -1039,7 +1039,7 @@ var SPCApp = {
                 },
                 theme: { mode: theme.mode },
                 series: [{ name: 'Cpk', data: cpkVal }],
-                xaxis: { categories: labels, labels: { style: { colors: theme.text, fontSize: '12px' } } },
+                xaxis: { categories: labels, labels: { style: { colors: theme.text, fontSize: '12px', fontFamily: 'Inter, sans-serif' } } },
                 plotOptions: {
                     bar: {
                         borderRadius: 4,
@@ -1052,7 +1052,7 @@ var SPCApp = {
                         }
                     }
                 },
-                dataLabels: { enabled: false }, yaxis: { labels: { formatter: function (v) { return v.toFixed(3); }, style: { colors: theme.text, fontSize: '12px' } }, title: { text: 'Cpk' } }, grid: { borderColor: theme.grid },
+                dataLabels: { enabled: false }, yaxis: { labels: { formatter: function (v) { return v.toFixed(3); }, style: { colors: theme.text, fontSize: '12px', fontFamily: 'Inter, sans-serif' } }, title: { text: 'Cpk' } }, grid: { borderColor: theme.grid },
                 annotations: {
                     yaxis: [
                         { y: 1.0, borderColor: theme.danger, strokeDashArray: 4, label: { text: '1.0', style: { color: '#fff', background: theme.danger } } },
@@ -1089,8 +1089,8 @@ var SPCApp = {
                 colors: ['#3b82f6', '#10b981', '#ef4444', '#ef4444'], // Blue-500, Emerald-500, Red-500
                 stroke: { width: [3, 2, 2, 2], dashArray: [0, 0, 5, 5] },
                 markers: { size: [4, 0, 0, 0], hover: { size: 6 } },
-                xaxis: { categories: labels, labels: { style: { colors: theme.text, fontSize: '12px' } } },
-                dataLabels: { enabled: false }, yaxis: { labels: { formatter: function (v) { return v.toFixed(4); }, style: { colors: theme.text, fontSize: '12px' } }, title: { text: self.t('平均值', 'Mean') } }, grid: { borderColor: theme.grid }
+                xaxis: { categories: labels, labels: { style: { colors: theme.text, fontSize: '12px', fontFamily: 'Inter, sans-serif' } } },
+                dataLabels: { enabled: false }, yaxis: { labels: { formatter: function (v) { return v.toFixed(4); }, style: { colors: theme.text, fontSize: '12px', fontFamily: 'Inter, sans-serif' } }, title: { text: self.t('平均值', 'Mean') } }, grid: { borderColor: theme.grid }
             };
             var chartMean = new ApexCharts(document.querySelector("#meanChart"), meanOpt);
             chartMean.render(); this.chartInstances.push(chartMean);
@@ -1119,8 +1119,8 @@ var SPCApp = {
                 colors: ['#3b82f6', '#ef4444'], // Blue-500, Red-500
                 stroke: { width: 3 },
                 markers: { size: 4, shape: ['circle', 'rect'] },
-                xaxis: { categories: labels, labels: { style: { colors: theme.text, fontSize: '12px' } } },
-                dataLabels: { enabled: false }, yaxis: { labels: { formatter: function (v) { return v.toFixed(4); }, style: { colors: theme.text, fontSize: '12px' } }, title: { text: self.t('標準差', 'StdDev') } }, grid: { borderColor: theme.grid }
+                xaxis: { categories: labels, labels: { style: { colors: theme.text, fontSize: '12px', fontFamily: 'Inter, sans-serif' } } },
+                dataLabels: { enabled: false }, yaxis: { labels: { formatter: function (v) { return v.toFixed(4); }, style: { colors: theme.text, fontSize: '12px', fontFamily: 'Inter, sans-serif' } }, title: { text: self.t('標準差', 'StdDev') } }, grid: { borderColor: theme.grid }
             };
             var chartStd = new ApexCharts(document.querySelector("#stdDevChart"), stdOpt);
             chartStd.render(); this.chartInstances.push(chartStd);
@@ -1155,8 +1155,8 @@ var SPCApp = {
                 colors: ['#ef4444', '#3b82f6', '#ef4444', '#ff9800', '#10b981', '#ff9800'], // Red, Blue, Red, Orange, Emerald, Orange
                 stroke: { width: [1.5, 3, 1.5, 2, 2, 2], dashArray: [0, 0, 0, 5, 0, 5] },
                 markers: { size: [0, 4, 0, 0, 0, 0], colors: ['#3b82f6'], strokeColors: '#fff' },
-                xaxis: { categories: labels, labels: { style: { colors: theme.text, fontSize: '12px' } } },
-                dataLabels: { enabled: false }, yaxis: { labels: { formatter: function (v) { return v.toFixed(4); }, style: { colors: theme.text, fontSize: '12px' } }, title: { text: self.t('測量值', 'Value') } }, grid: { borderColor: theme.grid },
+                xaxis: { categories: labels, labels: { style: { colors: theme.text, fontSize: '12px', fontFamily: 'Inter, sans-serif' } } },
+                dataLabels: { enabled: false }, yaxis: { labels: { formatter: function (v) { return v.toFixed(4); }, style: { colors: theme.text, fontSize: '12px', fontFamily: 'Inter, sans-serif' } }, title: { text: self.t('測量值', 'Value') } }, grid: { borderColor: theme.grid },
                 tooltip: { fixed: { enabled: true, position: 'topRight', offsetX: 0, offsetY: 0 }, shared: true, intersect: false }
             };
             var chartG = new ApexCharts(document.querySelector("#groupChart"), gOpt);
@@ -1182,8 +1182,8 @@ var SPCApp = {
                 colors: ['#8b5cf6'], // Violet-500
                 stroke: { width: 2 },
                 markers: { size: 4, shape: 'square' },
-                xaxis: { categories: labels, labels: { style: { colors: theme.text, fontSize: '12px' } } },
-                dataLabels: { enabled: false }, yaxis: { labels: { formatter: function (v) { return v.toFixed(4); }, style: { colors: theme.text, fontSize: '12px' } }, title: { text: self.t('全距', 'Range') } }, grid: { borderColor: theme.grid }
+                xaxis: { categories: labels, labels: { style: { colors: theme.text, fontSize: '12px', fontFamily: 'Inter, sans-serif' } } },
+                dataLabels: { enabled: false }, yaxis: { labels: { formatter: function (v) { return v.toFixed(4); }, style: { colors: theme.text, fontSize: '12px', fontFamily: 'Inter, sans-serif' } }, title: { text: self.t('全距', 'Range') } }, grid: { borderColor: theme.grid }
             };
             var chartV = new ApexCharts(document.querySelector("#groupVarChart"), vOpt);
             chartV.render(); this.chartInstances.push(chartV);

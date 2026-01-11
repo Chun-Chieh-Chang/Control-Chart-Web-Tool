@@ -143,8 +143,17 @@ class SpecificationExtractor {
         const spec = this.createSpecificationData();
 
         try {
+            // DEBUG: 打印該行的所有內容，確認列索引
+            let rowContent = [];
+            for (let c = 0; c < 10; c++) {
+                const cell = worksheet[XLSX.utils.encode_cell({ r: row, c: c })];
+                rowContent.push(`Col${c}[${String.fromCharCode(65 + c)}]:${cell ? cell.v : 'null'}`);
+            }
+            console.log(`[SpecDebug][Row${row + 1}] 內容: `, rowContent.join(', '));
+
             // 定義欄位索引（根據用戶 QIP 報表截圖調整）
             // Row 26: (1)[A] Tool[B] 1.10[C] +[D] 0.13[E]
+            // Col A = 0, Col B = 1, Col C = 2, Col D = 3, Col E = 4
             // Row 27:                        -[D] 0.13[E]
             const nominalCol = 2;   // C欄 (Col index 2)
             const signCol = 3;      // D欄 (Col index 3)

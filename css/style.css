@@ -286,6 +286,18 @@ label {
     border-bottom-color: #475569 !important;
 }
 
+/* Hide number input spinners */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    appearance: none;
+    margin: 0;
+}
+
+input[type="number"] {
+    -moz-appearance: textfield;
+}
+
 .dark .apexcharts-xaxistooltip {
     background: #1e293b !important;
     color: #f1f5f9 !important;

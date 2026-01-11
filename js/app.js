@@ -938,6 +938,7 @@ var SPCApp = {
     },
 
     renderAnomalySidebar: function (pageXbarR, pageLabels) {
+        var self = this;
         var list = document.getElementById('anomalyList');
         if (!list) return;
         list.innerHTML = '';
@@ -956,12 +957,25 @@ var SPCApp = {
 
             var rulesText = v.rules.map(function (r) { return 'Rule ' + r; }).join(', ');
 
-            card.innerHTML = '<div class="flex justify-between items-start mb-1">' +
+            card.innerHTML = '<div class="flex justify-between items-start mb-2 pb-2 border-b border-slate-100 dark:border-slate-700">' +
                 '<div class="text-sm font-bold text-slate-900 dark:text-white">' + (pageLabels[v.index] || 'Batch') + '</div>' +
-                '<div class="text-xs font-bold text-rose-500 bg-rose-50 dark:bg-rose-900/30 px-2 py-0.5 rounded-full">' + rulesText + '</div>' +
+                '<div class="text-[10px] font-bold text-rose-500 bg-rose-50 dark:bg-rose-900/30 px-2 py-0.5 rounded-full">' + rulesText + '</div>' +
                 '</div>' +
-                '<div class="text-xs text-slate-500 dark:text-slate-400">Index: ' + (v.index + 1) + '</div>';
+                '<div class="space-y-3">' +
+                '<div>' +
+                '<div class="flex items-center gap-1.5 text-[10px] text-sky-600 dark:text-sky-400 font-bold">' +
+                '<span class="material-icons-outlined text-[12px]">precision_manufacturing</span> 成型專家</div>' +
+                '<div class="text-[10px] text-slate-600 dark:text-slate-400 leading-normal pl-4 mt-0.5">' + exp.m + '</div>' +
+                '</div>' +
+                '<div>' +
+                '<div class="flex items-center gap-1.5 text-[10px] text-emerald-600 dark:text-emerald-400 font-bold">' +
+                '<span class="material-icons-outlined text-[12px]">assignment_turned_in</span> 品管專家</div>' +
+                '<div class="text-[10px] text-slate-600 dark:text-slate-400 leading-normal pl-4 mt-0.5">' + exp.q + '</div>' +
+                '</div>' +
+                '</div>' +
+                '<div class="text-[9px] text-slate-400 mt-2 text-right italic">Index: ' + (v.index + 1) + '</div>';
 
+            // Keep the hover tooltip functionality as well
             card.addEventListener('mouseenter', function () {
                 var tooltip = document.getElementById('nelson-tooltip');
                 if (!tooltip) return;

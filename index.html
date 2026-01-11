@@ -895,230 +895,236 @@
             </div>
 
             <!-- View: QIP Data Extract -->
-            <div id="view-qip-extract" class="p-8 max-w-7xl mx-auto space-y-8 hidden">
-                <!-- Header -->
-                <div class="flex items-center gap-3 mb-6">
-                    <div
-                        class="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-900/30 flex items-center justify-center">
-                        <span class="material-icons-outlined text-emerald-600">download</span>
-                    </div>
-                    <div>
-                        <h2 class="text-xl font-bold text-slate-900 dark:text-white" data-en="QIP Data Extract"
-                            data-zh="QIP 數據提取">QIP 數據提取</h2>
-                        <p class="text-xs text-slate-500 dark:text-slate-400"
-                            data-en="Extract structured data from QIP inspection reports" data-zh="從 QIP 檢驗報告中提取結構化數據">從
-                            QIP 檢驗報告中提取結構化數據</p>
-                    </div>
-                </div>
-
-                <!-- Privacy Banner -->
+            <div id="view-qip-extract" class="p-8 max-w-7xl mx-auto space-y-6 hidden">
+                <!-- Slim Header & Status -->
                 <div
-                    class="saas-card p-4 bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-800 flex items-center gap-3">
-                    <span class="material-icons-outlined text-emerald-600">lock</span>
-                    <span class="text-sm text-emerald-700 dark:text-emerald-300"
-                        data-en="Privacy guarantee: All file processing is done locally in your browser"
-                        data-zh="資料隱私保障：所有處理在瀏覽器本地完成">資料隱私保障：所有處理在瀏覽器本地完成</span>
+                    class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm">
+                    <div class="flex items-center gap-3">
+                        <div
+                            class="w-10 h-10 rounded-xl bg-emerald-500 text-white flex items-center justify-center shadow-lg shadow-emerald-100 dark:shadow-none">
+                            <span class="material-icons-outlined">fact_check</span>
+                        </div>
+                        <div>
+                            <h2 class="text-lg font-bold text-slate-900 dark:text-white" data-en="QIP Data Extractor"
+                                data-zh="QIP 數據自動提取器">QIP 數據自動提取器</h2>
+                            <div class="flex items-center gap-2 mt-0.5">
+                                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                                <span class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Local
+                                    Processing Engine</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div
+                        class="flex items-center gap-4 bg-slate-50 dark:bg-slate-900/50 px-4 py-2 rounded-xl border border-slate-100 dark:border-slate-800">
+                        <div class="flex items-center gap-2">
+                            <span class="material-icons-outlined text-emerald-600 text-sm">lock</span>
+                            <span class="text-[11px] text-slate-600 dark:text-slate-400 font-medium">Browser-side
+                                privacy guaranteed. No data is sent to servers.</span>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="grid grid-cols-1 lg:grid-cols-7 gap-6">
-                    <!-- Step 1: File Upload -->
-                    <div class="lg:col-span-6 space-y-6">
-                        <div class="saas-card p-6">
-                            <div class="flex items-center gap-3 mb-4">
-                                <span
-                                    class="w-8 h-8 rounded-lg bg-primary text-white flex items-center justify-center text-sm font-bold">1</span>
-                                <h3 class="text-base font-bold text-slate-900 dark:text-white" data-en="Upload QIP File"
-                                    data-zh="上傳 QIP 檔案">上傳 QIP 檔案</h3>
-                            </div>
-                            <div id="qip-upload-zone"
-                                class="rounded-xl border-2 border-dashed border-slate-200 dark:border-slate-700 p-8 text-center hover:border-primary transition-colors cursor-pointer">
-                                <input type="file" id="qip-file-input" accept=".xls,.xlsx,.xlsm" hidden>
-                                <span class="material-icons-outlined text-4xl text-slate-400 mb-3">cloud_upload</span>
-                                <p class="text-sm text-slate-600 dark:text-slate-400 mb-2"
-                                    data-en="Drag & drop Excel file here" data-zh="拖曳 Excel 檔案至此">拖曳 Excel 檔案至此</p>
-                                <button
-                                    class="px-4 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:bg-indigo-700 transition-all"
-                                    data-en="Select File" data-zh="選擇檔案">選擇檔案</button>
-                                <p class="text-[10px] text-slate-400 mt-2">.xls, .xlsx, .xlsm</p>
-                            </div>
-                            <div id="qip-file-info"
-                                class="mt-4 p-4 bg-emerald-50 dark:bg-emerald-900/20 rounded-lg hidden">
-                                <div class="flex items-center justify-between">
-                                    <div class="flex items-center gap-3">
-                                        <span class="material-icons-outlined text-emerald-600">check_circle</span>
-                                        <span id="qip-file-name"
-                                            class="font-medium text-slate-900 dark:text-white"></span>
-                                    </div>
-                                    <button id="qip-remove-file" class="text-slate-400 hover:text-rose-500">
-                                        <span class="material-icons-outlined text-sm">close</span>
-                                    </button>
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                    <!-- Left: Extraction Controls -->
+                    <div class="lg:col-span-8 space-y-6">
+                        <!-- Dual Card: Upload & Basic Config -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <!-- File Upload Area -->
+                            <div class="saas-card p-5 h-full flex flex-col">
+                                <div class="flex items-center gap-2 mb-4">
+                                    <span
+                                        class="w-6 h-6 rounded-lg bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 flex items-center justify-center text-[10px] font-bold">01</span>
+                                    <h3 class="text-sm font-bold text-slate-900 dark:text-white">Source Selection</h3>
                                 </div>
-                                <div id="qip-workbook-info" class="text-xs text-slate-500 mt-2"></div>
+
+                                <div id="qip-upload-zone"
+                                    class="flex-1 rounded-xl border-2 border-dashed border-slate-100 dark:border-slate-700 p-6 text-center hover:border-emerald-400 hover:bg-emerald-50/10 transition-all cursor-pointer flex flex-col items-center justify-center">
+                                    <input type="file" id="qip-file-input" accept=".xls,.xlsx,.xlsm" hidden>
+                                    <span
+                                        class="material-icons-outlined text-3xl text-slate-300 mb-2">cloud_upload</span>
+                                    <p class="text-[11px] text-slate-500 mb-3">Drop report or click to select</p>
+                                    <button
+                                        class="px-4 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold transition-all">Select
+                                        File</button>
+                                </div>
+
+                                <div id="qip-file-info"
+                                    class="mt-4 p-3 bg-emerald-50 dark:bg-emerald-900/20 rounded-xl hidden border border-emerald-100 dark:border-emerald-800/50">
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex items-center gap-2 min-w-0">
+                                            <span
+                                                class="material-icons-outlined text-emerald-600 text-base">task_alt</span>
+                                            <span id="qip-file-name"
+                                                class="text-xs font-bold text-slate-900 dark:text-white truncate"></span>
+                                        </div>
+                                        <button id="qip-remove-file"
+                                            class="text-slate-400 hover:text-rose-500 transition-colors">
+                                            <span class="material-icons-outlined text-sm">close</span>
+                                        </button>
+                                    </div>
+                                    <div id="qip-workbook-info"
+                                        class="text-[9px] text-emerald-600/70 mt-1 pl-6 font-medium"></div>
+                                </div>
+                            </div>
+
+                            <!-- Basic Specs -->
+                            <div class="saas-card p-5 h-full">
+                                <div class="flex items-center gap-2 mb-4">
+                                    <span
+                                        class="w-6 h-6 rounded-lg bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 flex items-center justify-center text-[10px] font-bold">02</span>
+                                    <h3 class="text-sm font-bold text-slate-900 dark:text-white">Product Layout</h3>
+                                </div>
+
+                                <div class="space-y-4">
+                                    <div class="grid grid-cols-2 gap-3">
+                                        <div class="space-y-1">
+                                            <label
+                                                class="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">Product
+                                                Code</label>
+                                            <input type="text" id="qip-product-code"
+                                                class="w-full px-3 py-2 border border-slate-100 dark:border-slate-700 rounded-lg text-xs bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white focus:ring-2 focus:ring-emerald-500/20"
+                                                placeholder="P/N Auto">
+                                        </div>
+                                        <div class="space-y-1">
+                                            <label
+                                                class="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">Cavities</label>
+                                            <select id="qip-cavity-count"
+                                                class="w-full px-3 py-2 border border-slate-100 dark:border-slate-700 rounded-lg text-xs bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white focus:ring-2 focus:ring-emerald-500/20">
+                                                <option value="">Select</option>
+                                                <option value="8">8 穴</option>
+                                                <option value="16">16 穴</option>
+                                                <option value="24">24 穴</option>
+                                                <option value="32">32 穴</option>
+                                                <option value="40">40 穴</option>
+                                                <option value="48">48 穴</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div id="qip-worksheet-select-group" class="space-y-1 hidden">
+                                        <label
+                                            class="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">Select
+                                            Sheet</label>
+                                        <div class="flex gap-2">
+                                            <select id="qip-worksheet-select"
+                                                class="flex-1 px-3 py-2 border border-slate-100 dark:border-slate-700 rounded-lg text-xs bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white"></select>
+                                            <button id="qip-preview-btn"
+                                                class="px-3 py-2 bg-emerald-50 text-emerald-600 rounded-lg text-xs font-bold hover:bg-emerald-100 transition-all border border-emerald-100">
+                                                <span
+                                                    class="material-icons-outlined text-sm align-middle">visibility</span>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <!-- Context Tip -->
+                                    <div
+                                        class="p-3 bg-blue-50/50 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-900/30 rounded-xl flex gap-2">
+                                        <span class="material-icons-outlined text-blue-500 text-base">lightbulb</span>
+                                        <p class="text-[10px] text-blue-700 dark:text-blue-300 leading-normal">
+                                            Use "Preview" to open the sheet, then use 📍 button to select coordinate
+                                            ranges by dragging on the table.
+                                        </p>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
-                        <!-- Step 2: Configuration -->
-                        <div class="saas-card p-6">
-                            <div class="flex items-center gap-3 mb-4">
-                                <span
-                                    class="w-8 h-8 rounded-lg bg-primary text-white flex items-center justify-center text-sm font-bold">2</span>
-                                <h3 class="text-base font-bold text-slate-900 dark:text-white" data-en="Configuration"
-                                    data-zh="參數配置">參數配置</h3>
-                            </div>
+                        <!-- Dynamic Range Map -->
+                        <div id="qip-cavity-groups" class="grid grid-cols-1 md:grid-cols-2 gap-4 hidden">
+                            <!-- Dynamic content injected as grid -->
+                        </div>
+                    </div>
+
+                    <!-- Right: Actions & Configurations -->
+                    <div class="lg:col-span-4 space-y-6">
+                        <!-- Processing Console -->
+                        <div class="saas-card p-5 bg-slate-900 text-white border-none shadow-xl">
+                            <h4
+                                class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-5 flex justify-between items-center">
+                                Processing Console
+                                <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                            </h4>
 
                             <div class="space-y-4">
-                                <div class="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <label class="text-xs font-bold text-slate-500 uppercase mb-1 block"
-                                            data-en="Product Code" data-zh="產品品號">產品品號</label>
-                                        <input type="text" id="qip-product-code"
-                                            class="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
-                                            placeholder="自動從檔案名提取">
+                                <button id="qip-start-process" disabled
+                                    class="w-full px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl font-bold transition-all disabled:opacity-20 flex items-center justify-center gap-2 shadow-lg shadow-emerald-900/20">
+                                    <span class="material-icons-outlined text-lg">play_circle</span>
+                                    <span>Run Extraction</span>
+                                </button>
+
+                                <div id="qip-progress" class="space-y-2 hidden">
+                                    <div class="flex justify-between text-[10px] font-bold text-slate-400 px-1">
+                                        <span id="qip-progress-text">Initializing...</span>
+                                        <span id="qip-progress-percent">0%</span>
                                     </div>
-                                    <div>
-                                        <label class="text-xs font-bold text-slate-500 uppercase mb-1 block"
-                                            data-en="Cavity Count" data-zh="模穴數">模穴數</label>
-                                        <select id="qip-cavity-count"
-                                            class="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-white">
-                                            <option value="">-- 請選擇 --</option>
-                                            <option value="8">8 穴</option>
-                                            <option value="16">16 穴</option>
-                                            <option value="24">24 穴</option>
-                                            <option value="32">32 穴</option>
-                                            <option value="40">40 穴</option>
-                                            <option value="48">48 穴</option>
-                                        </select>
+                                    <div class="w-full bg-slate-800 rounded-full h-1.5 p-0.5 overflow-hidden">
+                                        <div id="qip-progress-bar"
+                                            class="bg-emerald-400 h-full rounded-full transition-all duration-300 shadow-[0_0_8px_rgba(52,211,153,0.5)]"
+                                            style="width: 0%"></div>
                                     </div>
                                 </div>
 
-                                <!-- Worksheet Selection for Preview -->
-                                <div id="qip-worksheet-select-group" class="hidden">
-                                    <label class="text-xs font-bold text-slate-500 uppercase mb-1 block"
-                                        data-en="Worksheet" data-zh="工作表">工作表</label>
-                                    <div class="flex gap-2">
-                                        <select id="qip-worksheet-select"
-                                            class="flex-1 px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-white">
-                                            <option value="">-- 請選擇工作表 --</option>
-                                        </select>
-                                        <button id="qip-preview-btn"
-                                            class="px-4 py-2 bg-emerald-600 text-white rounded-lg text-sm font-medium hover:bg-emerald-700 transition-all flex items-center gap-2">
-                                            <span class="material-icons-outlined text-base">visibility</span>
-                                            <span data-en="Preview" data-zh="預覽">預覽</span>
+                                <div id="qip-result-section"
+                                    class="pt-4 mt-4 border-t border-slate-800 space-y-4 hidden">
+                                    <div id="qip-result-summary"
+                                        class="bg-slate-800/50 p-4 rounded-xl border border-slate-700/50">
+                                        <!-- Summary -->
+                                    </div>
+                                    <div class="grid grid-cols-2 gap-3">
+                                        <button id="qip-download-excel"
+                                            class="p-3 bg-white/5 hover:bg-white/10 text-white rounded-xl text-xs font-bold transition-all flex flex-col items-center gap-2 border border-white/10">
+                                            <span class="material-icons-outlined text-emerald-400">download</span>
+                                            Excel
+                                        </button>
+                                        <button id="qip-send-to-spc"
+                                            class="p-3 bg-white/5 hover:bg-white/10 text-white rounded-xl text-xs font-bold transition-all flex flex-col items-center gap-2 border border-white/10">
+                                            <span class="material-icons-outlined text-indigo-400">arrow_forward</span>
+                                            Send to SPC
                                         </button>
                                     </div>
                                 </div>
+                            </div>
+                        </div>
 
-                                <!-- Hint for mouse range selection -->
-                                <div
-                                    class="p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
-                                    <div class="flex items-start gap-2">
-                                        <span class="material-icons-outlined text-blue-600 text-lg">info</span>
-                                        <div class="text-xs text-blue-700 dark:text-blue-300">
-                                            <strong>操作提示：</strong>1) 點擊「預覽」查看工作表 → 2) 點擊「📍 選擇」按鈕 → 3) 在表格中拖曳滑鼠選擇範圍
-                                        </div>
+                        <!-- Configuration Storage -->
+                        <div class="saas-card overflow-hidden">
+                            <div
+                                class="p-4 border-b border-slate-50 dark:border-slate-800 flex justify-between items-center bg-slate-50/50 dark:bg-slate-900/50">
+                                <h4 class="text-xs font-bold text-slate-500 uppercase tracking-widest">Library</h4>
+                                <span class="material-icons-outlined text-slate-300 text-sm">inventory_2</span>
+                            </div>
+                            <div class="p-4 space-y-3">
+                                <div class="space-y-1">
+                                    <label class="text-[9px] font-bold text-slate-400 px-1">Save Configuration</label>
+                                    <div class="flex gap-2">
+                                        <input type="text" id="qip-config-name"
+                                            class="flex-1 px-3 py-1.5 border border-slate-100 dark:border-slate-800 rounded-lg text-[11px] bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white"
+                                            placeholder="Layout name...">
+                                        <button id="qip-save-config"
+                                            class="px-2 py-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 text-slate-600 dark:text-slate-400 hover:text-emerald-600 rounded-lg transition-all border border-slate-100 dark:border-slate-800">
+                                            <span class="material-icons-outlined text-sm">save</span>
+                                        </button>
                                     </div>
                                 </div>
-
-
-                                <!-- Cavity Range Groups (Dynamic) -->
-                                <div id="qip-cavity-groups" class="space-y-3 hidden"></div>
-
-                                <!-- Config Management -->
-                                <div class="flex gap-2 pt-4 border-t border-slate-100 dark:border-slate-700">
-                                    <input type="text" id="qip-config-name"
-                                        class="flex-1 px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
-                                        placeholder="配置名稱">
-                                    <button id="qip-save-config"
-                                        class="px-4 py-2 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-white rounded-lg text-sm hover:bg-slate-200 dark:hover:bg-slate-600 transition-all"><span
-                                            class="material-icons-outlined text-sm align-middle">save</span> 保存</button>
-                                    <button id="qip-load-config"
-                                        class="px-4 py-2 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-white rounded-lg text-sm hover:bg-slate-200 dark:hover:bg-slate-600 transition-all"><span
-                                            class="material-icons-outlined text-sm align-middle">folder_open</span>
-                                        載入</button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Step 3: Process -->
-                        <div class="saas-card p-6">
-                            <div class="flex items-center gap-3 mb-4">
-                                <span
-                                    class="w-8 h-8 rounded-lg bg-primary text-white flex items-center justify-center text-sm font-bold">3</span>
-                                <h3 class="text-base font-bold text-slate-900 dark:text-white" data-en="Execute"
-                                    data-zh="執行處理">執行處理</h3>
-                            </div>
-                            <button id="qip-start-process" disabled
-                                class="w-full px-6 py-3 bg-emerald-600 text-white rounded-lg font-bold hover:bg-emerald-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
-                                <span class="material-icons-outlined">play_arrow</span>
-                                <span data-en="Start Processing" data-zh="開始處理">開始處理</span>
-                            </button>
-                            <div id="qip-progress" class="mt-4 hidden">
-                                <div class="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2">
-                                    <div id="qip-progress-bar" class="bg-emerald-600 h-2 rounded-full transition-all"
-                                        style="width: 0%"></div>
-                                </div>
-                                <p id="qip-progress-text" class="text-xs text-slate-500 mt-2 text-center">準備中...</p>
-                            </div>
-                        </div>
-
-                        <!-- Step 4: Results -->
-                        <div id="qip-result-section" class="saas-card p-6 hidden">
-                            <div class="flex items-center gap-3 mb-4">
-                                <span
-                                    class="w-8 h-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center text-sm font-bold">✓</span>
-                                <h3 class="text-base font-bold text-slate-900 dark:text-white" data-en="Results"
-                                    data-zh="處理結果">處理結果</h3>
-                            </div>
-                            <div id="qip-result-summary"
-                                class="p-4 bg-emerald-50 dark:bg-emerald-900/20 rounded-lg mb-4">
-                                <!-- Dynamic summary -->
-                            </div>
-                            <div class="flex gap-3">
-                                <button id="qip-download-excel"
-                                    class="flex-1 px-6 py-3 bg-primary text-white rounded-lg font-bold hover:bg-indigo-700 transition-all flex items-center justify-center gap-2">
-                                    <span class="material-icons-outlined">download</span>
-                                    <span data-en="Download Excel" data-zh="下載 Excel">下載 Excel</span>
-                                </button>
-                                <button id="qip-send-to-spc"
-                                    class="flex-1 px-6 py-3 bg-slate-800 text-white rounded-lg font-bold hover:bg-slate-700 transition-all flex items-center justify-center gap-2">
-                                    <span class="material-icons-outlined">arrow_forward</span>
-                                    <span data-en="Send to SPC" data-zh="傳送至 SPC 分析">傳送至 SPC 分析</span>
+                                <button id="qip-load-config"
+                                    class="w-full px-4 py-2 bg-slate-50 dark:bg-slate-800 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 text-slate-600 dark:text-slate-400 hover:text-indigo-600 rounded-lg text-xs font-bold transition-all border border-slate-100 dark:border-slate-800 flex items-center justify-center gap-2">
+                                    <span class="material-icons-outlined text-sm">folder_open</span>
+                                    <span>Browse Saved Layouts</span>
                                 </button>
                             </div>
-                            <div id="qip-error-log" class="mt-4 p-4 bg-rose-50 dark:bg-rose-900/20 rounded-lg hidden">
-                                <h4 class="font-bold text-rose-600 mb-2">處理異常記錄</h4>
-                                <div id="qip-error-list" class="text-sm text-rose-600"></div>
+                        </div>
+
+                        <!-- Logs / Analytics -->
+                        <div id="qip-error-log"
+                            class="saas-card p-4 bg-rose-50 dark:bg-rose-950/20 border-rose-100 dark:border-rose-900 hidden">
+                            <h4 class="text-[10px] font-bold text-rose-600 mb-2 flex items-center gap-2 uppercase">
+                                <span class="material-icons-outlined text-sm">error_outline</span>
+                                Exception Log
+                            </h4>
+                            <div id="qip-error-list" class="text-[10px] text-rose-500/80 leading-relaxed font-mono">
                             </div>
                         </div>
-                    </div>
-
-                    <!-- Sidebar: Preview & Help -->
-                    <div class="space-y-6">
-                        <div class="saas-card p-6">
-                            <h4 class="text-sm font-bold text-slate-900 dark:text-white mb-3" data-en="Quick Guide"
-                                data-zh="快速指南">快速指南</h4>
-                            <ul class="text-xs text-slate-500 space-y-2">
-                                <li class="flex items-start gap-2">
-                                    <span
-                                        class="w-4 h-4 rounded-full bg-primary/20 text-primary flex items-center justify-center flex-shrink-0 text-[10px]">1</span>
-                                    <span data-en="Upload QIP Excel file" data-zh="上傳 QIP Excel 檔案">上傳 QIP Excel
-                                        檔案</span>
-                                </li>
-                                <li class="flex items-start gap-2">
-                                    <span
-                                        class="w-4 h-4 rounded-full bg-primary/20 text-primary flex items-center justify-center flex-shrink-0 text-[10px]">2</span>
-                                    <span data-en="Configure cavity count and ranges" data-zh="設定模穴數與範圍">設定模穴數與範圍</span>
-                                </li>
-                                <li class="flex items-start gap-2">
-                                    <span
-                                        class="w-4 h-4 rounded-full bg-primary/20 text-primary flex items-center justify-center flex-shrink-0 text-[10px]">3</span>
-                                    <span data-en="Click process and download result"
-                                        data-zh="點擊處理並下載結果">點擊處理並下載結果</span>
-                                </li>
-                            </ul>
-                        </div>
-
-
                     </div>
                 </div>
 
@@ -1133,13 +1139,19 @@
                                 選擇模式：<strong id="qip-selection-type">無</strong>
                             </span>
                         </div>
-                        <div class="flex gap-2">
-                            <button id="qip-prev-sheet"
-                                class="p-1.5 rounded hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"><span
-                                    class="material-icons-outlined text-base">chevron_left</span></button>
-                            <button id="qip-next-sheet"
-                                class="p-1.5 rounded hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"><span
-                                    class="material-icons-outlined text-base">chevron_right</span></button>
+                        <div class="flex items-center gap-4">
+                            <div class="flex gap-2 bg-slate-100 dark:bg-slate-700 p-1 rounded-lg">
+                                <button id="qip-prev-sheet"
+                                    class="p-1 rounded hover:bg-white dark:hover:bg-slate-600 transition-colors shadow-sm"><span
+                                        class="material-icons-outlined text-base">chevron_left</span></button>
+                                <button id="qip-next-sheet"
+                                    class="p-1 rounded hover:bg-white dark:hover:bg-slate-600 transition-colors shadow-sm"><span
+                                        class="material-icons-outlined text-base">chevron_right</span></button>
+                            </div>
+                            <button onclick="document.getElementById('qip-preview-panel').classList.add('hidden')"
+                                class="text-slate-400 hover:text-rose-500 transition-colors">
+                                <span class="material-icons-outlined">close</span>
+                            </button>
                         </div>
                     </div>
                     <div id="qip-preview-content"

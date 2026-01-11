@@ -178,29 +178,36 @@ var QIPExtractApp = {
         for (var i = 1; i <= groupCount; i++) {
             var start = (i - 1) * 8 + 1;
             var end = Math.min(i * 8, cavityCount);
-            html += '<div class="p-4 bg-slate-50 dark:bg-slate-800 rounded-lg space-y-3">' +
-                '<div class="text-xs font-bold text-slate-600 dark:text-slate-400">第 ' + start + '-' + end + ' 穴</div>' +
-                '<div class="space-y-2">' +
-                // 穴號範圍
-                '<div class="flex gap-2 items-end">' +
-                '<div class="flex-1"><label class="text-[10px] text-slate-500 block">穴號範圍</label>' +
-                '<input type="text" id="qip-cavity-id-' + i + '" class="qip-range-input w-full px-2 py-1 text-xs border rounded bg-white dark:bg-slate-700 dark:border-slate-600" placeholder="如: K3:R3"></div>' +
-                '<button class="qip-select-btn px-3 py-1.5 text-xs bg-primary text-white rounded hover:bg-indigo-700 flex items-center gap-1" data-target="qip-cavity-id-' + i + '" data-type="cavity">' +
-                '<span>📍</span> 選擇</button>' +
+            html += '<div class="p-4 bg-white dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-700/50 space-y-3 shadow-sm">' +
+                '<div class="flex items-center justify-between border-b border-slate-50 dark:border-slate-700/50 pb-2">' +
+                '<div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Cavities ' + start + '-' + end + '</div>' +
+                (i > 1 ? '<div class="flex items-center gap-2 font-mono"><span class="text-[9px] text-slate-400">OFFSET:</span>' +
+                    '<input type="number" id="qip-offset-' + i + '" class="w-10 bg-transparent text-[10px] font-bold text-indigo-500 text-center focus:outline-none" value="1" min="1" max="10"></div>' : '') +
                 '</div>' +
-                // 數據範圍
-                '<div class="flex gap-2 items-end">' +
-                '<div class="flex-1"><label class="text-[10px] text-slate-500 block">數據範圍</label>' +
-                '<input type="text" id="qip-data-range-' + i + '" class="qip-range-input w-full px-2 py-1 text-xs border rounded bg-white dark:bg-slate-700 dark:border-slate-600" placeholder="如: K4:R4"></div>' +
-                '<button class="qip-select-btn px-3 py-1.5 text-xs bg-primary text-white rounded hover:bg-indigo-700 flex items-center gap-1" data-target="qip-data-range-' + i + '" data-type="data">' +
-                '<span>📍</span> 選擇</button>' +
+
+                '<div class="grid grid-cols-1 gap-3">' +
+                // 穴號範圍 (Cavity ID)
+                '<div class="flex items-center gap-3">' +
+                '<div class="w-7 h-7 rounded-lg bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 flex items-center justify-center flex-shrink-0"><span class="material-icons-outlined text-sm">tag</span></div>' +
+                '<div class="flex-1">' +
+                '<input type="text" id="qip-cavity-id-' + i + '" class="qip-range-input w-full bg-transparent text-xs font-mono font-bold text-slate-700 dark:text-slate-300 border-b border-slate-100 dark:border-slate-700 focus:border-emerald-500 outline-none pb-1" placeholder="ID Range (e.g. K3:R3)">' +
+                '</div>' +
+                '<button class="qip-select-btn p-1.5 text-violet-500 hover:bg-violet-50 dark:hover:bg-violet-900/20 rounded-lg transition-all" data-target="qip-cavity-id-' + i + '" data-type="cavity" title="Select Range">' +
+                '<span class="material-icons-outlined text-base">ads_click</span></button>' +
+                '</div>' +
+
+                // 數據範圍 (Data Values)
+                '<div class="flex items-center gap-3">' +
+                '<div class="w-7 h-7 rounded-lg bg-blue-50 dark:bg-blue-900/30 text-blue-600 flex items-center justify-center flex-shrink-0"><span class="material-icons-outlined text-sm">bar_chart</span></div>' +
+                '<div class="flex-1">' +
+                '<input type="text" id="qip-data-range-' + i + '" class="qip-range-input w-full bg-transparent text-xs font-mono font-bold text-slate-700 dark:text-slate-300 border-b border-slate-100 dark:border-slate-700 focus:border-blue-500 outline-none pb-1" placeholder="Data Range (e.g. K4:R4)">' +
+                '</div>' +
+                '<button class="qip-select-btn p-1.5 text-violet-500 hover:bg-violet-50 dark:hover:bg-violet-900/20 rounded-lg transition-all" data-target="qip-data-range-' + i + '" data-type="data" title="Select Range">' +
+                '<span class="material-icons-outlined text-base">ads_click</span></button>' +
+                '</div>' +
+
                 '</div>' +
                 '</div>';
-            if (i > 1) {
-                html += '<div><label class="text-[10px] text-slate-500 block">頁面偏移</label>' +
-                    '<input type="number" id="qip-offset-' + i + '" class="w-20 px-2 py-1 text-xs border rounded bg-white dark:bg-slate-700 dark:border-slate-600" value="1" min="1" max="10"></div>';
-            }
-            html += '</div>';
         }
         this.els.cavityGroups.innerHTML = html;
 
@@ -513,14 +520,24 @@ var QIPExtractApp = {
 
     showConfigDialog: function () {
         var configs = JSON.parse(localStorage.getItem('qip_configs') || '[]');
-        if (configs.length === 0) { alert('尚未保存任何配置'); return; }
+        if (configs.length === 0) {
+            alert(this.t('尚未保存任何配置', 'No saved configurations found.'));
+            return;
+        }
 
         var list = configs.map(function (c, i) {
-            return c.name + ' (' + c.cavityCount + '穴)';
+            var date = c.savedAt ? new Date(c.savedAt).toLocaleDateString() : 'N/A';
+            return i + ': ' + c.name + ' [' + c.cavityCount + ' Cavities, ' + date + ']';
         }).join('\n');
-        var choice = prompt('請選擇配置編號 (0-' + (configs.length - 1) + '):\n' + list);
-        if (choice !== null) {
-            this.loadConfiguration(parseInt(choice));
+
+        var choice = prompt(this.t('請輸入欲讀取的配置編號 (0-' + (configs.length - 1) + '):', 'Enter layout ID to load (0-' + (configs.length - 1) + '):') + '\n\n' + list);
+        if (choice !== null && choice !== '' && !isNaN(choice)) {
+            var idx = parseInt(choice);
+            if (idx >= 0 && idx < configs.length) {
+                this.loadConfiguration(idx);
+            } else {
+                alert(this.t('編號無效', 'Invalid ID'));
+            }
         }
     },
 
@@ -587,6 +604,8 @@ var QIPExtractApp = {
 
             this.processingResults = await processor.processWorkbook(this.workbook, (progress) => {
                 self.els.progressBar.style.width = progress.percent + '%';
+                var pctEl = document.getElementById('qip-progress-percent');
+                if (pctEl) pctEl.textContent = Math.round(progress.percent) + '%';
                 self.els.progressText.textContent = progress.message;
             });
 
@@ -603,13 +622,14 @@ var QIPExtractApp = {
 
     showResults: function (results) {
         this.els.progressBar.style.width = '100%';
-        this.els.progressText.textContent = '處理完成！';
+        this.els.progressText.textContent = 'Extraction Complete';
         this.els.resultSection.classList.remove('hidden');
 
-        var summary = '<div class="text-sm"><strong>產品名稱:</strong> ' + (results.productInfo.productName || '-') + '</div>' +
-            '<div class="text-sm"><strong>產品品號:</strong> ' + (results.productCode || '-') + '</div>' +
-            '<div class="text-sm"><strong>檢驗項目:</strong> ' + results.itemCount + ' 個</div>' +
-            '<div class="text-sm"><strong>有效批次:</strong> ' + results.totalBatches + ' 批</div>';
+        var summary = '<div class="space-y-3">' +
+            '<div class="flex justify-between items-center"><span class="text-[10px] text-slate-500 uppercase font-bold">Product</span><span class="text-xs font-bold text-white truncate max-w-[150px]">' + (results.productInfo.productName || '-') + '</span></div>' +
+            '<div class="flex justify-between items-center"><span class="text-[10px] text-slate-500 uppercase font-bold">Extracted Items</span><span class="text-xs font-bold text-emerald-400">' + results.itemCount + '</span></div>' +
+            '<div class="flex justify-between items-center"><span class="text-[10px] text-slate-500 uppercase font-bold">Total Batches</span><span class="text-xs font-bold text-indigo-400">' + results.totalBatches + '</span></div>' +
+            '</div>';
 
         this.els.resultSummary.innerHTML = summary;
 

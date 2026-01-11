@@ -143,33 +143,22 @@ class SpecificationExtractor {
         const spec = this.createSpecificationData();
 
         try {
-            // 定義欄位索引（根據VBA中的定義）
-            const symbolCol = 2;    // C欄
-            const nominalCol1 = 4;  // E欄
-            const nominalCol2 = 5;  // F欄
-            const upperSignCol = 6; // G欄
-            const upperTolCol = 7;  // H欄
-            const lowerSignCol = 8; // I欄
-            const lowerTolCol = 9;  // J欄
+            // 定義欄位索引（根據用戶 QIP 報表截圖調整）
+            // Row 26: (1)[A] Tool[B] 1.10[C] +[D] 0.13[E]
+            // Row 27:                        -[D] 0.13[E]
+            const nominalCol = 2;   // C欄 (Col index 2)
+            const signCol = 3;      // D欄 (Col index 3)
+            const tolCol = 4;       // E欄 (Col index 4)
 
-            // 讀取符號
-            const symbolCell = worksheet[XLSX.utils.encode_cell({ r: row, c: symbolCol })];
-            spec.symbol = symbolCell ? String(symbolCell.v || '').trim() : '';
-
-            // 讀取基準值（嘗試E、F欄）
+            // 讀取基準值（C欄）
             let nominalValue = null;
-            for (const col of [nominalCol1, nominalCol2]) {
-                const cell = worksheet[XLSX.utils.encode_cell({ r: row, c: col })];
-                if (cell && !isNaN(parseFloat(cell.v))) {
-                    nominalValue = parseFloat(cell.v);
-                    break;
-                }
-                // 嘗試下一行
-                const nextCell = worksheet[XLSX.utils.encode_cell({ r: row + 1, c: col })];
-                if (nextCell && !isNaN(parseFloat(nextCell.v))) {
-                    nominalValue = parseFloat(nextCell.v);
-                    break;
-                }
+            const nominalCell = worksheet[XLSX.utils.encode_cell({ r: row, c: nominalCol })];
+
+            if (nominalCell && !isNaN(parseFloat(nominalCell.v))) {
+                nominalValue = parseFloat(nominalCell.v);
+            } else {
+                // 如果本行沒有，嘗試從合併儲存格獲取或假設與上一行相同（不太可能，通常是itemName行有target）
+                // 這裡我們假設Target值必須存在
             }
 
             if (nominalValue === null) return spec;
@@ -177,33 +166,40 @@ class SpecificationExtractor {
             spec.nominalValue = nominalValue;
             spec.target = nominalValue;
 
-            // 讀取上公差
-            const upperSignCell = worksheet[XLSX.utils.encode_cell({ r: row, c: upperSignCol })];
-            const upperTolCell = worksheet[XLSX.utils.encode_cell({ r: row, c: upperTolCol })];
-            let upperTol = 0;
+            // --- 讀取上公差 (本行: Row) ---
+            const upperSignCell = worksheet[XLSX.utils.encode_cell({ r: row, c: signCol })];
+            const upperTolCell = worksheet[XLSX.utils.encode_cell({ r: row, c: tolCol })];
 
+            let upperTolVal = 0;
             if (upperTolCell && !isNaN(parseFloat(upperTolCell.v))) {
-                upperTol = Math.abs(parseFloat(upperTolCell.v));
+                upperTolVal = Math.abs(parseFloat(upperTolCell.v));
             }
 
-            // 根據符號確定正負
             const upperSign = upperSignCell ? String(upperSignCell.v).trim() : '+';
-            spec.upperTolerance = upperTol;
+            // 如果符號是 '-'，則為負；否則為正
+            const upperActualTol = (upperSign === '-') ? -upperTolVal : upperTolVal;
 
-            // 讀取下公差
-            const lowerSignCell = worksheet[XLSX.utils.encode_cell({ r: row + 1, c: lowerSignCol })];
-            const lowerTolCell = worksheet[XLSX.utils.encode_cell({ r: row + 1, c: lowerTolCol })];
-            let lowerTol = 0;
+            spec.upperTolerance = upperActualTol;
+            spec.usl = spec.nominalValue + spec.upperTolerance;
 
+            // --- 讀取下公差 (下一行: Row + 1) ---
+            // 注意：下公差通常在下一行，與 Target 相同的列通常是空的
+            const lowerSignCell = worksheet[XLSX.utils.encode_cell({ r: row + 1, c: signCol })];
+            const lowerTolCell = worksheet[XLSX.utils.encode_cell({ r: row + 1, c: tolCol })];
+
+            let lowerTolVal = 0;
             if (lowerTolCell && !isNaN(parseFloat(lowerTolCell.v))) {
-                lowerTol = Math.abs(parseFloat(lowerTolCell.v));
+                lowerTolVal = Math.abs(parseFloat(lowerTolCell.v));
             }
 
-            spec.lowerTolerance = lowerTol;
+            const lowerSign = lowerSignCell ? String(lowerSignCell.v).trim() : '-'; // 預設可能是負
+            // 下公差計算：如果是 '-' 則減去，如果是 '+' 則加上
+            // LSL = Target + (Sign * Value)
+            const lowerActualTol = (lowerSign === '-') ? -lowerTolVal : lowerTolVal;
 
-            // 計算 USL 和 LSL
-            spec.usl = spec.nominalValue + spec.upperTolerance;
-            spec.lsl = spec.nominalValue - spec.lowerTolerance;
+            spec.lowerTolerance = lowerActualTol; // 這裡存儲的是相對於 Target 的偏移量
+            spec.lsl = spec.nominalValue + spec.lowerTolerance;
+
             spec.isValid = true;
 
             return spec;

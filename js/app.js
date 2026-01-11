@@ -936,13 +936,27 @@ var SPCApp = {
                         var violation = pageXbarR.xBar.violations.find(v => v.index === dataPointIndex);
                         if (violation && (seriesIndex === 0 || name === 'X-Bar')) {
                             var rulesText = violation.rules.map(r => 'Rule ' + r).join(', ');
-                            var mainRule = violation.rules[0];
-                            var expPair = self.nelsonExpertise[mainRule] || {
-                                zh: { m: "請檢查製程參數。", q: "請參考標準作業程序。" },
-                                en: { m: "Please check process parameters.", q: "Please refer to SOP." }
-                            };
                             var currentLang = self.settings.language || 'zh';
-                            var exp = expPair[currentLang] || expPair['zh'];
+
+                            // 收集所有規則的建議
+                            var moldingAdviceHtml = '';
+                            var qualityAdviceHtml = '';
+
+                            violation.rules.forEach(function (ruleId) {
+                                var pair = self.nelsonExpertise[ruleId] || {
+                                    zh: { m: "請檢查製程參數。", q: "請參考標準作業程序。" },
+                                    en: { m: "Please check process parameters.", q: "Please refer to SOP." }
+                                };
+                                var advice = pair[currentLang] || pair['zh'];
+
+                                moldingAdviceHtml += '<div class="text-xs text-slate-300 leading-normal pl-0 mt-1 flex items-start">' +
+                                    '<span class="inline-block px-1 rounded bg-slate-700 text-[10px] text-slate-300 mr-1 min-w-[20px] text-center">R' + ruleId + '</span>' +
+                                    '<span>' + advice.m + '</span></div>';
+
+                                qualityAdviceHtml += '<div class="text-xs text-slate-300 leading-normal pl-0 mt-1 flex items-start">' +
+                                    '<span class="inline-block px-1 rounded bg-slate-700 text-[10px] text-slate-300 mr-1 min-w-[20px] text-center">R' + ruleId + '</span>' +
+                                    '<span>' + advice.q + '</span></div>';
+                            });
 
                             html += '<div class="space-y-3 mt-2">';
                             html += '<div class="flex items-center justify-between gap-4">';
@@ -951,12 +965,12 @@ var SPCApp = {
 
                             html += '<div>';
                             html += '<div class="flex items-center gap-1.5 text-xs text-sky-400 font-bold"><span class="material-icons-outlined text-[14px]">precision_manufacturing</span> ' + self.t('成型專家', 'Molding Expert') + '</div>';
-                            html += '<div class="text-xs text-slate-300 leading-normal pl-4 mt-1">' + (exp ? exp.m : '-') + '</div>';
+                            html += '<div class="pl-2">' + moldingAdviceHtml + '</div>';
                             html += '</div>';
 
                             html += '<div>';
                             html += '<div class="flex items-center gap-1.5 text-xs text-emerald-400 font-bold"><span class="material-icons-outlined text-[14px]">assignment_turned_in</span> ' + self.t('品管專家', 'Quality Expert') + '</div>';
-                            html += '<div class="text-xs text-slate-300 leading-normal pl-4 mt-1">' + (exp ? exp.q : '-') + '</div>';
+                            html += '<div class="pl-2">' + qualityAdviceHtml + '</div>';
                             html += '</div>';
                             html += '</div>';
                         }

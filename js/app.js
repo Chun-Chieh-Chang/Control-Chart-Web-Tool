@@ -738,7 +738,7 @@ var SPCApp = {
                 '<div class="saas-card p-8"> <h3 class="text-base font-bold mb-6 dark:text-white">' + this.t('模穴 Cpk 效能比較', 'Cavity Cpk') + '</h3> <div id="cpkChart" class="h-96"></div> </div>' +
                 '<div class="grid grid-cols-1 md:grid-cols-2 gap-6">' +
                 '<div class="saas-card p-8"> <h3 class="text-base font-bold mb-6 dark:text-white">' + this.t('均值比較', 'Mean Comp') + '</h3> <div id="meanChart" class="h-80"></div> </div>' +
-                '<div class="saas-card p-8"> <h3 class="text-base font-bold mb-6 dark:text-white">' + this.t('標差比較', 'StdDev Comp') + '</h3> <div id="stdDevChart" class="h-80"></div> </div> </div>' +
+                '<div class="saas-card p-8"> <h3 class="text-base font-bold mb-6 dark:text-white">' + this.t('標準差比較', 'StdDev Comp') + '</h3> <div id="stdDevChart" class="h-80"></div> </div> </div>' +
                 '<div class="saas-card overflow-hidden"> <div class="p-6 border-b dark:border-slate-700"> <h3 class="text-base font-bold dark:text-white">' + this.t('數據明細', 'Details') + '</h3> </div>' +
                 '<table class="w-full text-sm text-left"> <thead class="text-xs text-slate-400 bg-slate-50/50 dark:bg-slate-700/50 uppercase"> <tr><th class="px-6 py-3">Name</th><th class="px-6 py-3 text-center">Mean</th><th class="px-6 py-3 text-center">Cpk</th><th class="px-6 py-3 text-center">n</th></tr> </thead>' +
                 '<tbody class="divide-y dark:divide-slate-700">' + data.cavityStats.map(function (s) {

@@ -1276,17 +1276,45 @@ var SPCApp = {
         }
 
         violations.forEach(function (v) {
-            var ruleId = v.rules[0];
-            var expPair = self.nelsonExpertise[ruleId] || {
-                zh: { m: "請檢查製程參數。", q: "請參考標準作業程序。" },
-                en: { m: "Please check process parameters.", q: "Please refer to SOP." }
-            };
-            var exp = self.settings.language === 'zh' ? expPair.zh : expPair.en;
-
             var card = document.createElement('div');
             card.className = 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-4 rounded-xl mb-3 mx-4 group relative cursor-help hover:border-rose-400 dark:hover:border-rose-500 transition-colors shadow-sm';
 
             var rulesText = v.rules.map(function (r) { return 'Rule ' + r; }).join(', ');
+
+            // 收集所有違反規則的專家意見
+            var allMoldingAdvice = [];
+            var allQualityAdvice = [];
+            var seenMoldingAdvice = new Set();
+            var seenQualityAdvice = new Set();
+
+            v.rules.forEach(function (ruleId) {
+                var expPair = self.nelsonExpertise[ruleId] || {
+                    zh: { m: "請檢查製程參數。", q: "請參考標準作業程序。" },
+                    en: { m: "Please check process parameters.", q: "Please refer to SOP." }
+                };
+                var exp = self.settings.language === 'zh' ? expPair.zh : expPair.en;
+
+                // 避免重複的建議
+                if (!seenMoldingAdvice.has(exp.m)) {
+                    allMoldingAdvice.push(exp.m);
+                    seenMoldingAdvice.add(exp.m);
+                }
+                if (!seenQualityAdvice.has(exp.q)) {
+                    allQualityAdvice.push(exp.q);
+                    seenQualityAdvice.add(exp.q);
+                }
+            });
+
+            // 組合所有建議
+            var moldingAdviceHTML = allMoldingAdvice.map(function (advice, idx) {
+                return '<div class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed pl-4 ' + (idx > 0 ? 'mt-2' : '') + '">' +
+                    (allMoldingAdvice.length > 1 ? '• ' : '') + advice + '</div>';
+            }).join('');
+
+            var qualityAdviceHTML = allQualityAdvice.map(function (advice, idx) {
+                return '<div class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed pl-4 ' + (idx > 0 ? 'mt-2' : '') + '">' +
+                    (allQualityAdvice.length > 1 ? '• ' : '') + advice + '</div>';
+            }).join('');
 
             card.innerHTML = '<div class="flex justify-between items-start mb-2 pb-2 border-b border-slate-100 dark:border-slate-700">' +
                 '<div class="text-base font-bold text-slate-900 dark:text-white">' + (pageLabels[v.index] || 'Batch') + '</div>' +
@@ -1296,12 +1324,12 @@ var SPCApp = {
                 '<div>' +
                 '<div class="flex items-center gap-1.5 text-xs text-sky-600 dark:text-sky-400 font-bold mb-1">' +
                 '<span class="material-icons-outlined text-sm">precision_manufacturing</span> ' + self.t('成型專家', 'Molding Expert') + '</div>' +
-                '<div class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed pl-4">' + exp.m + '</div>' +
+                moldingAdviceHTML +
                 '</div>' +
                 '<div>' +
                 '<div class="flex items-center gap-1.5 text-xs text-emerald-600 dark:text-emerald-400 font-bold mb-1">' +
                 '<span class="material-icons-outlined text-sm">assignment_turned_in</span> ' + self.t('品管專家', 'Quality Expert') + '</div>' +
-                '<div class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed pl-4">' + exp.q + '</div>' +
+                qualityAdviceHTML +
                 '</div>' +
                 '</div>' +
                 '<div class="text-[11px] text-slate-400 mt-2 text-right italic">Index: ' + (v.index + 1) + '</div>';

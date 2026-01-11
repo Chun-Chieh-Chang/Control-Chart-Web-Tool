@@ -638,6 +638,7 @@ var QIPExtractApp = {
         }
     },
 
+
     showResults: function (results) {
         this.els.progressBar.style.width = '100%';
         this.els.progressText.textContent = 'Extraction Complete';
@@ -658,8 +659,98 @@ var QIPExtractApp = {
             this.els.errorLog.classList.add('hidden');
         }
 
+        // Render detailed extraction results
+        this.renderExtractionDetail(results);
+
         this.els.startProcess.disabled = false;
     },
+
+    renderExtractionDetail: function (results) {
+        var detailPanel = document.getElementById('qip-extraction-detail-panel');
+        var detailContent = document.getElementById('qip-extraction-detail-content');
+
+        if (!detailPanel || !detailContent) return;
+
+        var html = '';
+        var items = results.inspectionItems || {};
+        var itemNames = Object.keys(items);
+
+        if (itemNames.length === 0) {
+            html = '<div class="text-center py-8 text-slate-400">' + this.t('無提取數據', 'No extracted data') + '</div>';
+        } else {
+            itemNames.forEach(function (itemName, idx) {
+                var item = items[itemName];
+                var batchNames = Object.keys(item.batches);
+                var totalBatches = batchNames.length;
+                var allCavities = Array.from(item.allCavities).sort(function (a, b) {
+                    return parseInt(a) - parseInt(b);
+                });
+                var cavityCount = allCavities.length;
+
+                // Item Card (Collapsible)
+                html += '<div class="border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden">';
+
+                // Header
+                html += '<div class="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800/50 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800" onclick="this.nextElementSibling.classList.toggle(\'hidden\')">';
+                html += '<div class="flex items-center gap-3 flex-1 min-w-0">';
+                html += '<div class="w-8 h-8 rounded-lg bg-indigo-50 dark:bg-indigo-900/30 flex items-center justify-center flex-shrink-0">';
+                html += '<span class="material-icons-outlined text-sm text-indigo-600">' + (idx % 3 === 0 ? 'straighten' : idx % 3 === 1 ? 'speed' : 'widgets') + '</span>';
+                html += '</div>';
+                html += '<div class="flex-1 min-w-0">';
+                html += '<h5 class="text-sm font-bold text-slate-900 dark:text-white truncate">' + itemName + '</h5>';
+                html += '<div class="flex items-center gap-3 mt-0.5">';
+                html += '<span class="text-xs text-slate-500"><span class="font-mono font-bold text-indigo-600">' + totalBatches + '</span> ' + (totalBatches > 1 ? 'batches' : 'batch') + '</span>';
+                html += '<span class="text-xs text-slate-400">•</span>';
+                html += '<span class="text-xs text-slate-500"><span class="font-mono font-bold text-emerald-600">' + cavityCount + '</span> ' + (cavityCount > 1 ? 'cavities' : 'cavity') + '</span>';
+                html += '</div>';
+                html += '</div>';
+                html += '</div>';
+                html += '<span class="material-icons-outlined text-slate-400 text-sm">expand_more</span>';
+                html += '</div>';
+
+                // Content (Collapsible)
+                html += '<div class="hidden border-t border-slate-200 dark:border-slate-700">';
+
+                // Cavity Summary
+                html += '<div class="p-4 bg-slate-50/50 dark:bg-slate-900/20 border-b border-slate-200 dark:border-slate-700">';
+                html += '<div class="text-xs font-bold text-slate-500 uppercase mb-2">' + (window.currentLang === 'zh' ? '穴號範圍' : 'Cavity Range') + '</div>';
+                html += '<div class="flex flex-wrap gap-1">';
+                allCavities.forEach(function (cav) {
+                    html += '<span class="px-1.5 py-0.5 bg-emerald-100 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 text-xs font-mono rounded">' + cav + '</span>';
+                });
+                html += '</div>';
+                html += '</div>';
+
+                // Sample Batches (Show first 5)
+                html += '<div class="p-4 space-y-2">';
+                html += '<div class="text-xs font-bold text-slate-500 uppercase mb-2">' + (window.currentLang === 'zh' ? '批次樣本（前5筆）' : 'Sample Batches (First 5)') + '</div>';
+                batchNames.slice(0, 5).forEach(function (batchName) {
+                    var batchData = item.batches[batchName];
+                    var cavIds = Object.keys(batchData).sort(function (a, b) { return parseInt(a) - parseInt(b); });
+
+                    html += '<div class="flex items-start gap-2 p-2 rounded-lg bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700">';
+                    html += '<div class="text-xs font-mono font-bold text-slate-700 dark:text-slate-300 min-w-[80px]">' + batchName + '</div>';
+                    html += '<div class="flex-1 flex flex-wrap gap-1">';
+                    cavIds.forEach(function (cavId) {
+                        html += '<span class="text-xs px-1 py-0.5 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-400 rounded font-mono">' + cavId + ':' + batchData[cavId].toFixed(3) + '</span>';
+                    });
+                    html += '</div>';
+                    html += '</div>';
+                });
+                if (totalBatches > 5) {
+                    html += '<div class="text-xs text-slate-400 text-center pt-2">... ' + (window.currentLang === 'zh' ? '及其他 ' : 'and ') + (totalBatches - 5) + (window.currentLang === 'zh' ? ' 筆批次' : ' more batches') + '</div>';
+                }
+                html += '</div>';
+
+                html += '</div>'; // End collapsible content
+                html += '</div>'; // End item card
+            });
+        }
+
+        detailContent.innerHTML = html;
+        detailPanel.classList.remove('hidden');
+    },
+
 
     downloadResults: function () {
         if (!this.processingResults) { alert(this.t('沒有可下載的結果', 'No results to download')); return; }

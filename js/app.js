@@ -896,8 +896,14 @@ var SPCApp = {
                     height: 380,
                     toolbar: { show: false },
                     background: 'transparent',
-                    zoom: { enabled: true, type: 'x' },
-                    events: { dblclick: function (e, c) { c.updateOptions({ xaxis: { min: undefined, max: undefined } }); } }
+                    zoom: { enabled: true, type: 'x', zoomOnScroll: false, resetIcon: { offsetX: 0, offsetY: 0 } },
+                    events: {
+                        mounted: function (chartContext, config) {
+                            chartContext.el.addEventListener('dblclick', function () {
+                                chartContext.resetSeries();
+                            });
+                        }
+                    }
                 },
                 theme: { mode: theme.mode },
                 series: [
@@ -970,8 +976,14 @@ var SPCApp = {
                     height: 300,
                     toolbar: { show: false },
                     background: 'transparent',
-                    zoom: { enabled: true, type: 'x' },
-                    events: { dblclick: function (e, c) { c.updateOptions({ xaxis: { min: undefined, max: undefined } }); } }
+                    zoom: { enabled: true, type: 'x', zoomOnScroll: false, resetIcon: { offsetX: 0, offsetY: 0 } },
+                    events: {
+                        mounted: function (chartContext, config) {
+                            chartContext.el.addEventListener('dblclick', function () {
+                                chartContext.resetSeries();
+                            });
+                        }
+                    }
                 },
                 theme: { mode: theme.mode },
                 series: [
@@ -1002,8 +1014,14 @@ var SPCApp = {
                     height: 350,
                     toolbar: { show: false },
                     background: 'transparent',
-                    zoom: { enabled: true, type: 'x' },
-                    events: { dblclick: function (e, c) { c.updateOptions({ xaxis: { min: undefined, max: undefined } }); } }
+                    zoom: { enabled: true, type: 'x', zoomOnScroll: false, resetIcon: { offsetX: 0, offsetY: 0 } },
+                    events: {
+                        mounted: function (chartContext, config) {
+                            chartContext.el.addEventListener('dblclick', function () {
+                                chartContext.resetSeries();
+                            });
+                        }
+                    }
                 },
                 theme: { mode: theme.mode },
                 series: [{ name: 'Cpk', data: cpkVal }],
@@ -1038,8 +1056,14 @@ var SPCApp = {
                     height: 350,
                     toolbar: { show: false },
                     background: 'transparent',
-                    zoom: { enabled: true, type: 'x' },
-                    events: { dblclick: function (e, c) { c.updateOptions({ xaxis: { min: undefined, max: undefined } }); } }
+                    zoom: { enabled: true, type: 'x', zoomOnScroll: false, resetIcon: { offsetX: 0, offsetY: 0 } },
+                    events: {
+                        mounted: function (chartContext, config) {
+                            chartContext.el.addEventListener('dblclick', function () {
+                                chartContext.resetSeries();
+                            });
+                        }
+                    }
                 },
                 theme: { mode: theme.mode },
                 series: [
@@ -1064,8 +1088,14 @@ var SPCApp = {
                     height: 350,
                     toolbar: { show: false },
                     background: 'transparent',
-                    zoom: { enabled: true, type: 'x' },
-                    events: { dblclick: function (e, c) { c.updateOptions({ xaxis: { min: undefined, max: undefined } }); } }
+                    zoom: { enabled: true, type: 'x', zoomOnScroll: false, resetIcon: { offsetX: 0, offsetY: 0 } },
+                    events: {
+                        mounted: function (chartContext, config) {
+                            chartContext.el.addEventListener('dblclick', function () {
+                                chartContext.resetSeries();
+                            });
+                        }
+                    }
                 },
                 theme: { mode: theme.mode },
                 series: [
@@ -1090,8 +1120,14 @@ var SPCApp = {
                     type: 'line',
                     height: 380,
                     toolbar: { show: false },
-                    zoom: { enabled: true, type: 'x' },
-                    events: { dblclick: function (e, c) { c.updateOptions({ xaxis: { min: undefined, max: undefined } }); } }
+                    zoom: { enabled: true, type: 'x', zoomOnScroll: false, resetIcon: { offsetX: 0, offsetY: 0 } },
+                    events: {
+                        mounted: function (chartContext, config) {
+                            chartContext.el.addEventListener('dblclick', function () {
+                                chartContext.resetSeries();
+                            });
+                        }
+                    }
                 },
                 theme: { mode: theme.mode },
                 series: [
@@ -1118,8 +1154,14 @@ var SPCApp = {
                     type: 'line',
                     height: 380,
                     toolbar: { show: false },
-                    zoom: { enabled: true, type: 'x' },
-                    events: { dblclick: function (e, c) { c.updateOptions({ xaxis: { min: undefined, max: undefined } }); } }
+                    zoom: { enabled: true, type: 'x', zoomOnScroll: false, resetIcon: { offsetX: 0, offsetY: 0 } },
+                    events: {
+                        mounted: function (chartContext, config) {
+                            chartContext.el.addEventListener('dblclick', function () {
+                                chartContext.resetSeries();
+                            });
+                        }
+                    }
                 },
                 theme: { mode: theme.mode },
                 series: [{ name: 'Range', data: data.groupStats.map(s => s.range) }],

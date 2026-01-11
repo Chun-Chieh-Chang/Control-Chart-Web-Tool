@@ -74,6 +74,16 @@ var SPCApp = {
                 self.saveSettings();
                 self.syncLanguageState();
                 self.updateLanguage();
+
+                // Force refresh of the current view to apply translations to dynamic content
+                var activeView = document.querySelector('section:not(.hidden)');
+                if (activeView) {
+                    var viewId = activeView.id;
+                    if (viewId === 'view-analysis' && self.analysisResults) self.renderAnalysisView(true);
+                    else if (viewId === 'view-dashboard') self.renderDashboard();
+                    else if (viewId === 'view-history') self.renderHistoryView();
+                    else if (viewId === 'view-settings') self.renderSettings();
+                }
             });
         }
     },
@@ -271,8 +281,9 @@ var SPCApp = {
         if (dashConfigs) dashConfigs.textContent = totalConfigs;
 
         // Mocking some stats if not explicitly tracked
-        if (dashAnomalies) dashAnomalies.textContent = Math.floor(totalHistory * 2.5);
-        if (dashCpk) dashCpk.textContent = (1.33 + Math.random() * 0.2).toFixed(2);
+        // Mocking some stats if not explicitly tracked (Display '-' or 0 if no history)
+        if (dashAnomalies) dashAnomalies.textContent = totalHistory > 0 ? Math.floor(totalHistory * 2.5) : 0;
+        if (dashCpk) dashCpk.textContent = totalHistory > 0 ? (1.33 + Math.random() * 0.2).toFixed(2) : '-';
 
         // Recent Activity List
         var recentList = document.getElementById('dash-recent-list');
@@ -550,6 +561,7 @@ var SPCApp = {
         if (viewId === 'dashboard') this.renderDashboard();
         if (viewId === 'history') this.renderHistoryView();
         if (viewId === 'settings') this.renderSettings();
+        if (viewId === 'analysis' && this.analysisResults) this.renderAnalysisView(true);
 
         // Check for extracted QIP data when switching to import view
         if ((viewId === 'import' || viewId === 'dashboard') && window.qipExtractedData) {
@@ -685,6 +697,12 @@ var SPCApp = {
     },
 
     displayResults: function () {
+        this.renderAnalysisView(false);
+        var self = this;
+        setTimeout(function () { self.switchView('analysis'); document.getElementById('results').scrollIntoView({ behavior: 'smooth' }); }, 100);
+    },
+
+    renderAnalysisView: function (preserveState) {
         var resultsContent = document.getElementById('resultsContent');
         var data = this.analysisResults;
         var self = this;
@@ -692,7 +710,9 @@ var SPCApp = {
 
         if (data.type === 'batch') {
             var totalBatches = Math.min(data.batchNames.length, data.xbarR.xBar.data.length);
-            this.batchPagination = { currentPage: 1, totalPages: Math.ceil(totalBatches / 25), maxPerPage: 25, totalBatches: totalBatches };
+            if (!preserveState) {
+                this.batchPagination = { currentPage: 1, totalPages: Math.ceil(totalBatches / 25), maxPerPage: 25, totalBatches: totalBatches };
+            }
 
             html = '<div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">' +
                 '<div class="saas-card p-4"> <div class="text-[10px] font-bold text-slate-500 uppercase">' + this.t('模穴數', 'Cavities') + '</div> <div class="text-xl font-bold dark:text-white">' + data.xbarR.summary.n + '</div> </div>' +
@@ -747,7 +767,7 @@ var SPCApp = {
             this.updatePaginationButtons();
         }
 
-        setTimeout(function () { self.renderCharts(); self.switchView('analysis'); document.getElementById('results').scrollIntoView({ behavior: 'smooth' }); }, 100);
+        setTimeout(function () { self.renderCharts(); }, 100);
     },
 
     changeBatchPage: function (delta) {
@@ -901,24 +921,29 @@ var SPCApp = {
 
                         // Check if this point has a Nelson Rule violation
                         var violation = pageXbarR.xBar.violations.find(v => v.index === dataPointIndex);
-                        if (violation && seriesIndex === 0) {
+                        if (violation && (seriesIndex === 0 || name === 'X-Bar')) {
                             var rulesText = violation.rules.map(r => 'Rule ' + r).join(', ');
                             var mainRule = violation.rules[0];
-                            var exp = self.nelsonExpertise[mainRule] || { m: "請檢查製程參數。", q: "請參考標準作業程序。" };
+                            var expPair = self.nelsonExpertise[mainRule] || {
+                                zh: { m: "請檢查製程參數。", q: "請參考標準作業程序。" },
+                                en: { m: "Please check process parameters.", q: "Please refer to SOP." }
+                            };
+                            var currentLang = self.settings.language || 'zh';
+                            var exp = expPair[currentLang] || expPair['zh'];
 
                             html += '<div class="space-y-3 mt-2">';
                             html += '<div class="flex items-center justify-between gap-4">';
-                            html += '<div class="text-xs bg-rose-500/20 text-rose-400 px-2 py-0.5 rounded font-bold">' + rulesText + '</div>';
+                            html += '<div class="text-[10px] bg-rose-500/20 text-rose-400 px-2 py-0.5 rounded font-bold">' + rulesText + '</div>';
                             html += '</div>';
 
                             html += '<div>';
-                            html += '<div class="flex items-center gap-1.5 text-xs text-sky-400 font-bold"><span class="material-icons-outlined text-sm">precision_manufacturing</span> 成型專家</div>';
-                            html += '<div class="text-sm text-slate-300 leading-normal pl-4 mt-1">' + exp.m + '</div>';
+                            html += '<div class="flex items-center gap-1.5 text-xs text-sky-400 font-bold"><span class="material-icons-outlined text-[14px]">precision_manufacturing</span> ' + self.t('成型專家', 'Molding Expert') + '</div>';
+                            html += '<div class="text-xs text-slate-300 leading-normal pl-4 mt-1">' + (exp ? exp.m : '-') + '</div>';
                             html += '</div>';
 
                             html += '<div>';
-                            html += '<div class="flex items-center gap-1.5 text-xs text-emerald-400 font-bold"><span class="material-icons-outlined text-sm">assignment_turned_in</span> 品管專家</div>';
-                            html += '<div class="text-sm text-slate-300 leading-normal pl-4 mt-1">' + exp.q + '</div>';
+                            html += '<div class="flex items-center gap-1.5 text-xs text-emerald-400 font-bold"><span class="material-icons-outlined text-[14px]">assignment_turned_in</span> ' + self.t('品管專家', 'Quality Expert') + '</div>';
+                            html += '<div class="text-xs text-slate-300 leading-normal pl-4 mt-1">' + (exp ? exp.q : '-') + '</div>';
                             html += '</div>';
                             html += '</div>';
                         }
@@ -1190,34 +1215,6 @@ var SPCApp = {
                 '</div>' +
                 '</div>' +
                 '<div class="text-[11px] text-slate-400 mt-2 text-right italic">Index: ' + (v.index + 1) + '</div>';
-
-            // Keep the hover tooltip functionality as well
-            card.addEventListener('mouseenter', function () {
-                var tooltip = document.getElementById('nelson-tooltip');
-                if (!tooltip) return;
-
-                var content = '<div class="font-bold text-base mb-2 border-b border-slate-700 pb-2">Nelson Rule ' + ruleId + '</div>' +
-                    '<div class="mb-3">' +
-                    '<div class="flex items-center gap-2 text-sky-400 font-bold mb-1"><span class="material-icons-outlined text-sm">precision_manufacturing</span> ' + self.t('成型專家', 'Molding Expert') + '</div>' +
-                    '<div class="text-slate-300 leading-relaxed">' + exp.m + '</div>' +
-                    '</div>' +
-                    '<div>' +
-                    '<div class="flex items-center gap-2 text-emerald-400 font-bold mb-1"><span class="material-icons-outlined text-sm">assignment_turned_in</span> ' + self.t('品管專家', 'Quality Expert') + '</div>' +
-                    '<div class="text-slate-300 leading-relaxed">' + exp.q + '</div>' +
-                    '</div>' +
-                    '<div class="absolute top-6 -right-1.5 w-3 h-3 bg-slate-900 border-t border-r border-slate-700 transform rotate-45"></div>';
-
-                tooltip.innerHTML = content;
-                var rect = card.getBoundingClientRect();
-                tooltip.style.left = (rect.left - 300) + 'px';
-                tooltip.style.top = rect.top + 'px';
-                tooltip.classList.remove('hidden');
-            });
-
-            card.addEventListener('mouseleave', function () {
-                var tooltip = document.getElementById('nelson-tooltip');
-                if (tooltip) tooltip.classList.add('hidden');
-            });
 
             list.appendChild(card);
         });

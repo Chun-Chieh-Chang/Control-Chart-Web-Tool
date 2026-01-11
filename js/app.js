@@ -139,6 +139,18 @@ var SPCApp = {
         this.renderHistoryView();
     },
 
+    deleteHistoryItem: function (index) {
+        if (confirm(this.t('確定要刪除此條紀錄嗎？', 'Are you sure you want to delete this record?'))) {
+            this.history.splice(index, 1);
+            localStorage.setItem('spc_history', JSON.stringify(this.history));
+            this.renderRecentFiles();
+            this.renderHistoryView();
+            if (document.getElementById('view-dashboard').classList.contains('hidden') === false) {
+                this.renderDashboard();
+            }
+        }
+    },
+
     renderRecentFiles: function () {
         var container = document.getElementById('recentFilesContainer');
         if (!container) return;
@@ -149,8 +161,9 @@ var SPCApp = {
             return;
         }
 
-        var html = this.history.slice(0, 5).map(function (h) {
+        var html = this.history.slice(0, 5).map(function (h, i) {
             var d = new Date(h.time);
+            h.index = i; // Store original index for deletion logic if sorted/sliced
             var timeStr = d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
             return '<div class="flex items-center group cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50 p-2 rounded-lg transition-all">' +
                 '<div class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-700 flex items-center justify-center mr-3 group-hover:bg-primary/10 transition-colors">' +
@@ -160,6 +173,9 @@ var SPCApp = {
                 '<div class="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">' + h.name + '</div>' +
                 '<div class="text-sm text-slate-400">' + h.size + ' • ' + timeStr + '</div>' +
                 '</div>' +
+                '<button onclick="event.stopPropagation(); SPCApp.deleteHistoryItem(' + h.index + ')" class="p-1 opacity-0 group-hover:opacity-100 text-slate-300 hover:text-rose-500 transition-all rounded">' +
+                '<span class="material-icons-outlined text-sm">delete</span>' +
+                '</button>' +
                 '</div>';
         }).join('');
         container.innerHTML = html;
@@ -183,11 +199,14 @@ var SPCApp = {
             var timeStr = d.toLocaleDateString() + ' ' + d.toLocaleTimeString();
 
             row.innerHTML = '<td class="px-6 py-4 font-bold text-slate-900 dark:text-white">' + h.name + '</td>' +
-                '<td class="px-6 py-4"><span class="px-2 py-1 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 text-[10px] font-bold rounded uppercase">' + h.type + '</span></td>' +
-                '<td class="px-6 py-4 text-xs text-slate-500">' + (h.item || '-') + '</td>' +
-                '<td class="px-6 py-4 text-xs text-slate-500">' + timeStr + '</td>' +
-                '<td class="px-6 py-4 text-center">' +
-                '<button class="view-log-btn text-indigo-600 hover:text-indigo-800 font-bold text-xs" data-index="' + i + '">View Log</button>' +
+                '<td class="px-6 py-4"><span class="px-2 py-1 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 text-sm font-bold rounded uppercase">' + h.type + '</span></td>' +
+                '<td class="px-6 py-4 text-sm text-slate-500">' + (h.item || '-') + '</td>' +
+                '<td class="px-6 py-4 text-sm text-slate-500">' + timeStr + '</td>' +
+                '<td class="px-6 py-4 text-center flex items-center justify-center gap-3">' +
+                '<button class="view-log-btn text-indigo-600 hover:text-indigo-800 font-bold text-sm" data-index="' + i + '">' + self.t('檢視詳情', 'View Log') + '</button>' +
+                '<button onclick="SPCApp.deleteHistoryItem(' + i + ')" class="text-slate-300 hover:text-rose-500 transition-colors">' +
+                '<span class="material-icons-outlined text-lg">delete</span>' +
+                '</button>' +
                 '</td>';
             tbody.appendChild(row);
         });

@@ -1065,7 +1065,8 @@ var SPCApp = {
                 stroke: { width: [1.5, 3, 1.5, 2, 2, 2], dashArray: [0, 0, 0, 5, 0, 5] },
                 markers: { size: [0, 4, 0, 0, 0, 0], colors: ['#3b82f6'], strokeColors: '#fff' },
                 xaxis: { categories: labels, labels: { style: { colors: theme.text, fontSize: '12px' } } },
-                dataLabels: { enabled: false }, yaxis: { labels: { formatter: function (v) { return v.toFixed(4); }, style: { colors: theme.text, fontSize: '12px' } }, title: { text: self.t('測量值', 'Value') } }, grid: { borderColor: theme.grid }
+                dataLabels: { enabled: false }, yaxis: { labels: { formatter: function (v) { return v.toFixed(4); }, style: { colors: theme.text, fontSize: '12px' } }, title: { text: self.t('測量值', 'Value') } }, grid: { borderColor: theme.grid },
+                tooltip: { followCursor: true, intersect: false, shared: true }
             };
             var chartG = new ApexCharts(document.querySelector("#groupChart"), gOpt);
             chartG.render(); this.chartInstances.push(chartG);

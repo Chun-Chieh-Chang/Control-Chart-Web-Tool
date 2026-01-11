@@ -108,7 +108,7 @@ var QIPExtractApp = {
     loadFile: function (file) {
         var self = this;
         if (!file.name.match(/\.(xlsx|xls|xlsm)$/i)) {
-            alert('請選擇 Excel 檔案');
+            alert(this.t('請選擇 Excel 檔案', 'Please select an Excel file'));
             return;
         }
 
@@ -124,7 +124,7 @@ var QIPExtractApp = {
                 self.els.uploadZone.classList.add('hidden');
                 self.els.fileInfo.classList.remove('hidden');
                 self.els.fileName.textContent = file.name;
-                self.els.workbookInfo.textContent = self.workbook.SheetNames.length + ' 個工作表';
+                self.els.workbookInfo.textContent = self.workbook.SheetNames.length + ' ' + self.t('個工作表', 'Sheets');
 
                 // Auto-fill product code
                 if (!self.els.productCode.value) {
@@ -135,7 +135,7 @@ var QIPExtractApp = {
                 self.els.worksheetSelectGroup.classList.remove('hidden');
                 self.updateStartButton();
             } catch (error) {
-                alert('檔案讀取失敗: ' + error.message);
+                alert(self.t('檔案讀取失敗: ', 'File read failed: ') + error.message);
             }
         };
         reader.readAsArrayBuffer(file);
@@ -156,7 +156,7 @@ var QIPExtractApp = {
 
     updateWorksheetSelector: function () {
         var select = this.els.worksheetSelect;
-        select.innerHTML = '<option value="">-- 請選擇 --</option>';
+        select.innerHTML = '<option value="">' + this.t('-- 請選擇 --', '-- Select --') + '</option>';
         if (this.workbook) {
             this.workbook.SheetNames.forEach(function (name) {
                 var opt = document.createElement('option');
@@ -187,8 +187,8 @@ var QIPExtractApp = {
             var end = Math.min(i * 8, cavityCount);
             html += '<div class="p-4 bg-white dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-700/50 space-y-3 shadow-sm">' +
                 '<div class="flex items-center justify-between border-b border-slate-50 dark:border-slate-700/50 pb-2">' +
-                '<div class="text-sm font-bold text-slate-400 uppercase tracking-widest">Cavities ' + start + '-' + end + '</div>' +
-                (i > 1 ? '<div class="flex items-center gap-2 font-mono"><span class="text-sm text-slate-400">OFFSET:</span>' +
+                '<div class="text-sm font-bold text-slate-400 uppercase tracking-widest">' + this.t('模穴 ', 'Cavities ') + start + '-' + end + '</div>' +
+                (i > 1 ? '<div class="flex items-center gap-2 font-mono"><span class="text-sm text-slate-400">' + this.t('偏移:', 'OFFSET:') + '</span>' +
                     '<input type="number" id="qip-offset-' + i + '" class="w-16 px-1.5 py-0.5 bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-700 rounded-lg text-sm font-bold text-indigo-500 text-center focus:outline-indigo-500" value="1" min="1" max="100"></div>' : '') +
                 '</div>' +
 
@@ -197,9 +197,9 @@ var QIPExtractApp = {
                 '<div class="flex items-center gap-3">' +
                 '<div class="w-7 h-7 rounded-lg bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 flex items-center justify-center flex-shrink-0"><span class="material-icons-outlined text-sm">tag</span></div>' +
                 '<div class="flex-1">' +
-                '<input type="text" id="qip-cavity-id-' + i + '" class="qip-range-input w-full bg-transparent text-sm font-mono font-bold text-slate-700 dark:text-slate-300 border-b border-slate-100 dark:border-slate-700 focus:border-emerald-500 outline-none pb-1" placeholder="ID Range (e.g. K3:R3)">' +
+                '<input type="text" id="qip-cavity-id-' + i + '" class="qip-range-input w-full bg-transparent text-sm font-mono font-bold text-slate-700 dark:text-slate-300 border-b border-slate-100 dark:border-slate-700 focus:border-emerald-500 outline-none pb-1" placeholder="' + this.t('ID 範圍 (例如 K3:R3)', 'ID Range (e.g. K3:R3)') + '">' +
                 '</div>' +
-                '<button class="qip-select-btn p-1.5 text-violet-500 hover:bg-violet-50 dark:hover:bg-violet-900/20 rounded-lg transition-all" data-target="qip-cavity-id-' + i + '" data-type="cavity" title="Select Range">' +
+                '<button class="qip-select-btn p-1.5 text-violet-500 hover:bg-violet-50 dark:hover:bg-violet-900/20 rounded-lg transition-all" data-target="qip-cavity-id-' + i + '" data-type="cavity" title="' + this.t('選取範圍', 'Select Range') + '">' +
                 '<span class="material-icons-outlined text-base">ads_click</span></button>' +
                 '</div>' +
 
@@ -207,9 +207,9 @@ var QIPExtractApp = {
                 '<div class="flex items-center gap-3">' +
                 '<div class="w-7 h-7 rounded-lg bg-blue-50 dark:bg-blue-900/30 text-blue-600 flex items-center justify-center flex-shrink-0"><span class="material-icons-outlined text-sm">bar_chart</span></div>' +
                 '<div class="flex-1">' +
-                '<input type="text" id="qip-data-range-' + i + '" class="qip-range-input w-full bg-transparent text-sm font-mono font-bold text-slate-700 dark:text-slate-300 border-b border-slate-100 dark:border-slate-700 focus:border-blue-500 outline-none pb-1" placeholder="Data Range (e.g. K4:R4)">' +
+                '<input type="text" id="qip-data-range-' + i + '" class="qip-range-input w-full bg-transparent text-sm font-mono font-bold text-slate-700 dark:text-slate-300 border-b border-slate-100 dark:border-slate-700 focus:border-blue-500 outline-none pb-1" placeholder="' + this.t('數據範圍 (例如 K4:R4)', 'Data Range (e.g. K4:R4)') + '">' +
                 '</div>' +
-                '<button class="qip-select-btn p-1.5 text-violet-500 hover:bg-violet-50 dark:hover:bg-violet-900/20 rounded-lg transition-all" data-target="qip-data-range-' + i + '" data-type="data" title="Select Range">' +
+                '<button class="qip-select-btn p-1.5 text-violet-500 hover:bg-violet-50 dark:hover:bg-violet-900/20 rounded-lg transition-all" data-target="qip-data-range-' + i + '" data-type="data" title="' + this.t('選取範圍', 'Select Range') + '">' +
                 '<span class="material-icons-outlined text-base">ads_click</span></button>' +
                 '</div>' +
 
@@ -236,7 +236,7 @@ var QIPExtractApp = {
 
     updateWorksheetSelector: function () {
         var select = this.els.worksheetSelect;
-        select.innerHTML = '<option value="">-- 請選擇工作表 --</option>';
+        select.innerHTML = '<option value="">' + this.t('-- 請選擇工作表 --', '-- Select Sheet --') + '</option>';
         if (this.workbook) {
             this.workbook.SheetNames.forEach(function (name) {
                 var opt = document.createElement('option');
@@ -271,7 +271,7 @@ var QIPExtractApp = {
         if (selectionTypeEl) {
             var currentText = selectionTypeEl.innerText.split(' (')[0]; // Reset prev info
             if (merges.length > 0) {
-                selectionTypeEl.innerText = currentText + ' (已偵測到 ' + merges.length + ' 個合併區域)';
+                selectionTypeEl.innerText = currentText + ' (' + this.t('已偵測到 ', 'Detected ') + merges.length + ' ' + this.t('個合併區域', 'merges') + ')';
             } else {
                 selectionTypeEl.innerText = currentText;
             }
@@ -380,7 +380,7 @@ var QIPExtractApp = {
 
         if (this.els.selectionModeIndic && this.els.selectionTypeText) {
             this.els.selectionModeIndic.classList.remove('hidden');
-            this.els.selectionTypeText.textContent = type === 'cavity' ? '穴號範圍' : '數據範圍';
+            this.els.selectionTypeText.textContent = type === 'cavity' ? this.t('穴號範圍', 'Cavity ID Range') : this.t('數據範圍', 'Data Range');
         }
 
         if (this.els.previewPanel.classList.contains('hidden')) {
@@ -514,7 +514,7 @@ var QIPExtractApp = {
 
     saveConfiguration: function () {
         var name = this.els.configName.value.trim();
-        if (!name) { alert('請輸入配置名稱'); return; }
+        if (!name) { alert(this.t('請輸入配置名稱', 'Please enter configuration name')); return; }
 
         var config = this.gatherConfiguration();
         config.name = name;
@@ -526,7 +526,7 @@ var QIPExtractApp = {
         else configs.push(config);
 
         localStorage.setItem('qip_configs', JSON.stringify(configs));
-        alert('配置已保存');
+        alert(this.t('配置已保存', 'Configuration saved'));
     },
 
     showConfigDialog: function () {
@@ -538,10 +538,10 @@ var QIPExtractApp = {
 
         var list = configs.map(function (c, i) {
             var date = c.savedAt ? new Date(c.savedAt).toLocaleDateString() : 'N/A';
-            return i + ': ' + c.name + ' [' + c.cavityCount + ' Cavities, ' + date + ']';
+            return i + ': ' + c.name + ' [' + c.cavityCount + ' ' + this.t('穴', 'Cavities') + ', ' + date + ']';
         }).join('\n');
 
-        var choice = prompt(this.t('請輸入欲讀取的配置編號 (0-' + (configs.length - 1) + '):', 'Enter layout ID to load (0-' + (configs.length - 1) + '):') + '\n\n' + list);
+        var choice = prompt(this.t('請輸入欲讀取的配置編號 (0-', 'Enter layout ID to load (0-') + (configs.length - 1) + '):' + '\n\n' + list);
         if (choice !== null && choice !== '' && !isNaN(choice)) {
             var idx = parseInt(choice);
             if (idx >= 0 && idx < configs.length) {
@@ -593,13 +593,13 @@ var QIPExtractApp = {
 
     startProcessing: async function () {
         var self = this;
-        if (!this.workbook) { alert('請先上傳檔案'); return; }
+        if (!this.workbook) { alert(this.t('請先上傳檔案', 'Please upload a file first')); return; }
 
         var config = this.gatherConfiguration();
 
         // Basic validation
         if (!config.cavityGroups[1] || !config.cavityGroups[1].cavityIdRange || !config.cavityGroups[1].dataRange) {
-            alert('請至少設定第一組的穴號範圍和數據範圍');
+            alert(this.t('請至少設定第一組的穴號範圍和數據範圍', 'Please set Cavity ID and Data range for Group 1'));
             return;
         }
 
@@ -607,7 +607,7 @@ var QIPExtractApp = {
         this.els.startProcess.disabled = true;
         this.els.resultSection.classList.add('hidden');
         this.els.progressBar.style.width = '10%';
-        this.els.progressText.textContent = '初始化處理器...';
+        this.els.progressText.textContent = this.t('初始化處理器...', 'Initializing processor...');
 
         try {
             // 使用新版 QIPProcessor
@@ -623,9 +623,9 @@ var QIPExtractApp = {
             this.showResults(this.processingResults);
         } catch (error) {
             console.error(error);
-            alert('處理失敗: ' + error.message);
+            alert(this.t('處理失敗: ', 'Processing failed: ') + error.message);
             this.els.progressBar.style.width = '0%';
-            this.els.progressText.textContent = '處理失敗';
+            this.els.progressText.textContent = this.t('處理失敗', 'Extraction Failed');
         } finally {
             this.els.startProcess.disabled = false;
         }
@@ -637,9 +637,9 @@ var QIPExtractApp = {
         this.els.resultSection.classList.remove('hidden');
 
         var summary = '<div class="space-y-3">' +
-            '<div class="flex justify-between items-center"><span class="text-sm text-slate-500 uppercase font-bold">Product</span><span class="text-sm font-bold text-white truncate max-w-[150px]">' + (results.productInfo.productName || '-') + '</span></div>' +
-            '<div class="flex justify-between items-center"><span class="text-sm text-slate-500 uppercase font-bold">Extracted Items</span><span class="text-sm font-bold text-emerald-400">' + results.itemCount + '</span></div>' +
-            '<div class="flex justify-between items-center"><span class="text-sm text-slate-500 uppercase font-bold">Total Batches</span><span class="text-sm font-bold text-indigo-400">' + results.totalBatches + '</span></div>' +
+            '<div class="flex justify-between items-center"><span class="text-sm text-slate-500 uppercase font-bold">' + this.t('產品資料', 'Product') + '</span><span class="text-sm font-bold text-white truncate max-w-[150px]">' + (results.productInfo.productName || '-') + '</span></div>' +
+            '<div class="flex justify-between items-center"><span class="text-sm text-slate-500 uppercase font-bold">' + this.t('提取項目數', 'Extracted Items') + '</span><span class="text-sm font-bold text-emerald-400">' + results.itemCount + '</span></div>' +
+            '<div class="flex justify-between items-center"><span class="text-sm text-slate-500 uppercase font-bold">' + this.t('總批次數', 'Total Batches') + '</span><span class="text-sm font-bold text-indigo-400">' + results.totalBatches + '</span></div>' +
             '</div>';
 
         this.els.resultSummary.innerHTML = summary;
@@ -655,7 +655,7 @@ var QIPExtractApp = {
     },
 
     downloadResults: function () {
-        if (!this.processingResults) { alert('沒有可下載的結果'); return; }
+        if (!this.processingResults) { alert(this.t('沒有可下載的結果', 'No results to download')); return; }
 
         try {
             const exporter = new ExcelExporter();
@@ -667,7 +667,7 @@ var QIPExtractApp = {
             console.log('Excel 導出成功');
         } catch (error) {
             console.error(error);
-            alert('下載失敗: ' + error.message);
+            alert(this.t('下載失敗: ', 'Download failed: ') + error.message);
         }
     },
 
@@ -675,7 +675,7 @@ var QIPExtractApp = {
         console.log('QIP: Preparing to send data to SPC analysis...', this.processingResults);
 
         if (!this.processingResults) {
-            alert('沒有可傳送的數據：請先點擊「開始提取數據」按鈕。');
+            alert(this.t('沒有可傳送的數據：請先點擊「開始提取數據」按鈕。', 'No data to send: Please click "Run Extraction" first.'));
             return;
         }
 
@@ -685,7 +685,7 @@ var QIPExtractApp = {
         console.log('QIP: Inspection items found:', itemCount, items);
 
         if (itemCount === 0) {
-            alert('沒有可傳送的數據：提取結果中不包含任何有效的檢驗項目。');
+            alert(this.t('沒有可傳送的數據：提取結果中不包含任何有效的檢驗項目。', 'No data to send: No valid inspection items found.'));
             return;
         }
 
@@ -696,10 +696,10 @@ var QIPExtractApp = {
         // Switch to import view and trigger file processing
         if (typeof SPCApp !== 'undefined') {
             SPCApp.switchView('import');
-            alert('數據已準備就緒，請在 QIP 匯入頁面選擇檢驗項目進行分析。');
+            alert(this.t('數據已準備就緒，請在 QIP 匯入頁面選擇檢驗項目進行分析。', 'Data ready. Please select an item on the Import page to analyze.'));
         } else {
             console.error('QIP: SPCApp not found!');
-            alert('無法連接 SPC 分析模組');
+            alert(this.t('無法連接 SPC 分析模組', 'Cannot connect to SPC analysis module'));
         }
     }
 };

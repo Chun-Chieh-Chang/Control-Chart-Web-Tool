@@ -11,18 +11,43 @@ var SPCApp = {
     chartInstances: [],
     batchPagination: { currentPage: 1, totalPages: 1, maxPerPage: 25, totalBatches: 0 },
     nelsonExpertise: {
-        1: { m: "突發異常：異物阻塞射嘴、加熱圈燒毀、模具未鎖緊。", q: "非機遇原因介入 (0.3%)，需立即隔離全檢。" },
-        2: { m: "製程漂移：原料批次變更、模溫水路積垢、油溫未熱平衡。", q: "平均值移動，Cpk 將下降，建議預防性調整。" },
-        3: { m: "漸進變化：頂針/滑塊/止逆環磨損、溫控失效。", q: "強烈失控預兆 (Trend)，應立即預防保養(PM)。" },
-        4: { m: "人為過度干預：頻繁調整保壓/背壓，或液壓不穩。", q: "負自相關 (Oscillation)，請停止微調 (Hands Off)。" },
-        5: { m: "製程設定改變：冷卻時間或週期不穩。", q: "中等程度的製程偏移傾向 (2/3 > 2σ)。" },
-        6: { m: "製程不穩定：原料混合不均或計量不穩。", q: "小幅度的連續偏移 (4/5 > 1σ)。" },
-        7: { m: "分層現象：多模穴流動平衡不佳。", q: "數據過於集中 (Hugging Center)，可能變異數估算錯誤。" },
-        8: { m: "混合分佈：兩台機器混料或雙模穴差異大。", q: "雙峰分佈 (Mixture)，避開了中心區域。" }
+        1: {
+            zh: { m: "突發異常：異物阻塞射嘴、加熱圈燒毀、模具未鎖緊。", q: "非機遇原因介入 (0.3%)，需立即隔離全檢。" },
+            en: { m: "Sudden Anomaly: Nozzle blockage, heater band burnout, or loose mold lock.", q: "Assignable cause present (0.3%). Isolate batch for 100% inspection." }
+        },
+        2: {
+            zh: { m: "製程漂移：原料批次變更、模溫水路積垢、油溫未熱平衡。", q: "平均值移動，Cpk 將下降，建議預防性調整。" },
+            en: { m: "Process Shift: Raw material batch change, scale in cooling lines, or thermal imbalance at startup.", q: "Mean shift detected. Cpk will drop. Recommend process center adjustment." }
+        },
+        3: {
+            zh: { m: "漸進變化：頂針/滑塊/止逆環磨損、溫控失效。", q: "強烈失控預兆 (Trend)，應立即預防保養(PM)。" },
+            en: { m: "Drift: Tooling wear (ejectors/sliders/check ring) or failing temperature control.", q: "Strong warning signal (Trend). Perform Preventive Maintenance (PM) immediately." }
+        },
+        4: {
+            zh: { m: "人為過度干預：頻繁調整保壓/背壓，或液壓不穩。", q: "負自相關 (Oscillation)，請停止微調 (Hands Off)。" },
+            en: { m: "Over-control: Frequent manual adjustments by operators or unstable hydraulic pressure.", q: "Negative Autocorrelation. Stop manual micro-adjustments (Hands Off)." }
+        },
+        5: {
+            zh: { m: "製程設定改變：冷卻時間或週期不穩。", q: "中等程度的製程偏移傾向 (2/3 > 2σ)。" },
+            en: { m: "Warning: Instability in cooling time or cycle stability.", q: "Substantial shift warning (2 of 3 > 2σ). Verify First Article." }
+        },
+        6: {
+            zh: { m: "製程不穩定：原料混合不均或計量不穩。", q: "小幅度的連續偏移 (4/5 > 1σ)。" },
+            en: { m: "Early Warning: Material mixing issues or metering inconsistencies.", q: "Early sensitivity indicator (4 of 5 > 1σ). Monitor closely." }
+        },
+        7: {
+            zh: { m: "分層現象：多模穴流動平衡不佳。", q: "數據過於集中 (Hugging Center)，可能變異數估算錯誤。" },
+            en: { m: "Stratification: Poor flow balance across multiple cavities.", q: "Points too close to center (Hugging Center). Possible miscalculation of variance." }
+        },
+        8: {
+            zh: { m: "混合分佈：兩台機器混料或雙模穴差異大。", q: "雙峰分佈 (Mixture)，避開了中心區域。" },
+            en: { m: "Mixture: Mixed materials from two machines or large difference between two mold cavities.", q: "Bimodal distribution (Mixture). Points avoid the center area." }
+        }
     },
     settings: {
         cpkThreshold: 1.33,
-        autoSave: true
+        autoSave: true,
+        language: 'zh'
     },
 
     init: function () {
@@ -37,7 +62,7 @@ var SPCApp = {
     },
 
     t: function (zh, en) {
-        return this.currentLanguage === 'zh' ? zh : en;
+        return this.settings.language === 'zh' ? zh : en;
     },
 
     setupLanguageToggle: function () {
@@ -45,19 +70,32 @@ var SPCApp = {
         var langBtn = document.getElementById('langBtn');
         if (langBtn) {
             langBtn.addEventListener('click', function () {
-                self.currentLanguage = self.currentLanguage === 'zh' ? 'en' : 'zh';
-                var langText = document.getElementById('langText');
-                if (langText) langText.textContent = self.currentLanguage === 'zh' ? 'EN' : '中文';
+                self.settings.language = (self.settings.language === 'zh' ? 'en' : 'zh');
+                self.saveSettings();
+                self.syncLanguageState();
                 self.updateLanguage();
             });
         }
     },
 
+    syncLanguageState: function () {
+        this.currentLanguage = this.settings.language;
+        window.currentLang = this.settings.language;
+        var langText = document.getElementById('langText');
+        if (langText) langText.textContent = this.currentLanguage === 'zh' ? 'EN' : '中文';
+    },
+
     updateLanguage: function () {
         var self = this;
+        // 1. Text content
         var elements = document.querySelectorAll('[data-en][data-zh]');
         elements.forEach(function (el) {
-            el.textContent = self.currentLanguage === 'zh' ? el.dataset.zh : el.dataset.en;
+            el.textContent = self.settings.language === 'zh' ? el.dataset.zh : el.dataset.en;
+        });
+        // 2. Placeholders
+        var placeholders = document.querySelectorAll('[data-p-en][data-p-zh]');
+        placeholders.forEach(function (el) {
+            el.placeholder = self.settings.language === 'zh' ? el.dataset.pZh : el.dataset.pEn;
         });
     },
 
@@ -744,13 +782,13 @@ var SPCApp = {
         for (var c = 0; c < 25; c++) html += '<col style="width:58px;">';
         html += '<col style="width:30px;"><col style="width:30px;"><col style="width:30px;"><col style="width:30px;"> </colgroup>';
 
-        html += '<tr style="background:var(--table-header-bg); text-align:center;"><td colspan="30" style="border:1px solid var(--table-border); font-weight:bold; font-size:14px; padding:3px;">X̄ - R 管制圖</td></tr>';
+        html += '<tr style="background:var(--table-header-bg); text-align:center;"><td colspan="30" style="border:1px solid var(--table-border); font-weight:bold; font-size:14px; padding:3px;">' + this.t('X̄ - R 管制圖', 'X-Bar - R Control Chart') + '</td></tr>';
 
         var meta = [
-            { l1: '商品名稱', v1: info.name, l2: '規格', v2: '標準', l3: '管制圖', v3: 'X̄', v4: 'R', l4: '製造部門', v4_val: info.dept },
-            { l1: '商品料號', v1: info.item, l2: '最大值', v2: SPCEngine.round(specs.usl, 4), l3: '上限', v3: SPCEngine.round(pageXbarR.xBar.UCL, 4), v4: SPCEngine.round(pageXbarR.R.UCL, 4), l4: '檢驗人員', v4_val: info.inspector },
-            { l1: '測量單位', v1: info.unit, l2: '目標值', v2: SPCEngine.round(specs.target, 4), l3: '中心值', v3: SPCEngine.round(pageXbarR.xBar.CL, 4), v4: SPCEngine.round(pageXbarR.R.CL, 4), l4: '管制特性', v4_val: info.char },
-            { l1: '檢驗日期', v1: info.batchRange || '-', l2: '最小值', v2: SPCEngine.round(specs.lsl, 4), l3: '下限', v3: SPCEngine.round(pageXbarR.xBar.LCL, 4), v4: '-', l4: '圖表編號', v4_val: info.chartNo || '-' }
+            { l1: this.t('商品名稱', 'Product'), v1: info.name, l2: this.t('規格', 'Specs'), v2: this.t('標準', 'Standard'), l3: this.t('管制圖', 'Chart'), v3: 'X̄', v4: 'R', l4: this.t('製造部門', 'Dept'), v4_val: info.dept },
+            { l1: this.t('商品料號', 'Item P/N'), v1: info.item, l2: this.t('最大值', 'Max (USL)'), v2: SPCEngine.round(specs.usl, 4), l3: this.t('上限', 'UCL'), v3: SPCEngine.round(pageXbarR.xBar.UCL, 4), v4: SPCEngine.round(pageXbarR.R.UCL, 4), l4: this.t('檢驗人員', 'Inspector'), v4_val: info.inspector },
+            { l1: this.t('測量單位', 'Unit'), v1: info.unit, l2: this.t('目標值', 'Target'), v2: SPCEngine.round(specs.target, 4), l3: this.t('中心值', 'CL'), v3: SPCEngine.round(pageXbarR.xBar.CL, 4), v4: SPCEngine.round(pageXbarR.R.CL, 4), l4: this.t('管制特性', 'Char'), v4_val: info.char },
+            { l1: this.t('檢驗日期', 'Date'), v1: info.batchRange || '-', l2: this.t('最小值', 'Min (LSL)'), v2: SPCEngine.round(specs.lsl, 4), l3: this.t('下限', 'LCL'), v3: SPCEngine.round(pageXbarR.xBar.LCL, 4), v4: '-', l4: this.t('圖表編號', 'Chart No.'), v4_val: info.chartNo || '-' }
         ];
 
         meta.forEach(function (r) {
@@ -768,12 +806,12 @@ var SPCApp = {
         });
 
         html += '<tr style="background:var(--table-data-header-bg); font-weight:bold; text-align:center;">' +
-            '<td style="border:1px solid var(--table-border);">批號</td>';
+            '<td style="border:1px solid var(--table-border);">' + this.t('批號', 'Batch') + '</td>';
         for (var b = 0; b < 25; b++) {
             var name = pageLabels[b] || '';
             html += '<td style="border:1px solid var(--table-border); height:35px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + name + '</td>';
         }
-        html += '<td colspan="4" style="border:1px solid var(--table-border);">彙總</td></tr>';
+        html += '<td colspan="4" style="border:1px solid var(--table-border);">' + this.t('彙總', 'Stats') + '</td></tr>';
 
         for (var i = 0; i < cavityCount; i++) {
             html += '<tr style="text-align:center;"><td style="border:1px solid var(--table-border); font-weight:bold; background:var(--table-label-bg);">X' + (i + 1) + '</td>';
@@ -1124,7 +1162,11 @@ var SPCApp = {
 
         violations.forEach(function (v) {
             var ruleId = v.rules[0];
-            var exp = self.nelsonExpertise[ruleId] || { m: "請檢查製程參數。", q: "請參考標準作業程序。" };
+            var expPair = self.nelsonExpertise[ruleId] || {
+                zh: { m: "請檢查製程參數。", q: "請參考標準作業程序。" },
+                en: { m: "Please check process parameters.", q: "Please refer to SOP." }
+            };
+            var exp = self.settings.language === 'zh' ? expPair.zh : expPair.en;
 
             var card = document.createElement('div');
             card.className = 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-4 rounded-xl mb-3 mx-4 group relative cursor-help hover:border-rose-400 dark:hover:border-rose-500 transition-colors shadow-sm';
@@ -1138,12 +1180,12 @@ var SPCApp = {
                 '<div class="space-y-4">' +
                 '<div>' +
                 '<div class="flex items-center gap-1.5 text-xs text-sky-600 dark:text-sky-400 font-bold mb-1">' +
-                '<span class="material-icons-outlined text-sm">precision_manufacturing</span> 成型專家</div>' +
+                '<span class="material-icons-outlined text-sm">precision_manufacturing</span> ' + self.t('成型專家', 'Molding Expert') + '</div>' +
                 '<div class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed pl-4">' + exp.m + '</div>' +
                 '</div>' +
                 '<div>' +
                 '<div class="flex items-center gap-1.5 text-xs text-emerald-600 dark:text-emerald-400 font-bold mb-1">' +
-                '<span class="material-icons-outlined text-sm">assignment_turned_in</span> 品管專家</div>' +
+                '<span class="material-icons-outlined text-sm">assignment_turned_in</span> ' + self.t('品管專家', 'Quality Expert') + '</div>' +
                 '<div class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed pl-4">' + exp.q + '</div>' +
                 '</div>' +
                 '</div>' +
@@ -1156,11 +1198,11 @@ var SPCApp = {
 
                 var content = '<div class="font-bold text-base mb-2 border-b border-slate-700 pb-2">Nelson Rule ' + ruleId + '</div>' +
                     '<div class="mb-3">' +
-                    '<div class="flex items-center gap-2 text-sky-400 font-bold mb-1"><span class="material-icons-outlined text-sm">precision_manufacturing</span> 成型專家</div>' +
+                    '<div class="flex items-center gap-2 text-sky-400 font-bold mb-1"><span class="material-icons-outlined text-sm">precision_manufacturing</span> ' + self.t('成型專家', 'Molding Expert') + '</div>' +
                     '<div class="text-slate-300 leading-relaxed">' + exp.m + '</div>' +
                     '</div>' +
                     '<div>' +
-                    '<div class="flex items-center gap-2 text-emerald-400 font-bold mb-1"><span class="material-icons-outlined text-sm">assignment_turned_in</span> 品管專家</div>' +
+                    '<div class="flex items-center gap-2 text-emerald-400 font-bold mb-1"><span class="material-icons-outlined text-sm">assignment_turned_in</span> ' + self.t('品管專家', 'Quality Expert') + '</div>' +
                     '<div class="text-slate-300 leading-relaxed">' + exp.q + '</div>' +
                     '</div>' +
                     '<div class="absolute top-6 -right-1.5 w-3 h-3 bg-slate-900 border-t border-r border-slate-700 transform rotate-45"></div>';
@@ -1188,7 +1230,7 @@ var SPCApp = {
         var configs = JSON.parse(localStorage.getItem('qip_configs') || '[]');
 
         configList.innerHTML = configs.length === 0 ?
-            '<tr><td colspan="4" class="px-6 py-8 text-center text-slate-400 italic">尚未儲存任何 QIP 提取配置</td></tr>' : '';
+            '<tr><td colspan="4" class="px-6 py-8 text-center text-slate-400 italic">' + this.t('尚未儲存任何 QIP 提取配置', 'No saved configurations found.') + '</td></tr>' : '';
 
         configs.forEach(function (config, index) {
             var row = document.createElement('tr');
@@ -1211,7 +1253,7 @@ var SPCApp = {
         // Event: Delete Config
         configList.querySelectorAll('.delete-config-btn').forEach(btn => {
             btn.addEventListener('click', function () {
-                if (confirm('確定要刪除此配置嗎？')) {
+                if (confirm(self.t('確定要刪除此配置嗎？', 'Are you sure you want to delete this config?'))) {
                     var idx = parseInt(this.dataset.index);
                     configs.splice(idx, 1);
                     localStorage.setItem('qip_configs', JSON.stringify(configs));
@@ -1236,12 +1278,12 @@ var SPCApp = {
         // Language setting sync
         var langSelect = document.getElementById('setting-lang');
         if (langSelect) {
-            langSelect.value = this.currentLanguage;
+            langSelect.value = this.settings.language;
             langSelect.onchange = function () {
-                self.currentLanguage = this.value;
+                self.settings.language = this.value;
+                self.saveSettings();
+                self.syncLanguageState();
                 self.updateLanguage();
-                var langText = document.getElementById('langText');
-                if (langText) langText.textContent = self.currentLanguage === 'zh' ? 'EN' : '中文';
             };
         }
 
@@ -1302,11 +1344,11 @@ var SPCApp = {
                 });
 
                 localStorage.setItem('qip_configs', JSON.stringify(merged));
-                alert(`成功讀取！已匯入 ${imported.length} 組配置。`);
+                alert(self.t(`成功讀取！已匯入 ${imported.length} 組配置。`, `Import success! ${imported.length} configs added.`));
                 self.renderSettings();
                 event.target.value = ''; // Reset input
             } catch (err) {
-                alert('讀取失敗：檔案格式不正確');
+                alert(self.t('讀取失敗：檔案格式不正確', 'Import failed: Invalid file format'));
                 console.error(err);
             }
         };

@@ -614,6 +614,12 @@ var SPCApp = {
             // Set the workbook for SPC analysis
             this.workbook = exporter.workbook;
 
+            // Mock file object for QIP data to ensure filename flows through to Analysis/History
+            this.selectedFile = {
+                name: (results.productCode || 'QIP_Data') + (results.productCode.endsWith('.xlsx') ? '' : '.xlsx'),
+                size: 0
+            };
+
             // Update UI state to show loaded
             var fileInfo = document.getElementById('fileInfo');
             var uploadZone = document.getElementById('uploadZone');
@@ -653,6 +659,12 @@ var SPCApp = {
             try {
                 var ws = self.workbook.Sheets[self.selectedItem];
                 var dataInput = new DataInput(ws);
+
+                // Fallback: If Item P/N is empty, use the filename (without extension)
+                if (!dataInput.productInfo.item && self.selectedFile && self.selectedFile.name) {
+                    dataInput.productInfo.item = self.selectedFile.name.replace(/\.[^/.]+$/, "");
+                }
+
                 var results;
 
                 if (type === 'batch') {

@@ -1031,11 +1031,17 @@ var SPCApp = {
                     height: 350,
                     toolbar: { show: true },
                     background: 'transparent',
-                    zoom: { enabled: true, type: 'x', zoomOnScroll: false, resetIcon: { offsetX: 0, offsetY: 0 } },
+                    selection: { enabled: true, type: 'x' },
+                    zoom: { enabled: false },
                     events: {
+                        selection: function (chart, e) {
+                            if (e.xaxis) {
+                                chart.updateOptions({ xaxis: { min: e.xaxis.min, max: e.xaxis.max } }, false, false);
+                            }
+                        },
                         mounted: function (chartContext, config) {
                             chartContext.el.addEventListener('dblclick', function () {
-                                chartContext.resetSeries();
+                                chartContext.updateOptions({ xaxis: { min: undefined, max: undefined } }, false, false);
                             });
                         }
                     }
@@ -1073,11 +1079,17 @@ var SPCApp = {
                     height: 350,
                     toolbar: { show: true },
                     background: 'transparent',
-                    zoom: { enabled: true, type: 'x', zoomOnScroll: false, resetIcon: { offsetX: 0, offsetY: 0 } },
+                    selection: { enabled: true, type: 'x' },
+                    zoom: { enabled: false },
                     events: {
+                        selection: function (chart, e) {
+                            if (e.xaxis) {
+                                chart.updateOptions({ xaxis: { min: e.xaxis.min, max: e.xaxis.max } }, false, false);
+                            }
+                        },
                         mounted: function (chartContext, config) {
                             chartContext.el.addEventListener('dblclick', function () {
-                                chartContext.resetSeries();
+                                chartContext.updateOptions({ xaxis: { min: undefined, max: undefined } }, false, false);
                             });
                         }
                     }
@@ -1105,11 +1117,17 @@ var SPCApp = {
                     height: 350,
                     toolbar: { show: true },
                     background: 'transparent',
-                    zoom: { enabled: true, type: 'x', zoomOnScroll: false, resetIcon: { offsetX: 0, offsetY: 0 } },
+                    selection: { enabled: true, type: 'x' },
+                    zoom: { enabled: false },
                     events: {
+                        selection: function (chart, e) {
+                            if (e.xaxis) {
+                                chart.updateOptions({ xaxis: { min: e.xaxis.min, max: e.xaxis.max } }, false, false);
+                            }
+                        },
                         mounted: function (chartContext, config) {
                             chartContext.el.addEventListener('dblclick', function () {
-                                chartContext.resetSeries();
+                                chartContext.updateOptions({ xaxis: { min: undefined, max: undefined } }, false, false);
                             });
                         }
                     }
@@ -1137,11 +1155,17 @@ var SPCApp = {
                     type: 'line',
                     height: 380,
                     toolbar: { show: true },
-                    zoom: { enabled: true, type: 'x', zoomOnScroll: false, resetIcon: { offsetX: 0, offsetY: 0 } },
+                    selection: { enabled: true, type: 'x' },
+                    zoom: { enabled: false },
                     events: {
+                        selection: function (chart, e) {
+                            if (e.xaxis) {
+                                chart.updateOptions({ xaxis: { min: e.xaxis.min, max: e.xaxis.max } }, false, false);
+                            }
+                        },
                         mounted: function (chartContext, config) {
                             chartContext.el.addEventListener('dblclick', function () {
-                                chartContext.resetSeries();
+                                chartContext.updateOptions({ xaxis: { min: undefined, max: undefined } }, false, false);
                             });
                         }
                     }

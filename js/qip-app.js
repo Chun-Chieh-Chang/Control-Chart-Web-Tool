@@ -641,19 +641,33 @@ var QIPExtractApp = {
     },
 
     sendToSPC: function () {
-        if (!this.processingResults || Object.keys(this.processingResults.inspectionItems || {}).length === 0) {
-            alert('沒有可傳送的數據');
+        console.log('QIP: Preparing to send data to SPC analysis...', this.processingResults);
+
+        if (!this.processingResults) {
+            alert('沒有可傳送的數據：請先點擊「開始提取數據」按鈕。');
             return;
         }
 
-        // Store extracted data for SPC analysis
+        const items = this.processingResults.inspectionItems || {};
+        const itemCount = Object.keys(items).length;
+
+        console.log('QIP: Inspection items found:', itemCount, items);
+
+        if (itemCount === 0) {
+            alert('沒有可傳送的數據：提取結果中不包含任何有效的檢驗項目。');
+            return;
+        }
+
+        // Store extracted data for SPC analysis (global window object)
         window.qipExtractedData = this.processingResults;
+        console.log('QIP: Data stored in window.qipExtractedData');
 
         // Switch to import view and trigger file processing
         if (typeof SPCApp !== 'undefined') {
             SPCApp.switchView('import');
             alert('數據已準備就緒，請在 QIP 匯入頁面選擇檢驗項目進行分析。');
         } else {
+            console.error('QIP: SPCApp not found!');
             alert('無法連接 SPC 分析模組');
         }
     }

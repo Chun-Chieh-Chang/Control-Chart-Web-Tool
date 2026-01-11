@@ -1,0 +1,44 @@
+// 調試補丁：在 processor.js 的 Line 175-190 替換為以下代碼
+
+                // 提取檢驗項目名稱 - 支援合併儲存格（模仿 VBA MergeArea 邏輯）
+                // VBA: tempValue = Trim(CStr(m.Cells(1, 1).value))
+                let tempValue = safeGetMergedValue(dataRow, 0);  // 先嘗試 A 列
+                console.log(`[QIP DEBUG][Row${dataRow+1}] A列(col 0)讀取: "${tempValue}" (type: ${typeof tempValue})`);
+                
+                if (!tempValue || String(tempValue).trim() === '') {
+                    tempValue = safeGetMergedValue(dataRow, 1);  // 再嘗試 B 列
+                    console.log(`[QIP DEBUG][Row${dataRow+1}] B列(col 1)讀取: "${tempValue}" (type: ${typeof tempValue})`);
+                }
+                
+                // 也嘗試 C 列和 D 列，因為可能檢驗項目名稱在更右邊
+                if (!tempValue || String(tempValue).trim() === '') {
+                    tempValue = safeGetMergedValue(dataRow, 2);  // C 列
+                    console.log(`[QIP DEBUG][Row${dataRow+1}] C列(col 2)讀取: "${tempValue}" (type: ${typeof tempValue})`);
+                }
+                
+                if (!tempValue || String(tempValue).trim() === '') {
+                    tempValue = safeGetMergedValue(dataRow, 3);  // D 列
+                    console.log(`[QIP DEBUG][Row${dataRow+1}] D列(col 3)讀取: "${tempValue}" (type: ${typeof tempValue})`);
+                }
+
+                if (tempValue) {
+                    const cleanedValue = String(tempValue).trim().replace(/[()]/g, '');
+                    const isNumeric = DataExtractor.isNumericString(cleanedValue);
+                    console.log(`[QIP DEBUG][Row${dataRow+1}] 清理後: "${cleanedValue}", isNumeric: ${isNumeric}, length: ${cleanedValue.length}`);
+                    
+                    if (cleanedValue && !isNumeric) {
+                        itemName = cleanedValue;
+                        console.log(`[QIP][Row${dataRow + 1}] ✓ 找到檢驗項目: "${itemName}"`);
+                    } else if (isNumeric) {
+                        console.warn(`[QIP DEBUG][Row${dataRow+1}] 值是數字，跳過`);
+                    } else {
+                        console.warn(`[QIP DEBUG][Row${dataRow+1}] 清理後為空字串`);
+                    }
+                } else {
+                    console.warn(`[QIP DEBUG][Row${dataRow+1}] A/B/C/D 列都沒有值`);
+                }
+
+                if (!itemName) {
+                    console.warn(`[QIP][Row${dataRow + 1}] ✗ 未找到檢驗項目名稱，跳過此行`);
+                    continue;
+                }

@@ -170,25 +170,29 @@ class QIPProcessor {
                 const data = {};
                 let itemName = '';
 
-                // 提取檢驗項目名稱 - 支援合併儲存格（模仿 VBA MergeArea 邏輯）
-                // VBA: tempValue = Trim(CStr(m.Cells(1, 1).value))
-                let tempValue = safeGetMergedValue(dataRow, 0);  // 先嘗試 A 列
-                if (!tempValue || String(tempValue).trim() === '') {
-                    tempValue = safeGetMergedValue(dataRow, 1);  // 再嘗試 B 列
+                // 提取检验项目名称 - 只从 A 列读取
+                // 注意：检验项目名称可以是数字（如 "1", "2"），必须作为文字处理
+                let tempValue = safeGetMergedValue(dataRow, 0);  // A 列
+
+                if (tempValue !== null && tempValue !== undefined) {
+                    itemName = String(tempValue).trim();
                 }
 
-                if (tempValue) {
-                    const cleanedValue = String(tempValue).trim().replace(/[()]/g, '');
-                    if (cleanedValue && !DataExtractor.isNumericString(cleanedValue)) {
-                        itemName = cleanedValue;
-                        console.log(`[QIP][Row${dataRow + 1}] ✓ 找到檢驗項目: "${itemName}"`);
+                // 如果 A 列没有，尝试 B 列
+                if (!itemName || itemName === '') {
+                    tempValue = safeGetMergedValue(dataRow, 1);  // B 列
+                    if (tempValue !== null && tempValue !== undefined) {
+                        itemName = String(tempValue).trim();
                     }
                 }
 
-                if (!itemName) {
-                    console.warn(`[QIP][Row${dataRow + 1}] ✗ 未找到檢驗項目名稱，跳過此行`);
+                if (itemName && itemName !== '') {
+                    console.log(`[QIP][Row${dataRow + 1}] ✓ 找到检验项目: "${itemName}"`);
+                } else {
+                    console.warn(`[QIP][Row${dataRow + 1}] ✗ A/B 列都没有内容，跳过此行`);
                     continue;
                 }
+
 
                 // 提取穴號數據
                 const idRow = idRangeParsed.startRow - 1; // 0-indexed

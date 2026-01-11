@@ -1,0 +1,23 @@
+<!-- Extraction Results Detail Panel -->
+<div id="qip-extraction-detail-panel" class="saas-card p-6 hidden mt-6">
+    <div class="flex items-center justify-between mb-4 pb-4 border-b border-slate-200 dark:border-slate-700">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-900/30 flex items-center justify-center">
+                <span class="material-icons-outlined text-emerald-600">science</span>
+            </div>
+            <div>
+                <h4 class="text-sm font-bold text-slate-900 dark:text-white" data-en="Extraction Results Detail"
+                    data-zh="提取結果詳情">提取結果詳情</h4>
+                <p class="text-xs text-slate-500 mt-0.5" data-en="Verify extracted data before export"
+                    data-zh="匯出前驗證提取的數據">匯出前驗證提取的數據</p>
+            </div>
+        </div>
+        <button onclick="document.getElementById('qip-extraction-detail-panel').classList.add('hidden')"
+            class="text-slate-400 hover:text-rose-500 transition-colors">
+            <span class="material-icons-outlined">close</span>
+        </button>
+    </div>
+    <div id="qip-extraction-detail-content" class="space-y-3">
+        <!-- Dynamic content will be injected here -->
+    </div>
+</div>

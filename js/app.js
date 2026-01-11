@@ -10,6 +10,16 @@ var SPCApp = {
     analysisResults: null,
     chartInstances: [],
     batchPagination: { currentPage: 1, totalPages: 1, maxPerPage: 25, totalBatches: 0 },
+    nelsonExpertise: {
+        1: { m: "突發異常：異物阻塞射嘴、加熱圈燒毀、模具未鎖緊。", q: "非機遇原因介入 (0.3%)，需立即隔離全檢。" },
+        2: { m: "製程漂移：原料批次變更、模溫水路積垢、油溫未熱平衡。", q: "平均值移動，Cpk 將下降，建議預防性調整。" },
+        3: { m: "漸進變化：頂針/滑塊/止逆環磨損、溫控失效。", q: "強烈失控預兆 (Trend)，應立即預防保養(PM)。" },
+        4: { m: "人為過度干預：頻繁調整保壓/背壓，或液壓不穩。", q: "負自相關 (Oscillation)，請停止微調 (Hands Off)。" },
+        5: { m: "製程設定改變：冷卻時間或週期不穩。", q: "中等程度的製程偏移傾向 (2/3 > 2σ)。" },
+        6: { m: "製程不穩定：原料混合不均或計量不穩。", q: "小幅度的連續偏移 (4/5 > 1σ)。" },
+        7: { m: "分層現象：多模穴流動平衡不佳。", q: "數據過於集中 (Hugging Center)，可能變異數估算錯誤。" },
+        8: { m: "混合分佈：兩台機器混料或雙模穴差異大。", q: "雙峰分佈 (Mixture)，避開了中心區域。" }
+    },
 
     init: function () {
         this.setupLanguageToggle();
@@ -660,7 +670,49 @@ var SPCApp = {
                 xaxis: { categories: pageLabels, labels: { style: { colors: theme.text, fontSize: '10px' } } },
                 yaxis: { labels: { formatter: function (v) { return v.toFixed(4); }, style: { colors: theme.text } } },
                 grid: { borderColor: theme.grid },
-                tooltip: { theme: theme.mode },
+                tooltip: {
+                    theme: theme.mode,
+                    custom: function ({ series, seriesIndex, dataPointIndex, w }) {
+                        var val = series[seriesIndex][dataPointIndex];
+                        var name = w.globals.seriesNames[seriesIndex];
+                        var label = w.globals.categoryLabels[dataPointIndex];
+
+                        // Build standard tooltip header
+                        var html = '<div class="px-3 py-2 bg-slate-900 border border-slate-700 shadow-xl rounded-lg">';
+                        html += '<div class="text-[10px] text-slate-400 font-bold uppercase mb-1">' + label + '</div>';
+                        html += '<div class="flex items-center gap-2 mb-2 pb-2 border-b border-slate-800">';
+                        html += '<span class="w-2 h-2 rounded-full" style="background-color:' + w.globals.colors[seriesIndex] + '"></span>';
+                        html += '<span class="text-xs font-bold text-white">' + name + ': ' + val.toFixed(4) + '</span>';
+                        html += '</div>';
+
+                        // Check if this point has a Nelson Rule violation
+                        var violation = pageXbarR.xBar.violations.find(v => v.index === dataPointIndex);
+                        if (violation && seriesIndex === 0) {
+                            var rulesText = violation.rules.map(r => 'Rule ' + r).join(', ');
+                            var mainRule = violation.rules[0];
+                            var exp = self.nelsonExpertise[mainRule] || { m: "請檢查製程參數。", q: "請參考標準作業程序。" };
+
+                            html += '<div class="space-y-3 mt-2">';
+                            html += '<div class="flex items-center justify-between gap-4">';
+                            html += '<div class="text-[10px] bg-rose-500/20 text-rose-400 px-2 py-0.5 rounded font-bold">' + rulesText + '</div>';
+                            html += '</div>';
+
+                            html += '<div>';
+                            html += '<div class="flex items-center gap-1.5 text-[10px] text-sky-400 font-bold"><span class="material-icons-outlined text-[12px]">precision_manufacturing</span> 成型專家</div>';
+                            html += '<div class="text-[10px] text-slate-300 leading-normal pl-4 mt-0.5">' + exp.m + '</div>';
+                            html += '</div>';
+
+                            html += '<div>';
+                            html += '<div class="flex items-center gap-1.5 text-[10px] text-emerald-400 font-bold"><span class="material-icons-outlined text-[12px]">assignment_turned_in</span> 品管專家</div>';
+                            html += '<div class="text-[10px] text-slate-300 leading-normal pl-4 mt-0.5">' + exp.q + '</div>';
+                            html += '</div>';
+                            html += '</div>';
+                        }
+
+                        html += '</div>';
+                        return html;
+                    }
+                },
                 markers: { size: 4, discrete: pageXbarR.xBar.violations.map(function (v) { return { seriesIndex: 0, dataPointIndex: v.index, fillColor: '#f43f5e', strokeColor: '#fff', size: 6 }; }) }
             };
             var chartX = new ApexCharts(document.querySelector("#xbarChart"), xOpt);
@@ -895,20 +947,9 @@ var SPCApp = {
             return;
         }
 
-        var nelsonExpertise = {
-            1: { m: "突發異常：異物阻塞射嘴、加熱圈燒毀、模具未鎖緊。", q: "非機遇原因介入 (0.3%)，需立即隔離全檢。" },
-            2: { m: "製程漂移：原料批次變更、模溫水路積垢、油溫未熱平衡。", q: "平均值移動，Cpk 將下降，建議預防性調整。" },
-            3: { m: "漸進變化：頂針/滑塊/止逆環磨損、溫控失效。", q: "強烈失控預兆 (Trend)，應立即預防保養(PM)。" },
-            4: { m: "人為過度干預：頻繁調整保壓/背壓，或液壓不穩。", q: "負自相關 (Oscillation)，請停止微調 (Hands Off)。" },
-            5: { m: "製程設定改變：冷卻時間或週期不穩。", q: "中等程度的製程偏移傾向 (2/3 > 2σ)。" },
-            6: { m: "製程不穩定：原料混合不均或計量不穩。", q: "小幅度的連續偏移 (4/5 > 1σ)。" },
-            7: { m: "分層現象：多模穴流動平衡不佳。", q: "數據過於集中 (Hugging Center)，可能變異數估算錯誤。" },
-            8: { m: "混合分佈：兩台機器混料或雙模穴差異大。", q: "雙峰分佈 (Mixture)，避開了中心區域。" }
-        };
-
         violations.forEach(function (v) {
             var ruleId = v.rules[0];
-            var exp = nelsonExpertise[ruleId] || { m: "請檢查製程參數。", q: "請參考標準作業程序。" };
+            var exp = self.nelsonExpertise[ruleId] || { m: "請檢查製程參數。", q: "請參考標準作業程序。" };
 
             var card = document.createElement('div');
             card.className = 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-4 rounded-xl mb-3 mx-4 group relative cursor-help hover:border-rose-400 dark:hover:border-rose-500 transition-colors shadow-sm';

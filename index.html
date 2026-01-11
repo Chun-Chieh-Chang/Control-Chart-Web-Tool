@@ -102,7 +102,7 @@
                 <span class="material-icons-outlined text-xl">fact_check</span>
                 <span data-en="Nelson Rules" data-zh="Nelson 法則解讀">Nelson 法則解讀</span>
             </a>
-            <div class="pt-8 mb-2 px-3 text-[10px] font-bold text-slate-500 uppercase tracking-widest">System</div>
+            <div class="pt-8 mb-2 px-3 text-sm font-bold text-slate-500 uppercase tracking-widest">System</div>
             <a href="#" id="nav-settings"
                 class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800 transition-all">
                 <span class="material-icons-outlined text-xl">settings</span>
@@ -121,7 +121,7 @@
                 <img src="AI數字人.png" class="w-9 h-9 rounded-full bg-slate-700 object-cover" alt="Author">
                 <div class="flex-1 min-w-0">
                     <p class="text-sm font-bold text-white truncate">Author Info</p>
-                    <p class="text-[10px] text-slate-500 truncate">Chun-Chieh-Chang, 2026</p>
+                    <p class="text-sm text-slate-500 truncate">Chun-Chieh-Chang, 2026</p>
                 </div>
             </div>
         </div>
@@ -148,12 +148,12 @@
                     <span
                         class="material-icons-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-lg transition-colors group-focus-within:text-primary">search</span>
                     <input type="text" id="globalSearch" placeholder="Search data..."
-                        class="pl-10 pr-4 py-2 bg-slate-100 dark:bg-slate-800 border-transparent focus:bg-white dark:focus:bg-slate-900 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 dark:focus:ring-indigo-900/20 rounded-xl text-xs w-64 transition-all text-slate-900 dark:text-white">
+                        class="pl-10 pr-4 py-2 bg-slate-100 dark:bg-slate-800 border-transparent focus:bg-white dark:focus:bg-slate-900 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 dark:focus:ring-indigo-900/20 rounded-xl text-sm w-64 transition-all text-slate-900 dark:text-white">
                 </div>
                 <!-- Language Toggle -->
                 <button id="langBtn"
                     class="p-2 hover:bg-slate-100 rounded-lg transition-all text-slate-600 border border-slate-200 shadow-sm flex items-center">
-                    <span id="langText" class="text-[10px] font-bold px-1">EN</span>
+                    <span id="langText" class="text-sm font-bold px-1">EN</span>
                 </button>
                 <div class="w-px h-6 bg-slate-200"></div>
                 <!-- Notification -->
@@ -194,9 +194,9 @@
                         class="saas-card p-6 bg-gradient-to-br from-indigo-500 to-indigo-600 text-white border-none shadow-lg shadow-indigo-200 dark:shadow-none">
                         <div class="flex justify-between items-start mb-4">
                             <span class="material-icons-outlined text-3xl opacity-80">history</span>
-                            <span class="text-[10px] font-bold bg-white/20 px-2 py-1 rounded">CACHE</span>
+                            <span class="text-sm font-bold bg-white/20 px-2 py-1 rounded">CACHE</span>
                         </div>
-                        <h4 class="text-xs font-bold opacity-80 uppercase tracking-widest mb-1" data-en="Total Analyses"
+                        <h4 class="text-sm font-bold opacity-80 uppercase tracking-widest mb-1" data-en="Total Analyses"
                             data-zh="累計分析次數">累計分析次數</h4>
                         <div class="text-3xl font-bold" id="dash-total-history">0</div>
                     </div>
@@ -207,7 +207,7 @@
                             <span
                                 class="text-[10px] font-bold text-rose-500 bg-rose-50 dark:bg-rose-900/30 px-2 py-1 rounded">ALERTS</span>
                         </div>
-                        <h4 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1"
+                        <h4 class="text-sm font-bold text-slate-500 uppercase tracking-widest mb-1"
                             data-en="Total Anomalies" data-zh="累計異常偵測">累計異常偵測</h4>
                         <div class="text-3xl font-bold text-slate-900 dark:text-white" id="dash-total-anomalies">0</div>
                     </div>
@@ -218,7 +218,7 @@
                             <span
                                 class="text-[10px] font-bold text-emerald-500 bg-emerald-50 dark:bg-emerald-900/30 px-2 py-1 rounded">QUALITY</span>
                         </div>
-                        <h4 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1"
+                        <h4 class="text-sm font-bold text-slate-500 uppercase tracking-widest mb-1"
                             data-en="Avg Cpk (Recent)" data-zh="近期平均 Cpk">近期平均 Cpk</h4>
                         <div class="text-3xl font-bold text-slate-900 dark:text-white" id="dash-avg-cpk">0.00</div>
                     </div>
@@ -229,7 +229,7 @@
                             <span
                                 class="text-[10px] font-bold text-amber-500 bg-amber-50 dark:bg-amber-900/30 px-2 py-1 rounded">DATA</span>
                         </div>
-                        <h4 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1"
+                        <h4 class="text-sm font-bold text-slate-500 uppercase tracking-widest mb-1"
                             data-en="Cached Configs" data-zh="已儲存參數">已儲存參數</h4>
                         <div class="text-3xl font-bold text-slate-900 dark:text-white" id="dash-total-configs">0</div>
                     </div>
@@ -244,7 +244,7 @@
                                 <h4 class="font-bold text-slate-900 dark:text-white" data-en="Recent Analyses"
                                     data-zh="近期分析活動">近期分析活動</h4>
                                 <a href="#" id="dash-view-all-history"
-                                    class="text-xs text-indigo-600 font-bold hover:underline">View All</a>
+                                    class="text-sm text-indigo-600 font-bold hover:underline">View All</a>
                             </div>
                             <div class="p-0">
                                 <table class="w-full text-sm text-left">
@@ -259,7 +259,7 @@
                     <!-- System Status & Quick Links -->
                     <div class="space-y-6">
                         <div class="saas-card p-6">
-                            <h4 class="font-bold text-slate-900 dark:text-white mb-6 uppercase text-xs tracking-widest"
+                            <h4 class="font-bold text-slate-900 dark:text-white mb-6 uppercase text-sm tracking-widest"
                                 data-en="Quick Actions" data-zh="快速操作">快速操作</h4>
                             <div class="grid grid-cols-2 gap-4">
                                 <button onclick="SPCApp.switchView('qip-extract')"
@@ -385,7 +385,7 @@
                             <div class="saas-card p-6 border-l-4 border-l-blue-500">
                                 <h4 class="text-sm font-bold text-slate-900 dark:text-white mb-2"
                                     data-en="Analysis Mode" data-zh="分析模式說明">分析模式說明</h4>
-                                <p class="text-xs text-slate-500 leading-relaxed">
+                                <p class="text-sm text-slate-500 leading-relaxed">
                                     系統會自動識別檢驗項目。您可以選擇 <strong>Batch (批次)</strong> 用於 X-Bar R 管制圖，或 <strong>Cavity
                                         (穴號)</strong> 用於模穴間的 Cpk 差異評估。
                                 </p>
@@ -407,14 +407,14 @@
                                 <div class="flex items-center gap-4 mt-1">
                                     <span
                                         class="text-[10px] text-emerald-600 bg-emerald-50 dark:bg-emerald-900/30 px-2 py-0.5 rounded font-bold uppercase tracking-widest">Ready</span>
-                                    <span class="text-xs text-slate-400 font-medium" id="fileMeta">Calculating
+                                    <span class="text-sm text-slate-400 font-medium" id="fileMeta">Calculating
                                         specs...</span>
                                 </div>
                             </div>
                         </div>
                         <div class="flex gap-3">
                             <button id="resetBtn"
-                                class="px-4 py-2 text-slate-500 hover:text-rose-600 text-xs font-bold border border-slate-200 rounded-lg hover:bg-rose-50 hover:border-rose-100 transition-all flex items-center gap-2">
+                                class="px-4 py-2 text-slate-500 hover:text-rose-600 text-sm font-bold border border-slate-200 rounded-lg hover:bg-rose-50 hover:border-rose-100 transition-all flex items-center gap-2">
                                 <span class="material-icons-outlined text-sm">delete_sweep</span>
                                 <span data-en="Change File" data-zh="更換檔案">更換檔案</span>
                             </button>
@@ -429,7 +429,7 @@
                                 <span class="material-icons-outlined text-indigo-500">table_rows</span>
                                 Data Content Preview
                             </h4>
-                            <span class="text-[10px] text-slate-400 italic">Showing first 5 rows of raw data</span>
+                            <span class="text-sm text-slate-400 italic">Showing first 5 rows of raw data</span>
                         </div>
                         <div class="saas-card overflow-hidden">
                             <div class="overflow-x-auto">
@@ -481,10 +481,10 @@
                                 <span class="material-icons-outlined text-3xl">analytics</span>
                             </div>
                             <h4 class="font-bold text-slate-900 dark:text-white mb-2">Batch Analysis</h4>
-                            <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mb-6">X-Bar R control
+                            <p class="text-sm text-slate-500 dark:text-slate-400 leading-relaxed mb-6">X-Bar R control
                                 charts with automated Nelson rules violation detection.</p>
                             <span
-                                class="text-xs font-bold text-indigo-600 dark:text-indigo-400 group-hover:translate-x-1 transition-transform inline-flex items-center">Run
+                                class="text-sm font-bold text-indigo-600 dark:text-indigo-400 group-hover:translate-x-1 transition-transform inline-flex items-center">Run
                                 Model <span class="material-icons-outlined text-sm ml-1">chevron_right</span></span>
                         </div>
                         <!-- Cavity -->
@@ -495,10 +495,10 @@
                                 <span class="material-icons-outlined text-3xl">biotech</span>
                             </div>
                             <h4 class="font-bold text-slate-900 dark:text-white mb-2">Cavity Analysis</h4>
-                            <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mb-6">Cross-cavity
+                            <p class="text-sm text-slate-500 dark:text-slate-400 leading-relaxed mb-6">Cross-cavity
                                 performance comparison. Evaluate Cpk differences between tools.</p>
                             <span
-                                class="text-xs font-bold text-indigo-600 dark:text-indigo-400 group-hover:translate-x-1 transition-transform inline-flex items-center">Run
+                                class="text-sm font-bold text-indigo-600 dark:text-indigo-400 group-hover:translate-x-1 transition-transform inline-flex items-center">Run
                                 Model <span class="material-icons-outlined text-sm ml-1">chevron_right</span></span>
                         </div>
                         <!-- Group -->
@@ -509,10 +509,10 @@
                                 <span class="material-icons-outlined text-3xl">insights</span>
                             </div>
                             <h4 class="font-bold text-slate-900 dark:text-white mb-2">Group Variance</h4>
-                            <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mb-6">Analyze overall
+                            <p class="text-sm text-slate-500 dark:text-slate-400 leading-relaxed mb-6">Analyze overall
                                 variation trends using Min-Max-Average grouping.</p>
                             <span
-                                class="text-xs font-bold text-indigo-600 dark:text-indigo-400 group-hover:translate-x-1 transition-transform inline-flex items-center">Run
+                                class="text-sm font-bold text-indigo-600 dark:text-indigo-400 group-hover:translate-x-1 transition-transform inline-flex items-center">Run
                                 Model <span class="material-icons-outlined text-sm ml-1">chevron_right</span></span>
                         </div>
                     </div>
@@ -532,7 +532,7 @@
                             <div>
                                 <h2 class="text-xl font-bold text-slate-900 dark:text-white"
                                     data-en="Analysis Results Overview" data-zh="分析結果總覽">分析結果總覽</h2>
-                                <p class="text-xs text-slate-500 dark:text-slate-400">Statistical processing and control
+                                <p class="text-sm text-slate-500 dark:text-slate-400">Statistical processing and control
                                     chart visualization</p>
                             </div>
                         </div>
@@ -561,7 +561,7 @@
                     <div>
                         <h2 class="text-xl font-bold text-slate-900 dark:text-white" data-en="Analysis History"
                             data-zh="歷史分析紀錄">歷史分析紀錄</h2>
-                        <p class="text-xs text-slate-500 dark:text-slate-400">View and reload previous analysis sessions
+                        <p class="text-sm text-slate-500 dark:text-slate-400">View and reload previous analysis sessions
                             from your local cache</p>
                     </div>
                 </div>
@@ -570,7 +570,7 @@
                     <div class="overflow-x-auto">
                         <table class="w-full text-sm text-left">
                             <thead
-                                class="text-[11px] text-slate-500 dark:text-slate-400 uppercase bg-slate-50/50 dark:bg-slate-700/50">
+                                class="text-sm text-slate-500 dark:text-slate-400 uppercase bg-slate-50/50 dark:bg-slate-700/50">
                                 <tr>
                                     <th class="px-6 py-4 font-bold">File Name</th>
                                     <th class="px-6 py-4 font-bold">Analysis Type</th>
@@ -613,7 +613,7 @@
                         </div>
                         <div>
                             <h4 class="font-bold text-slate-900 dark:text-white">資深射出成型專家</h4>
-                            <p class="text-xs text-slate-500">觀點：模具磨損、機台參數、原料變異、周邊設備</p>
+                            <p class="text-sm text-slate-500">觀點：模具磨損、機台參數、原料變異、周邊設備</p>
                         </div>
                     </div>
                     <div
@@ -624,7 +624,7 @@
                         </div>
                         <div>
                             <h4 class="font-bold text-slate-900 dark:text-white">資深品管品質專家</h4>
-                            <p class="text-xs text-slate-500">觀點：統計顯著性、抽樣風險、可歸屬原因、客戶規範</p>
+                            <p class="text-sm text-slate-500">觀點：統計顯著性、抽樣風險、可歸屬原因、客戶規範</p>
                         </div>
                     </div>
                 </div>
@@ -642,7 +642,7 @@
                                 <div>
                                     <h3 class="text-lg font-bold text-slate-900 dark:text-white">一點超出 3σ 管制界限 (One point
                                         beyond Zone A)</h3>
-                                    <p class="text-xs font-mono text-rose-600 dark:text-rose-400 mt-1">Out of Control
+                                    <p class="text-sm font-mono text-rose-600 dark:text-rose-400 mt-1">Out of Control
                                         (OOC)</p>
                                 </div>
                             </div>
@@ -686,7 +686,7 @@
                                 <div>
                                     <h3 class="text-lg font-bold text-slate-900 dark:text-white">連續 9 點在中心線同一側 (9 points
                                         on same side)</h3>
-                                    <p class="text-xs font-mono text-amber-600 dark:text-amber-400 mt-1">Process Shift
+                                    <p class="text-sm font-mono text-amber-600 dark:text-amber-400 mt-1">Process Shift
                                         (Mean Shift)</p>
                                 </div>
                             </div>
@@ -729,7 +729,7 @@
                                 <div>
                                     <h3 class="text-lg font-bold text-slate-900 dark:text-white">連續 6 點持續上升或下降 (6 points
                                         trend)</h3>
-                                    <p class="text-xs font-mono text-sky-600 dark:text-sky-400 mt-1">Trend (Drift)</p>
+                                    <p class="text-sm font-mono text-sky-600 dark:text-sky-400 mt-1">Trend (Drift)</p>
                                 </div>
                             </div>
                             <span
@@ -770,7 +770,7 @@
                                 <div>
                                     <h3 class="text-lg font-bold text-slate-900 dark:text-white">連續 14 點上下交替 (14 points
                                         alternating)</h3>
-                                    <p class="text-xs font-mono text-indigo-600 dark:text-indigo-400 mt-1">Oscillation
+                                    <p class="text-sm font-mono text-indigo-600 dark:text-indigo-400 mt-1">Oscillation
                                         (Over-control)</p>
                                 </div>
                             </div>
@@ -811,7 +811,7 @@
                                 <div>
                                     <h3 class="text-lg font-bold text-slate-900 dark:text-white">連續 3 點中有 2 點 > 2σ (2 of
                                         3 > 2σ)</h3>
-                                    <p class="text-xs font-mono text-orange-600 dark:text-orange-400 mt-1">Warning
+                                    <p class="text-sm font-mono text-orange-600 dark:text-orange-400 mt-1">Warning
                                         (Medium Shift)</p>
                                 </div>
                             </div>
@@ -853,7 +853,7 @@
                                 <div>
                                     <h3 class="text-lg font-bold text-slate-900 dark:text-white">連續 5 點中有 4 點 > 1σ (4 of
                                         5 > 1σ)</h3>
-                                    <p class="text-xs font-mono text-teal-600 dark:text-teal-400 mt-1">Early Warning
+                                    <p class="text-sm font-mono text-teal-600 dark:text-teal-400 mt-1">Early Warning
                                         (Small Shift)</p>
                                 </div>
                             </div>
@@ -919,7 +919,7 @@
                         class="flex items-center gap-4 bg-slate-50 dark:bg-slate-900/50 px-4 py-2 rounded-xl border border-slate-100 dark:border-slate-800">
                         <div class="flex items-center gap-2">
                             <span class="material-icons-outlined text-emerald-600 text-sm">lock</span>
-                            <span class="text-[11px] text-slate-600 dark:text-slate-400 font-medium">Browser-side
+                            <span class="text-sm text-slate-600 dark:text-slate-400 font-medium">Browser-side
                                 privacy guaranteed. No data is sent to servers.</span>
                         </div>
                     </div>
@@ -945,7 +945,7 @@
                                         class="material-icons-outlined text-3xl text-slate-300 mb-2">cloud_upload</span>
                                     <p class="text-[11px] text-slate-500 mb-3">Drop report or click to select</p>
                                     <button
-                                        class="px-4 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold transition-all">Select
+                                        class="px-4 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-bold transition-all">Select
                                         File</button>
                                 </div>
 
@@ -956,7 +956,7 @@
                                             <span
                                                 class="material-icons-outlined text-emerald-600 text-base">task_alt</span>
                                             <span id="qip-file-name"
-                                                class="text-xs font-bold text-slate-900 dark:text-white truncate"></span>
+                                                class="text-sm font-bold text-slate-900 dark:text-white truncate"></span>
                                         </div>
                                         <button id="qip-remove-file"
                                             class="text-slate-400 hover:text-rose-500 transition-colors">
@@ -980,17 +980,17 @@
                                     <div class="grid grid-cols-2 gap-3">
                                         <div class="space-y-1">
                                             <label
-                                                class="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">Product
+                                                class="text-sm font-bold text-slate-400 uppercase tracking-widest pl-1">Product
                                                 Code</label>
                                             <input type="text" id="qip-product-code"
-                                                class="w-full px-3 py-2 border border-slate-100 dark:border-slate-700 rounded-lg text-xs bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white focus:ring-2 focus:ring-emerald-500/20"
+                                                class="w-full px-3 py-2 border border-slate-100 dark:border-slate-700 rounded-lg text-sm bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white focus:ring-2 focus:ring-emerald-500/20"
                                                 placeholder="P/N Auto">
                                         </div>
                                         <div class="space-y-1">
                                             <label
-                                                class="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">Cavities</label>
+                                                class="text-sm font-bold text-slate-400 uppercase tracking-widest pl-1">Cavities</label>
                                             <select id="qip-cavity-count"
-                                                class="w-full px-3 py-2 border border-slate-100 dark:border-slate-700 rounded-lg text-xs bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white focus:ring-2 focus:ring-emerald-500/20">
+                                                class="w-full px-3 py-2 border border-slate-100 dark:border-slate-700 rounded-lg text-sm bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white focus:ring-2 focus:ring-emerald-500/20">
                                                 <option value="">Select</option>
                                                 <option value="8">8 穴</option>
                                                 <option value="16">16 穴</option>
@@ -1004,13 +1004,13 @@
 
                                     <div id="qip-worksheet-select-group" class="space-y-1 hidden">
                                         <label
-                                            class="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">Select
+                                            class="text-sm font-bold text-slate-400 uppercase tracking-widest pl-1">Select
                                             Sheet</label>
                                         <div class="flex gap-2">
                                             <select id="qip-worksheet-select"
-                                                class="flex-1 px-3 py-2 border border-slate-100 dark:border-slate-700 rounded-lg text-xs bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white"></select>
+                                                class="flex-1 px-3 py-2 border border-slate-100 dark:border-slate-700 rounded-lg text-sm bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white"></select>
                                             <button id="qip-preview-btn"
-                                                class="px-3 py-2 bg-emerald-50 text-emerald-600 rounded-lg text-xs font-bold hover:bg-emerald-100 transition-all border border-emerald-100">
+                                                class="px-3 py-2 bg-emerald-50 text-emerald-600 rounded-lg text-sm font-bold hover:bg-emerald-100 transition-all border border-emerald-100">
                                                 <span
                                                     class="material-icons-outlined text-sm align-middle">visibility</span>
                                             </button>
@@ -1021,7 +1021,7 @@
                                     <div
                                         class="p-3 bg-blue-50/50 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-900/30 rounded-xl flex gap-2">
                                         <span class="material-icons-outlined text-blue-500 text-base">lightbulb</span>
-                                        <p class="text-[10px] text-blue-700 dark:text-blue-300 leading-normal">
+                                        <p class="text-sm text-blue-700 dark:text-blue-300 leading-normal">
                                             Use "Preview" to open the sheet, then use 📍 button to select coordinate
                                             ranges by dragging on the table.
                                         </p>
@@ -1041,7 +1041,7 @@
                         <!-- Processing Console -->
                         <div class="saas-card p-5 bg-slate-900 text-white border-none shadow-xl">
                             <h4
-                                class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-5 flex justify-between items-center">
+                                class="text-sm font-bold text-slate-500 uppercase tracking-widest mb-5 flex justify-between items-center">
                                 Processing Console
                                 <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
                             </h4>
@@ -1073,12 +1073,12 @@
                                     </div>
                                     <div class="grid grid-cols-2 gap-3">
                                         <button id="qip-download-excel"
-                                            class="p-3 bg-white/5 hover:bg-white/10 text-white rounded-xl text-xs font-bold transition-all flex flex-col items-center gap-2 border border-white/10">
+                                            class="p-3 bg-white/5 hover:bg-white/10 text-white rounded-xl text-sm font-bold transition-all flex flex-col items-center gap-2 border border-white/10">
                                             <span class="material-icons-outlined text-emerald-400">download</span>
                                             Excel
                                         </button>
                                         <button id="qip-send-to-spc"
-                                            class="p-3 bg-white/5 hover:bg-white/10 text-white rounded-xl text-xs font-bold transition-all flex flex-col items-center gap-2 border border-white/10">
+                                            class="p-3 bg-white/5 hover:bg-white/10 text-white rounded-xl text-sm font-bold transition-all flex flex-col items-center gap-2 border border-white/10">
                                             <span class="material-icons-outlined text-indigo-400">arrow_forward</span>
                                             Send to SPC
                                         </button>
@@ -1091,12 +1091,13 @@
                         <div class="saas-card overflow-hidden">
                             <div
                                 class="p-4 border-b border-slate-50 dark:border-slate-800 flex justify-between items-center bg-slate-50/50 dark:bg-slate-900/50">
-                                <h4 class="text-xs font-bold text-slate-500 uppercase tracking-widest">Library</h4>
+                                <h4 class="text-sm font-bold text-slate-500 uppercase tracking-widest">Library</h4>
                                 <span class="material-icons-outlined text-slate-300 text-sm">inventory_2</span>
                             </div>
                             <div class="p-4 space-y-3">
                                 <div class="space-y-1">
-                                    <label class="text-[9px] font-bold text-slate-400 px-1">Save Configuration</label>
+                                    <label class="text-sm font-bold text-slate-500 uppercase tracking-widest mb-3">Save
+                                        Configuration</label>
                                     <div class="flex gap-2">
                                         <input type="text" id="qip-config-name"
                                             class="flex-1 px-3 py-1.5 border border-slate-100 dark:border-slate-800 rounded-lg text-[11px] bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white"
@@ -1108,7 +1109,7 @@
                                     </div>
                                 </div>
                                 <button id="qip-load-config"
-                                    class="w-full px-4 py-2 bg-slate-50 dark:bg-slate-800 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 text-slate-600 dark:text-slate-400 hover:text-indigo-600 rounded-lg text-xs font-bold transition-all border border-slate-100 dark:border-slate-800 flex items-center justify-center gap-2">
+                                    class="w-full px-4 py-2 bg-slate-50 dark:bg-slate-800 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 text-slate-600 dark:text-slate-400 hover:text-indigo-600 rounded-lg text-sm font-bold transition-all border border-slate-100 dark:border-slate-800 flex items-center justify-center gap-2">
                                     <span class="material-icons-outlined text-sm">folder_open</span>
                                     <span>Browse Saved Layouts</span>
                                 </button>
@@ -1118,11 +1119,11 @@
                         <!-- Logs / Analytics -->
                         <div id="qip-error-log"
                             class="saas-card p-4 bg-rose-50 dark:bg-rose-950/20 border-rose-100 dark:border-rose-900 hidden">
-                            <h4 class="text-[10px] font-bold text-rose-600 mb-2 flex items-center gap-2 uppercase">
+                            <h4 class="text-sm font-bold text-rose-600 mb-2 flex items-center gap-2 uppercase">
                                 <span class="material-icons-outlined text-sm">error_outline</span>
                                 Exception Log
                             </h4>
-                            <div id="qip-error-list" class="text-[10px] text-rose-500/80 leading-relaxed font-mono">
+                            <div id="qip-error-list" class="text-sm text-rose-500/80 leading-relaxed font-mono">
                             </div>
                         </div>
                     </div>
@@ -1135,7 +1136,7 @@
                             <h4 class="text-sm font-bold text-slate-900 dark:text-white" data-en="Worksheet Preview"
                                 data-zh="工作表預覽">工作表預覽</h4>
                             <span id="qip-selection-mode"
-                                class="text-xs px-2 py-1 bg-primary/10 text-primary rounded hidden">
+                                class="text-sm px-2 py-1 bg-primary/10 text-primary rounded hidden">
                                 選擇模式：<strong id="qip-selection-type">無</strong>
                             </span>
                         </div>
@@ -1172,7 +1173,7 @@
                 <span
                     class="px-2 py-1 bg-rose-50 text-rose-600 text-[10px] font-bold rounded uppercase animate-pulse">Live</span>
             </h3>
-            <p class="text-xs text-slate-500 mt-2">Real-time detection based on Nelson Rules for SPC.</p>
+            <p class="text-sm text-slate-500 mt-2">Real-time detection based on Nelson Rules for SPC.</p>
         </div>
         <div class="flex-1 overflow-y-auto p-4 space-y-4" id="anomalyList">
             <!-- Cards -->
@@ -1188,7 +1189,7 @@
 
     <!-- Global Nelson Rule Tooltip (Fixed Position) -->
     <div id="nelson-tooltip"
-        class="fixed hidden z-[9999] w-72 bg-slate-900 text-white text-xs rounded-xl p-4 shadow-2xl pointer-events-none transition-opacity duration-200 border border-slate-700">
+        class="fixed hidden z-[9999] w-72 bg-slate-900 text-white text-sm rounded-xl p-4 shadow-2xl pointer-events-none transition-opacity duration-200 border border-slate-700">
         <!-- Content injected by JS -->
     </div>
 

@@ -180,9 +180,9 @@ var QIPExtractApp = {
             var end = Math.min(i * 8, cavityCount);
             html += '<div class="p-4 bg-white dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-700/50 space-y-3 shadow-sm">' +
                 '<div class="flex items-center justify-between border-b border-slate-50 dark:border-slate-700/50 pb-2">' +
-                '<div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Cavities ' + start + '-' + end + '</div>' +
-                (i > 1 ? '<div class="flex items-center gap-2 font-mono"><span class="text-[9px] text-slate-400">OFFSET:</span>' +
-                    '<input type="number" id="qip-offset-' + i + '" class="w-10 bg-transparent text-[10px] font-bold text-indigo-500 text-center focus:outline-none" value="1" min="1" max="10"></div>' : '') +
+                '<div class="text-sm font-bold text-slate-400 uppercase tracking-widest">Cavities ' + start + '-' + end + '</div>' +
+                (i > 1 ? '<div class="flex items-center gap-2 font-mono"><span class="text-sm text-slate-400">OFFSET:</span>' +
+                    '<input type="number" id="qip-offset-' + i + '" class="w-10 bg-transparent text-sm font-bold text-indigo-500 text-center focus:outline-none" value="1" min="1" max="10"></div>' : '') +
                 '</div>' +
 
                 '<div class="grid grid-cols-1 gap-3">' +
@@ -190,7 +190,7 @@ var QIPExtractApp = {
                 '<div class="flex items-center gap-3">' +
                 '<div class="w-7 h-7 rounded-lg bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 flex items-center justify-center flex-shrink-0"><span class="material-icons-outlined text-sm">tag</span></div>' +
                 '<div class="flex-1">' +
-                '<input type="text" id="qip-cavity-id-' + i + '" class="qip-range-input w-full bg-transparent text-xs font-mono font-bold text-slate-700 dark:text-slate-300 border-b border-slate-100 dark:border-slate-700 focus:border-emerald-500 outline-none pb-1" placeholder="ID Range (e.g. K3:R3)">' +
+                '<input type="text" id="qip-cavity-id-' + i + '" class="qip-range-input w-full bg-transparent text-sm font-mono font-bold text-slate-700 dark:text-slate-300 border-b border-slate-100 dark:border-slate-700 focus:border-emerald-500 outline-none pb-1" placeholder="ID Range (e.g. K3:R3)">' +
                 '</div>' +
                 '<button class="qip-select-btn p-1.5 text-violet-500 hover:bg-violet-50 dark:hover:bg-violet-900/20 rounded-lg transition-all" data-target="qip-cavity-id-' + i + '" data-type="cavity" title="Select Range">' +
                 '<span class="material-icons-outlined text-base">ads_click</span></button>' +
@@ -200,7 +200,7 @@ var QIPExtractApp = {
                 '<div class="flex items-center gap-3">' +
                 '<div class="w-7 h-7 rounded-lg bg-blue-50 dark:bg-blue-900/30 text-blue-600 flex items-center justify-center flex-shrink-0"><span class="material-icons-outlined text-sm">bar_chart</span></div>' +
                 '<div class="flex-1">' +
-                '<input type="text" id="qip-data-range-' + i + '" class="qip-range-input w-full bg-transparent text-xs font-mono font-bold text-slate-700 dark:text-slate-300 border-b border-slate-100 dark:border-slate-700 focus:border-blue-500 outline-none pb-1" placeholder="Data Range (e.g. K4:R4)">' +
+                '<input type="text" id="qip-data-range-' + i + '" class="qip-range-input w-full bg-transparent text-sm font-mono font-bold text-slate-700 dark:text-slate-300 border-b border-slate-100 dark:border-slate-700 focus:border-blue-500 outline-none pb-1" placeholder="Data Range (e.g. K4:R4)">' +
                 '</div>' +
                 '<button class="qip-select-btn p-1.5 text-violet-500 hover:bg-violet-50 dark:hover:bg-violet-900/20 rounded-lg transition-all" data-target="qip-data-range-' + i + '" data-type="data" title="Select Range">' +
                 '<span class="material-icons-outlined text-base">ads_click</span></button>' +
@@ -626,9 +626,9 @@ var QIPExtractApp = {
         this.els.resultSection.classList.remove('hidden');
 
         var summary = '<div class="space-y-3">' +
-            '<div class="flex justify-between items-center"><span class="text-[10px] text-slate-500 uppercase font-bold">Product</span><span class="text-xs font-bold text-white truncate max-w-[150px]">' + (results.productInfo.productName || '-') + '</span></div>' +
-            '<div class="flex justify-between items-center"><span class="text-[10px] text-slate-500 uppercase font-bold">Extracted Items</span><span class="text-xs font-bold text-emerald-400">' + results.itemCount + '</span></div>' +
-            '<div class="flex justify-between items-center"><span class="text-[10px] text-slate-500 uppercase font-bold">Total Batches</span><span class="text-xs font-bold text-indigo-400">' + results.totalBatches + '</span></div>' +
+            '<div class="flex justify-between items-center"><span class="text-sm text-slate-500 uppercase font-bold">Product</span><span class="text-sm font-bold text-white truncate max-w-[150px]">' + (results.productInfo.productName || '-') + '</span></div>' +
+            '<div class="flex justify-between items-center"><span class="text-sm text-slate-500 uppercase font-bold">Extracted Items</span><span class="text-sm font-bold text-emerald-400">' + results.itemCount + '</span></div>' +
+            '<div class="flex justify-between items-center"><span class="text-sm text-slate-500 uppercase font-bold">Total Batches</span><span class="text-sm font-bold text-indigo-400">' + results.totalBatches + '</span></div>' +
             '</div>';
 
         this.els.resultSummary.innerHTML = summary;

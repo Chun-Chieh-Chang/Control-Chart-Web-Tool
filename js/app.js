@@ -153,7 +153,7 @@ var SPCApp = {
                 '</div>' +
                 '<div class="flex-1 min-w-0">' +
                 '<div class="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">' + h.name + '</div>' +
-                '<div class="text-[10px] text-slate-400">' + h.size + ' • ' + timeStr + '</div>' +
+                '<div class="text-sm text-slate-400">' + h.size + ' • ' + timeStr + '</div>' +
                 '</div>' +
                 '</div>';
         }).join('');
@@ -228,7 +228,7 @@ var SPCApp = {
                         '</div>' +
                         '<div>' +
                         '<div class="text-sm font-bold text-slate-900 dark:text-white">' + h.name + '</div>' +
-                        '<div class="text-[10px] text-slate-400">' + h.type.toUpperCase() + ' Analysis</div>' +
+                        '<div class="text-sm text-slate-400">' + h.type.toUpperCase() + ' Analysis</div>' +
                         '</div>' +
                         '</div>' +
                         '</td>' +
@@ -711,7 +711,7 @@ var SPCApp = {
         var cavityCount = data.xbarR.summary.n;
         var totalWidth = 60 + (25 * 58) + 120;
 
-        var html = '<table class="excel-table" style="width:' + totalWidth + 'px; border-collapse:collapse; font-size:10px; font-family:sans-serif; border:2px solid var(--table-border); table-layout:fixed;">';
+        var html = '<table class="excel-table" style="width:' + totalWidth + 'px; border-collapse:collapse; font-size:14px; font-family:sans-serif; border:2px solid var(--table-border); table-layout:fixed; font-weight: 500;">';
         html += '<colgroup> <col style="width:60px;"> ';
         for (var c = 0; c < 25; c++) html += '<col style="width:58px;">';
         html += '<col style="width:30px;"><col style="width:30px;"><col style="width:30px;"><col style="width:30px;"> </colgroup>';
@@ -815,7 +815,7 @@ var SPCApp = {
                 ],
                 colors: ['#4f46e5', '#f43f5e', '#10b981', '#f43f5e'],
                 stroke: { width: [3, 1.5, 1.5, 1.5], dashArray: [0, 6, 0, 6] },
-                xaxis: { categories: pageLabels, labels: { style: { colors: theme.text, fontSize: '10px' } } },
+                xaxis: { categories: pageLabels, labels: { style: { colors: theme.text, fontSize: '14px' } } },
                 yaxis: { labels: { formatter: function (v) { return v.toFixed(4); }, style: { colors: theme.text } } },
                 grid: { borderColor: theme.grid },
                 tooltip: {
@@ -827,7 +827,7 @@ var SPCApp = {
 
                         // Build standard tooltip header
                         var html = '<div class="px-3 py-2 bg-slate-900 border border-slate-700 shadow-xl rounded-lg">';
-                        html += '<div class="text-xs text-slate-400 font-bold uppercase mb-1">' + label + '</div>';
+                        html += '<div class="text-sm text-slate-400 font-bold uppercase mb-1">' + label + '</div>';
                         html += '<div class="flex items-center gap-2 mb-2 pb-2 border-b border-slate-800">';
                         html += '<span class="w-2 h-2 rounded-full" style="background-color:' + w.globals.colors[seriesIndex] + '"></span>';
                         html += '<span class="text-sm font-bold text-white">' + name + ': ' + val.toFixed(4) + '</span>';
@@ -847,12 +847,12 @@ var SPCApp = {
 
                             html += '<div>';
                             html += '<div class="flex items-center gap-1.5 text-xs text-sky-400 font-bold"><span class="material-icons-outlined text-sm">precision_manufacturing</span> 成型專家</div>';
-                            html += '<div class="text-[13px] text-slate-300 leading-normal pl-4 mt-1">' + exp.m + '</div>';
+                            html += '<div class="text-sm text-slate-300 leading-normal pl-4 mt-1">' + exp.m + '</div>';
                             html += '</div>';
 
                             html += '<div>';
                             html += '<div class="flex items-center gap-1.5 text-xs text-emerald-400 font-bold"><span class="material-icons-outlined text-sm">assignment_turned_in</span> 品管專家</div>';
-                            html += '<div class="text-[13px] text-slate-300 leading-normal pl-4 mt-1">' + exp.q + '</div>';
+                            html += '<div class="text-sm text-slate-300 leading-normal pl-4 mt-1">' + exp.q + '</div>';
                             html += '</div>';
                             html += '</div>';
                         }
@@ -876,7 +876,7 @@ var SPCApp = {
                 ],
                 colors: ['#64748b', '#f43f5e', '#10b981'],
                 stroke: { width: [2.5, 1, 1], dashArray: [0, 6, 0] },
-                xaxis: { categories: pageLabels, labels: { style: { colors: theme.text, fontSize: '10px' } } },
+                xaxis: { categories: pageLabels, labels: { style: { colors: theme.text, fontSize: '14px' } } },
                 yaxis: { labels: { formatter: function (v) { return v.toFixed(4); }, style: { colors: theme.text } } },
                 grid: { borderColor: theme.grid },
                 tooltip: { theme: theme.mode }

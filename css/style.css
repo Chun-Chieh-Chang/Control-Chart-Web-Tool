@@ -12,6 +12,15 @@
     --surface: #ffffff;
     --text-main: #1e293b;
 
+    /* Typography Standards */
+    --font-base: 'Inter', system-ui, -apple-system, sans-serif;
+    --size-min: 14px;
+    --size-base: 14px;
+    --size-md: 16px;
+    --size-lg: 18px;
+    --size-xl: 20px;
+    --size-2xl: 24px;
+
     /* Table Variables */
     --table-border: #000;
     --table-bg: #fff;
@@ -46,6 +55,48 @@ html.dark {
 body {
     background-color: var(--background);
     color: var(--text-main);
+    font-family: var(--font-base);
+    font-size: var(--size-base);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* Ensure no text falls below the minimum readable size */
+* {
+    font-size: inherit;
+}
+
+small,
+.text-xs,
+.text-\[10px\],
+.text-\[11px\],
+.text-\[9px\] {
+    font-size: var(--size-min) !important;
+}
+
+h1 {
+    font-size: var(--size-2xl);
+    font-weight: 700;
+}
+
+h2 {
+    font-size: var(--size-xl);
+    font-weight: 600;
+}
+
+h3 {
+    font-size: var(--size-lg);
+    font-weight: 600;
+}
+
+h4 {
+    font-size: var(--size-md);
+    font-weight: 600;
+}
+
+label {
+    font-size: var(--size-base);
+    font-weight: 500;
 }
 
 /* SaaS Card Style */

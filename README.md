@@ -86,19 +86,23 @@ Excel 檔案需符合以下格式：
 - **圖表**: ApexCharts (SVG rendering for high resolution)
 - **計算引擎**: 自訂 SPC 統計引擎
 
-### 📁 專案結構
+### 📁 專案結構 (MECE 架構)
 
 ```
-web/
+root/                       # 核心進入點
 ├── index.html              # 主頁面 (Entry Point)
-├── documents/              # 相關文檔 (SOP, DEV_LOG)
-└── js/
-    ├── app.js              # 主程式邏輯 (UI & Flow)
-    ├── engine.js           # SPC 統計運算核心
-    ├── input.js            # 檔案讀取與預處理
-    └── qip/                # QIP 解析模組
-        ├── data-extractor.js
-        └── ...
+├── README.md               # 專案說明文件
+├── AI數字人.png             # UI 作者頭像
+├── docs/                   # 文件與歷程系統
+│   ├── guides/             # SOP, 操作指南, 維護指南
+│   └── logs/               # 開發日誌, 修正總結, 歷史記錄
+├── js/                     # 程式邏輯核心
+│   ├── app.js              # UI 控製與流程管理
+│   ├── engine.js           # SPC 統計運算核心
+│   ├── excel-builder.js    # Excel 報表生成 (手動模式)
+│   └── qip/                # QIP 定製化解析模組
+├── _archive/               # 封存檔案與測試樣板
+└── templates/              # 預設 Excel 範本存儲
 ```
 
 ### 📊 SPC 計算公式
@@ -199,14 +203,25 @@ Excel file must follow this format:
 - Cavity column headers must contain "穴"
 
 ### 🛠️ Tech Stack
+...
+### 📁 Project Structure (MECE)
 
-- **Frontend**: HTML5, Vanilla JavaScript
-- **Styling**: Tailwind CSS (CDN)
-- **Excel Processing**: SheetJS (reading and writing)
-- **Charts**: ApexCharts (SVG rendering)
-- **Calculation Engine**: Custom SPC statistical engine
-
-### 📊 SPC Formulas
+```
+root/                       # Entry point
+├── index.html              # Main application page
+├── README.md               # Documentation
+├── AI數字人.png             # UI Author Image
+├── docs/                   # Documentation system
+│   ├── guides/             # SOPs, Guides, Maintenance
+│   └── logs/               # Dev logs, Summaries, History
+├── js/                     # Application logic
+│   ├── app.js              # UI controller
+│   ├── engine.js           # Statistical engine (SPC)
+│   ├── excel-builder.js    # Excel report builder (Manual)
+│   └── qip/                # QIP parsing modules
+├── _archive/               # Archived legacy files
+└── templates/              # Built-in Excel templates
+```
 
 #### X̄-R Control Charts
 - UCL(X̄) = X̿ + A₂ × R̄

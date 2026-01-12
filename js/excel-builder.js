@@ -356,6 +356,50 @@ class SPCExcelBuilder {
         const footerRow = causeEndRow + 5; // Adjusted since charts are removed
         const f1 = ws.getCell(footerRow, 1); f1.value = 'MOULDEX QE20002-R01.A'; f1.font = fontBold;
         const f2 = ws.getCell(footerRow, 28); f2.value = `第 ${sheetIdx} 頁，共 ${totalSheets} 頁`; f2.font = fontBold; f2.alignment = { horizontal: 'right' };
+
+        // 10. Auto-fit Columns (C to AB) based on content
+        // Focus on adjusting width for Batch Names (Row 6) and Summary (Col 28)
+        // avoiding disruption of the header layout (Rows 1-5 merged cells)
+        for (let c = 3; c <= 28; c++) {
+            let maxLen = 5; // Min default
+            const col = ws.getColumn(c);
+
+            // Check specific rows that drive content width
+            // Row 6: Batch Names / Date Header
+            const val6 = ws.getCell(6, c).value;
+            if (val6) {
+                // Count double-byte characters as 2 length for better fitting
+                const str = val6.toString();
+                let len = 0;
+                for (let i = 0; i < str.length; i++) {
+                    len += (str.charCodeAt(i) > 255) ? 2 : 1.1;
+                }
+                maxLen = Math.max(maxLen, len);
+            }
+
+            // Special Case: Column AB (28) - Summary Stats
+            if (c === 28) {
+                for (let r = 7; r <= 15; r++) {
+                    const v = ws.getCell(r, c).value;
+                    if (v) {
+                        const str = v.toString();
+                        let len = 0;
+                        for (let i = 0; i < str.length; i++) {
+                            len += (str.charCodeAt(i) > 255) ? 2 : 1.1;
+                        }
+                        maxLen = Math.max(maxLen, len);
+                    }
+                }
+                maxLen += 2; // Extra padding
+            }
+
+            // Apply width
+            let newWidth = maxLen + 2;
+            if (newWidth < 6) newWidth = 6; // Minimum constraint
+            if (newWidth > 40) newWidth = 40; // Maximum constraint
+
+            col.width = newWidth;
+        }
     }
 
     generateSimpleReport() {

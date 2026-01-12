@@ -184,6 +184,7 @@ class SPCExcelBuilder {
         const borderThin = { style: 'thin', color: { argb: 'FFBFBFBF' } };
         const borderMedium = { style: 'medium', color: { argb: 'FF000000' } };
         const fontNormal = { name: 'Microsoft JhengHei', size: 10 };
+        const fontData = { name: 'Times New Roman', size: 10 };
         const fontBold = { name: 'Microsoft JhengHei', size: 10, bold: true };
         const fontTitle = { name: 'Microsoft JhengHei', size: 20, bold: true };
         const fontBlueBold = { name: 'Microsoft JhengHei', size: 10, bold: true, color: { argb: 'FF0000FF' } };
@@ -280,21 +281,23 @@ class SPCExcelBuilder {
                 if (batchIndex > endBIdx) continue; // No more batches for this sheet/column
 
                 if (r === 6) {
-                    cell.value = data.batchNames[batchIndex]; cell.alignment = alignCenter;
+                    cell.value = data.batchNames[batchIndex]; cell.alignment = alignCenter; cell.font = fontNormal;
                 } else if (r >= sampleStartRow && r <= sampleEndRow) {
                     const cavIdx = r - sampleStartRow;
                     const val = data.dataMatrix[batchIndex][cavIdx];
-                    if (val !== null && val !== undefined) { cell.value = val; cell.numFmt = '0.0000'; cell.alignment = alignCenter; }
+                    if (val !== null && val !== undefined) { cell.value = val; cell.numFmt = '0.0000'; cell.alignment = alignCenter; cell.font = fontData; }
                 } else if (r === sumRow) {
                     let sum = 0, count = 0;
                     data.dataMatrix[batchIndex].forEach(v => { if (v != null) { sum += v; count++; } });
-                    if (count > 0) { cell.value = sum; cell.numFmt = '0.0000'; cell.alignment = alignCenter; }
+                    if (count > 0) { cell.value = sum; cell.numFmt = '0.0000'; cell.alignment = alignCenter; cell.font = fontData; }
                 } else if (r === meanRow) {
                     const val = data.xbarR.xBar.data[batchIndex]; cell.value = val; cell.numFmt = '0.0000'; cell.alignment = alignCenter;
-                    if (val > data.xbarR.xBar.UCL || val < data.xbarR.xBar.LCL) { cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFFF00' } }; cell.font = { ...fontNormal, color: { argb: 'FFFF0000' } }; }
+                    if (val > data.xbarR.xBar.UCL || val < data.xbarR.xBar.LCL) { cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFFF00' } }; cell.font = { ...fontData, color: { argb: 'FFFF0000' } }; }
+                    else { cell.font = fontData; }
                 } else if (r === rangeRow) {
                     const val = data.xbarR.R.data[batchIndex]; cell.value = val; cell.numFmt = '0.0000'; cell.alignment = alignCenter;
-                    if (val > data.xbarR.R.UCL) { cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFFF00' } }; cell.font = { ...fontNormal, color: { argb: 'FFFF0000' } }; }
+                    if (val > data.xbarR.R.UCL) { cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFFF00' } }; cell.font = { ...fontData, color: { argb: 'FFFF0000' } }; }
+                    else { cell.font = fontData; }
                 }
             }
         }

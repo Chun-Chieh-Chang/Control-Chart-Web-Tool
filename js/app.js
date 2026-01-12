@@ -812,18 +812,19 @@ var SPCApp = {
         var cavityCount = data.xbarR.summary.n;
         var totalWidth = 60 + (25 * 58) + 120;
 
-        var html = '<table class="excel-table" style="width:' + totalWidth + 'px; border-collapse:collapse; font-size:12px; font-family:sans-serif; border:2px solid var(--table-border); table-layout:fixed; font-weight: 500;">';
+        var html = '<table class="excel-table" style="width:' + totalWidth + 'px; border-collapse:collapse; font-size:12px; font-family:\'Times New Roman\', \'Microsoft JhengHei\', sans-serif; border:2px solid var(--table-border); table-layout:fixed; font-weight: 500;">';
         html += '<colgroup> <col style="width:60px;"> ';
         for (var c = 0; c < 25; c++) html += '<col style="width:58px;">';
         html += '<col style="width:30px;"><col style="width:30px;"><col style="width:30px;"><col style="width:30px;"> </colgroup>';
 
-        html += '<tr style="background:var(--table-header-bg); text-align:center;"><td colspan="30" style="border:1px solid var(--table-border); font-weight:bold; font-size:14px; padding:3px;">' + this.t('X̄ - R 管制圖', 'X-Bar - R Control Chart') + '</td></tr>';
+        html += '<tr style="background:var(--table-header-bg); text-align:center;"><td colspan="30" style="border:1px solid var(--table-border); font-weight:bold; font-size:14px; font-family:\'Microsoft JhengHei\', sans-serif; padding:3px;">' + this.t('X̄ - R 管制圖', 'X-Bar - R Control Chart') + '</td></tr>';
 
+        // Match Excel Layout (Approximate)
         var meta = [
-            { l1: this.t('商品名稱', 'Product'), v1: info.name, l2: this.t('規格', 'Specs'), v2: this.t('標準', 'Standard'), l3: this.t('管制圖', 'Chart'), v3: 'X̄', v4: 'R', l4: this.t('製造部門', 'Dept'), v4_val: info.dept },
-            { l1: this.t('商品料號', 'Item P/N'), v1: info.item, l2: this.t('最大值', 'Max (USL)'), v2: SPCEngine.round(specs.usl, 4), l3: this.t('上限', 'UCL'), v3: SPCEngine.round(pageXbarR.xBar.UCL, 4), v4: SPCEngine.round(pageXbarR.R.UCL, 4), l4: this.t('檢驗人員', 'Inspector'), v4_val: info.inspector },
-            { l1: this.t('測量單位', 'Unit'), v1: info.unit, l2: this.t('目標值', 'Target'), v2: SPCEngine.round(specs.target, 4), l3: this.t('中心值', 'CL'), v3: SPCEngine.round(pageXbarR.xBar.CL, 4), v4: SPCEngine.round(pageXbarR.R.CL, 4), l4: this.t('管制特性', 'Char'), v4_val: info.char },
-            { l1: this.t('檢驗日期', 'Date'), v1: info.batchRange || '-', l2: this.t('最小值', 'Min (LSL)'), v2: SPCEngine.round(specs.lsl, 4), l3: this.t('下限', 'LCL'), v3: SPCEngine.round(pageXbarR.xBar.LCL, 4), v4: '-', l4: this.t('圖表編號', 'Chart No.'), v4_val: info.chartNo || '-' }
+            { l1: this.t('產品名稱', 'Product'), v1: info.name, l2: this.t('規 格', 'Specs'), v2: this.t('標準', 'Standard'), l3: this.t('管制圖', 'Chart'), v3: 'X̄', v4: 'R', l4: this.t('製造部門', 'Dept'), v4_val: info.dept },
+            { l1: this.t('產品料號', 'Item P/N'), v1: info.item, l2: this.t('最大值', 'Max (USL)'), v2: SPCEngine.round(specs.usl, 4), l3: this.t('上 限', 'UCL'), v3: SPCEngine.round(pageXbarR.xBar.UCL, 4), v4: SPCEngine.round(pageXbarR.R.UCL, 4), l4: this.t('檢驗單位', 'Insp. Unit'), v4_val: '品管組' },
+            { l1: this.t('測量單位', 'Unit'), v1: info.unit, l2: this.t('目標值', 'Target'), v2: SPCEngine.round(specs.target, 4), l3: this.t('中心值', 'CL'), v3: SPCEngine.round(pageXbarR.xBar.CL, 4), v4: SPCEngine.round(pageXbarR.R.CL, 4), l4: this.t('檢驗人員', 'Inspector'), v4_val: info.inspector },
+            { l1: this.t('管制特性', 'Char'), v1: '平均值/全距', l2: this.t('最小值', 'Min (LSL)'), v2: SPCEngine.round(specs.lsl, 4), l3: this.t('下 限', 'LCL'), v3: SPCEngine.round(pageXbarR.xBar.LCL, 4), v4: '-', l4: this.t('檢驗日期', 'Date'), v4_val: info.batchRange || '-' }
         ];
 
         meta.forEach(function (r) {
@@ -848,16 +849,30 @@ var SPCApp = {
         }
         html += '<td colspan="4" style="border:1px solid var(--table-border);">' + this.t('彙總', 'Stats') + '</td></tr>';
 
+        // Calculate Sheet Stats (Match Excel Logic)
+        var sheetSumX = 0, sheetSumR = 0, sheetCount = 0;
+        var xData = pageXbarR.xBar.data;
+        var rData = pageXbarR.R.data;
+        for (var b = 0; b < xData.length; b++) {
+            if (xData[b] !== null && xData[b] !== undefined) {
+                sheetSumX += xData[b];
+                sheetSumR += rData[b];
+                sheetCount++;
+            }
+        }
+        var sheetXDoubleBar = sheetCount > 0 ? sheetSumX / sheetCount : 0;
+        var sheetRBar = sheetCount > 0 ? sheetSumR / sheetCount : 0;
+
         for (var i = 0; i < cavityCount; i++) {
-            html += '<tr style="text-align:center;"><td style="border:1px solid var(--table-border); font-weight:bold; background:var(--table-label-bg);">X' + (i + 1) + '</td>';
+            html += '<tr style="text-align:center;"><td style="border:1px solid var(--table-border); font-weight:bold; background:var(--table-label-bg); font-family:\'Microsoft JhengHei\', sans-serif;">X' + (i + 1) + '</td>';
             for (var j = 0; j < 25; j++) {
                 var val = (pageDataMatrix[j] && pageDataMatrix[j][i] !== undefined) ? pageDataMatrix[j][i] : '';
-                html += '<td style="border:1px solid var(--table-border); background:var(--table-bg);">' + val + '</td>';
+                html += '<td style="border:1px solid var(--table-border); background:var(--table-bg); font-family:\'Times New Roman\', serif;">' + val + '</td>';
             }
-            if (i === 0) html += '<td colspan="4" rowspan="2" style="border:1px solid var(--table-border); font-weight:bold; background:var(--table-bg);">ΣX̄ = ' + SPCEngine.round(pageXbarR.summary.xDoubleBar * pageXbarR.summary.k, 4) + '</td>';
-            else if (i === 2) html += '<td colspan="4" rowspan="2" style="border:1px solid var(--table-border); font-weight:bold; background:var(--table-bg);">X̿ = ' + SPCEngine.round(pageXbarR.summary.xDoubleBar, 4) + '</td>';
-            else if (i === 4) html += '<td colspan="4" rowspan="2" style="border:1px solid var(--table-border); font-weight:bold; background:var(--table-bg);">ΣR = ' + SPCEngine.round(pageXbarR.summary.rBar * pageXbarR.summary.k, 4) + '</td>';
-            else if (i === 6) html += '<td colspan="4" rowspan="2" style="border:1px solid var(--table-border); font-weight:bold; background:var(--table-bg);">R̄ = ' + SPCEngine.round(pageXbarR.summary.rBar, 4) + '</td>';
+            if (i === 0) html += '<td colspan="4" rowspan="2" style="border:1px solid var(--table-border); font-weight:bold; background:var(--table-stats-bg, #DCE6F1); font-family:\'Times New Roman\', serif; text-align:left; vertical-align:middle; padding-left:5px;">ΣX̄ = ' + SPCEngine.round(sheetSumX, 4) + '</td>';
+            else if (i === 2) html += '<td colspan="4" rowspan="2" style="border:1px solid var(--table-border); font-weight:bold; background:var(--table-stats-bg, #DCE6F1); font-family:\'Times New Roman\', serif; text-align:left; vertical-align:middle; padding-left:5px;">X̿ = ' + SPCEngine.round(sheetXDoubleBar, 4) + '</td>';
+            else if (i === 4) html += '<td colspan="4" rowspan="2" style="border:1px solid var(--table-border); font-weight:bold; background:var(--table-stats-bg, #DCE6F1); font-family:\'Times New Roman\', serif; text-align:left; vertical-align:middle; padding-left:5px;">ΣR = ' + SPCEngine.round(sheetSumR, 4) + '</td>';
+            else if (i === 6) html += '<td colspan="4" rowspan="2" style="border:1px solid var(--table-border); font-weight:bold; background:var(--table-stats-bg, #DCE6F1); font-family:\'Times New Roman\', serif; text-align:left; vertical-align:middle; padding-left:5px;">R̄ = ' + SPCEngine.round(sheetRBar, 4) + '</td>';
             else if (i >= 8) html += '<td colspan="4" style="border:1px solid var(--table-border); background:transparent;"></td>';
             html += '</tr>';
         }

@@ -1,0 +1,44 @@
+
+您可以直接將以下內容複製並貼給 AI，建議同時附上我們最後討論的**「寬螢幕優化版：QIP 分析工作區」與「PDF 報告預覽」**的截圖。
+
+🚀 QIP 數據分析與 SPC 整合系統開發指令 (Master Prompt)
+【專案目標】：開發一個基於 Web 的專業品質分析平台，能夠讀取 Excel QIP 表格，進行即時 SPC 統計計算，並提供寬螢幕優化的互動圖表與 PDF 報告導出。
+
+1. 技術棧要求 (Tech Stack)
+前端框架：React + Tailwind CSS。
+圖表庫：Recharts 或 ECharts (需支援控制線、異常點高亮與縮放連動)。
+數據處理：XLSX (SheetJS) 用於解析 Excel。
+報告導出：jsPDF + html2canvas 或 React-PDF。
+2. UI 佈局架構 (Widescreen Layout Logic)
+請採用「左右分割」且「層級分明」的寬螢幕佈局：
+
+左側邊欄 (20% 寬度)：
+File Upload: 支持拖放的 Excel 上傳區。
+Parameters: 可設定 Sigma 倍數、規格限 (USL/LSL)、子組大小。
+Collapsible: 側邊欄需可收摺以最大化圖表空間。
+右側主工作區 (80% 寬度)：
+Top (KPI Row)：橫向排列 4-5 個指標卡片（Cpk, Ppk, Mean, StdDev, Anomaly Count）。
+Middle (Chart Area)：寬度優先的 X-bar 與 R 控制圖，縱向堆疊，支援橫向滾動。
+Bottom (Data Detail)：左側 60% 為數據表格（具備異常紅字高亮、關鍵字過濾）；右側 40% 為異常紀錄 Log。
+3. 核心功能邏輯 (Core Logic)
+Excel 解析：
+讀取 Excel 後自動識別包含 "Value" 或 "Measurement" 的欄位。
+允許使用者在 UI 上確認/映射「時間」、「批次」與「量測值」欄位。
+SPC 計算：
+計算 平均值 (X-bar)、標準差 (σ)。
+自動算出 UCL (Mean + 3σ) 與 LCL (Mean - 3σ)。
+計算製程能力指標 Cpk = min((USL-Mean)/3σ, (Mean-LSL)/3σ)。
+交互聯動 (Interactivity)：
+點擊「異常紀錄」中的項目，圖表自動聚焦（Focus/Zoom）到該點。
+滑鼠懸停圖表點位時，下方數據表格同步捲動至對應行數。
+4. 視覺與體驗 (UX/UI Design)
+SaaS 風格：使用 bg-slate-50 背景，white 卡片，indigo-600 作為主色。
+異常標示：圖表點位與表格文字若超出 [LCL, UCL] 範圍，必須強制變更為紅色 (text-red-500) 並附帶警示圖示。
+PDF 導出：點擊「產生報告」後，彈出預覽視窗，將當前圖表、KPI 與數據摘要渲染進 A4 格式的 PDF 文件。
+💡 給您的操作建議：
+第一步：基礎架構。先讓 AI 建立「左右分割的寬螢幕佈局」與「側邊欄上傳組件」。
+第二步：數據處理。將我之前提供給您的 parseSPCExcel JavaScript 代碼貼給它，讓它處理 Excel 邏輯。
+第三步：圖表整合。將 XBarChart 的 Tailwind 代碼與圖表邏輯整合進主區域。
+第四步：修飾與細節。最後要求它加入「KPI 卡片」與「異常紅字高亮」。
+如果您在開發過程中遇到任何特定的組件邏輯問題（例如：如何實作雙圖同步縮放），歡迎隨時回來找我，我可以為您提供更深層的程式碼細節！
+

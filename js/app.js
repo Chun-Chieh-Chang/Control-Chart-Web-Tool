@@ -720,6 +720,9 @@ var SPCApp = {
         var self = this;
         var html = '';
 
+        // Ensure sidebar is closed by default for new analysis
+        this.toggleAnomalySidebar(false);
+
         if (data.type === 'batch') {
             var totalBatches = Math.min(data.batchNames.length, data.xbarR.xBar.data.length);
             if (!preserveState) {
@@ -1238,77 +1241,151 @@ var SPCApp = {
     downloadExcel: async function () {
         var self = this;
         var data = this.analysisResults;
-        var wb = XLSX.utils.book_new();
-        var maxBatchesPerSheet = 25;
 
+        this.showLoading(this.t('正在生成 Excel 報表...', 'Generating Excel Report...'));
+
+        // Capture Charts
+        var images = {};
         if (data.type === 'batch') {
-            var totalBatches = Math.min(data.batchNames.length, data.xbarR.xBar.data.length);
-            var totalSheets = Math.ceil(totalBatches / maxBatchesPerSheet);
-            var cavityCount = data.productInfo.n || data.xbarR.summary.n;
-
-            for (var sheetIdx = 0; sheetIdx < totalSheets; sheetIdx++) {
-                var startBatch = sheetIdx * maxBatchesPerSheet;
-                var endBatch = Math.min((sheetIdx + 1) * maxBatchesPerSheet, totalBatches);
-                var batchCount = endBatch - startBatch;
-                var wsData = [];
-
-                wsData.push([this.t('X̄ - R 管制圖', 'X-Bar R Chart')]);
-                wsData.push([this.t('產品名稱', 'Product'), data.productInfo.name, '', '', this.t('規格', 'Spec'), '', '', this.t('管制界限', 'Limits')]);
-                wsData.push([this.t('檢驗項目', 'Item'), this.selectedItem, '', '', 'Target', data.specs.target, '', 'UCL', SPCEngine.round(data.xbarR.xBar.UCL, 4)]);
-                wsData.push([this.t('模穴數', 'Cavities'), cavityCount, '', '', 'USL', data.specs.usl, '', 'CL', SPCEngine.round(data.xbarR.xBar.CL, 4)]);
-                wsData.push([this.t('批號數', 'Batches'), data.xbarR.summary.k, '', '', 'LSL', data.specs.lsl, '', 'LCL', SPCEngine.round(data.xbarR.xBar.LCL, 4)]);
-                wsData.push([]);
-
-                var headerRow = [this.t('檢驗批號', 'Batch No.')];
-                for (var b = startBatch; b < endBatch; b++) headerRow.push(data.batchNames[b]);
-                wsData.push(headerRow);
-
-                for (var cav = 0; cav < cavityCount; cav++) {
-                    var cavRow = ['X' + (cav + 1)];
-                    for (var b = startBatch; b < endBatch; b++) cavRow.push(data.dataMatrix[b][cav]);
-                    wsData.push(cavRow);
-                }
-                var xbarRow = ['X̄']; for (var b = startBatch; b < endBatch; b++) xbarRow.push(data.xbarR.xBar.data[b]); wsData.push(xbarRow);
-                var rRow = ['R']; for (var b = startBatch; b < endBatch; b++) rRow.push(data.xbarR.R.data[b]); wsData.push(rRow);
-
-                var ws = XLSX.utils.aoa_to_sheet(wsData);
-                XLSX.utils.book_append_sheet(wb, ws, 'P' + (sheetIdx + 1));
+            // Assuming chartInstances[0] is XBar and [1] is R (based on render order in renderCharts)
+            if (this.chartInstances.length >= 2) {
+                try {
+                    const xUri = await this.chartInstances[0].dataURI();
+                    const rUri = await this.chartInstances[1].dataURI();
+                    images.xbar = xUri.imgURI;
+                    images.r = rUri.imgURI;
+                } catch (e) { console.error('Error capturing charts', e); }
             }
-        } else if (data.type === 'cavity') {
-            var wsData = [[this.t('模穴分析', 'Cavity Analysis')], ['Cavity', 'Mean', 'Cpk', 'n']];
-            data.cavityStats.forEach(s => wsData.push([s.name, s.mean, s.Cpk, s.count]));
-            XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(wsData), 'Cavity');
-        } else if (data.type === 'group') {
-            var wsData = [[this.t('群組分析', 'Group Analysis')], ['Batch', 'Max', 'Avg', 'Min', 'Range']];
-            data.groupStats.forEach(function (s) { wsData.push([s.batch, s.max, s.avg, s.min, s.range]); });
-            XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(wsData), 'Group');
         }
-
-        var dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, '');
-        var itemStr = (self.selectedItem || 'Data').replace(/[:\/\\*?"<>|]/g, '_');
-        var defaultName = 'SPC_Report_' + itemStr + '_' + data.type + '_' + dateStr + '.xlsx';
 
         try {
-            if (window.showSaveFilePicker) {
-                var handle = await window.showSaveFilePicker({
-                    suggestedName: defaultName,
-                    types: [{
-                        description: 'Excel Workbook',
-                        accept: { 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.xlsx'] }
-                    }]
-                });
-                var writable = await handle.createWritable();
-                var wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
-                await writable.write(wbout);
-                await writable.close();
-                return;
+            // Check if SPCExcelBuilder is loaded
+            if (typeof SPCExcelBuilder === 'undefined') {
+                throw new Error('ExcelBuilder module not loaded');
             }
-        } catch (err) {
-            if (err.name !== 'AbortError') console.error('File save error:', err);
-            else return;
-        }
 
-        XLSX.writeFile(wb, defaultName);
+            // Template Selection Disabled (Reverted to Manual Mode)
+            var templateBuffer = null;
+            var templateCapacity = 0;
+            console.log("Template selection disabled. Using Manual Generation Mode.");
+
+            // // Template Smart Selection
+            // var templateBase64 = null;
+            // var templateCapacity = 0;
+            // var cavCount = data.xbarR.summary.n;
+            // var usedBuiltIn = false;
+
+            // // Debugging Info
+            // // console.log(`Template Search: Cavities=${cavCount}`);
+
+            // // 1. Check User Uploaded Template
+            // var userTemplate = localStorage.getItem('spc_template_file');
+            // if (userTemplate) {
+            //     if (userTemplate.length > 100) {
+            //         templateBase64 = userTemplate;
+            //         templateCapacity = cavCount;
+            //         console.log('Using User Custom Template');
+            //     } else {
+            //         localStorage.removeItem('spc_template_file');
+            //     }
+            // }
+
+            // // 2. Check Built-in Templates
+            // if (!templateBase64) {
+            //     if (typeof SPC_TEMPLATES === 'undefined') {
+            //         // Last ditch: check if window.SPC_TEMPLATES exists
+            //         if (window.SPC_TEMPLATES) {
+            //             console.log("Found SPC_TEMPLATES on window");
+            //         } else {
+            //             console.error("SPC_TEMPLATES not defined. Template file probably not loaded.");
+            //             // alert("Critical Error: Built-in Templates not loaded. Please refresh the page.");
+            //         }
+            //     } else {
+            //         // Find best fit
+            //         var availableSizes = Object.keys(SPC_TEMPLATES).map(Number).sort((a, b) => a - b);
+            //         var bestFit = availableSizes.find(size => size >= cavCount);
+            //         if (!bestFit) bestFit = availableSizes[availableSizes.length - 1];
+
+            //         if (bestFit) {
+            //             templateBase64 = SPC_TEMPLATES[bestFit];
+            //             templateCapacity = bestFit;
+            //             usedBuiltIn = true;
+            //             // console.log(`Selected Template: ${bestFit}`);
+            //         }
+            //     }
+            // }
+
+            // var templateBuffer = null;
+            // if (templateBase64) {
+            //     try {
+            //         // Extract Base64, remove whitespaces
+            //         var content = templateBase64.includes(',') ? templateBase64.split(',')[1] : templateBase64;
+            //         content = content.replace(/\s/g, ''); // Fix potential formatting issues
+
+            //         var binary_string = window.atob(content);
+            //         var len = binary_string.length;
+            //         var bytes = new Uint8Array(len);
+            //         for (var i = 0; i < len; i++) {
+            //             bytes[i] = binary_string.charCodeAt(i);
+            //         }
+            //         templateBuffer = bytes.buffer;
+            //         // console.log(`Template Buffer Prepared: ${len} bytes`);
+            //     } catch (e) {
+            //         console.error('Failed to parse template', e);
+            //         // alert("Template Parsing Failed: " + e.message);
+            //     }
+            // } else {
+            //     console.warn("No template selected.");
+            // }
+
+            const builder = new SPCExcelBuilder(data, images, templateBuffer, templateCapacity);
+            const buffer = await builder.generate();
+
+            // Save file
+            const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+
+            // Generate filename matches QIP/VBA style
+            var dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+            var itemStr = (self.selectedItem || 'Data').replace(/[:\/\\*?"<>|]/g, '_');
+            var filename = 'SPC_Report_' + itemStr + '_' + data.type + '_' + dateStr + '.xlsx';
+
+            // Use File System Access API if available
+            try {
+                if (window.showSaveFilePicker) {
+                    var handle = await window.showSaveFilePicker({
+                        suggestedName: filename,
+                        types: [{
+                            description: 'Excel Workbook',
+                            accept: { 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.xlsx'] }
+                        }]
+                    });
+                    var writable = await handle.createWritable();
+                    await writable.write(blob);
+                    await writable.close();
+                    this.hideLoading();
+                    return;
+                }
+            } catch (err) {
+                if (err.name !== 'AbortError') console.error('File save error:', err);
+                else { this.hideLoading(); return; } // User cancelled
+            }
+
+            // Fallback download
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+        } catch (e) {
+            console.error('Export failed', e);
+            alert(this.t('導出失敗: ', 'Export failed: ') + e.message);
+        } finally {
+            this.hideLoading();
+        }
     },
 
     showLoading: function (text) {
@@ -1329,9 +1406,14 @@ var SPCApp = {
         if (!list) return;
         list.innerHTML = '';
         var violations = pageXbarR.xBar.violations;
+        var indicator = document.getElementById('anomalyIndicator');
+
         if (violations.length === 0) {
             list.innerHTML = '<div class="text-center text-slate-400 dark:text-slate-500 py-8 text-sm">' + this.t('本頁無異常點', 'No anomalies on this page') + '</div>';
+            if (indicator) indicator.classList.add('hidden');
             return;
+        } else {
+            if (indicator) indicator.classList.remove('hidden');
         }
 
         violations.forEach(function (v) {
@@ -1398,7 +1480,34 @@ var SPCApp = {
 
             list.appendChild(card);
         });
+
+
     },
+
+    toggleAnomalySidebar: function (show) {
+        var sidebar = document.getElementById('anomalySidebar');
+        if (!sidebar) return;
+
+        var isHidden = sidebar.style.display === 'none' || sidebar.classList.contains('hidden');
+
+        if (show === undefined) {
+            // Toggle
+            if (isHidden) {
+                sidebar.classList.remove('hidden');
+                sidebar.style.display = 'flex';
+            } else {
+                sidebar.classList.add('hidden');
+                sidebar.style.display = 'none';
+            }
+        } else if (show) {
+            sidebar.classList.remove('hidden');
+            sidebar.style.display = 'flex';
+        } else {
+            sidebar.classList.add('hidden');
+            sidebar.style.display = 'none';
+        }
+    },
+
 
     // --- Settings View Logic ---
     renderSettings: function () {
@@ -1475,6 +1584,44 @@ var SPCApp = {
         }
     },
 
+    handleTemplateUpload: function (file) {
+        if (!file) return;
+        var self = this;
+        var reader = new FileReader();
+        reader.onload = function (e) {
+            try {
+                // Store as Base64 string
+                // Check size? LS limit is ~5MB chars. Base64 is 33% larger.
+                // 3MB xlsx -> 4MB base64. OK for simple templates.
+                var base64 = e.target.result;
+                localStorage.setItem('spc_template_file', base64);
+                localStorage.setItem('spc_template_meta', JSON.stringify({
+                    name: file.name,
+                    size: file.size,
+                    date: new Date().toISOString()
+                }));
+                alert(self.t('模板上傳成功！導出報表時將自動採用此模板。', 'Template uploaded! It will be used for future Excel exports.'));
+                self.renderSettings(); // Refresh UI
+            } catch (err) {
+                console.error(err);
+                if (err.name === 'QuotaExceededError') {
+                    alert(self.t('錯誤：模板檔案太大，無法儲存於瀏覽器快取。', 'Error: Template file is too large for browser storage.'));
+                } else {
+                    alert('Upload failed: ' + err.message);
+                }
+            }
+        };
+        reader.readAsDataURL(file);
+    },
+
+    clearTemplate: function () {
+        if (confirm(this.t('確定要移除自定義模板嗎？', 'Remove custom template?'))) {
+            localStorage.removeItem('spc_template_file');
+            localStorage.removeItem('spc_template_meta');
+            this.renderSettings();
+        }
+    },
+
     saveSettings: function () {
         localStorage.setItem('spc_settings', JSON.stringify(this.settings));
     },
@@ -1546,12 +1693,21 @@ var SPCApp = {
     },
 
     resetSystem: function () {
+        console.log('SPCApp: resetSystem triggered');
         var msg = this.t('確定要重置系統嗎？這將清除所有緩存配置、歷史紀錄、QIP 設定與當前所有數據並重新整理頁面。',
             'Are you sure you want to reset the system? This will clear all cached configs, history, QIP settings, and current data, and then refresh the page.');
+
         if (confirm(msg)) {
-            localStorage.clear();
-            sessionStorage.clear();
-            window.location.reload();
+            try {
+                console.log('Clearing storage...');
+                localStorage.clear();
+                sessionStorage.clear();
+                console.log('Storage cleared. Reloading...');
+                window.location.reload();
+            } catch (e) {
+                console.error('Reset failed:', e);
+                alert('Reset failed: ' + e.message);
+            }
         }
     }
 };

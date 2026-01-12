@@ -1,0 +1,5 @@
+{
+  "name": "QIP SPC Workspace",
+  "description": "A Statistical Process Control (SPC) dashboard for manufacturing quality analysis with Gemini AI integration for anomaly investigation.",
+  "requestFramePermissions": []
+}

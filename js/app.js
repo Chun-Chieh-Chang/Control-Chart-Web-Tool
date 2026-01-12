@@ -1488,7 +1488,7 @@ var SPCApp = {
         var sidebar = document.getElementById('anomalySidebar');
         if (!sidebar) return;
 
-        var isHidden = sidebar.style.display === 'none' || sidebar.classList.contains('hidden');
+        var isHidden = sidebar.classList.contains('hidden') || sidebar.style.display === 'none';
 
         if (show === undefined) {
             // Toggle

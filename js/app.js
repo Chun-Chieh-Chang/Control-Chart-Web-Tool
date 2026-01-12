@@ -924,7 +924,7 @@ var SPCApp = {
                 chart: {
                     type: 'line',
                     height: 380,
-                    toolbar: { show: false },
+                    toolbar: { show: true },
                     selection: { enabled: false },
                     background: 'transparent',
                     zoom: { enabled: false },
@@ -1019,7 +1019,7 @@ var SPCApp = {
                 chart: {
                     type: 'line',
                     height: 300,
-                    toolbar: { show: false },
+                    toolbar: { show: true },
                     selection: { enabled: false },
                     background: 'transparent',
                     zoom: { enabled: false },

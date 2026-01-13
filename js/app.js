@@ -862,7 +862,7 @@ var SPCApp = {
         var cavityCount = data.xbarR.summary.n;
         var totalWidth = 60 + (25 * 58) + 120;
 
-        var html = '<table class="excel-table" style="width:' + totalWidth + 'px; border-collapse:collapse; font-size:12px; font-family:\'Times New Roman\', \'Microsoft JhengHei\', sans-serif; border:2px solid var(--table-border); table-layout:fixed; font-weight: 500;">';
+        var html = '<table class="excel-table" style="width:' + totalWidth + 'px; border-collapse:collapse; font-size:12px; font-family:\'Arial\', \'Microsoft JhengHei\', sans-serif; border:2px solid var(--table-border); table-layout:fixed; font-weight: 500;">';
         html += '<colgroup> <col style="width:60px;"> ';
         for (var c = 0; c < 25; c++) html += '<col style="width:58px;">';
         html += '<col style="width:30px;"><col style="width:30px;"><col style="width:30px;"><col style="width:30px;"> </colgroup>';
@@ -917,12 +917,12 @@ var SPCApp = {
             html += '<tr style="text-align:center;"><td style="border:1px solid var(--table-border); font-weight:bold; background:var(--table-label-bg); font-family:\'Microsoft JhengHei\', sans-serif;">X' + (i + 1) + '</td>';
             for (var j = 0; j < 25; j++) {
                 var val = (pageDataMatrix[j] && pageDataMatrix[j][i] !== undefined) ? pageDataMatrix[j][i] : '';
-                html += '<td style="border:1px solid var(--table-border); background:var(--table-bg); font-family:\'Times New Roman\', serif;">' + val + '</td>';
+                html += '<td style="border:1px solid var(--table-border); background:var(--table-bg); font-family:\'Arial\', serif;">' + val + '</td>';
             }
-            if (i === 0) html += '<td colspan="4" rowspan="2" style="border:1px solid var(--table-border); font-weight:bold; background:var(--table-stats-bg); font-family:\'Times New Roman\', serif; text-align:left; vertical-align:middle; padding-left:5px;">ΣX̄ = ' + SPCEngine.round(sheetSumX, 4) + '</td>';
-            else if (i === 2) html += '<td colspan="4" rowspan="2" style="border:1px solid var(--table-border); font-weight:bold; background:var(--table-stats-bg); font-family:\'Times New Roman\', serif; text-align:left; vertical-align:middle; padding-left:5px;">X̿ = ' + SPCEngine.round(sheetXDoubleBar, 4) + '</td>';
-            else if (i === 4) html += '<td colspan="4" rowspan="2" style="border:1px solid var(--table-border); font-weight:bold; background:var(--table-stats-bg); font-family:\'Times New Roman\', serif; text-align:left; vertical-align:middle; padding-left:5px;">ΣR = ' + SPCEngine.round(sheetSumR, 4) + '</td>';
-            else if (i === 6) html += '<td colspan="4" rowspan="2" style="border:1px solid var(--table-border); font-weight:bold; background:var(--table-stats-bg); font-family:\'Times New Roman\', serif; text-align:left; vertical-align:middle; padding-left:5px;">R̄ = ' + SPCEngine.round(sheetRBar, 4) + '</td>';
+            if (i === 0) html += '<td colspan="4" rowspan="2" style="border:1px solid var(--table-border); font-weight:bold; background:var(--table-stats-bg); font-family:\'Arial\', serif; text-align:left; vertical-align:middle; padding-left:5px;">ΣX̄ = ' + SPCEngine.round(sheetSumX, 4) + '</td>';
+            else if (i === 2) html += '<td colspan="4" rowspan="2" style="border:1px solid var(--table-border); font-weight:bold; background:var(--table-stats-bg); font-family:\'Arial\', serif; text-align:left; vertical-align:middle; padding-left:5px;">X̿ = ' + SPCEngine.round(sheetXDoubleBar, 4) + '</td>';
+            else if (i === 4) html += '<td colspan="4" rowspan="2" style="border:1px solid var(--table-border); font-weight:bold; background:var(--table-stats-bg); font-family:\'Arial\', serif; text-align:left; vertical-align:middle; padding-left:5px;">ΣR = ' + SPCEngine.round(sheetSumR, 4) + '</td>';
+            else if (i === 6) html += '<td colspan="4" rowspan="2" style="border:1px solid var(--table-border); font-weight:bold; background:var(--table-stats-bg); font-family:\'Arial\', serif; text-align:left; vertical-align:middle; padding-left:5px;">R̄ = ' + SPCEngine.round(sheetRBar, 4) + '</td>';
             else if (i >= 8) html += '<td colspan="4" style="border:1px solid var(--table-border); background:transparent;"></td>';
             html += '</tr>';
         }

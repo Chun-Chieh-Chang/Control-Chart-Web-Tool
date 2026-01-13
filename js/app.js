@@ -1000,6 +1000,8 @@ var SPCApp = {
                 grid: { borderColor: theme.grid },
                 tooltip: {
                     theme: theme.mode,
+                    followCursor: true,
+                    fixed: { enabled: false },
                     custom: function ({ series, seriesIndex, dataPointIndex, w }) {
                         var val = series[seriesIndex][dataPointIndex];
                         var name = w.globals.seriesNames[seriesIndex];
@@ -1092,7 +1094,7 @@ var SPCApp = {
                 xaxis: { categories: pageLabels, labels: { style: { colors: theme.text, fontSize: '12px', fontFamily: 'Inter, sans-serif' } } },
                 yaxis: { labels: { formatter: function (v) { return v.toFixed(4); }, style: { colors: theme.text, fontSize: '12px', fontFamily: 'Inter, sans-serif' } } },
                 grid: { borderColor: theme.grid },
-                tooltip: { theme: theme.mode },
+                tooltip: { theme: theme.mode, followCursor: true, fixed: { enabled: false } },
                 markers: { size: [4, 0, 0] }
             };
             var chartR = new ApexCharts(document.querySelector("#rChart"), rOpt);
@@ -1142,6 +1144,7 @@ var SPCApp = {
                     }
                 },
                 dataLabels: { enabled: false }, yaxis: { labels: { formatter: function (v) { return v.toFixed(3); }, style: { colors: theme.text, fontSize: '12px', fontFamily: 'Inter, sans-serif' } }, title: { text: 'Cpk' } }, grid: { borderColor: theme.grid },
+                tooltip: { followCursor: true, fixed: { enabled: false } },
                 annotations: {
                     yaxis: [
                         { y: 1.0, borderColor: theme.danger, strokeDashArray: 4, label: { text: '1.0', style: { color: '#fff', background: theme.danger } } },
@@ -1185,7 +1188,8 @@ var SPCApp = {
                 stroke: { width: [3, 2, 2, 2], dashArray: [0, 0, 5, 5] },
                 markers: { size: [4, 0, 0, 0], hover: { size: 6 } },
                 xaxis: { categories: labels, labels: { style: { colors: theme.text, fontSize: '12px', fontFamily: 'Inter, sans-serif' } } },
-                dataLabels: { enabled: false }, yaxis: { labels: { formatter: function (v) { return v.toFixed(4); }, style: { colors: theme.text, fontSize: '12px', fontFamily: 'Inter, sans-serif' } }, title: { text: self.t('平均值', 'Mean') } }, grid: { borderColor: theme.grid }
+                dataLabels: { enabled: false }, yaxis: { labels: { formatter: function (v) { return v.toFixed(4); }, style: { colors: theme.text, fontSize: '12px', fontFamily: 'Inter, sans-serif' } }, title: { text: self.t('平均值', 'Mean') } }, grid: { borderColor: theme.grid },
+                tooltip: { followCursor: true, shared: true, fixed: { enabled: false } }
             };
             var chartMean = new ApexCharts(document.querySelector("#meanChart"), meanOpt);
             chartMean.render(); this.chartInstances.push(chartMean);
@@ -1221,7 +1225,8 @@ var SPCApp = {
                 stroke: { width: 3 },
                 markers: { size: 4, shape: ['circle', 'rect'] },
                 xaxis: { categories: labels, labels: { style: { colors: theme.text, fontSize: '12px', fontFamily: 'Inter, sans-serif' } } },
-                dataLabels: { enabled: false }, yaxis: { min: 0, labels: { formatter: function (v) { return v.toFixed(6); }, style: { colors: theme.text, fontSize: '12px', fontFamily: 'Inter, sans-serif' } }, title: { text: self.t('標準差', 'StdDev') } }, grid: { borderColor: theme.grid }
+                dataLabels: { enabled: false }, yaxis: { min: 0, labels: { formatter: function (v) { return v.toFixed(6); }, style: { colors: theme.text, fontSize: '12px', fontFamily: 'Inter, sans-serif' } }, title: { text: self.t('標準差', 'StdDev') } }, grid: { borderColor: theme.grid },
+                tooltip: { followCursor: true, shared: true, fixed: { enabled: false } }
             };
             var chartStd = new ApexCharts(document.querySelector("#stdDevChart"), stdOpt);
             chartStd.render(); this.chartInstances.push(chartStd);
@@ -1264,7 +1269,13 @@ var SPCApp = {
                 markers: { size: [0, 4, 0, 0, 0, 0], colors: ['#3b82f6'], strokeColors: '#fff' },
                 xaxis: { categories: labels, labels: { style: { colors: theme.text, fontSize: '12px', fontFamily: 'Inter, sans-serif' } } },
                 dataLabels: { enabled: false }, yaxis: { labels: { formatter: function (v) { return v.toFixed(4); }, style: { colors: theme.text, fontSize: '12px', fontFamily: 'Inter, sans-serif' } }, title: { text: self.t('測量值', 'Value') } }, grid: { borderColor: theme.grid },
-                tooltip: { fixed: { enabled: false }, followCursor: true, shared: true, intersect: false }
+                tooltip: {
+                    followCursor: true,
+                    shared: true,
+                    intersect: false,
+                    fixed: { enabled: false },
+                    style: { fontSize: '12px' }
+                }
             };
             var chartG = new ApexCharts(document.querySelector("#groupChart"), gOpt);
             chartG.render(); this.chartInstances.push(chartG);
@@ -1296,7 +1307,8 @@ var SPCApp = {
                 stroke: { width: 2 },
                 markers: { size: 4, shape: 'square' },
                 xaxis: { categories: labels, labels: { style: { colors: theme.text, fontSize: '12px', fontFamily: 'Inter, sans-serif' } } },
-                dataLabels: { enabled: false }, yaxis: { labels: { formatter: function (v) { return v.toFixed(4); }, style: { colors: theme.text, fontSize: '12px', fontFamily: 'Inter, sans-serif' } }, title: { text: self.t('全距', 'Range') } }, grid: { borderColor: theme.grid }
+                dataLabels: { enabled: false }, yaxis: { labels: { formatter: function (v) { return v.toFixed(4); }, style: { colors: theme.text, fontSize: '12px', fontFamily: 'Inter, sans-serif' } }, title: { text: self.t('全距', 'Range') } }, grid: { borderColor: theme.grid },
+                tooltip: { followCursor: true, fixed: { enabled: false }, style: { fontSize: '12px' } }
             };
             var chartV = new ApexCharts(document.querySelector("#groupVarChart"), vOpt);
             chartV.render(); this.chartInstances.push(chartV);

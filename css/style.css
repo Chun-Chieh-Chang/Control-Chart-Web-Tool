@@ -31,7 +31,7 @@
     --table-ooc-bg: yellow;
     --table-ooc-text: #000;
 
-    --card-bg: #ffffff;
+    --card-bg: rgba(255, 255, 255, 0.7);
 }
 
 /* Dark Mode Overrides */
@@ -49,7 +49,7 @@ html.dark {
     --table-ooc-bg: #991b1b !important;
     --table-ooc-text: #ffffff !important;
 
-    --card-bg: #1e293b;
+    --card-bg: rgba(30, 41, 59, 0.7);
 }
 
 body {
@@ -99,11 +99,13 @@ label {
     font-weight: 500;
 }
 
-/* SaaS Card Style */
+/* SaaS Card Style - Glassmorphism Preferred */
 .saas-card {
     background: var(--card-bg);
-    border: 1px solid #f1f5f9;
-    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
     border-radius: 16px;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }

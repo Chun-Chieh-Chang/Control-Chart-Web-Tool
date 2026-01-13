@@ -17,15 +17,54 @@ class QIPProcessor {
     }
 
     /**
-     * 處理工作簿
-     * @param {Object} workbook - SheetJS workbook
+     * 處理多個工作簿
+     * @param {Array} workbooks - Array of SheetJS workbooks
      * @param {Function} progressCallback - 進度回調函數
      * @returns {Object} 處理結果
      */
-    async processWorkbook(workbook, progressCallback = () => { }) {
-        console.log('開始處理工作簿...');
-        console.log('配置:', this.config);
+    async processWorkbooks(workbooks, progressCallback = () => { }) {
+        console.log(`開始處理 ${workbooks.length} 個工作簿...`);
+        
+        for (let i = 0; i < workbooks.length; i++) {
+            const wb = workbooks[i];
+            const currentRatio = i / workbooks.length;
+            const nextRatio = (i + 1) / workbooks.length;
 
+            await this.processWorkbook(wb, (p) => {
+                // 調整進度回調，使其反應整體的進度
+                progressCallback({
+                    current: p.current,
+                    total: p.total,
+                    message: `[檔案 ${i + 1}/${workbooks.length}] ${p.message}`,
+                    percent: Math.round((currentRatio + (p.percent / 100) * (nextRatio - currentRatio)) * 100)
+                });
+            }, true); // pass true to indicate it's part of a multi-batch
+        }
+
+        // 最後統一提取規格與產品資訊 (從第一個有效的工作簿提取即可，假設格式相同)
+        if (workbooks.length > 0) {
+            await this.extractSpecifications(workbooks[0], progressCallback);
+            const info = this.extractProductInfo(workbooks[0]);
+            // 如果 results.productInfo 尚未設定或為空，則更新
+            if (!this.results.productInfo.productName) {
+                this.results.productInfo = info;
+            }
+        }
+
+        console.log('所有工作簿處理完成', this.results);
+        return this.getResults();
+    }
+
+    /**
+     * 處理工作簿
+     * @param {Object} workbook - SheetJS workbook
+     * @param {Function} progressCallback - 進度回調函數
+     * @param {boolean} cumulative - 是否為累加模式（不重置統計）
+     * @returns {Object} 處理結果
+     */
+    async processWorkbook(workbook, progressCallback = () => { }, cumulative = false) {
+        console.log('開始處理工作簿...');
+        
         const sheetCount = workbook.SheetNames.length;
         let processedCount = 0;
 
@@ -39,7 +78,6 @@ class QIPProcessor {
             }
         }
         const step = maxOffset + 1;
-        console.log(`處理步長: ${step} (最大偏移: ${maxOffset})`);
 
         // 遍歷所有工作表
         for (let i = 0; i < sheetCount; i += step) {
@@ -64,20 +102,19 @@ class QIPProcessor {
                 this.errorLogger.logError(sheetName, error.message);
             }
 
-            // 讓 UI 有機會更新
-            await this.sleep(10);
+            await this.sleep(5);
         }
 
-        this.results.processedSheets = processedCount;
+        if (cumulative) {
+            this.results.processedSheets += processedCount;
+        } else {
+            this.results.processedSheets = processedCount;
+            // 非累加模式下才執行最後的提取
+            await this.extractSpecifications(workbook, progressCallback);
+            this.results.productInfo = this.extractProductInfo(workbook);
+        }
 
-        // 嘗試提取規格數據
-        await this.extractSpecifications(workbook, progressCallback);
-
-        // 提取產品資訊 (比照 VBA)
-        this.results.productInfo = this.extractProductInfo(workbook);
-
-        console.log('處理完成', this.results);
-        return this.getResults();
+        return cumulative ? this.results : this.getResults();
     }
 
     /**

@@ -79,6 +79,7 @@ class ExcelExporter {
         data.push(specRow);
 
         // 數據行（從第3行開始）
+        let currentRow = 2; // Index 2 is Row 3
         for (const batchName of batches) {
             const batchData = itemData.batches[batchName];
             const row = [batchName, '', '', '']; // 批號 + 3個空欄（規格欄）
@@ -89,10 +90,30 @@ class ExcelExporter {
             }
 
             data.push(row);
+
+            // 為該行設置字體（批號用 JhengHei，數據用 Times New Roman）
+            for (let col = 0; col < row.length; col++) {
+                const cellAddr = XLSX.utils.encode_cell({ r: currentRow, c: col });
+                // Note: Worksheet data is not yet in AAO format in memory until aoa_to_sheet
+            }
+            currentRow++;
         }
 
         // 創建工作表
         const worksheet = XLSX.utils.aoa_to_sheet(data);
+
+        // 套用數據行字體 (After aoa_to_sheet)
+        for (let r = 2; r < data.length; r++) {
+            for (let c = 0; c < data[0].length; c++) {
+                const cellAddr = XLSX.utils.encode_cell({ r: r, c: c });
+                if (worksheet[cellAddr]) {
+                    if (!worksheet[cellAddr].s) worksheet[cellAddr].s = {};
+                    worksheet[cellAddr].s.font = {
+                        name: (c === 0) ? 'Microsoft JhengHei' : 'Times New Roman'
+                    };
+                }
+            }
+        }
 
         // 設置列寬
         const colWidths = [
@@ -143,7 +164,7 @@ class ExcelExporter {
             if (worksheet[cellAddr]) {
                 // 標記為標題（供後續處理）
                 worksheet[cellAddr].s = {
-                    font: { bold: true },
+                    font: { bold: true, name: 'Microsoft JhengHei' },
                     fill: { fgColor: { rgb: '92D050' } },
                     alignment: { horizontal: 'center' }
                 };
@@ -157,11 +178,13 @@ class ExcelExporter {
      * @param {Object} specification 
      */
     setSpecificationStyles(worksheet, specification) {
-        // 設置規格數字格式
+        // 設置規格數字格式與字體
         for (let c = 1; c <= 3; c++) {
             const cellAddr = XLSX.utils.encode_cell({ r: 1, c: c });
-            if (worksheet[cellAddr] && typeof worksheet[cellAddr].v === 'number') {
+            if (worksheet[cellAddr]) {
                 worksheet[cellAddr].z = '0.0000';
+                if (!worksheet[cellAddr].s) worksheet[cellAddr].s = {};
+                worksheet[cellAddr].s.font = { name: 'Times New Roman' };
             }
         }
     }

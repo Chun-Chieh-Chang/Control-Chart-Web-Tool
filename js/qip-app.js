@@ -4,8 +4,8 @@
  */
 
 var QIPExtractApp = {
-    workbook: null,
-    fileName: '',
+    workbooks: [],
+    fileNames: [],
     processingResults: null,
     selectionMode: null,
     selectionTarget: null,
@@ -72,13 +72,13 @@ var QIPExtractApp = {
 
         // File upload
         this.els.uploadZone.addEventListener('click', function () { self.els.fileInput.click(); });
-        this.els.fileInput.addEventListener('change', function (e) { if (e.target.files[0]) self.loadFile(e.target.files[0]); });
+        this.els.fileInput.addEventListener('change', function (e) { if (e.target.files.length > 0) self.loadFiles(e.target.files); });
         this.els.uploadZone.addEventListener('dragover', function (e) { e.preventDefault(); e.currentTarget.classList.add('border-primary'); });
         this.els.uploadZone.addEventListener('dragleave', function (e) { e.preventDefault(); e.currentTarget.classList.remove('border-primary'); });
         this.els.uploadZone.addEventListener('drop', function (e) {
             e.preventDefault();
             e.currentTarget.classList.remove('border-primary');
-            if (e.dataTransfer.files[0]) self.loadFile(e.dataTransfer.files[0]);
+            if (e.dataTransfer.files.length > 0) self.loadFiles(e.dataTransfer.files);
         });
 
         if (this.els.removeFile) this.els.removeFile.addEventListener('click', function () { self.removeFile(); });
@@ -107,45 +107,75 @@ var QIPExtractApp = {
 
     },
 
-    loadFile: function (file) {
+    loadFiles: function (files) {
         var self = this;
-        if (!file.name.match(/\.(xlsx|xls|xlsm)$/i)) {
-            alert(this.t('請選擇 Excel 檔案', 'Please select an Excel file'));
+        var validFiles = Array.from(files).filter(function (file) {
+            return file.name.match(/\.(xlsx|xls|xlsm)$/i);
+        });
+
+        if (validFiles.length === 0) {
+            alert(this.t('請選擇有效的 Excel 檔案', 'Please select valid Excel files'));
             return;
         }
 
-        var reader = new FileReader();
-        reader.onload = function (e) {
-            try {
-                var data = new Uint8Array(e.target.result);
-                // Specifically verify that merges are parsed
-                self.workbook = XLSX.read(data, { type: 'array', cellStyles: true });
-                console.log('Workbook loaded. Sheets:', self.workbook.SheetNames);
-                self.fileName = file.name;
+        this.workbooks = [];
+        this.fileNames = [];
 
-                self.els.uploadZone.classList.add('hidden');
-                self.els.fileInfo.classList.remove('hidden');
-                self.els.fileName.textContent = file.name;
-                self.els.workbookInfo.textContent = self.workbook.SheetNames.length + ' ' + self.t('個工作表', 'Sheets');
+        var promises = validFiles.map(function (file) {
+            return new Promise(function (resolve, reject) {
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    try {
+                        var data = new Uint8Array(e.target.result);
+                        var workbook = XLSX.read(data, { type: 'array', cellStyles: true });
+                        resolve({ workbook: workbook, fileName: file.name });
+                    } catch (error) {
+                        reject(error);
+                    }
+                };
+                reader.onerror = reject;
+                reader.readAsArrayBuffer(file);
+            });
+        });
 
-                // Auto-fill product code
-                if (!self.els.productCode.value) {
-                    self.els.productCode.value = file.name.replace(/\.[^/.]+$/, '');
-                }
+        Promise.all(promises).then(function (results) {
+            self.workbooks = results.map(r => r.workbook);
+            self.fileNames = results.map(r => r.fileName);
 
-                self.updateWorksheetSelector();
-                self.els.worksheetSelectGroup.classList.remove('hidden');
-                self.updateStartButton();
-            } catch (error) {
-                alert(self.t('檔案讀取失敗: ', 'File read failed: ') + error.message);
+            self.els.uploadZone.classList.add('hidden');
+            self.els.fileInfo.classList.remove('hidden');
+
+            // UI 顯示
+            if (self.fileNames.length === 1) {
+                self.els.fileName.textContent = self.fileNames[0];
+            } else {
+                self.els.fileName.textContent = self.fileNames.length + ' ' + self.t('個檔案...', 'files...');
+                self.els.fileName.title = self.fileNames.join('\n');
             }
-        };
-        reader.readAsArrayBuffer(file);
+
+            var totalSheets = self.workbooks.reduce((acc, wb) => acc + wb.SheetNames.length, 0);
+            self.els.workbookInfo.textContent = totalSheets + ' ' + self.t('個工作表 (來自 ', 'Sheets (from ') + self.fileNames.length + ' ' + self.t('個檔案)', 'files)');
+
+            // 產品料號自動填入 (以第一個檔案為準)
+            if (!self.els.productCode.value) {
+                self.els.productCode.value = self.fileNames[0].replace(/\.[^/.]+$/, '');
+            }
+
+            self.updateWorksheetSelector();
+            self.els.worksheetSelectGroup.classList.remove('hidden');
+            self.updateStartButton();
+        }).catch(function (error) {
+            alert(self.t('檔案讀取失敗: ', 'File read failed: ') + error.message);
+        });
+    },
+
+    loadFile: function (file) { // 保留舊方法供參考或單檔調用
+        this.loadFiles([file]);
     },
 
     removeFile: function () {
-        this.workbook = null;
-        this.fileName = '';
+        this.workbooks = [];
+        this.fileNames = [];
         this.els.fileInput.value = '';
         this.els.uploadZone.classList.remove('hidden');
         this.els.fileInfo.classList.add('hidden');
@@ -163,9 +193,10 @@ var QIPExtractApp = {
 
     updateWorksheetSelector: function () {
         var select = this.els.worksheetSelect;
-        select.innerHTML = '<option value="">' + this.t('-- 請選擇 --', '-- Select --') + '</option>';
-        if (this.workbook) {
-            this.workbook.SheetNames.forEach(function (name) {
+        select.innerHTML = '<option value="">' + this.t('-- 請選擇工作表 --', '-- Select Sheet --') + '</option>';
+        if (this.workbooks && this.workbooks.length > 0) {
+            // 使用第一個工作表進行預覽與配置設定
+            this.workbooks[0].SheetNames.forEach(function (name) {
                 var opt = document.createElement('option');
                 opt.value = name;
                 opt.textContent = name;
@@ -242,10 +273,12 @@ var QIPExtractApp = {
     },
 
     updateWorksheetSelector: function () {
+        // Repeated definition removed in multi-replace if applicable, 
+        // but let's ensure consistency.
         var select = this.els.worksheetSelect;
         select.innerHTML = '<option value="">' + this.t('-- 請選擇工作表 --', '-- Select Sheet --') + '</option>';
-        if (this.workbook) {
-            this.workbook.SheetNames.forEach(function (name) {
+        if (this.workbooks && this.workbooks.length > 0) {
+            this.workbooks[0].SheetNames.forEach(function (name) {
                 var opt = document.createElement('option');
                 opt.value = name;
                 opt.textContent = name;
@@ -256,13 +289,13 @@ var QIPExtractApp = {
 
     previewWorksheet: function () {
         var sheetName = this.els.worksheetSelect.value;
-        if (!sheetName || !this.workbook) return;
+        if (!sheetName || !this.workbooks || this.workbooks.length === 0) return;
 
         if (this.els.currentSheetName) {
             this.els.currentSheetName.textContent = sheetName;
         }
 
-        var ws = this.workbook.Sheets[sheetName];
+        var ws = this.workbooks[0].Sheets[sheetName];
         this.renderPreviewTable(ws);
         this.els.previewPanel.classList.remove('hidden');
     },
@@ -409,8 +442,8 @@ var QIPExtractApp = {
         // Since we don't have easy access to ws here, we can infer from DOM or re-fetch
         // Best way: use the current sheet from workbook
         var sheetName = this.els.worksheetSelect.value;
-        if (sheetName && this.workbook) {
-            var ws = this.workbook.Sheets[sheetName];
+        if (sheetName && this.workbooks && this.workbooks.length > 0) {
+            var ws = this.workbooks[0].Sheets[sheetName];
             var merges = ws['!merges'] || [];
 
             var changed = true;
@@ -589,7 +622,7 @@ var QIPExtractApp = {
     },
 
     updateStartButton: function () {
-        var hasFile = this.workbook !== null;
+        var hasFile = this.workbooks && this.workbooks.length > 0;
         var hasCavity = parseInt(this.els.cavityCount.value) > 0;
         var cavId = document.getElementById('qip-cavity-id-1');
         var dataR = document.getElementById('qip-data-range-1');
@@ -600,7 +633,7 @@ var QIPExtractApp = {
 
     startProcessing: async function () {
         var self = this;
-        if (!this.workbook) { alert(this.t('請先上傳檔案', 'Please upload a file first')); return; }
+        if (!this.workbooks || this.workbooks.length === 0) { alert(this.t('請先上傳檔案', 'Please upload files first')); return; }
 
         var config = this.gatherConfiguration();
 
@@ -613,14 +646,15 @@ var QIPExtractApp = {
         this.els.progress.classList.remove('hidden');
         this.els.startProcess.disabled = true;
         this.els.resultSection.classList.add('hidden');
-        this.els.progressBar.style.width = '10%';
+        this.els.progressBar.style.width = '5%';
         this.els.progressText.textContent = this.t('初始化處理器...', 'Initializing processor...');
 
         try {
             // 使用新版 QIPProcessor
             const processor = new QIPProcessor(config);
 
-            this.processingResults = await processor.processWorkbook(this.workbook, (progress) => {
+            // 處理多個工作簿
+            this.processingResults = await processor.processWorkbooks(this.workbooks, (progress) => {
                 self.els.progressBar.style.width = progress.percent + '%';
                 var pctEl = document.getElementById('qip-progress-percent');
                 if (pctEl) pctEl.textContent = Math.round(progress.percent) + '%';

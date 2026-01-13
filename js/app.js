@@ -1271,10 +1271,29 @@ var SPCApp = {
                 dataLabels: { enabled: false }, yaxis: { labels: { formatter: function (v) { return v.toFixed(4); }, style: { colors: theme.text, fontSize: '12px', fontFamily: 'Inter, sans-serif' } }, title: { text: self.t('測量值', 'Value') } }, grid: { borderColor: theme.grid },
                 tooltip: {
                     followCursor: true,
-                    shared: true,
                     intersect: false,
                     fixed: { enabled: false },
-                    style: { fontSize: '12px' }
+                    custom: function ({ series, seriesIndex, dataPointIndex, w }) {
+                        var label = w.globals.categoryLabels[dataPointIndex];
+                        var html = '<div class="px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 shadow-xl rounded-lg">';
+                        html += '<div class="text-xs text-slate-500 dark:text-slate-400 font-bold uppercase mb-1 border-b border-slate-200 dark:border-slate-800 pb-1">' + label + '</div>';
+
+                        w.config.series.forEach(function (s, idx) {
+                            var val = series[idx][dataPointIndex];
+                            if (val !== undefined && val !== null) {
+                                html += '<div class="flex items-center justify-between gap-4 py-0.5">';
+                                html += '<div class="flex items-center gap-1.5">';
+                                html += '<span class="w-2 h-2 rounded-full" style="background-color:' + w.globals.colors[idx] + '"></span>';
+                                html += '<span class="text-xs font-bold text-slate-700 dark:text-slate-200">' + s.name + ':</span>';
+                                html += '</div>';
+                                html += '<span class="text-xs font-mono font-bold text-slate-600 dark:text-slate-300">' + (typeof val === "number" ? val.toFixed(4) : val) + '</span>';
+                                html += '</div>';
+                            }
+                        });
+
+                        html += '</div>';
+                        return html;
+                    }
                 }
             };
             var chartG = new ApexCharts(document.querySelector("#groupChart"), gOpt);

@@ -126,10 +126,10 @@ var SPCApp = {
         uploadZone.addEventListener('drop', function (e) {
             e.preventDefault();
             uploadZone.classList.remove('dragover');
-            if (e.dataTransfer.files.length > 0) self.handleFile(e.dataTransfer.files[0]);
+            if (e.dataTransfer.files.length > 0) self.handleFiles(e.dataTransfer.files);
         });
         fileInput.addEventListener('change', function (e) {
-            if (e.target.files.length > 0) self.handleFile(e.target.files[0]);
+            if (e.target.files.length > 0) self.handleFiles(e.target.files);
         });
 
         var resetBtn = document.getElementById('resetBtn');
@@ -323,48 +323,98 @@ var SPCApp = {
         }
     },
 
-    handleFile: function (file) {
+    handleFiles: function (files) {
         var self = this;
-        this.selectedFile = file;
-        if (!file.name.match(/\.(xlsx|xls)$/i)) {
-            alert(this.t('請選擇 Excel 檔案', 'Please select an Excel file'));
+        var fileList = Array.from(files).filter(function (f) {
+            return f.name.match(/\.(xlsx|xls|xlsm)$/i);
+        });
+
+        if (fileList.length === 0) {
+            alert(this.t('請選擇 Excel 檔案', 'Please select Excel files'));
             return;
         }
-        this.showLoading(this.t('讀取檔案中...', 'Reading file...'));
 
-        var reader = new FileReader();
-        reader.onload = function (e) {
-            try {
-                var data = new Uint8Array(e.target.result);
-                self.workbook = XLSX.read(data, { type: 'array' });
+        this.showLoading(this.t('讀取檔案中...', 'Reading files...'));
 
-                // UI Updates
-                var uploadZone = document.getElementById('uploadZone');
-                var fileInfo = document.getElementById('fileInfo');
-                if (uploadZone) uploadZone.style.display = 'none';
-                if (fileInfo) fileInfo.style.display = 'flex';
+        var promises = fileList.map(function (file) {
+            return new Promise(function (resolve, reject) {
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    try {
+                        var data = new Uint8Array(e.target.result);
+                        var wb = XLSX.read(data, { type: 'array' });
+                        resolve({ name: file.name, workbook: wb, size: file.size });
+                    } catch (err) { reject(err); }
+                };
+                reader.onerror = reject;
+                reader.readAsArrayBuffer(file);
+            });
+        });
 
-                var fileNameEl = document.getElementById('fileName');
-                if (fileNameEl) fileNameEl.textContent = file.name;
+        Promise.all(promises).then(function (results) {
+            // Merge logic: Map sheet names to merged data
+            var merged = { SheetNames: [], Sheets: {} };
 
-                var sheetCount = self.workbook.SheetNames.length;
-                var fileMetaEl = document.getElementById('fileMeta');
-                if (fileMetaEl) fileMetaEl.textContent = sheetCount + ' Inspection items detected';
+            results.forEach(function (res) {
+                var wb = res.workbook;
+                wb.SheetNames.forEach(function (name) {
+                    var ws = wb.Sheets[name];
+                    if (!merged.Sheets[name]) {
+                        merged.SheetNames.push(name);
+                        merged.Sheets[name] = ws;
+                    } else {
+                        // Merge data rows (Row 3+)
+                        var existingData = XLSX.utils.sheet_to_json(merged.Sheets[name], { header: 1, defval: '' });
+                        var newData = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
 
-                self.showInspectionItems();
+                        if (newData.length > 2) {
+                            var rowsToAppend = newData.slice(2);
+                            existingData = existingData.concat(rowsToAppend);
+                            merged.Sheets[name] = XLSX.utils.aoa_to_sheet(existingData);
+                        }
+                    }
+                });
+            });
 
-                // Show preview of the first sheet
-                if (sheetCount > 0) {
-                    self.renderDataPreview(self.workbook.SheetNames[0]);
+            self.workbook = merged;
+            // Primary file display
+            self.selectedFile = fileList[0];
+
+            // UI Updates
+            var uploadZone = document.getElementById('uploadZone');
+            var fileInfo = document.getElementById('fileInfo');
+            if (uploadZone) uploadZone.style.display = 'none';
+            if (fileInfo) fileInfo.style.display = 'flex';
+
+            var fileNameEl = document.getElementById('fileName');
+            if (fileNameEl) {
+                if (fileList.length === 1) {
+                    fileNameEl.textContent = fileList[0].name;
+                } else {
+                    fileNameEl.textContent = fileList.length + ' ' + self.t('個檔案...', 'files...');
+                    fileNameEl.title = fileList.map(f => f.name).join('\n');
                 }
-
-                self.hideLoading();
-            } catch (error) {
-                self.hideLoading();
-                alert(self.t('檔案讀取失敗', 'File reading failed') + ': ' + error.message);
             }
-        };
-        reader.readAsArrayBuffer(file);
+
+            var sheetCount = merged.SheetNames.length;
+            var fileMetaEl = document.getElementById('fileMeta');
+            if (fileMetaEl) {
+                fileMetaEl.textContent = sheetCount + ' ' + self.t('個檢驗項目已偵測', 'Inspection items detected');
+            }
+
+            self.showInspectionItems();
+
+            // Show preview of the first sheet
+            if (sheetCount > 0) {
+                self.renderDataPreview(merged.SheetNames[0]);
+            }
+
+            self.hideLoading();
+        }).catch(function (error) {
+            self.hideLoading();
+            alert(self.t('檔案讀取失敗', 'File reading failed') + ': ' + error.message);
+            console.error(error);
+        });
     },
 
     renderDataPreview: function (sheetName) {

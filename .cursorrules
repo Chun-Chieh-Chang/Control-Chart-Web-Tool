@@ -19,10 +19,9 @@
 - **訊息密度**：UI 介面應維持較高的訊息密度，以「一目了然」為設計原則，避免不必要的空間浪費。
 - **識別性**：字體大小應適中，配色應維持高對比度，確保內容容易辨識。
 - **視覺風格**：前端元件必須使用 **玻璃擬態 (Glassmorphism)** 風格（如背景模糊、半透明邊框、細緻陰影等）。
-- **輸出字體規範 (Font Stack)**：
-  - **中文**：微軟正黑體 (Microsoft JhengHei)
-  - **英文/數字**：Times New Roman
-  - 範例 CSS: `font-family: "Times New Roman", "Microsoft JhengHei", sans-serif;`
+- **字體規範 (Font Stack)**：
+    UI/UX：維持原有的 Inter 字體，確保網頁介面現代化視覺感受。
+    報表輸出：導出的 Excel 檔案已設定為「微軟正黑體（中文）+ Times New Roman（英文/數字）」。
 
 ## 4. 溝通與回應規範
 - **語言**：務必使用 **繁體中文** 進行所有的回覆與說明。

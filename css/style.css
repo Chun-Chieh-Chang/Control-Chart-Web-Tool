@@ -30,6 +30,7 @@
     --table-data-header-bg: #e5e7eb;
     --table-ooc-bg: yellow;
     --table-ooc-text: #000;
+    --table-stats-bg: #DCE6F1;
 
     --card-bg: rgba(255, 255, 255, 0.7);
 }
@@ -48,6 +49,7 @@ html.dark {
     --table-data-header-bg: #0f172a !important;
     --table-ooc-bg: #991b1b !important;
     --table-ooc-text: #ffffff !important;
+    --table-stats-bg: #1e293b !important;
 
     --card-bg: rgba(30, 41, 59, 0.7);
 }

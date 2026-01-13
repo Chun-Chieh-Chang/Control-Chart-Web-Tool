@@ -339,19 +339,19 @@ var QIPExtractApp = {
             }
         });
 
-        var html = '<table class="qip-preview-table" style="border-collapse: collapse; font-size: 10px; width: 100%;">';
+        var html = '<table class="qip-preview-table" style="border-collapse: collapse; font-size: 12px; width: 100%; color: var(--table-text); background: var(--table-bg);">';
 
         // Header row
-        html += '<thead><tr><th style="border: 1px solid #cbd5e1; padding: 4px; background: #f1f5f9; width: 40px;"></th>';
+        html += '<thead><tr><th style="border: 1px solid var(--table-border); padding: 4px; background: var(--table-header-bg); width: 40px;"></th>';
         for (var c = 0; c < maxCols; c++) {
-            html += '<th style="border: 1px solid #cbd5e1; padding: 4px; background: #f1f5f9; font-weight: bold; min-width: 60px;">' +
+            html += '<th style="border: 1px solid var(--table-border); padding: 4px; background: var(--table-header-bg); font-weight: bold; min-width: 60px;">' +
                 XLSX.utils.encode_col(c) + '</th>';
         }
         html += '</tr></thead><tbody>';
 
         // Data rows
         for (var r = 0; r < maxRows; r++) {
-            html += '<tr><th style="border: 1px solid #cbd5e1; padding: 4px; background: #f1f5f9; font-weight: bold;">' + (r + 1) + '</th>';
+            html += '<tr><th style="border: 1px solid var(--table-border); padding: 4px; background: var(--table-header-bg); font-weight: bold;">' + (r + 1) + '</th>';
             for (var c = 0; c < maxCols; c++) {
                 if (skipMap[r + ',' + c]) continue;
 
@@ -366,7 +366,7 @@ var QIPExtractApp = {
                 }
 
                 html += '<td class="qip-cell" data-row="' + r + '" data-col="' + c + '" data-addr="' + cellAddr + '"' + mergeAttr +
-                    ' style="border: 1px solid #cbd5e1; padding: 4px; cursor: pointer; background: white; user-select: none;">' +
+                    ' style="border: 1px solid var(--table-border); padding: 4px; cursor: pointer; background: var(--table-bg); user-select: none;">' +
                     value + '</td>';
             }
             html += '</tr>';

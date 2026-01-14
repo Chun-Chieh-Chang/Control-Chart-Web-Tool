@@ -226,7 +226,8 @@ class SpecificationExtractor {
             spec.nominalValue = nominalValue;
             spec.target = nominalValue;
 
-            // --- 讀取上公差 (本行: Row) ---
+            // --- 符號感知公差計算 (Sign-Aware Tolerance Calculation) ---
+            // 讀取上公差 (本行: Row)
             const upperSignVal = this.getMergedCellValue(worksheet, row, signCol);
             const upperTolValRaw = this.getMergedCellValue(worksheet, row, tolCol);
 
@@ -236,13 +237,8 @@ class SpecificationExtractor {
             }
 
             const upperSign = upperSignVal ? String(upperSignVal).trim() : '+';
-            // 如果符號是 '-'，則為負；否則為正
-            const upperActualTol = (upperSign === '-') ? -upperTolVal : upperTolVal;
 
-            spec.upperTolerance = upperActualTol;
-            spec.usl = spec.nominalValue + spec.upperTolerance;
-
-            // --- 讀取下公差 (下一行: Row + 1) ---
+            // 讀取下公差 (下一行: Row + 1)
             const lowerSignVal = this.getMergedCellValue(worksheet, row + 1, signCol);
             const lowerTolValRaw = this.getMergedCellValue(worksheet, row + 1, tolCol);
 
@@ -252,10 +248,47 @@ class SpecificationExtractor {
             }
 
             const lowerSign = lowerSignVal ? String(lowerSignVal).trim() : '-';
-            const lowerActualTol = (lowerSign === '-') ? -lowerTolVal : lowerTolVal;
 
-            spec.lowerTolerance = lowerActualTol;
-            spec.lsl = spec.nominalValue + spec.lowerTolerance;
+            // 符號感知計算：根據符號決定偏移方向
+            let boundary1, boundary2;
+
+            if (upperSign === '±') {
+                // ± 符號：雙向對稱偏移
+                boundary1 = nominalValue + upperTolVal;
+                boundary2 = nominalValue - upperTolVal;
+                console.log(`[SpecExtract] ± 對稱公差: ±${upperTolVal}`);
+            } else {
+                // 根據符號計算兩個邊界
+                // + 符號：正偏移 (加上公差值)
+                // - 符號：負偏移 (減去公差值)
+                if (upperSign === '+') {
+                    boundary1 = nominalValue + upperTolVal;
+                } else if (upperSign === '-') {
+                    boundary1 = nominalValue - upperTolVal;
+                } else {
+                    // 未知符號，默認為正偏移
+                    boundary1 = nominalValue + upperTolVal;
+                }
+
+                if (lowerSign === '+') {
+                    boundary2 = nominalValue + lowerTolVal;
+                } else if (lowerSign === '-') {
+                    boundary2 = nominalValue - lowerTolVal;
+                } else {
+                    // 未知符號，默認為負偏移
+                    boundary2 = nominalValue - lowerTolVal;
+                }
+
+                console.log(`[SpecExtract] 符號感知計算: ${upperSign}${upperTolVal} / ${lowerSign}${lowerTolVal}`);
+            }
+
+            // 自動邊界校準：確保 USL > LSL
+            spec.usl = Math.max(boundary1, boundary2);
+            spec.lsl = Math.min(boundary1, boundary2);
+            spec.upperTolerance = spec.usl - nominalValue;
+            spec.lowerTolerance = spec.lsl - nominalValue;
+
+            console.log(`[SpecExtract] 最終規格: Nominal=${nominalValue}, USL=${spec.usl}, LSL=${spec.lsl}`);
 
             spec.isValid = true;
 

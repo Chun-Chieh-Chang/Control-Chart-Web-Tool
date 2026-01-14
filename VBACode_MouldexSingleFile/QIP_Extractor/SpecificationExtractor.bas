@@ -231,23 +231,64 @@ Private Function ReadSpecificationFromRow(ws As Worksheet, row As Long) As Speci
         lowerTol = 0
     End If
     
-    ' 驗證公差符號並設定公差值
-    If upperSign = "+" And lowerSign = "-" Then
-        spec.UpperTolerance = upperTol
-        spec.LowerTolerance = lowerTol
-    ElseIf upperSign = "±" Then
-        ' ± 公差格式
-        spec.UpperTolerance = upperTol
-        spec.LowerTolerance = upperTol
+    ' ============================================================================
+    ' 符號感知公差計算 (Sign-Aware Tolerance Calculation)
+    ' ============================================================================
+    ' 系統根據符號欄位決定偏移方向：
+    ' + 符號：視為相對於基準值的 正偏移 (加上公差值)
+    ' - 符號：視為相對於基準值的 負偏移 (減去公差值)
+    ' ± 符號：視為 雙向對稱偏移
+    ' ============================================================================
+    
+    Dim boundary1 As Double, boundary2 As Double
+    
+    ' 處理 ± 對稱公差
+    If upperSign = "±" Then
+        boundary1 = spec.NominalValue + upperTol
+        boundary2 = spec.NominalValue - upperTol
     Else
-        ' 默認處理：假設為對稱公差
-        spec.UpperTolerance = upperTol
-        spec.LowerTolerance = lowerTol
+        ' 根據符號計算第一個邊界（上公差行）
+        If upperSign = "+" Then
+            boundary1 = spec.NominalValue + upperTol
+        ElseIf upperSign = "-" Then
+            boundary1 = spec.NominalValue - upperTol
+        Else
+            ' 未知符號，默認為正偏移
+            boundary1 = spec.NominalValue + upperTol
+        End If
+        
+        ' 根據符號計算第二個邊界（下公差行）
+        If lowerSign = "+" Then
+            boundary2 = spec.NominalValue + lowerTol
+        ElseIf lowerSign = "-" Then
+            boundary2 = spec.NominalValue - lowerTol
+        Else
+            ' 未知符號，默認為負偏移
+            boundary2 = spec.NominalValue - lowerTol
+        End If
     End If
     
-    ' 計算USL和LSL
-    spec.usl = spec.NominalValue + spec.UpperTolerance
-    spec.lsl = spec.NominalValue - spec.LowerTolerance
+    ' ============================================================================
+    ' 自動邊界校準：確保 USL > LSL
+    ' ============================================================================
+    ' 比對兩個邊界值，較大值設為 USL，較小值設為 LSL
+    ' 這樣可以正確處理各種公差組合，包括：
+    ' - 單向公差：+0.1 / +0.05 (兩者皆高於基準)
+    ' - 單向公差：-0.05 / -0.1 (兩者皆低於基準)
+    ' - 傳統公差：+0.1 / -0.1
+    ' ============================================================================
+    
+    If boundary1 > boundary2 Then
+        spec.usl = boundary1
+        spec.lsl = boundary2
+    Else
+        spec.usl = boundary2
+        spec.lsl = boundary1
+    End If
+    
+    ' 計算最終的公差值（相對於基準值的偏移量）
+    spec.UpperTolerance = spec.usl - spec.NominalValue
+    spec.LowerTolerance = spec.lsl - spec.NominalValue
     spec.IsValid = True
     
     ReadSpecificationFromRow = spec

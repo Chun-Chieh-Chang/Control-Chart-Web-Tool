@@ -78,6 +78,40 @@ Excel 檔案需符合以下格式：
 - 第 3 行起：數據
 - 模穴欄位標題需包含「穴」字
 
+### 🎯 規格限值計算邏輯
+
+**規格上限 (USL) 與下限 (LSL) 的正確性，與上下公差讀取的正確與否有關**。本系統採用先進的**符號感知計算**邏輯，確保各種公差場景都能正確處理。
+
+#### 符號感知計算 (Sign-Aware Calculation)
+
+系統不再僅僅讀取公差的絕對值，而是結合左側符號欄位來決定偏移方向：
+
+| 符號 | 意義 | 計算方式 |
+|------|------|----------|
+| **`+`** | 正偏移 | 相對於基準值的**正向**偏移 |
+| **`-`** | 負偏移 | 相對於基準值的**負向**偏移 |
+| **`±`** | 對稱偏移 | 雙向對稱偏移 |
+
+#### 支持複雜公差場景
+
+透過符號感知邏輯，系統可以正確處理非標準的公差組合：
+
+- ✅ **單向正公差**: `+0.1 / +0.05` (兩者皆高於基準)
+- ✅ **單向負公差**: `-0.05 / -0.1` (兩者皆低於基準)
+- ✅ **傳統對稱公差**: `+0.1 / -0.1`
+- ✅ **不對稱公差**: `+0.15 / -0.05`
+- ✅ **± 符號公差**: `±0.1`
+
+#### 自動邊界校準
+
+在計算出兩個偏移邊界後，系統會自動比對並將：
+- **較大值** 設為 **USL (上規格限)**
+- **較小值** 設為 **LSL (下規格限)**
+
+這確保了數據輸出的邏輯一致性，**避免因輸入順序導致的上限小於下限的情形**。
+
+> 📘 **詳細說明**: 請參閱 [`docs/SPECIFICATION_LIMIT_CALCULATION.md`](docs/SPECIFICATION_LIMIT_CALCULATION.md) 了解完整的計算邏輯與範例
+
 ### 🛠️ 技術架構
 
 - **前端**: HTML5, Vanilla JavaScript
@@ -201,6 +235,40 @@ Excel file must follow this format:
 - Row 2: Specifications (Target, USL, LSL)
 - Row 3+: Data
 - Cavity column headers must contain "穴"
+
+### 🎯 Specification Limit Calculation Logic
+
+**The correctness of USL (Upper Specification Limit) and LSL (Lower Specification Limit) depends on proper tolerance reading**. This system employs advanced **sign-aware calculation** logic to ensure accurate handling of various tolerance scenarios.
+
+#### Sign-Aware Calculation
+
+The system no longer simply reads absolute tolerance values, but combines them with sign symbols to determine offset direction:
+
+| Symbol | Meaning | Calculation Method |
+|--------|---------|-------------------|
+| **`+`** | Positive Offset | **Positive** offset from nominal value |
+| **`-`** | Negative Offset | **Negative** offset from nominal value |
+| **`±`** | Symmetric Offset | Bidirectional symmetric offset |
+
+#### Support for Complex Tolerance Scenarios
+
+Through sign-aware logic, the system can correctly handle non-standard tolerance combinations:
+
+- ✅ **Single-sided positive tolerance**: `+0.1 / +0.05` (both above nominal)
+- ✅ **Single-sided negative tolerance**: `-0.05 / -0.1` (both below nominal)
+- ✅ **Traditional symmetric tolerance**: `+0.1 / -0.1`
+- ✅ **Asymmetric tolerance**: `+0.15 / -0.05`
+- ✅ **± symbol tolerance**: `±0.1`
+
+#### Automatic Boundary Calibration
+
+After calculating two offset boundaries, the system automatically compares and assigns:
+- **Larger value** as **USL (Upper Specification Limit)**
+- **Smaller value** as **LSL (Lower Specification Limit)**
+
+This ensures logical consistency in data output and **prevents scenarios where the upper limit is less than the lower limit due to input order**.
+
+> 📘 **Detailed Documentation**: See [`docs/SPECIFICATION_LIMIT_CALCULATION.md`](docs/SPECIFICATION_LIMIT_CALCULATION.md) for complete calculation logic and examples
 
 ### 🛠️ Tech Stack
 ...

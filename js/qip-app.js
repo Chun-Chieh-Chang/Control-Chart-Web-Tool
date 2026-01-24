@@ -167,15 +167,22 @@ var QIPExtractApp = {
             }
 
             self.updateWorksheetSelector();
-            // self.els.worksheetSelectGroup.classList.remove('hidden'); // Now hidden by default
 
             // Automatically preview the first sheet
             if (self.els.worksheetSelect.options.length > 1) {
                 self.els.worksheetSelect.selectedIndex = 1;
+                self.els.worksheetSelect.value = self.els.worksheetSelect.options[1].value;
+                console.log('QIP: Auto-previewing sheet:', self.els.worksheetSelect.value);
                 self.previewWorksheet();
+
+                // Ensure the panel is scrolled into view after a short delay
+                setTimeout(function () {
+                    self.els.previewPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 300);
             }
 
             self.updateStartButton();
+
 
         }).catch(function (error) {
             alert(self.t('檔案讀取失敗: ', 'File read failed: ') + error.message);
@@ -302,8 +309,15 @@ var QIPExtractApp = {
         }
 
         var ws = this.workbooks[0].Sheets[sheetName];
+
+        if (!ws) {
+            console.error('QIP: Worksheet not found:', sheetName);
+            return;
+        }
         this.renderPreviewTable(ws);
         this.els.previewPanel.classList.remove('hidden');
+        console.log('QIP: Preview panel unhidden for sheet:', sheetName);
+
     },
 
     renderPreviewTable: function (ws) {

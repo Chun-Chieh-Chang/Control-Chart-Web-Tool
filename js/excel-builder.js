@@ -192,7 +192,9 @@ class SPCExcelBuilder {
         const alignCenter = { vertical: 'middle', horizontal: 'center' };
         const applyFullBorder = (cell) => { cell.border = { top: borderThin, left: borderThin, bottom: borderThin, right: borderThin }; };
 
-        const sheetName = `${info.item || 'Sheet'} -${String(sheetIdx).padStart(3, '0')} `;
+        const safeItemName = (info.item || 'Sheet').replace(/[\\/:*?"<>|\[\]]/g, '_').substring(0, 20);
+        const sheetName = `${safeItemName}-${String(sheetIdx).padStart(3, '0')}`;
+
         const ws = this.workbook.addWorksheet(sheetName, {
             pageSetup: { paperSize: 9, orientation: 'landscape', fitToPage: true, fitToWidth: 1, fitToHeight: 0 }
         });
@@ -257,17 +259,19 @@ class SPCExcelBuilder {
 
         // 4. Data Layout Labels
         ws.mergeCells('A6:B6'); ws.getCell('A6').value = '檢驗日期'; ws.getCell('A6').font = fontBold; ws.getCell('A6').alignment = alignCenter;
-        ws.mergeCells(`A${sampleStartRow}:A${sampleEndRow} `);
-        const sl = ws.getCell(`A${sampleStartRow} `); sl.value = '樣本測定值'; sl.font = fontBlueBold; sl.alignment = { textRotation: 90, vertical: 'middle', horizontal: 'center' };
+        ws.mergeCells(`A${sampleStartRow}:A${sampleEndRow}`);
+        const sl = ws.getCell(`A${sampleStartRow}`); sl.value = '樣本測定值'; sl.font = fontBlueBold; sl.alignment = { textRotation: 90, vertical: 'middle', horizontal: 'center' };
+
         for (let i = 0; i < cavCount; i++) {
             const cell = ws.getCell(sampleStartRow + i, 2); cell.value = 'X' + (i + 1); cell.font = fontBlueBold; cell.alignment = alignCenter;
         }
         ['ΣX', 'X̄', 'R'].forEach((lbl, idx) => {
-            const r = sumRow + idx; ws.mergeCells(`A${r}:B${r} `);
-            const c = ws.getCell(`A${r} `); c.value = lbl; c.font = fontBold; c.alignment = alignCenter;
+            const r = sumRow + idx; ws.mergeCells(`A${r}:B${r}`);
+            const c = ws.getCell(`A${r}`); c.value = lbl; c.font = fontBold; c.alignment = alignCenter;
         });
-        ws.mergeCells(`A${causeStartRow}:B${causeEndRow} `);
-        const cl = ws.getCell(`A${causeStartRow} `); cl.value = '原因追查'; cl.font = { ...fontBold, color: { argb: 'FF0000FF' } }; cl.alignment = { textRotation: 90, vertical: 'middle', horizontal: 'center' };
+        ws.mergeCells(`A${causeStartRow}:B${causeEndRow}`);
+        const cl = ws.getCell(`A${causeStartRow}`); cl.value = '原因追查'; cl.font = { ...fontBold, color: { argb: 'FF0000FF' } }; cl.alignment = { textRotation: 90, vertical: 'middle', horizontal: 'center' };
+
 
         // 5. Fill Data & Gridlines
         for (let r = 6; r <= causeEndRow; r++) {

@@ -11,6 +11,11 @@ var QIPExtractApp = {
     selectionTarget: null,
     selectionStart: null,
     selectionEnd: null,
+    groupSheetIndices: {}, // Track which sheet index each group uses
+    activeSelectionGroup: null, // Track which group is currently being configured
+    firstClickCell: null, // Track the first point in two-click selection
+
+
 
     t: function (zh, en) {
         return (window.currentLang === 'zh') ? zh : en;
@@ -162,8 +167,16 @@ var QIPExtractApp = {
             }
 
             self.updateWorksheetSelector();
-            self.els.worksheetSelectGroup.classList.remove('hidden');
+            // self.els.worksheetSelectGroup.classList.remove('hidden'); // Now hidden by default
+
+            // Automatically preview the first sheet
+            if (self.els.worksheetSelect.options.length > 1) {
+                self.els.worksheetSelect.selectedIndex = 1;
+                self.previewWorksheet();
+            }
+
             self.updateStartButton();
+
         }).catch(function (error) {
             alert(self.t('檔案讀取失敗: ', 'File read failed: ') + error.message);
         });
@@ -176,7 +189,9 @@ var QIPExtractApp = {
     removeFile: function () {
         this.workbooks = [];
         this.fileNames = [];
+        this.groupSheetIndices = {};
         this.els.fileInput.value = '';
+
         this.els.uploadZone.classList.remove('hidden');
         this.els.fileInfo.classList.add('hidden');
 
@@ -226,9 +241,9 @@ var QIPExtractApp = {
             html += '<div class="p-4 bg-white dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-700/50 space-y-3 shadow-sm">' +
                 '<div class="flex items-center justify-between border-b border-slate-50 dark:border-slate-700/50 pb-2">' +
                 '<div class="text-sm font-bold text-slate-400 uppercase tracking-widest">' + this.t('模穴 ', 'Cavities ') + start + '-' + end + '</div>' +
-                (i > 1 ? '<div class="flex items-center gap-2 font-mono"><span class="text-sm text-slate-400">' + this.t('偏移:', 'OFFSET:') + '</span>' +
-                    '<input type="number" id="qip-offset-' + i + '" class="w-16 px-1.5 py-0.5 bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-700 rounded-lg text-sm font-bold text-indigo-500 text-center focus:outline-indigo-500" value="1" min="1" max="100"></div>' : '') +
+                '<div id="qip-group-sheet-info-' + i + '" class="text-[10px] font-mono text-indigo-400 bg-indigo-50/30 dark:bg-indigo-900/10 px-2 py-0.5 rounded-full border border-indigo-100/50 dark:border-indigo-800/20">Sheet: -</div>' +
                 '</div>' +
+
 
                 '<div class="grid grid-cols-1 gap-3">' +
                 // 穴號範圍 (Cavity ID)
@@ -237,7 +252,8 @@ var QIPExtractApp = {
                 '<div class="flex-1">' +
                 '<input type="text" id="qip-cavity-id-' + i + '" class="qip-range-input w-full bg-transparent text-sm font-mono font-bold text-slate-700 dark:text-slate-300 border-b border-slate-100 dark:border-slate-700 focus:border-emerald-500 outline-none pb-1" placeholder="' + this.t('ID 範圍 (例如 K3:R3)', 'ID Range (e.g. K3:R3)') + '">' +
                 '</div>' +
-                '<button class="qip-select-btn p-1.5 text-violet-500 hover:bg-violet-50 dark:hover:bg-violet-900/20 rounded-lg transition-all" data-target="qip-cavity-id-' + i + '" data-type="cavity" title="' + this.t('選取範圍', 'Select Range') + '">' +
+                '<button class="qip-select-btn p-1.5 text-violet-500 hover:bg-violet-50 dark:hover:bg-violet-900/20 rounded-lg transition-all" data-target="qip-cavity-id-' + i + '" data-group="' + i + '" data-type="cavity" title="' + this.t('選取範圍', 'Select Range') + '">' +
+
                 '<span class="material-icons-outlined text-base">ads_click</span></button>' +
                 '</div>' +
 
@@ -247,7 +263,8 @@ var QIPExtractApp = {
                 '<div class="flex-1">' +
                 '<input type="text" id="qip-data-range-' + i + '" class="qip-range-input w-full bg-transparent text-sm font-mono font-bold text-slate-700 dark:text-slate-300 border-b border-slate-100 dark:border-slate-700 focus:border-blue-500 outline-none pb-1" placeholder="' + this.t('數據範圍 (例如 K4:R4)', 'Data Range (e.g. K4:R4)') + '">' +
                 '</div>' +
-                '<button class="qip-select-btn p-1.5 text-violet-500 hover:bg-violet-50 dark:hover:bg-violet-900/20 rounded-lg transition-all" data-target="qip-data-range-' + i + '" data-type="data" title="' + this.t('選取範圍', 'Select Range') + '">' +
+                '<button class="qip-select-btn p-1.5 text-violet-500 hover:bg-violet-50 dark:hover:bg-violet-900/20 rounded-lg transition-all" data-target="qip-data-range-' + i + '" data-group="' + i + '" data-type="data" title="' + this.t('選取範圍', 'Select Range') + '">' +
+
                 '<span class="material-icons-outlined text-base">ads_click</span></button>' +
                 '</div>' +
 
@@ -261,7 +278,8 @@ var QIPExtractApp = {
             document.querySelectorAll('.qip-select-btn').forEach(function (btn) {
                 btn.addEventListener('click', function (e) {
                     e.preventDefault();
-                    self.startRangeSelection(this.dataset.target, this.dataset.type);
+                    self.startRangeSelection(this.dataset.target, this.dataset.type, this.dataset.group);
+
                 });
             });
             document.querySelectorAll('.qip-range-input').forEach(function (input) {
@@ -272,20 +290,8 @@ var QIPExtractApp = {
         }, 100);
     },
 
-    updateWorksheetSelector: function () {
-        // Repeated definition removed in multi-replace if applicable, 
-        // but let's ensure consistency.
-        var select = this.els.worksheetSelect;
-        select.innerHTML = '<option value="">' + this.t('-- 請選擇工作表 --', '-- Select Sheet --') + '</option>';
-        if (this.workbooks && this.workbooks.length > 0) {
-            this.workbooks[0].SheetNames.forEach(function (name) {
-                var opt = document.createElement('option');
-                opt.value = name;
-                opt.textContent = name;
-                select.appendChild(opt);
-            });
-        }
-    },
+    // Removed redundant updateWorksheetSelector definition
+
 
     previewWorksheet: function () {
         var sheetName = this.els.worksheetSelect.value;
@@ -380,43 +386,61 @@ var QIPExtractApp = {
     bindCellEvents: function () {
         var self = this;
         var cells = this.els.previewContent.querySelectorAll('.qip-cell');
-        var isSelecting = false;
-        var startCell = null;
 
         cells.forEach(function (cell) {
-            cell.addEventListener('mousedown', function (e) {
+            cell.addEventListener('click', function (e) {
                 if (!self.selectionTarget) return;
                 e.preventDefault();
-                isSelecting = true;
-                startCell = { row: parseInt(this.dataset.row), col: parseInt(this.dataset.col), addr: this.dataset.addr };
-                self.clearSelection();
-                this.classList.add('qip-selected');
+
+                var currentCell = {
+                    row: parseInt(this.dataset.row),
+                    col: parseInt(this.dataset.col),
+                    addr: this.dataset.addr
+                };
+
+                if (!self.firstClickCell) {
+                    // First click: set the start point
+                    self.firstClickCell = currentCell;
+                    self.clearSelection();
+                    this.classList.add('qip-selected-first');
+                    this.classList.add('qip-selected');
+
+                    // Update instruction text if possible
+                    if (self.els.selectionTypeText) {
+                        var originalText = self.selectionType === 'cavity' ? self.t('穴號範圍', 'Cavity ID Range') : self.t('數據範圍', 'Data Range');
+                        self.els.selectionTypeText.textContent = originalText + ' (' + self.t('請點選結束位置', 'Select end point') + ')';
+                    }
+                } else {
+                    // Second click: set the end point and confirm
+                    self.highlightRange(self.firstClickCell.row, self.firstClickCell.col, currentCell.row, currentCell.col);
+
+                    // Small delay to let user see the final selection before confirmed/closed
+                    setTimeout(function () {
+                        self.confirmRangeSelection(self.firstClickCell, currentCell);
+                    }, 50);
+                }
             });
 
             cell.addEventListener('mouseover', function () {
-                if (!isSelecting || !self.selectionTarget) return;
-                var endRow = parseInt(this.dataset.row);
-                var endCol = parseInt(this.dataset.col);
-                self.highlightRange(startCell.row, startCell.col, endRow, endCol);
+                if (!self.selectionTarget || !self.firstClickCell) return;
+                var hoverCell = {
+                    row: parseInt(this.dataset.row),
+                    col: parseInt(this.dataset.col)
+                };
+                self.highlightRange(self.firstClickCell.row, self.firstClickCell.col, hoverCell.row, hoverCell.col);
             });
-
-            cell.addEventListener('mouseup', function () {
-                if (!isSelecting || !self.selectionTarget) return;
-                isSelecting = false;
-                var endRow = parseInt(this.dataset.row);
-                var endCol = parseInt(this.dataset.col);
-                self.confirmRangeSelection(startCell, { row: endRow, col: endCol, addr: this.dataset.addr });
-            });
-        });
-
-        document.addEventListener('mouseup', function () {
-            isSelecting = false;
         });
     },
 
-    startRangeSelection: function (targetId, type) {
+
+    startRangeSelection: function (targetId, type, groupIndex) {
         this.selectionTarget = targetId;
         this.selectionType = type;
+        this.activeSelectionGroup = groupIndex;
+        this.firstClickCell = null; // Reset selection state
+        this.clearSelection();
+
+
 
         if (this.els.selectionModeIndic && this.els.selectionTypeText) {
             this.els.selectionModeIndic.classList.remove('hidden');
@@ -483,8 +507,10 @@ var QIPExtractApp = {
         var cells = this.els.previewContent.querySelectorAll('.qip-cell');
         cells.forEach(function (cell) {
             cell.classList.remove('qip-selected');
+            cell.classList.remove('qip-selected-first');
         });
     },
+
 
     confirmRangeSelection: function (start, end) {
         // Use the calculated expanded range from highlightRange if available
@@ -515,10 +541,27 @@ var QIPExtractApp = {
             input.dispatchEvent(new Event('input', { bubbles: true }));
         }
 
+        // Save the sheet index for this group
+        if (this.activeSelectionGroup) {
+            var sheetIdx = this.els.worksheetSelect.selectedIndex - 1; // 0-based index of worksheet
+            var sheetName = this.els.worksheetSelect.value;
+            this.groupSheetIndices[this.activeSelectionGroup] = sheetIdx;
+
+            // Update UI to show which sheet this group is tied to
+            var infoEl = document.getElementById('qip-group-sheet-info-' + this.activeSelectionGroup);
+            if (infoEl) {
+                infoEl.textContent = 'Sheet: ' + sheetName;
+            }
+        }
+
         this.selectionTarget = null;
         this.selectionType = null;
         this.selectionStart = null;
         this.selectionEnd = null;
+        this.activeSelectionGroup = null;
+        this.firstClickCell = null;
+
+
 
         if (this.els.selectionModeIndic) {
             this.els.selectionModeIndic.classList.add('hidden');
@@ -546,9 +589,10 @@ var QIPExtractApp = {
             config.cavityGroups[i] = {
                 cavityIdRange: (document.getElementById('qip-cavity-id-' + i) || {}).value || '',
                 dataRange: (document.getElementById('qip-data-range-' + i) || {}).value || '',
-                pageOffset: i === 1 ? 0 : parseInt((document.getElementById('qip-offset-' + i) || {}).value || '1') - 1
+                pageOffset: this.groupSheetIndices[i] !== undefined ? this.groupSheetIndices[i] : (i === 1 ? 0 : 0)
             };
         }
+
         return config;
     },
 
@@ -607,12 +651,21 @@ var QIPExtractApp = {
             if (g) {
                 var cavId = document.getElementById('qip-cavity-id-' + i);
                 var dataR = document.getElementById('qip-data-range-' + i);
-                var offset = document.getElementById('qip-offset-' + i);
                 if (cavId) cavId.value = g.cavityIdRange || '';
                 if (dataR) dataR.value = g.dataRange || '';
-                if (offset && i > 1) offset.value = (g.pageOffset || 0) + 1;
+
+                // Handle new sheet index logic
+                if (g.pageOffset !== undefined) {
+                    this.groupSheetIndices[i] = g.pageOffset;
+                    var infoEl = document.getElementById('qip-group-sheet-info-' + i);
+                    if (infoEl && this.workbooks && this.workbooks.length > 0 && this.workbooks[0].SheetNames) {
+                        var sheetName = this.workbooks[0].SheetNames[g.pageOffset];
+                        if (sheetName) infoEl.textContent = 'Sheet: ' + sheetName;
+                    }
+                }
             }
         }
+
         this.updateStartButton();
     },
 

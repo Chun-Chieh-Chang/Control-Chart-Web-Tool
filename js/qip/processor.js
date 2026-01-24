@@ -24,7 +24,7 @@ class QIPProcessor {
      */
     async processWorkbooks(workbooks, progressCallback = () => { }) {
         console.log(`開始處理 ${workbooks.length} 個工作簿...`);
-        
+
         for (let i = 0; i < workbooks.length; i++) {
             const wb = workbooks[i];
             const currentRatio = i / workbooks.length;
@@ -64,36 +64,51 @@ class QIPProcessor {
      */
     async processWorkbook(workbook, progressCallback = () => { }, cumulative = false) {
         console.log('開始處理工作簿...');
-        
+
         const sheetCount = workbook.SheetNames.length;
         let processedCount = 0;
 
-        // 計算最大頁面偏移量，決定步長
-        let maxOffset = 0;
+        // 計算最小與最大頁面偏移量，決定步長與起始點
+        let minOffset = Infinity;
+        let maxOffset = -Infinity;
+        let hasActiveGroups = false;
         if (this.config.cavityGroups) {
             for (let g = 1; g <= 6; g++) {
-                if (this.config.cavityGroups[g]) {
-                    maxOffset = Math.max(maxOffset, this.config.cavityGroups[g].pageOffset || 0);
+                if (this.config.cavityGroups[g] && this.config.cavityGroups[g].cavityIdRange) {
+                    const offset = this.config.cavityGroups[g].pageOffset || 0;
+                    minOffset = Math.min(minOffset, offset);
+                    maxOffset = Math.max(maxOffset, offset);
+                    hasActiveGroups = true;
                 }
             }
         }
-        const step = maxOffset + 1;
+
+        if (!hasActiveGroups) {
+            minOffset = 0;
+            maxOffset = 0;
+        }
+
+        const step = maxOffset - minOffset + 1;
 
         // 遍歷所有工作表
+        // i 代表批次的基準偏移量（從 0 開始）
         for (let i = 0; i < sheetCount; i += step) {
-            const sheetName = workbook.SheetNames[i];
+            // 如果基準點 + 最小偏移量已經超出範圍，說明已無完整批次
+            if (i + minOffset >= sheetCount) break;
+
+            const sheetName = workbook.SheetNames[i + minOffset];
             const worksheet = workbook.Sheets[sheetName];
 
             try {
                 // 更新進度
                 progressCallback({
-                    current: i + 1,
+                    current: i + minOffset + 1,
                     total: sheetCount,
                     message: `處理批次: ${sheetName}`,
-                    percent: Math.round((i + 1) / sheetCount * 100)
+                    percent: Math.round((i + minOffset + 1) / sheetCount * 100)
                 });
 
-                // 提取並彙整數據
+                // 提取並彙整數據 (傳入 i 作為基準偏移)
                 await this.processWorksheet(workbook, worksheet, sheetName, i);
                 processedCount++;
 

@@ -46,6 +46,25 @@
             border: 2px solid #3b82f6 !important;
         }
 
+        .qip-selected-first {
+            box-shadow: inset 0 0 0 3px #10b981 !important;
+            animation: pulse-border 1s infinite;
+        }
+
+        @keyframes pulse-border {
+            0% {
+                box-shadow: inset 0 0 0 3px #10b981;
+            }
+
+            50% {
+                box-shadow: inset 0 0 0 5px #10b981;
+            }
+
+            100% {
+                box-shadow: inset 0 0 0 3px #10b981;
+            }
+        }
+
         .qip-preview-table th,
         .qip-preview-table td {
             white-space: normal;
@@ -1035,18 +1054,10 @@
                                         </div>
                                     </div>
 
-                                    <div id="qip-worksheet-select-group" class="space-y-1 hidden">
-                                        <label class="text-sm font-bold text-slate-400 uppercase tracking-widest pl-1"
-                                            data-en="Select Sheet" data-zh="選擇工作表">選擇工作表</label>
-                                        <div class="flex gap-2">
-                                            <select id="qip-worksheet-select"
-                                                class="flex-1 px-3 py-2 border border-slate-100 dark:border-slate-700 rounded-lg text-sm bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white"></select>
-                                            <button id="qip-preview-btn"
-                                                class="px-3 py-2 bg-emerald-50 text-emerald-600 rounded-lg text-sm font-bold hover:bg-emerald-100 transition-all border border-emerald-100">
-                                                <span
-                                                    class="material-icons-outlined text-sm align-middle">visibility</span>
-                                            </button>
-                                        </div>
+                                    <!-- Hidden worksheet selector, as preview is now automatic -->
+                                    <div id="qip-worksheet-select-group" class="hidden">
+                                        <select id="qip-worksheet-select" class="hidden"></select>
+                                        <button id="qip-preview-btn" class="hidden"></button>
                                     </div>
 
                                     <!-- Context Tip -->

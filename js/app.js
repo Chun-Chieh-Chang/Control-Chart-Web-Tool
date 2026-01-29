@@ -58,11 +58,28 @@ var SPCApp = {
         this.updateLanguage();
         this.loadFromHistory();
         this.switchView('dashboard');
-        console.log('SPC Analysis Tool initialized');
+        console.log('SPC Analysis Tool initialized. changeAnalysisModel defined:', typeof this.changeAnalysisModel === 'function');
     },
 
     t: function (zh, en) {
         return this.settings.language === 'zh' ? zh : en;
+    },
+
+    /**
+     * changeAnalysisModel - Quick jump back to model selection
+     */
+    changeAnalysisModel: function () {
+        console.log('SPCApp: changeAnalysisModel triggered');
+        this.switchView('import');
+        var step3 = document.getElementById('step3');
+        if (step3) {
+            step3.scrollIntoView({ behavior: 'smooth' });
+            // Add a highlight effect
+            step3.classList.add('ring-4', 'ring-primary/20', 'border-primary');
+            setTimeout(function () {
+                step3.classList.remove('ring-4', 'ring-primary/20', 'border-primary');
+            }, 1500);
+        }
     },
 
     showMetricsInfo: function () {
@@ -784,22 +801,6 @@ var SPCApp = {
         this.renderAnalysisView(false);
         var self = this;
         setTimeout(function () { self.switchView('analysis'); document.getElementById('results').scrollIntoView({ behavior: 'smooth' }); }, 100);
-    },
-
-    /**
-     * changeAnalysisModel - Quick jump back to model selection
-     */
-    changeAnalysisModel: function () {
-        this.switchView('import');
-        var step3 = document.getElementById('step3');
-        if (step3) {
-            step3.scrollIntoView({ behavior: 'smooth' });
-            // Add a highlight effect
-            step3.classList.add('ring-4', 'ring-primary/20', 'border-primary');
-            setTimeout(function () {
-                step3.classList.remove('ring-4', 'ring-primary/20', 'border-primary');
-            }, 1500);
-        }
     },
 
     renderAnalysisView: function (preserveState) {

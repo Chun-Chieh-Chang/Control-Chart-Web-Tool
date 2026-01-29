@@ -786,6 +786,22 @@ var SPCApp = {
         setTimeout(function () { self.switchView('analysis'); document.getElementById('results').scrollIntoView({ behavior: 'smooth' }); }, 100);
     },
 
+    /**
+     * changeAnalysisModel - Quick jump back to model selection
+     */
+    changeAnalysisModel: function () {
+        this.switchView('import');
+        var step3 = document.getElementById('step3');
+        if (step3) {
+            step3.scrollIntoView({ behavior: 'smooth' });
+            // Add a highlight effect
+            step3.classList.add('ring-4', 'ring-primary/20', 'border-primary');
+            setTimeout(function () {
+                step3.classList.remove('ring-4', 'ring-primary/20', 'border-primary');
+            }, 1500);
+        }
+    },
+
     renderAnalysisView: function (preserveState) {
         var resultsContent = document.getElementById('resultsContent');
         var data = this.analysisResults;

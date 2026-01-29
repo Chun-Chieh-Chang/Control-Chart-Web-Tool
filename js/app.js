@@ -796,13 +796,14 @@ var SPCApp = {
                 this.batchPagination = { currentPage: 1, totalPages: Math.ceil(totalBatches / 25), maxPerPage: 25, totalBatches: totalBatches };
             }
 
-            html = '<div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">' +
+            html = '<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">' +
                 '<div class="saas-card p-4"> <div class="text-[10px] font-bold text-slate-500 uppercase">' + this.t('模穴數', 'Cavities') + '</div> <div class="text-xl font-bold dark:text-white">' + data.xbarR.summary.n + '</div> </div>' +
-                '<div class="saas-card p-4"> <div class="text-[10px] font-bold text-slate-500 uppercase">' + this.t('總記錄', 'Total') + '</div> <div class="text-xl font-bold dark:text-white">' + totalBatches + '</div> </div>' +
+                '<div class="saas-card p-4"> <div class="text-[10px] font-bold text-slate-500 uppercase">' + this.t('規格上限 (USL)', 'USL') + '</div> <div class="text-xl font-bold font-mono text-slate-700 dark:text-slate-300">' + SPCEngine.round(data.specs.usl, 3) + '</div> </div>' +
+                '<div class="saas-card p-4"> <div class="text-[10px] font-bold text-slate-500 uppercase">' + this.t('標稱值 (Target)', 'Target') + '</div> <div class="text-xl font-bold font-mono text-slate-700 dark:text-slate-300">' + SPCEngine.round(data.specs.target, 3) + '</div> </div>' +
+                '<div class="saas-card p-4"> <div class="text-[10px] font-bold text-slate-500 uppercase">' + this.t('規格下限 (LSL)', 'LSL') + '</div> <div class="text-xl font-bold font-mono text-slate-700 dark:text-slate-300">' + SPCEngine.round(data.specs.lsl, 3) + '</div> </div>' +
                 '<div class="saas-card p-4"> <div class="text-[10px] font-bold text-slate-500 uppercase">' + this.t('製程能力 (Cpk)', 'Cpk') + '</div> <div class="text-xl font-bold text-primary">' + SPCEngine.round(data.xbarR.summary.Cpk, 3) + '</div> </div>' +
-                '<div class="saas-card p-4"> <div class="text-[10px] font-bold text-slate-500 uppercase">' + this.t('狀態', 'Status') + '</div> <div class="flex items-center gap-2">' +
-                '<span class="material-icons-outlined text-sm ' + (data.xbarR.xBar.violations.length > 0 ? 'text-rose-500' : 'text-emerald-500') + '">' + (data.xbarR.xBar.violations.length > 0 ? 'warning' : 'check_circle') + '</span>' +
-                '<span class="text-sm font-semibold ' + (data.xbarR.xBar.violations.length > 0 ? 'text-rose-600' : 'text-emerald-600') + '">' + (data.xbarR.xBar.violations.length > 0 ? this.t('異常', 'Alert') : this.t('正常', 'Normal')) + '</span> </div> </div> </div>';
+                '<div class="saas-card p-4"> <div class="text-[10px] font-bold text-slate-500 uppercase">' + this.t('績效指數 (Ppk)', 'Ppk') + '</div> <div class="text-xl font-bold text-indigo-500">' + SPCEngine.round(data.xbarR.summary.Ppk, 3) + '</div> </div>' +
+                '</div>';
 
             if (this.batchPagination.totalPages > 1) {
                 html += '<div class="flex items-center justify-between mb-4 bg-white dark:bg-slate-800 p-3 rounded-lg border border-slate-100 dark:border-slate-700 shadow-sm">' +

@@ -575,6 +575,11 @@
                             </div>
                         </div>
                         <div class="flex gap-3">
+                            <button id="metricsInfoBtn" onclick="SPCApp.showMetricsInfo()"
+                                class="px-5 py-2 bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-200 dark:border-indigo-700 rounded-lg text-sm font-bold text-indigo-700 dark:text-indigo-300 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-all flex items-center gap-2">
+                                <span class="material-icons-outlined text-sm">calculate</span>
+                                <span data-en="Metrics Info" data-zh="指標說明">指標說明</span>
+                            </button>
                             <button id="downloadExcel"
                                 class="px-5 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm font-bold text-slate-700 dark:text-white hover:bg-slate-50 dark:hover:bg-slate-700 transition-all flex items-center gap-2">
                                 <span class="material-icons-outlined text-sm">download</span>
@@ -1379,6 +1384,85 @@
             <!-- Cards -->
         </div>
     </aside>
+
+    </div>
+
+    <!-- SPC Metrics Info Modal -->
+    <div id="metricsInfoModal" class="fixed inset-0 z-[9999] hidden items-center justify-center bg-black/50 backdrop-blur-sm">
+        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl max-w-3xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <div class="sticky top-0 bg-white dark:bg-slate-800 p-6 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center">
+                <h3 class="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                    <span class="material-icons-outlined text-indigo-600">calculate</span>
+                    <span data-en="SPC Metrics Reference" data-zh="SPC 指標計算說明">SPC 指標計算說明</span>
+                </h3>
+                <button onclick="SPCApp.hideMetricsInfo()" class="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-all">
+                    <span class="material-icons-outlined">close</span>
+                </button>
+            </div>
+            <div class="p-6 space-y-6">
+                <!-- Cpk -->
+                <div class="bg-emerald-50 dark:bg-emerald-900/20 p-5 rounded-xl border border-emerald-200 dark:border-emerald-800">
+                    <h4 class="font-bold text-emerald-800 dark:text-emerald-300 mb-2">Cpk (製程能力指數)</h4>
+                    <code class="block bg-white dark:bg-slate-900 p-3 rounded-lg text-sm mb-3 font-mono">Cpk = min[ (USL - μ) / 3σ<sub>within</sub>, (μ - LSL) / 3σ<sub>within</sub> ]</code>
+                    <p class="text-sm text-slate-600 dark:text-slate-400" data-en="Short-term capability considering process centering. Uses within-subgroup standard deviation (σ_within = R̄/d₂)." data-zh="短期製程能力，考慮製程中心偏移。使用組內標準差 (σ_within = R̄/d₂)。">短期製程能力，考慮製程中心偏移。使用組內標準差 (σ_within = R̄/d₂)。</p>
+                </div>
+                <!-- Ppk -->
+                <div class="bg-sky-50 dark:bg-sky-900/20 p-5 rounded-xl border border-sky-200 dark:border-sky-800">
+                    <h4 class="font-bold text-sky-800 dark:text-sky-300 mb-2">Ppk (製程績效指數)</h4>
+                    <code class="block bg-white dark:bg-slate-900 p-3 rounded-lg text-sm mb-3 font-mono">Ppk = min[ (USL - μ) / 3σ<sub>overall</sub>, (μ - LSL) / 3σ<sub>overall</sub> ]</code>
+                    <p class="text-sm text-slate-600 dark:text-slate-400" data-en="Long-term performance using overall standard deviation of all raw data points." data-zh="長期製程績效，使用所有原始數據點的整體標準差。">長期製程績效，使用所有原始數據點的整體標準差。</p>
+                </div>
+                <!-- Sigma Within -->
+                <div class="bg-amber-50 dark:bg-amber-900/20 p-5 rounded-xl border border-amber-200 dark:border-amber-800">
+                    <h4 class="font-bold text-amber-800 dark:text-amber-300 mb-2">σ<sub>within</sub> (組內標準差)</h4>
+                    <code class="block bg-white dark:bg-slate-900 p-3 rounded-lg text-sm mb-3 font-mono">σ<sub>within</sub> = R̄ / d₂</code>
+                    <p class="text-sm text-slate-600 dark:text-slate-400" data-en="R̄ is the average of subgroup ranges. d₂ is a constant based on subgroup size (n)." data-zh="R̄ 為子組全距的平均值。d₂ 為依子組大小 (n) 查表的常數。">R̄ 為子組全距的平均值。d₂ 為依子組大小 (n) 查表的常數。</p>
+                </div>
+                <!-- d2 Table -->
+                <div class="bg-slate-50 dark:bg-slate-900/50 p-5 rounded-xl border border-slate-200 dark:border-slate-700">
+                    <h4 class="font-bold text-slate-800 dark:text-slate-300 mb-3">d₂ 常數對照表</h4>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm border-collapse">
+                            <thead>
+                                <tr class="bg-slate-200 dark:bg-slate-700">
+                                    <th class="px-3 py-2 border border-slate-300 dark:border-slate-600">n (子組大小)</th>
+                                    <th class="px-3 py-2 border border-slate-300 dark:border-slate-600">2</th>
+                                    <th class="px-3 py-2 border border-slate-300 dark:border-slate-600">3</th>
+                                    <th class="px-3 py-2 border border-slate-300 dark:border-slate-600">4</th>
+                                    <th class="px-3 py-2 border border-slate-300 dark:border-slate-600">5</th>
+                                    <th class="px-3 py-2 border border-slate-300 dark:border-slate-600">6</th>
+                                    <th class="px-3 py-2 border border-slate-300 dark:border-slate-600">8</th>
+                                    <th class="px-3 py-2 border border-slate-300 dark:border-slate-600">10</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <th class="px-3 py-2 border border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-800">d₂</th>
+                                    <td class="px-3 py-2 border border-slate-300 dark:border-slate-600 text-center">1.128</td>
+                                    <td class="px-3 py-2 border border-slate-300 dark:border-slate-600 text-center">1.693</td>
+                                    <td class="px-3 py-2 border border-slate-300 dark:border-slate-600 text-center">2.059</td>
+                                    <td class="px-3 py-2 border border-slate-300 dark:border-slate-600 text-center">2.326</td>
+                                    <td class="px-3 py-2 border border-slate-300 dark:border-slate-600 text-center">2.534</td>
+                                    <td class="px-3 py-2 border border-slate-300 dark:border-slate-600 text-center">2.847</td>
+                                    <td class="px-3 py-2 border border-slate-300 dark:border-slate-600 text-center">3.078</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <!-- Interpretation -->
+                <div class="bg-indigo-50 dark:bg-indigo-900/20 p-5 rounded-xl border border-indigo-200 dark:border-indigo-800">
+                    <h4 class="font-bold text-indigo-800 dark:text-indigo-300 mb-3" data-en="Interpretation Guidelines" data-zh="判讀標準">判讀標準</h4>
+                    <ul class="text-sm text-slate-600 dark:text-slate-400 space-y-2">
+                        <li class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-emerald-500"></span> <strong>Cpk ≥ 1.67:</strong> <span data-en="Excellent capability" data-zh="優異製程能力">優異製程能力</span></li>
+                        <li class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-green-500"></span> <strong>Cpk ≥ 1.33:</strong> <span data-en="Good capability" data-zh="良好製程能力">良好製程能力</span></li>
+                        <li class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-amber-500"></span> <strong>Cpk ≥ 1.00:</strong> <span data-en="Acceptable" data-zh="可接受">可接受</span></li>
+                        <li class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-red-500"></span> <strong>Cpk < 1.00:</strong> <span data-en="Needs improvement" data-zh="需改善">需改善</span></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Loading Overlay -->
     <div class="loading-overlay" id="loadingOverlay">

@@ -65,6 +65,22 @@ var SPCApp = {
         return this.settings.language === 'zh' ? zh : en;
     },
 
+    showMetricsInfo: function () {
+        var modal = document.getElementById('metricsInfoModal');
+        if (modal) {
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+    },
+
+    hideMetricsInfo: function () {
+        var modal = document.getElementById('metricsInfoModal');
+        if (modal) {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+    },
+
     setupLanguageToggle: function () {
         var self = this;
         var langBtn = document.getElementById('langBtn');
@@ -722,7 +738,8 @@ var SPCApp = {
                     var xbarR = SPCEngine.calculateXBarRLimits(dataMatrix);
                     var allValues = dataMatrix.flat().filter(function (v) { return v !== null; });
                     var specs = dataInput.specs;
-                    var cap = SPCEngine.calculateProcessCapability(allValues, specs.usl, specs.lsl);
+                    var n = dataMatrix[0] ? dataMatrix[0].length : 2;
+                    var cap = SPCEngine.calculateProcessCapability(allValues, specs.usl, specs.lsl, xbarR.summary.rBar, n);
                     xbarR.summary.Cpk = cap.Cpk;
                     xbarR.summary.Ppk = cap.Ppk;
 

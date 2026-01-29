@@ -31,6 +31,20 @@ var SPCEngine = {
         25: { A2: 0.153, D3: 0.459, D4: 1.541 }
     },
 
+    // d2 constants for estimating sigma from R-bar (extended to 48 cavities)
+    D2_CONSTANTS: {
+        2: 1.128, 3: 1.693, 4: 2.059, 5: 2.326, 6: 2.534,
+        7: 2.704, 8: 2.847, 9: 2.970, 10: 3.078, 11: 3.173,
+        12: 3.258, 13: 3.336, 14: 3.407, 15: 3.472, 16: 3.532,
+        17: 3.588, 18: 3.640, 19: 3.689, 20: 3.735, 21: 3.778,
+        22: 3.819, 23: 3.858, 24: 3.895, 25: 3.931, 26: 3.964,
+        27: 3.997, 28: 4.027, 29: 4.057, 30: 4.086, 31: 4.113,
+        32: 4.139, 33: 4.165, 34: 4.189, 35: 4.213, 36: 4.236,
+        37: 4.259, 38: 4.280, 39: 4.301, 40: 4.322, 41: 4.341,
+        42: 4.361, 43: 4.379, 44: 4.398, 45: 4.415, 46: 4.433,
+        47: 4.450, 48: 4.466
+    },
+
     getConstants: function (n) {
         if (n < 2) return { A2: 0, D3: 0, D4: 0 };
         if (n > 25) return { A2: 3 / Math.sqrt(n), D3: 0.5, D4: 1.5 };
@@ -162,12 +176,19 @@ var SPCEngine = {
         return violations;
     },
 
-    calculateProcessCapability: function (data, usl, lsl) {
+    calculateProcessCapability: function (data, usl, lsl, rBar, subgroupSize) {
         var filtered = data.filter(function (v) { return v !== null && !isNaN(v); });
         if (filtered.length < 2) return { Cp: 0, Cpk: 0, Pp: 0, Ppk: 0, mean: 0, withinStdDev: 0, overallStdDev: 0, count: 0 };
 
         var mean = this.mean(filtered);
-        var withinStdDev = this.withinStdDev(filtered);
+        // Use Xbar-R formula if rBar and subgroupSize provided, otherwise fallback to I-MR
+        var withinStdDev;
+        if (rBar !== undefined && subgroupSize !== undefined && subgroupSize >= 2) {
+            var d2 = this.D2_CONSTANTS[subgroupSize] || (subgroupSize > 25 ? 3.931 : 1.128);
+            withinStdDev = rBar / d2;
+        } else {
+            withinStdDev = this.withinStdDev(filtered);
+        }
         var overallStdDev = this.stdDev(filtered);
         var tolerance = usl - lsl;
 

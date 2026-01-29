@@ -98,6 +98,129 @@ var SPCApp = {
         }
     },
 
+    /**
+     * hideGlobalDiagnosis - Close the report modal
+     */
+    hideGlobalDiagnosis: function () {
+        var modal = document.getElementById('globalDiagnosisModal');
+        if (modal) {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+    },
+
+    /**
+     * runGlobalDiagnosis - Manifest the Cross-Item Logic by scanning all items
+     */
+    runGlobalDiagnosis: function () {
+        var self = this;
+        var modal = document.getElementById('globalDiagnosisModal');
+        var content = document.getElementById('globalDiagnosisContent');
+        if (!modal || !this.workbook) return;
+
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        content.innerHTML = '<div class="flex flex-col items-center justify-center py-12"><div class="spinner mb-4"></div><p class="text-slate-500 font-bold">正在掃描全局數據項目，請稍後...</p></div>';
+
+        setTimeout(function () {
+            var sheets = self.workbook.SheetNames;
+            var summary = [];
+            var globalImbalanceCount = 0;
+            var globalInstabilityCount = 0;
+            var lowCpkCount = 0;
+
+            sheets.forEach(function (sheetName) {
+                // Skip non-item sheets if any
+                if (sheetName.toLowerCase().indexOf('summary') >= 0 || sheetName.toLowerCase().indexOf('setting') >= 0) return;
+
+                var worksheet = self.workbook.Sheets[sheetName];
+                var dataInput = new DataInput(worksheet);
+                var specs = dataInput.getSpecs();
+                var dataMatrix = dataInput.getDataMatrix();
+                var allValues = dataMatrix.flat().filter(function (v) { return v !== null; });
+
+                if (allValues.length < 5) return; // Skip empty sheets
+
+                var n = dataInput.getCavityCount();
+                var xbarR = SPCEngine.calculateXBarRLimits(dataMatrix);
+                var cap = SPCEngine.calculateProcessCapability(allValues, specs.usl, specs.lsl, xbarR.summary.rBar, n);
+                var distStats = SPCEngine.calculateDistStats(allValues);
+                var diagnosis = SPCEngine.analyzeVarianceSource(cap.Cpk, cap.Ppk, distStats);
+
+                var cavityStats = [];
+                for (var i = 0; i < n; i++) {
+                    var cCap = SPCEngine.calculateProcessCapability(dataInput.getCavityBatchData(i), specs.usl, specs.lsl);
+                    cavityStats.push(cCap);
+                }
+                var balance = SPCEngine.analyzeCavityBalance(cavityStats, specs);
+
+                summary.push({
+                    name: sheetName,
+                    cpk: cap.Cpk,
+                    imbalance: balance ? balance.imbalanceRatio : 0,
+                    stability: diagnosis ? diagnosis.stability : 1,
+                    status: cap.Cpk < 1.33 ? 'Bad' : (cap.Cpk < 1.67 ? 'Normal' : 'Good')
+                });
+
+                if (balance && balance.imbalanceRatio > 25) globalImbalanceCount++;
+                if (diagnosis && diagnosis.stability < 0.8) globalInstabilityCount++;
+                if (cap.Cpk < 1.33) lowCpkCount++;
+            });
+
+            // Cross-Item Logic Application
+            var total = summary.length || 1;
+            var diagnosisResult = "";
+            var advice = "";
+            var severityColor = "#10b981";
+
+            if (globalImbalanceCount / total > 0.6) {
+                diagnosisResult = "全局性模具結構問題 (Global Mold Structure Issue)";
+                advice = "偵測到超過 60% 的尺寸項目呈現嚴重模穴不平衡。這通常表示模具的主流道設計、熱流道總溫控或模仁冷卻系統存在全局性的物理偏差。建議優先進行模具大修或流道平衡優化。";
+                severityColor = "#f43f5e";
+            } else if (globalInstabilityCount / total > 0.5) {
+                diagnosisResult = "製程重複精度問題 (Shot-to-Shot Instability)";
+                advice = "多個測項同步顯示批次間波動過大，但單發內相對穩定。建議檢查機台止逆環、料筒控溫穩定性或更換穩定的原料批次。";
+                severityColor = "#f59e0b";
+            } else if (globalImbalanceCount > 0) {
+                diagnosisResult = "局部特徵失效診斷 (Localized Feature Failure)";
+                advice = "僅特定尺寸（如厚度或特定部位尺寸）呈現不平衡，代表模具大架構穩定，但個別穴位的澆口或排氣功能已失效。建議針對異常項目對應的穴位進行局部維護。";
+                severityColor = "#6366f1";
+            } else if (lowCpkCount > 0) {
+                diagnosisResult = "公差定義與製程能力衝突 (Tolerance Conflict)";
+                advice = "製程穩定度良好，但 Cpk 指數偏低。這通常是規格限值 (USL/LSL) 定義過於嚴苛，已超出當前設備的物理加工極限。建議評估放寬公差或更換高流動性材料。";
+                severityColor = "#f59e0b";
+            } else {
+                diagnosisResult = "製程體質健康 (Healthy Process)";
+                advice = "所有檢驗項目均表現優異。請維持當前保壓條件與週期穩定，並建立定期預防保養計畫。";
+                severityColor = "#10b981";
+            }
+
+            // Render Report UI
+            var html = '<div class="space-y-6">' +
+                '<div class="p-6 rounded-2xl border-2 flex items-start gap-4" style="border-color:' + severityColor + '; background-color:' + severityColor + '10">' +
+                '<span class="material-icons-outlined text-4xl" style="color:' + severityColor + '">analytics</span>' +
+                '<div><h4 class="text-xl font-bold mb-2" style="color:' + severityColor + '">' + diagnosisResult + '</h4>' +
+                '<p class="text-slate-600 dark:text-slate-300 leading-relaxed font-bold">' + advice + '</p></div></div>' +
+                '<div class="grid grid-cols-1 md:grid-cols-3 gap-4">' +
+                '<div class="saas-card p-4 text-center"><div class="text-[10px] font-bold text-slate-400 uppercase">低能力項目數</div><div class="text-2xl font-bold text-rose-500">' + lowCpkCount + ' / ' + total + '</div></div>' +
+                '<div class="saas-card p-4 text-center"><div class="text-[10px] font-bold text-slate-400 uppercase">模穴失衡比例</div><div class="text-2xl font-bold text-indigo-500">' + Math.round((globalImbalanceCount / total) * 100) + '%</div></div>' +
+                '<div class="saas-card p-4 text-center"><div class="text-[10px] font-bold text-slate-400 uppercase">批次不穩比例</div><div class="text-2xl font-bold text-amber-500 text-blue-500">' + Math.round((globalInstabilityCount / total) * 100) + '%</div></div>' +
+                '</div>' +
+                '<div class="saas-card overflow-hidden"><table class="w-full text-sm text-left"><thead class="bg-slate-50 dark:bg-slate-800 text-slate-500 font-bold">' +
+                '<tr><th class="px-6 py-3">分析項目 (Inspection Item)</th><th class="px-6 py-3 text-center">Cpk</th><th class="px-6 py-3 text-center">不平衡率</th><th class="px-6 py-3 text-center">診斷</th></tr></thead>' +
+                '<tbody class="divide-y dark:divide-slate-700">' +
+                summary.map(function (s) {
+                    return '<tr><td class="px-6 py-4 font-bold dark:text-slate-300">' + s.name + '</td>' +
+                        '<td class="px-6 py-4 text-center font-mono ' + (s.cpk < 1.33 ? 'text-rose-500' : 'text-emerald-500') + '">' + s.cpk.toFixed(3) + '</td>' +
+                        '<td class="px-6 py-4 text-center">' + s.imbalance.toFixed(1) + '%</td>' +
+                        '<td class="px-6 py-4 text-center"><span class="px-2 py-0.5 rounded text-[10px] font-bold ' + (s.status === 'Bad' ? 'bg-rose-50 text-rose-600' : 'bg-emerald-50 text-emerald-600') + '">' + s.status + '</span></td></tr>';
+                }).join('') +
+                '</tbody></table></div></div>';
+
+            content.innerHTML = html;
+        }, 300);
+    },
+
     setupLanguageToggle: function () {
         var self = this;
         var langBtn = document.getElementById('langBtn');

@@ -210,6 +210,40 @@ var SPCEngine = {
         };
     },
 
+    /**
+     * analyzeCavityBalance - Professional assessment of thermal/physical balance
+     * @param {Array} cavityStats - Array of {name, mean, Cpk}
+     * @param {Object} specs - {usl, lsl, target}
+     */
+    analyzeCavityBalance: function (cavityStats, specs) {
+        if (!cavityStats || cavityStats.length < 2) return null;
+
+        var means = cavityStats.map(function (s) { return s.mean; });
+        var avgOfMeans = this.mean(means);
+        var maxMean = Math.max.apply(null, means);
+        var minMean = Math.min.apply(null, means);
+        var rangeOfMeans = maxMean - minMean;
+
+        var tolerance = (specs.usl - specs.lsl) || 1;
+        var imbalanceRatio = (rangeOfMeans / tolerance) * 100; // % of tolerance consumed by imbalance
+
+        var status = 'Excellent';
+        var color = '#10b981';
+        if (imbalanceRatio > 25) { status = 'Poor'; color = '#f43f5e'; }
+        else if (imbalanceRatio > 10) { status = 'Fair'; color = '#f59e0b'; }
+
+        return {
+            avgOfMeans: avgOfMeans,
+            rangeOfMeans: rangeOfMeans,
+            imbalanceRatio: imbalanceRatio,
+            status: status,
+            color: color,
+            advice: status === 'Excellent' ?
+                '模穴平衡良好，製程穩定。' :
+                (status === 'Fair' ? '偵測到輕微模穴不平衡，建議檢查流道平衡。' : '嚴重模穴不平衡！建議優先進行模具維修或熱流道調整。')
+        };
+    },
+
     getCapabilityColor: function (cpk) {
         if (cpk >= 1.67) return { bg: '#c6efce', text: '#006100' };
         if (cpk >= 1.33) return { bg: '#c6efce', text: '#006100' };

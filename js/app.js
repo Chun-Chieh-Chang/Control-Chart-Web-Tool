@@ -752,7 +752,8 @@ var SPCApp = {
                         cap.name = dataInput.getCavityNames()[i];
                         cavityStats.push(cap);
                     }
-                    results = { type: 'cavity', cavityStats: cavityStats, specs: specs, productInfo: dataInput.productInfo };
+                    var balance = SPCEngine.analyzeCavityBalance(cavityStats, specs);
+                    results = { type: 'cavity', cavityStats: cavityStats, specs: specs, balance: balance, productInfo: dataInput.productInfo };
                 } else if (type === 'group') {
                     var specs = dataInput.specs;
                     var dataMatrix = dataInput.getDataMatrix();
@@ -817,7 +818,24 @@ var SPCApp = {
                 '<div class="saas-card p-8"> <h3 class="text-base font-bold mb-6 dark:text-white">' + this.t('X̄ 管制圖', 'X-Bar Chart') + '</h3> <div id="xbarChart" class="h-96"></div> </div>' +
                 '<div class="saas-card p-8"> <h3 class="text-base font-bold mb-6 dark:text-white">' + this.t('R 管制圖', 'R Chart') + '</h3> <div id="rChart" class="h-80"></div> </div> </div>';
         } else if (data.type === 'cavity') {
+            var balHtml = '';
+            if (data.balance) {
+                balHtml = '<div class="saas-card p-6 border-l-4" style="border-left-color:' + data.balance.color + ' text-wrap: wrap;">' +
+                    '<div class="flex justify-between items-center mb-4">' +
+                    '<div> <h3 class="text-sm font-bold text-slate-500 uppercase">' + this.t('模穴平衡分析', 'Cavity Balance Analysis') + '</h3> ' +
+                    '<div class="text-2xl font-bold mt-1" style="color:' + data.balance.color + '">' + data.balance.status + '</div> </div>' +
+                    '<div class="text-right"> <div class="text-[10px] font-bold text-slate-400">' + this.t('全距 / 公差比', 'Range/Tol Ratio') + '</div>' +
+                    '<div class="text-xl font-mono font-bold text-slate-700 dark:text-slate-300">' + data.balance.imbalanceRatio.toFixed(1) + '%</div> </div> </div>' +
+                    '<div class="w-full bg-slate-100 dark:bg-slate-700 h-2 rounded-full mb-4 overflow-hidden"> ' +
+                    '<div class="h-full rounded-full" style="width:' + Math.min(data.balance.imbalanceRatio, 100) + '%; background-color:' + data.balance.color + '"></div> </div>' +
+                    '<div class="flex items-start gap-3 p-3 bg-slate-50 dark:bg-slate-900/50 rounded-lg border border-slate-100 dark:border-slate-800">' +
+                    '<span class="material-icons-outlined text-indigo-500 mt-0.5">psychology</span>' +
+                    '<div class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed font-bold">' +
+                    '<span class="text-indigo-600 dark:text-indigo-400 font-bold">' + this.t('智慧診斷：', 'AI Diagnosis: ') + '</span>' + data.balance.advice + '</div> </div> </div>';
+            }
+
             html = '<div class="grid grid-cols-1 gap-8">' +
+                balHtml +
                 '<div class="saas-card p-8"> <h3 class="text-base font-bold mb-6 dark:text-white">' + this.t('模穴 Cpk 效能比較', 'Cavity Cpk') + '</h3> <div id="cpkChart" class="h-96"></div> </div>' +
                 '<div class="grid grid-cols-1 md:grid-cols-2 gap-6">' +
                 '<div class="saas-card p-8"> <h3 class="text-base font-bold mb-6 dark:text-white">' + this.t('均值比較', 'Mean Comp') + '</h3> <div id="meanChart" class="h-80"></div> </div>' +

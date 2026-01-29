@@ -306,6 +306,53 @@ var SPCEngine = {
         };
     },
 
+    /**
+     * analyzeGroupStability - Intelligent diagnosis for Group Analysis mode
+     * @param {Array} groupStats - Array of {batch, avg, max, min, range, count}
+     * @param {Object} specs - {usl, lsl, target}
+     */
+    analyzeGroupStability: function (groupStats, specs) {
+        if (!groupStats || groupStats.length < 2) return null;
+
+        var ranges = groupStats.map(function (g) { return g.range; });
+        var avgRange = this.mean(ranges);
+        var maxRange = Math.max.apply(null, ranges);
+        var tolerance = (specs.usl - specs.lsl) || 1;
+
+        // Spread of ranges: consistency of variation across groups
+        var rangeStdDev = this.stdDev(ranges);
+        var consistencyScore = avgRange > 0 ? (rangeStdDev / avgRange) : 0;
+
+        var status = 'Stable';
+        var color = '#10b981';
+        var advice = '各組變異度一致，製程控制極為穩定。';
+
+        if (consistencyScore > 0.4) {
+            status = 'Unstable';
+            color = '#f43f5e';
+            advice = '組間變異波動劇烈！部分批次的內部品質差異過大，建議檢查機台保壓穩定性與模溫控制。';
+        } else if (consistencyScore > 0.2) {
+            status = 'Warning';
+            color = '#f59e0b';
+            advice = '製程穩定度有所起伏。建議監測模具排氣狀況與原料進料壓力。';
+        }
+
+        // Check for specific outliers
+        var outlierBatches = groupStats.filter(function (g) { return g.range > (avgRange + 2 * rangeStdDev); });
+        if (outlierBatches.length > 0) {
+            advice += ' 注意：批號 ' + outlierBatches.map(function (b) { return b.batch; }).join(', ') + ' 之變異明顯高於平均。';
+        }
+
+        return {
+            status: status,
+            color: color,
+            avgRange: avgRange,
+            maxRange: maxRange,
+            consistencyScore: consistencyScore,
+            advice: advice
+        };
+    },
+
     getCapabilityColor: function (cpk) {
         if (cpk >= 1.67) return { bg: '#c6efce', text: '#006100' };
         if (cpk >= 1.33) return { bg: '#c6efce', text: '#006100' };

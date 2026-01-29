@@ -782,7 +782,8 @@ var SPCApp = {
                         var filtered = row.filter(function (v) { return v !== null && !isNaN(v); });
                         return { batch: dataInput.batchNames[i] || 'B' + (i + 1), avg: SPCEngine.mean(filtered), max: SPCEngine.max(filtered), min: SPCEngine.min(filtered), range: SPCEngine.range(filtered), count: filtered.length };
                     });
-                    results = { type: 'group', groupStats: groupStats, specs: specs, productInfo: dataInput.productInfo };
+                    var stability = SPCEngine.analyzeGroupStability(groupStats, specs);
+                    results = { type: 'group', groupStats: groupStats, specs: specs, stability: stability, productInfo: dataInput.productInfo };
                 }
 
                 self.analysisResults = results;
@@ -894,7 +895,22 @@ var SPCApp = {
                         '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold ' + (s.Cpk < 1.33 ? 'bg-rose-50 text-rose-600' : 'bg-emerald-50 text-emerald-600') + '">' + SPCEngine.round(s.Cpk, 3) + '</span></td> <td class="px-6 py-4 text-center dark:text-slate-400">' + s.count + '</td> </tr>';
                 }).join('') + '</tbody> </table> </div> </div>';
         } else if (data.type === 'group') {
+            var groupHtml = '';
+            if (data.stability) {
+                groupHtml = '<div class="saas-card p-6 border-l-4 mb-8" style="border-left-color:' + data.stability.color + '">' +
+                    '<div class="flex justify-between items-center mb-4">' +
+                    '<div> <h3 class="text-sm font-bold text-slate-500 uppercase">' + this.t('群組穩定度 AI 診斷', 'Group Stability AI Analysis') + '</h3> ' +
+                    '<div class="text-2xl font-bold mt-1" style="color:' + data.stability.color + '">' + data.stability.status + '</div> </div>' +
+                    '<div class="text-right"> <div class="text-[10px] font-bold text-slate-400">' + this.t('變異一致性得分', 'Consistency Score') + '</div>' +
+                    '<div class="text-xl font-mono font-bold text-slate-700 dark:text-slate-300">' + (data.stability.consistencyScore * 100).toFixed(1) + '%</div> </div> </div>' +
+                    '<div class="flex items-start gap-3 p-3 bg-slate-50 dark:bg-slate-900/50 rounded-lg border border-slate-100 dark:border-slate-800">' +
+                    '<span class="material-icons-outlined text-indigo-500 mt-0.5">psychology</span>' +
+                    '<div class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed font-bold">' +
+                    '<span class="text-indigo-600 dark:text-indigo-400 font-bold">' + this.t('智慧診斷：', 'AI Diagnosis: ') + '</span>' + data.stability.advice + '</div> </div> </div>';
+            }
+
             html = '<div class="grid grid-cols-1 gap-8">' +
+                groupHtml +
                 '<div class="saas-card p-8"> <h3 class="text-base font-bold mb-6 dark:text-white">' + this.t('群組趨勢 (Min-Max-Avg)', 'Trend') + '</h3> <div id="groupChart" class="h-96"></div> </div>' +
                 '<div class="saas-card p-8"> <h3 class="text-base font-bold mb-6 dark:text-white">' + this.t('組間全距 (Variation)', 'Variation') + '</h3> <div id="groupVarChart" class="h-96"></div> </div> </div>';
         }

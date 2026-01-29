@@ -603,7 +603,11 @@ var SPCApp = {
             data[i].forEach(function (val) {
                 var td = document.createElement('td');
                 td.className = 'px-4 py-2 dark:text-slate-400';
-                td.textContent = (val !== null && val !== undefined) ? val : '';
+                var displayVal = val;
+                if (typeof val === 'number') {
+                    displayVal = SPCEngine.round(val, 6);
+                }
+                td.textContent = (val !== null && val !== undefined) ? displayVal : '';
                 tr.appendChild(td);
             });
             body.appendChild(tr);

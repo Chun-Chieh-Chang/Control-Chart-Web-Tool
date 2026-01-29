@@ -743,7 +743,11 @@ var SPCApp = {
                     xbarR.summary.Cpk = cap.Cpk;
                     xbarR.summary.Ppk = cap.Ppk;
 
-                    results = { type: 'batch', xbarR: xbarR, batchNames: dataInput.batchNames, specs: specs, dataMatrix: dataMatrix, cavityNames: dataInput.getCavityNames(), productInfo: dataInput.productInfo };
+                    // Advanced AI Diagnostics
+                    var distStats = SPCEngine.calculateDistStats(allValues);
+                    var diagnosis = SPCEngine.analyzeVarianceSource(cap.Cpk, cap.Ppk, distStats);
+
+                    results = { type: 'batch', xbarR: xbarR, batchNames: dataInput.batchNames, specs: specs, dataMatrix: dataMatrix, cavityNames: dataInput.getCavityNames(), productInfo: dataInput.productInfo, diagnosis: diagnosis };
                 } else if (type === 'cavity') {
                     var specs = dataInput.specs;
                     var cavityStats = [];
@@ -797,6 +801,32 @@ var SPCApp = {
                 this.batchPagination = { currentPage: 1, totalPages: Math.ceil(totalBatches / 25), maxPerPage: 25, totalBatches: totalBatches };
             }
 
+            var diagHtml = '';
+            if (data.diagnosis) {
+                diagHtml = '<div class="saas-card p-6 border-l-4 mb-8" style="border-left-color:' + data.diagnosis.color + '">' +
+                    '<div class="flex items-center gap-3 mb-4">' +
+                    '<div class="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-900/30 flex items-center justify-center">' +
+                    '<span class="material-icons-outlined text-indigo-600">psychology</span>' +
+                    '</div>' +
+                    '<div>' +
+                    '<h3 class="text-sm font-bold text-slate-500 uppercase">' + this.t('製程健康度 AI 診斷', 'Process Health AI Insights') + '</h3>' +
+                    '<div class="text-lg font-bold dark:text-white">' + data.diagnosis.source + '</div>' +
+                    '</div>' +
+                    '</div>' +
+                    '<div class="space-y-3">' +
+                    '<div class="p-3 bg-slate-50 dark:bg-slate-900/50 rounded-lg border border-slate-100 dark:border-slate-800 text-sm">' +
+                    '<span class="font-bold text-indigo-600 dark:text-indigo-400">' + this.t('專家建議：', 'Expert Advice: ') + '</span>' +
+                    '<span class="text-slate-600 dark:text-slate-400 font-bold">' + data.diagnosis.advice + '</span>' +
+                    '</div>' +
+                    (data.diagnosis.distWarning ?
+                        '<div class="p-3 bg-rose-50 dark:bg-rose-900/20 rounded-lg border border-rose-100 dark:border-rose-900/30 text-sm text-rose-600 dark:text-rose-400 flex items-center gap-2">' +
+                        '<span class="material-icons-outlined text-sm">report_problem</span>' +
+                        '<span class="font-bold">' + data.diagnosis.distWarning + '</span>' +
+                        '</div>' : '') +
+                    '</div>' +
+                    '</div>';
+            }
+
             html = '<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">' +
                 '<div class="saas-card p-4"> <div class="text-[10px] font-bold text-slate-500 uppercase">' + this.t('模穴數', 'Cavities') + '</div> <div class="text-xl font-bold dark:text-white">' + data.xbarR.summary.n + '</div> </div>' +
                 '<div class="saas-card p-4"> <div class="text-[10px] font-bold text-slate-500 uppercase">' + this.t('規格上限 (USL)', 'USL') + '</div> <div class="text-xl font-bold font-mono text-slate-700 dark:text-slate-300">' + SPCEngine.round(data.specs.usl, 3) + '</div> </div>' +
@@ -804,7 +834,7 @@ var SPCApp = {
                 '<div class="saas-card p-4"> <div class="text-[10px] font-bold text-slate-500 uppercase">' + this.t('規格下限 (LSL)', 'LSL') + '</div> <div class="text-xl font-bold font-mono text-slate-700 dark:text-slate-300">' + SPCEngine.round(data.specs.lsl, 3) + '</div> </div>' +
                 '<div class="saas-card p-4"> <div class="text-[10px] font-bold text-slate-500 uppercase">' + this.t('製程能力 (Cpk)', 'Cpk') + '</div> <div class="text-xl font-bold text-primary">' + SPCEngine.round(data.xbarR.summary.Cpk, 3) + '</div> </div>' +
                 '<div class="saas-card p-4"> <div class="text-[10px] font-bold text-slate-500 uppercase">' + this.t('績效指數 (Ppk)', 'Ppk') + '</div> <div class="text-xl font-bold text-indigo-500">' + SPCEngine.round(data.xbarR.summary.Ppk, 3) + '</div> </div>' +
-                '</div>';
+                '</div>' + diagHtml;
 
             if (this.batchPagination.totalPages > 1) {
                 html += '<div class="flex items-center justify-between mb-4 bg-white dark:bg-slate-800 p-3 rounded-lg border border-slate-100 dark:border-slate-700 shadow-sm">' +

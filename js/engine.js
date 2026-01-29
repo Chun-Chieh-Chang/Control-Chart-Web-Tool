@@ -244,6 +244,68 @@ var SPCEngine = {
         };
     },
 
+    /**
+     * calculateDistStats - Distribution Health (Skewness & Kurtosis)
+     * @param {Array} data - Raw data points
+     */
+    calculateDistStats: function (data) {
+        var filtered = data.filter(function (v) { return v !== null && !isNaN(v); });
+        var n = filtered.length;
+        if (n < 3) return { skewness: 0, kurtosis: 0 };
+
+        var mean = this.mean(filtered);
+        var stdDev = this.stdDev(filtered);
+        if (stdDev === 0) return { skewness: 0, kurtosis: 0 };
+
+        var sum3 = 0, sum4 = 0;
+        for (var i = 0; i < n; i++) {
+            var z = (filtered[i] - mean) / stdDev;
+            sum3 += Math.pow(z, 3);
+            sum4 += Math.pow(z, 4);
+        }
+
+        var skewness = (n / ((n - 1) * (n - 2))) * sum3;
+        var kurtosis = ((n * (n + 1)) / ((n - 1) * (n - 2) * (n - 3))) * sum4 - (3 * Math.pow(n - 1, 2)) / ((n - 2) * (n - 3));
+
+        return { skewness: skewness, kurtosis: kurtosis };
+    },
+
+    /**
+     * analyzeVarianceSource - AI Diagnosis of variation origins
+     */
+    analyzeVarianceSource: function (cpk, ppk, distStats) {
+        if (!cpk || !ppk) return null;
+
+        var stability = ppk / cpk;
+        var primarySource = '';
+        var recommendation = '';
+        var color = '#6366f1';
+
+        if (stability < 0.8) {
+            primarySource = '批次間變異 (Shot-to-Shot / Equipment)';
+            recommendation = '製程穩定度不足。請檢查機台參數再現性、原料穩定度或環境溫濕度波動。';
+            color = '#f59e0b';
+        } else {
+            primarySource = '組內變異 (Within-Shot / Tooling)';
+            recommendation = '製程控制良好，變異主要來自模穴差異或單次注射內的波動。建議檢查模穴平衡性或澆道設計。';
+            color = '#10b981';
+        }
+
+        // Add distribution warning
+        var distWarning = '';
+        if (Math.abs(distStats.skewness) > 1) {
+            distWarning = '警告：數據呈現偏態分佈 (Skewed)，Cpk 數值可能存在統計偏差，建議確認是否有模穴尺寸不一或數據取樣偏誤。';
+        }
+
+        return {
+            stability: stability,
+            source: primarySource,
+            advice: recommendation,
+            distWarning: distWarning,
+            color: color
+        };
+    },
+
     getCapabilityColor: function (cpk) {
         if (cpk >= 1.67) return { bg: '#c6efce', text: '#006100' };
         if (cpk >= 1.33) return { bg: '#c6efce', text: '#006100' };

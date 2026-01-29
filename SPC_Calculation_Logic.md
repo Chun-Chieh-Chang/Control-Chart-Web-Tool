@@ -148,6 +148,30 @@ Ppk = min[ (USL - μ) / 3σ_overall, (μ - LSL) / 3σ_overall ]
 
 ---
 
+## 變異源診斷 (Variance Source Diagnosis)
+
+系統透過比對 Cpk 與 Ppk 的落差，自動判定製程波動的主要來源。
+
+### 穩定度指數 (Stability Index, St)
+
+```
+St = Ppk / Cpk
+```
+
+- **St ≥ 0.8**: 表示製程波動主要來自**組內 (Within-Shot)**，即模穴差異或單次注射內的波動。
+- **St < 0.8**: 表示製程波動主要來自**批次間 (Shot-to-Shot)**，即機台穩定度、原料變動或環境影響。
+
+---
+
+## 數據分佈健康度 (Distribution Health Check)
+
+標準 SPC 計算假設數據符合常態分佈。若數據分佈異常，Cpk 的參考價值將大幅下降。
+
+- **偏度 (Skewness)**: 衡量分佈的不對稱性。若 $|Skewness| > 1$，表示數據嚴重偏斜（可能因單向受限或多穴差異引起），Cpk 可能存在誤差。
+- **峰度 (Kurtosis)**: 衡量分佈的尖銳程度。異常的峰度表示數據中存在過多極端值或數據過於集中。
+
+---
+
 ## 參考標準
 
 - ISO 22514-2: Statistical methods in process management

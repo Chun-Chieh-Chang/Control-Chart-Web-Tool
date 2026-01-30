@@ -47,11 +47,13 @@ var SPCApp = {
     settings: {
         cpkThreshold: 1.33,
         autoSave: true,
-        language: 'zh'
+        language: 'zh',
+        theme: 'dark'
     },
 
     init: function () {
         this.loadSettings();
+        this.applyTheme();
         this.setupLanguageToggle();
         this.setupFileUpload();
         this.setupEventListeners();
@@ -307,6 +309,21 @@ var SPCApp = {
             danger: '#f43f5e', // Rose-500 (Good on both)
             success: '#10b981' // Emerald-500 (Good on both)
         };
+    },
+
+    applyTheme: function () {
+        if (this.settings.theme === 'dark') {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    },
+
+    toggleDarkMode: function () {
+        document.documentElement.classList.toggle('dark');
+        this.settings.theme = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+        this.saveSettings();
+        if (this.analysisResults) this.renderCharts();
     },
 
     history: [],
@@ -740,9 +757,7 @@ var SPCApp = {
         var btn = document.getElementById('darkModeBtn');
         if (btn) {
             btn.addEventListener('click', function () {
-                setTimeout(function () {
-                    if (self.analysisResults) self.renderCharts();
-                }, 100);
+                self.toggleDarkMode();
             });
         }
     },

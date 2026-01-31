@@ -1,4 +1,21 @@
 # 專案開發與修訂日誌 (Development & Revision Log)
+
+## [2026-01-31] UI 介面文字優化
+**專案**: Control Chart Web Tool (SPC Analysis Tool)
+**類別**: UI/UX 改進
+
+### 變更內容
+- **導航選單更新**: 將左側欄「QIP 提取資料匯入」修正為「匯入QIP數據」
+  - 位置: `index.html` 第 110 行
+  - 影響範圍: 側邊欄導航選單顯示文字
+  - 目的: 使介面文字更簡潔明確，符合使用者習慣
+
+### 技術細節
+- 同步更新 `data-zh` 屬性以保持雙語系統一致性
+- 保持英文版本 `data-en="Import Extracted Data"` 不變
+
+---
+
 **日期**: 2026-01-29
 **專案**: MouldexControlChartBuilder (SPC Analysis Tool)
 **目標**: 強化多模穴射出成型之專家級統計診斷能力與全局分析邏輯。

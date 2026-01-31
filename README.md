@@ -5,6 +5,9 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](../LICENSE)
 ![Version](https://img.shields.io/badge/version-2.0.0-blue)
+[![Deploy to GitHub Pages](https://github.com/Chun-Chieh-Chang/Control-Chart-Web-Tool/actions/workflows/deploy.yml/badge.svg)](https://github.com/Chun-Chieh-Chang/Control-Chart-Web-Tool/actions/workflows/deploy.yml)
+
+> 🚀 **自動部署**: 使用 GitHub Actions 自動部署至 GitHub Pages | [部署文檔](docs/guides/DEPLOYMENT.md)
 
 [中文](#中文說明) | [English](#english-description)
 

@@ -1,6 +1,44 @@
 # 專案開發與修訂日誌 (Development & Revision Log)
 
+## [2026-01-31] 部署自動化 - GitHub Actions 整合
+**專案**: Control Chart Web Tool (SPC Analysis Tool)
+**類別**: DevOps / CI/CD
+
+### 變更內容
+- **部署方式升級**: 將 GitHub Pages 部署來源從靜態分支改為 GitHub Actions 自動化工作流程
+  - 新增配置檔案: `.github/workflows/deploy.yml`
+  - 新增文檔: `docs/guides/DEPLOYMENT.md`
+  - 觸發條件: 推送到 `main` 分支時自動部署
+  - 支援手動觸發 (workflow_dispatch)
+
+### 技術優勢
+1. **自動化部署**: 每次推送自動觸發部署，無需手動操作
+2. **版本控制**: 清晰的部署歷史記錄與狀態追蹤
+3. **並發保護**: 智能管理並發部署，避免衝突
+4. **靈活性**: 未來可擴展建置步驟（壓縮、測試等）
+
+### 檔案結構 (MECE 原則)
+```
+.github/
+└── workflows/
+    └── deploy.yml        # 部署工作流程
+docs/
+└── guides/
+    └── DEPLOYMENT.md     # 部署文檔
+```
+
+### 配置細節
+- **權限設定**: 
+  - `contents: read` - 讀取儲存庫
+  - `pages: write` - 部署到 Pages
+  - `id-token: write` - 身份驗證
+- **部署環境**: `github-pages`
+- **並發策略**: 不取消進行中的部署
+
+---
+
 ## [2026-01-31] UI 介面文字優化
+
 **專案**: Control Chart Web Tool (SPC Analysis Tool)
 **類別**: UI/UX 改進
 

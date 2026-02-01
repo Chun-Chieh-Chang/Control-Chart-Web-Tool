@@ -101,25 +101,89 @@ label {
     font-weight: 500;
 }
 
-/* SaaS Card Style - Glassmorphism Preferred */
+/* Glass Card Style - Matching Target UI */
 .saas-card {
-    background: var(--card-bg);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
-    border-radius: 16px;
+    border-width: 1px;
+    --tw-border-opacity: 1;
+    border-color: rgb(226 232 240 / var(--tw-border-opacity, 1));
+    background-color: rgba(255, 255, 255, 0.7);
+    --tw-backdrop-blur: blur(24px);
+    backdrop-filter: var(--tw-backdrop-blur);
+    -webkit-backdrop-filter: var(--tw-backdrop-blur);
+    box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.1);
+    border-radius: 2.5rem; /* rounded-[2.5rem] */
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.saas-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+.dark .saas-card {
+    border-color: rgba(255, 255, 255, 0.1);
+    background-color: rgba(15, 23, 42, 0.6);
 }
 
-.dark .saas-card {
-    border-color: #334155;
-    color: #f1f5f9;
+.saas-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+}
+
+/* Glass Navigation */
+.glass-nav {
+    border-bottom-width: 1px;
+    border-color: rgba(226, 232, 240, 1);
+    background-color: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: 0 4px 20px -5px rgba(0, 0, 0, 0.1);
+}
+
+.dark .glass-nav {
+    border-color: rgba(255, 255, 255, 0.1);
+    background-color: rgba(2, 6, 23, 0.8);
+}
+
+/* Hover Lift Effect */
+.hover-lift {
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hover-lift:hover {
+    transform: translateY(-0.25rem);
+}
+
+/* Step Number */
+.step-number {
+    display: flex;
+    height: 2rem;
+    width: 2rem;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.75rem;
+    font-size: 0.875rem;
+    font-weight: 900;
+    color: white;
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+}
+
+/* Button Actions */
+.btn-action {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    border-radius: 0.75rem;
+    padding: 0.5rem 1rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-action-primary {
+    background-color: var(--primary);
+    color: white;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.btn-action-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 20px -5px rgba(0,0,0,0.2); 
 }
 
 /* Anomaly Pulse Animation */

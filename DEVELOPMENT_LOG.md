@@ -1,5 +1,32 @@
 # 專案開發與修訂日誌 (Development & Revision Log)
 
+## [2026-02-01] UI/UX 現代化改版 (UI/UX Modernization)
+
+**專案**: Control Chart Web Tool
+**類別**: UI/UX, Style Update
+
+### 變更內容
+- **視覺風格同步**: 參考目標網站 (`chun-chieh-chang.github.io`) 的設計語言進行改版。
+  - **背景特效**: 引入動態光暈背景 (Gradient Orbs)，替換原本單調的背景色。
+  - **玻璃擬態 (Glassmorphism)**: 全面導入 `.glass-nav` 與 `.saas-card` 樣式，應用於導航欄、側邊欄與卡片元件，提升介面通透感。
+  - **字體升級**: 引入 `Material Icons Round` 圓角圖標，使介面更加圓潤現代。
+  - **側邊欄優化**: 修正側邊欄在淺色背景下的文字對比度問題，調整選單項目的 hover 狀態配色。
+
+### 技術實作細節
+- **CSS 架構**: 
+  - 新增 `.hover-lift` 動畫類別，增加互動反饋。
+  - 重構 `.saas-card` 樣式，移除舊版邊框，改用 `backdrop-filter: blur(24px)` 與多層陰影。
+  - 更新 Scrollbar 樣式以符合整體設計。
+- **HTML 結構**:
+  - 調整 `<body>` 與容器層級，以支援 `fixed` 定位的背景動畫層。
+  - 更新 Header 與 Aside 的 class list，移除舊版背景色，改用玻璃擬態背景。
+
+### 遭遇問題與排除
+- **瀏覽器工具限制**: 嘗試使用 `browser_subagent` 進行自動化 UI 分析時遭遇環境變數錯誤 (`$HOME environment variable is not set`)，導致無法啟動 Playwright。
+  - **解決方案**: 改用 `curl` 與 `Invoke-WebRequest` 抓取目標網頁源碼 (`temp_target.html`) 進行靜態分析，成功提取關鍵 CSS 變數與結構設計。
+
+---
+
 ## [2026-01-31] 部署自動化 - GitHub Actions 整合
 **專案**: Control Chart Web Tool (SPC Analysis Tool)
 **類別**: DevOps / CI/CD

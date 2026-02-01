@@ -12,7 +12,8 @@
     <script src="https://cdn.tailwindcss.com?plugins=forms,typography,container-queries"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
         rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined|Material+Icons+Round"
+        rel="stylesheet" />
     <script>
         tailwind.config = {
             darkMode: "class",
@@ -79,28 +80,38 @@
 </head>
 
 <body
-    class="font-sans antialiased text-slate-800 dark:text-slate-200 flex h-screen overflow-hidden bg-slate-50 dark:bg-slate-950">
+    class="font-sans antialiased text-slate-800 dark:text-slate-200 flex h-screen overflow-hidden bg-background-light dark:bg-slate-950">
+
+    <!-- Background Decoration (From Target) -->
+    <div class="fixed inset-0 pointer-events-none overflow-hidden -z-10">
+        <div
+            class="absolute -top-[10%] -left-[10%] w-[50%] h-[50%] bg-primary/10 blur-[150px] rounded-full animate-pulse transition-opacity duration-1000">
+        </div>
+        <div class="absolute top-[20%] -right-[10%] w-[40%] h-[40%] bg-indigo-500/10 blur-[120px] rounded-full animate-pulse"
+            style="animation-delay: 2s"></div>
+        <div class="absolute -bottom-[10%] left-[20%] w-[35%] h-[35%] bg-emerald-500/5 blur-[100px] rounded-full"></div>
+    </div>
 
     <!-- Sidebar Layout -->
     <aside
-        class="w-64 bg-slate-900 dark:bg-slate-950 flex-shrink-0 flex flex-col h-full z-30 transition-all border-r border-slate-800">
+        class="w-64 border-r border-slate-200 dark:border-white/5 bg-white/80 dark:bg-slate-950/80 backdrop-blur-xl flex-shrink-0 flex flex-col h-full z-30 transition-all shadow-xl">
         <!-- Logo -->
-        <div class="h-16 flex items-center px-6 border-b border-slate-800">
+        <div class="h-16 flex items-center px-6 border-b border-slate-100 dark:border-white/5">
             <div class="flex items-center gap-3">
                 <span class="material-icons-outlined text-primary text-3xl">analytics</span>
-                <span class="text-white font-bold tracking-tight text-lg">SPC Insights</span>
+                <span class="text-slate-900 dark:text-white font-black tracking-tight text-lg">SPC Insights</span>
             </div>
         </div>
 
         <!-- Navigation Items -->
         <nav class="flex-1 px-4 py-6 space-y-1 overflow-y-auto" id="main-nav">
             <a href="#" id="nav-dashboard"
-                class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800 transition-all">
+                class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-primary dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-all">
                 <span class="material-icons-outlined text-xl">dashboard</span>
                 <span data-en="Dashboard" data-zh="數據總覽">數據總覽</span>
             </a>
             <a href="#" id="nav-qip-extract"
-                class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800 transition-all">
+                class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-primary dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-all">
                 <span class="material-icons-outlined text-xl">download</span>
                 <span data-en="QIP Extract" data-zh="QIP 數據提取">QIP 數據提取</span>
             </a>
@@ -110,40 +121,50 @@
                 <span data-en="Import Extracted Data" data-zh="匯入QIP數據">匯入QIP數據</span>
             </a>
             <a href="#" id="nav-analysis"
-                class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800 transition-all">
+                class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-primary dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-all">
                 <span class="material-icons-outlined text-xl">query_stats</span>
                 <span data-en="Statistical" data-zh="統計分析">統計分析</span>
             </a>
             <a href="#" id="nav-history"
-                class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800 transition-all">
+                class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-primary dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-all">
                 <span class="material-icons-outlined text-xl">history</span>
                 <span data-en="History" data-zh="歷史紀錄">歷史紀錄</span>
             </a>
             <a href="#" id="nav-nelson"
-                class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800 transition-all">
+                class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-primary dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-all">
                 <span class="material-icons-outlined text-xl">fact_check</span>
                 <span data-en="Nelson Rules" data-zh="Nelson 法則解讀">Nelson 法則解讀</span>
             </a>
-            <div class="pt-8 mb-2 px-3 text-sm font-bold text-slate-500 uppercase tracking-widest" data-en="System"
-                data-zh="系統設定">系統設定</div>
+            <div class="pt-8 mb-2 px-3 text-sm font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest"
+                data-en="System" data-zh="系統設定">系統設定</div>
             <a href="#" id="nav-settings"
-                class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800 transition-all">
+                class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-primary dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-all">
                 <span class="material-icons-outlined text-xl">settings</span>
                 <span data-en="Settings" data-zh="設定中心">設定中心</span>
             </a>
             <a href="#" id="nav-reset"
-                class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-rose-400 hover:text-white hover:bg-rose-500 transition-all">
+                class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-rose-500 hover:text-white hover:bg-rose-500 transition-all">
                 <span class="material-icons-outlined text-xl">restart_alt</span>
                 <span data-en="Reset System" data-zh="重置系統">重置系統</span>
             </a>
         </nav>
 
+        <div class="px-4 pb-2">
+            <div
+                class="flex items-center gap-2 px-3 py-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400">
+                <span class="material-icons-outlined text-xs">lock</span>
+                <span class="text-[10px] font-bold leading-tight" data-zh="本地安全運算：資料絕不上傳雲端"
+                    data-en="Local Processing: Data stays on device">本地安全運算：資料絕不上傳雲端</span>
+            </div>
+        </div>
+
         <!-- User Profile (Google Style) -->
-        <div class="p-4 border-t border-slate-800">
+        <div class="p-4 border-t border-slate-200 dark:border-white/5">
             <div class="flex items-center gap-3 px-2 py-1">
                 <img src="AI數字人.png" class="w-9 h-9 rounded-full bg-slate-700 object-cover" alt="Author">
                 <div class="flex-1 min-w-0">
-                    <p class="text-sm font-bold text-white truncate" data-en="Author Info" data-zh="作者資訊">作者資訊</p>
+                    <p class="text-sm font-black text-slate-800 dark:text-white truncate" data-en="Author Info"
+                        data-zh="作者資訊">作者資訊</p>
                     <p class="text-[12px] font-bold text-slate-500 leading-tight">Wesley Chang, 2026 @ Mouldex
                     </p>
                 </div>
@@ -155,8 +176,7 @@
     <div class="flex-1 flex flex-col h-full overflow-hidden">
 
         <!-- Top Header -->
-        <header
-            class="h-16 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-8 bg-white/80 backdrop-blur-md z-20">
+        <header class="glass-nav h-16 flex items-center justify-between px-8 sticky top-0 z-20">
             <div class="flex items-center text-sm space-x-2 text-slate-500 dark:text-slate-400">
                 <span class="hover:text-slate-700 dark:hover:text-slate-200 cursor-pointer" data-en="Workspace"
                     data-zh="工作區">工作區</span>

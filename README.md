@@ -316,4 +316,4 @@ MIT License
 
 ---
 
-© 2026 Control Chart Web Tool. All rights reserved.
+© 2026 Wesley Chang @ Mouldex. All rights reserved.

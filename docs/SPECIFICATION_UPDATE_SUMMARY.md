@@ -204,4 +204,4 @@ console.log(`[SpecExtract] 最終規格: Nominal=${nominalValue}, USL=${spec.usl
 ---
 
 **更新完成**: 2026-01-14  
-**維護者**: Antigravity AI
+**維護者**: Wesley Chang @ Mouldex

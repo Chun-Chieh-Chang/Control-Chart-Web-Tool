@@ -261,5 +261,5 @@ JavaScript 實現包含詳細的控制台日誌，方便除錯：
 
 ---
 
-**文件維護**: Antigravity AI  
+**文件維護**: Wesley Chang @ Mouldex  
 **最後更新**: 2026-01-14

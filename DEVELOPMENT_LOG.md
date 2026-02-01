@@ -115,5 +115,5 @@ docs/
 - 更新 `README.md` 與 `SPC_Calculation_Logic.md`，將上述所有專家邏輯納入標準說明文件。
 
 ---
-**紀錄人**: Antigravity AI Assistant
+**紀錄人**: Wesley Chang
 **適用範圍**: 其他同類 SPC 分析工具之算法移植與邏輯參考。

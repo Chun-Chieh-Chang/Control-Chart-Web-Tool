@@ -93,4 +93,4 @@ npx http-server -p 8000
 ---
 
 **最後更新**: 2026-01-31  
-**維護者**: Chun-Chieh-Chang
+**維護者**: Wesley Chang @ Mouldex

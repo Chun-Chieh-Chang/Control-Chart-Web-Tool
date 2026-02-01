@@ -15,7 +15,7 @@ class SPCExcelBuilder {
     }
 
     setupWorkbook() {
-        this.workbook.creator = 'Mouldex SPC Web Tool';
+        this.workbook.creator = 'Wesley Chang @ Mouldex';
         this.workbook.created = new Date();
     }
 

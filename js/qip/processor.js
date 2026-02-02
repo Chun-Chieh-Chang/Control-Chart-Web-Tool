@@ -13,6 +13,7 @@ class QIPProcessor {
             processedSheets: 0,
             productInfo: { productName: '', measurementUnit: '' }
         };
+        this.currentWorkbookId = 0;
     }
 
     /**
@@ -29,6 +30,7 @@ class QIPProcessor {
             const currentRatio = i / workbooks.length;
             const nextRatio = (i + 1) / workbooks.length;
 
+            this.currentWorkbookId = i;
             await this.processWorkbook(wb, (p) => {
                 // 調整進度回調，使其反應整體的進度
                 progressCallback({
@@ -37,18 +39,13 @@ class QIPProcessor {
                     message: `[檔案 ${i + 1}/${workbooks.length}] ${p.message}`,
                     percent: Math.round((currentRatio + (p.percent / 100) * (nextRatio - currentRatio)) * 100)
                 });
-            }, true); // pass true to indicate it's part of a multi-batch
+            }, true, i); // pass workbook index as ID
         }
 
-        // 最後統一提取規格與產品資訊 (從第一個有效的工作簿提取即可，假設格式相同)
-        if (workbooks.length > 0) {
-            await this.extractSpecifications(workbooks[0], progressCallback);
-            const info = this.extractProductInfo(workbooks[0]);
-            // 如果 results.productInfo 尚未設定或為空，則更新
-            if (!this.results.productInfo.productName) {
-                this.results.productInfo = info;
-            }
-        }
+        // 從所有工作簿中尋找規格與產品資訊
+        await this.extractSpecifications(workbooks, progressCallback);
+        const info = this.extractProductInfo(workbooks);
+        this.results.productInfo = info;
 
         console.log('所有工作簿處理完成', this.results);
         return this.getResults();
@@ -59,9 +56,10 @@ class QIPProcessor {
      * @param {Object} workbook - SheetJS workbook
      * @param {Function} progressCallback - 進度回調函數
      * @param {boolean} cumulative - 是否為累加模式（不重置統計）
+     * @param {number} workbookId - 當前工作簿 ID
      * @returns {Object} 處理結果
      */
-    async processWorkbook(workbook, progressCallback = () => { }, cumulative = false) {
+    async processWorkbook(workbook, progressCallback = () => { }, cumulative = false, workbookId = 0) {
         console.log('開始處理工作簿...');
 
         const sheetCount = workbook.SheetNames.length;
@@ -124,7 +122,7 @@ class QIPProcessor {
                 });
 
                 // 提取並彙整數據 (傳入 i 作為基準偏移)
-                await this.processWorksheet(workbook, worksheet, sheetName, i);
+                await this.processWorksheet(workbook, worksheet, sheetName, i, workbookId);
                 processedCount++;
 
             } catch (error) {
@@ -148,15 +146,26 @@ class QIPProcessor {
     }
 
     /**
+     * 獲取基準批號名稱（移除字尾，如 -1, -2, (1) 等）
+     * @param {string} name 
+     * @returns {string}
+     */
+    getBaseBatchName(name) {
+        if (!name) return '';
+        // 移除常見的字尾，如 -1, -2, (1), (2), _1, _2 等
+        return name.replace(/[-_(\s](\d+)\)?$/g, '').trim();
+    }
+
+    /**
      * 處理單個工作表
-     * @param {Object} workbook 
      * @param {Object} worksheet 
      * @param {string} sheetName 
      * @param {number} sheetIndex 
+     * @param {number} workbookId
      */
-    async processWorksheet(workbook, worksheet, sheetName, sheetIndex) {
-        // 獲取批號（使用工作表名稱作為批號）
-        const batchName = sheetName;
+    async processWorksheet(workbook, worksheet, sheetName, sheetIndex, workbookId) {
+        // 獲取批號（使用工作表名稱作為批號，並提取基準名稱以利合併）
+        const batchName = this.getBaseBatchName(sheetName);
         // 用於彙整該工作表（批次）中所有穴組的數據
         // itemName -> merged data object
         const batchItemData = {};
@@ -192,7 +201,7 @@ class QIPProcessor {
 
         // 將該批次合併後的數據一次性加入結果
         for (const [itemName, data] of Object.entries(batchItemData)) {
-            this.addToResults(itemName, batchName, data);
+            this.addToResults(itemName, batchName, data, workbookId);
         }
     }
 
@@ -330,8 +339,9 @@ class QIPProcessor {
      * @param {string} inspectionItem 
      * @param {string} batchName 
      * @param {Object} data 
+     * @param {number} workbookId
      */
-    addToResults(inspectionItem, batchName, data) {
+    addToResults(inspectionItem, batchName, data, workbookId = 0) {
         if (!inspectionItem || Object.keys(data).length === 0) return;
 
         if (!this.results.inspectionItems[inspectionItem]) {
@@ -346,10 +356,22 @@ class QIPProcessor {
         const item = this.results.inspectionItems[inspectionItem];
         const cavityIds = Object.keys(data);
 
-        // Always add a new batch entry instead of merging by name
-        // This supports multiple batches with the same name (e.g. "Setup") from different files
-        item.batches.push({ name: batchName, data: { ...data } });
-        console.log(`[QIP] 新增批次 - 項目: ${inspectionItem}, 批次: ${batchName}, 穴號: [${cavityIds.join(', ')}]`);
+        // 檢查是否在當前工作簿中已有同名的批次 (使用基準名稱)
+        // 如果有，則合併數據（解決單個批次跨多個工作表的問題，例如 BatchA-1, BatchA-2）
+        // 如果沒有，或者工作簿不同，則新增批次（解決不同檔案中同名批號如 Setup 的問題）
+        const existingBatch = item.batches.find(b => b.name === batchName && b.workbookId === workbookId);
+
+        if (existingBatch) {
+            console.log(`[QIP] 合併批次數據 - 項目: ${inspectionItem}, 批次: ${batchName}, 原始穴數: ${Object.keys(existingBatch.data).length}, 新增穴數: ${cavityIds.length}`);
+            Object.assign(existingBatch.data, data);
+        } else {
+            item.batches.push({
+                name: batchName,
+                data: { ...data },
+                workbookId: workbookId
+            });
+            console.log(`[QIP] 新增批次 - 項目: ${inspectionItem}, 批次: ${batchName}, 穴號: [${cavityIds.join(', ')}]`);
+        }
 
         // 記錄所有穴號
         for (const cavityId of cavityIds) {
@@ -364,10 +386,10 @@ class QIPProcessor {
 
     /**
      * 提取規格數據
-     * @param {Object} workbook 
+     * @param {Array|Object} workbooks - 單個或多個工作簿
      * @param {Function} progressCallback 
      */
-    async extractSpecifications(workbook, progressCallback) {
+    async extractSpecifications(workbooks, progressCallback) {
         progressCallback({
             current: 100,
             total: 100,
@@ -375,62 +397,77 @@ class QIPProcessor {
             percent: 95
         });
 
+        const wbList = Array.isArray(workbooks) ? workbooks : [workbooks];
+
         for (const itemName of Object.keys(this.results.inspectionItems)) {
-            const spec = SpecificationExtractor.extractSpecification(workbook, itemName);
-            this.results.inspectionItems[itemName].specification = spec;
+            let foundSpec = null;
+            // 遍歷所有工作簿，直到找到有效的規格
+            for (const wb of wbList) {
+                const spec = SpecificationExtractor.extractSpecification(wb, itemName);
+                if (spec && spec.isValid) {
+                    foundSpec = spec;
+                    break;
+                }
+                // 如果沒找到有效的，先暫存第一個結果
+                if (!foundSpec) foundSpec = spec;
+            }
+            this.results.inspectionItems[itemName].specification = foundSpec;
         }
     }
 
     /**
      * 提取產品資訊 (Product Name & Measurement Unit)
-     * @param {Object} workbook 
+     * @param {Array|Object} workbooks - 單個或多個工作簿
      * @returns {Object}
      */
-    extractProductInfo(workbook) {
+    extractProductInfo(workbooks) {
         let productName = '';
         let measurementUnit = '';
 
-        for (const sheetName of workbook.SheetNames) {
-            const ws = workbook.Sheets[sheetName];
+        const wbList = Array.isArray(workbooks) ? workbooks : [workbooks];
 
-            // 提取產品名稱 (P2 或 P3)
-            // P2 = Index {c:15, r:1}, P3 = {c:15, r:2}
-            if (!productName) {
-                const cellP2 = ws['P2'];
-                if (cellP2 && cellP2.v) productName = String(cellP2.v).trim();
+        for (const workbook of wbList) {
+            for (const sheetName of workbook.SheetNames) {
+                const ws = workbook.Sheets[sheetName];
 
+                // 提取產品名稱 (P2 或 P3)
                 if (!productName) {
-                    const cellP3 = ws['P3'];
-                    if (cellP3 && cellP3.v) productName = String(cellP3.v).trim();
-                }
+                    const cellP2 = ws['P2'];
+                    if (cellP2 && cellP2.v) productName = String(cellP2.v).trim();
 
-                // 掃描 P2:V3 區域
-                if (!productName) {
-                    for (let r = 1; r <= 2; r++) {
-                        for (let c = 15; c <= 21; c++) {
-                            const addr = XLSX.utils.encode_cell({ r, c });
-                            const cell = ws[addr];
-                            if (cell && cell.v && String(cell.v).trim() !== '0' && String(cell.v).trim() !== 'False') {
-                                productName = String(cell.v).trim();
-                                break;
+                    if (!productName) {
+                        const cellP3 = ws['P3'];
+                        if (cellP3 && cellP3.v) productName = String(cellP3.v).trim();
+                    }
+
+                    // 掃描 P2:V3 區域
+                    if (!productName) {
+                        for (let r = 1; r <= 2; r++) {
+                            for (let c = 15; c <= 21; c++) {
+                                const addr = XLSX.utils.encode_cell({ r, c });
+                                const cell = ws[addr];
+                                if (cell && cell.v && String(cell.v).trim() !== '0' && String(cell.v).trim() !== 'False') {
+                                    productName = String(cell.v).trim();
+                                    break;
+                                }
                             }
+                            if (productName) break;
                         }
-                        if (productName) break;
                     }
                 }
-            }
 
-            // 提取測量單位 (W23) -> Index {c:22, r:22}
-            if (!measurementUnit) {
-                const cellW23 = ws['W23'];
-                if (cellW23 && cellW23.v) {
-                    let val = String(cellW23.v).trim();
-                    // 移除 "單位：" 前綴
-                    val = val.replace(/單位[:：]/g, '').trim();
-                    measurementUnit = val;
+                // 提取測量單位 (W23)
+                if (!measurementUnit) {
+                    const cellW23 = ws['W23'];
+                    if (cellW23 && cellW23.v) {
+                        let val = String(cellW23.v).trim();
+                        val = val.replace(/單位[:：]/g, '').trim();
+                        measurementUnit = val;
+                    }
                 }
-            }
 
+                if (productName && measurementUnit) break;
+            }
             if (productName && measurementUnit) break;
         }
 
@@ -443,7 +480,6 @@ class QIPProcessor {
      * @returns {Object}
      */
     getResults() {
-        // 計算實際的唯一批次數（從所有檢驗項目中收集所有唯一批次名稱）
         const allBatchOccurrencesCount = [];
         const uniqueBatchNames = new Set();
 
@@ -456,13 +492,6 @@ class QIPProcessor {
         }
         const maxBatchesInAnyItem = Math.max(...allBatchOccurrencesCount, 0);
         const actualUniqueBatchNamesCount = uniqueBatchNames.size;
-
-        console.log(`[QIP] 處理結果統計:`);
-        console.log(`  ├─ 檢驗項目數: ${Object.keys(this.results.inspectionItems).length}`);
-        console.log(`  ├─ 最大單項批次數: ${maxBatchesInAnyItem}`);
-        console.log(`  ├─ 唯一批次名稱數: ${actualUniqueBatchNamesCount}`);
-        console.log(`  ├─ 最大穴數: ${this.results.totalCavities}`);
-        console.log(`  └─ 處理工作表數: ${this.results.processedSheets}`);
 
         return {
             inspectionItems: this.results.inspectionItems,
@@ -478,10 +507,6 @@ class QIPProcessor {
         };
     }
 
-    /**
-     * 輔助函數：延遲
-     * @param {number} ms 
-     */
     sleep(ms) {
         return new Promise(resolve => setTimeout(resolve, ms));
     }

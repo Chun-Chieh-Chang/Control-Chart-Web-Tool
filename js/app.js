@@ -534,17 +534,19 @@ var SPCApp = {
                     var ws = wb.Sheets[name];
                     var newData = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
 
-                    // Handle duplicate sheet names across files by appending a suffix
-                    // This ensures "Setup" from File A and "Setup" from File B are treated as separate items
-                    var uniqueName = name;
-                    var counter = 1;
-                    while (merged.Sheets[uniqueName]) {
-                        uniqueName = name + ' (' + counter + ')';
-                        counter++;
+                    if (!merged.Sheets[name]) {
+                        merged.SheetNames.push(name);
+                        merged.Sheets[name] = XLSX.utils.aoa_to_sheet(newData);
+                    } else {
+                        // Merge logic: Concatenate data rows from Row 3 onwards
+                        var existingData = XLSX.utils.sheet_to_json(merged.Sheets[name], { header: 1, defval: '' });
+                        if (newData.length > 2) {
+                            var rowsToAppend = newData.slice(2);
+                            // Strictly append rows. Even if batch name is "Setup", it will appear again.
+                            existingData = existingData.concat(rowsToAppend);
+                            merged.Sheets[name] = XLSX.utils.aoa_to_sheet(existingData);
+                        }
                     }
-
-                    merged.SheetNames.push(uniqueName);
-                    merged.Sheets[uniqueName] = XLSX.utils.aoa_to_sheet(newData);
                 });
             });
 

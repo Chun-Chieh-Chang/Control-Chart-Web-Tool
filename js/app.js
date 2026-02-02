@@ -1103,10 +1103,10 @@ var SPCApp = {
         var cavityCount = data.xbarR.summary.n;
         var totalWidth = 60 + (25 * 58) + 120;
 
-        var html = '<table class="excel-table" style="width:' + totalWidth + 'px; border-collapse:collapse; font-size:12px; font-family:\'Arial\', \'Microsoft JhengHei\', sans-serif; border:2px solid var(--table-border); table-layout:fixed; font-weight: 500;">';
-        html += '<colgroup> <col style="width:60px;"> ';
-        for (var c = 0; c < 25; c++) html += '<col style="width:58px;">';
-        html += '<col style="width:30px;"><col style="width:30px;"><col style="width:30px;"><col style="width:30px;"> </colgroup>';
+        var html = '<table class="excel-table" style="width:100%; border-collapse:collapse; font-size:12px; font-family:\'Arial\', \'Microsoft JhengHei\', sans-serif; border:2px solid var(--table-border); table-layout:fixed; font-weight: 500;">';
+        html += '<colgroup> <col style="width:80px;"> ';
+        for (var c = 0; c < 25; c++) html += '<col>'; // Flexible width for data columns
+        html += '<col style="width:40px;"><col style="width:40px;"><col style="width:40px;"><col style="width:40px;"> </colgroup>';
 
         html += '<tr style="background:var(--table-header-bg); text-align:center;"><td colspan="30" style="border:1px solid var(--table-border); font-weight:bold; font-size:14px; font-family:\'Microsoft JhengHei\', sans-serif; padding:3px;">' + this.t('X̄ - R 管制圖', 'X-Bar - R Control Chart') + '</td></tr>';
 
@@ -1136,7 +1136,7 @@ var SPCApp = {
             '<td style="border:1px solid var(--table-border);">' + this.t('批號', 'Batch') + '</td>';
         for (var b = 0; b < 25; b++) {
             var name = pageLabels[b] || '';
-            html += '<td style="border:1px solid var(--table-border); height:35px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + name + '</td>';
+            html += '<td style="border:1px solid var(--table-border); word-break:break-word; white-space:normal; padding:2px; vertical-align:middle;">' + name + '</td>';
         }
         html += '<td colspan="4" style="border:1px solid var(--table-border);">' + this.t('彙總', 'Stats') + '</td></tr>';
 

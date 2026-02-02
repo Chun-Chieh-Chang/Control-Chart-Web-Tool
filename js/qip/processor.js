@@ -10,7 +10,6 @@ class QIPProcessor {
             inspectionItems: {},
             totalBatches: 0,
             totalCavities: 0,
-            totalCavities: 0,
             processedSheets: 0,
             productInfo: { productName: '', measurementUnit: '' }
         };
@@ -72,6 +71,8 @@ class QIPProcessor {
         let minOffset = Infinity;
         let maxOffset = -Infinity;
         let hasActiveGroups = false;
+        let refGroup = null;
+
         if (this.config.cavityGroups) {
             for (let g = 1; g <= 6; g++) {
                 if (this.config.cavityGroups[g] && this.config.cavityGroups[g].cavityIdRange) {
@@ -79,6 +80,10 @@ class QIPProcessor {
                     minOffset = Math.min(minOffset, offset);
                     maxOffset = Math.max(maxOffset, offset);
                     hasActiveGroups = true;
+
+                    if (!refGroup || offset < refGroup.pageOffset) {
+                        refGroup = this.config.cavityGroups[g];
+                    }
                 }
             }
         }
@@ -88,12 +93,22 @@ class QIPProcessor {
             maxOffset = 0;
         }
 
+        // Alignment logic: Find where the "Setup" sheet (reference sheet) is in THIS workbook
+        let baseIndex = 0;
+        if (refGroup && refGroup.sheetName) {
+            const index = workbook.SheetNames.indexOf(refGroup.sheetName);
+            if (index !== -1) {
+                // If refGroup was at index 2 during setup, but is at index 0 here,
+                // then baseIndex should be -2, such that baseIndex + offset(2) = 0.
+                baseIndex = index - refGroup.pageOffset;
+            }
+        }
+
         const step = maxOffset - minOffset + 1;
 
         // 遍歷所有工作表
-        // i 代表批次的基準偏移量（從 0 開始）
-        for (let i = 0; i < sheetCount; i += step) {
-            // 如果基準點 + 最小偏移量已經超出範圍，說明已無完整批次
+        for (let i = baseIndex; i < sheetCount; i += step) {
+            if (i + minOffset < 0) continue;
             if (i + minOffset >= sheetCount) break;
 
             const sheetName = workbook.SheetNames[i + minOffset];
@@ -223,14 +238,14 @@ class QIPProcessor {
                 let itemName = '';
 
                 // 提取检验项目名称 - 只从 A 列读取
-                // 注意：检验项目名称可以是数字（如 "1", "2"），必须作为文字处理
+                // 注意：检验项目名称可以是數字（如 "1", "2"），必須作為文字處理
                 let tempValue = safeGetMergedValue(dataRow, 0);  // A 列
 
                 if (tempValue !== null && tempValue !== undefined) {
                     itemName = String(tempValue).trim();
                 }
 
-                // 如果 A 列没有，尝试 B 列
+                // 如果 A 列没有，嘗試 B 列
                 if (!itemName || itemName === '') {
                     tempValue = safeGetMergedValue(dataRow, 1);  // B 列
                     if (tempValue !== null && tempValue !== undefined) {
@@ -239,9 +254,10 @@ class QIPProcessor {
                 }
 
                 if (itemName && itemName !== '') {
-                    console.log(`[QIP][Row${dataRow + 1}] ✓ 找到检验项目: "${itemName}"`);
+                    itemName = itemName.trim(); // Normalize to prevent duplicates due to spaces
+                    console.log(`[QIP][Row${dataRow + 1}] ✓ 找到檢驗項目: "${itemName}"`);
                 } else {
-                    console.warn(`[QIP][Row${dataRow + 1}] ✗ A/B 列都没有内容，跳过此行`);
+                    console.warn(`[QIP][Row${dataRow + 1}] ✗ A/B 列都沒有內容，跳過此行`);
                     continue;
                 }
 

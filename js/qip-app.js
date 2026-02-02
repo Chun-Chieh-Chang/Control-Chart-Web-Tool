@@ -598,12 +598,17 @@ var QIPExtractApp = {
             cavityCount: this.els.cavityCount.value,
             cavityGroups: {}
         };
+        var worksheetSelect = this.els.worksheetSelect;
         var groupCount = Math.ceil(parseInt(config.cavityCount) / 8) || 1;
         for (var i = 1; i <= groupCount; i++) {
+            var sheetIdx = this.groupSheetIndices[i] !== undefined ? this.groupSheetIndices[i] : (i === 1 ? (worksheetSelect.selectedIndex - 1) : 0);
+            var sheetName = (worksheetSelect.options[sheetIdx + 1] || {}).value || '';
+
             config.cavityGroups[i] = {
                 cavityIdRange: (document.getElementById('qip-cavity-id-' + i) || {}).value || '',
                 dataRange: (document.getElementById('qip-data-range-' + i) || {}).value || '',
-                pageOffset: this.groupSheetIndices[i] !== undefined ? this.groupSheetIndices[i] : (i === 1 ? 0 : 0)
+                pageOffset: sheetIdx,
+                sheetName: sheetName // Record the name for alignment
             };
         }
 

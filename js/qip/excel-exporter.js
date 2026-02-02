@@ -33,12 +33,6 @@ class ExcelExporter {
      * @param {string} sheetName - 工作表名稱（檢驗項目）
      * @param {Object} itemData - 項目數據 { batches, allCavities, specification }
      * @param {string} productCode - 產品品號
-     */
-    /**
-     * 添加檢驗項目工作表
-     * @param {string} sheetName - 工作表名稱（檢驗項目）
-     * @param {Object} itemData - 項目數據 { batches, allCavities, specification }
-     * @param {string} productCode - 產品品號
      * @param {Object} productInfo - 產品資訊 { productName, measurementUnit }
      */
     addInspectionSheet(sheetName, itemData, productCode = '', productInfo = null) {
@@ -49,9 +43,6 @@ class ExcelExporter {
         const cavities = Array.from(itemData.allCavities)
             .map(Number)
             .sort((a, b) => a - b);
-
-        // 獲取批號列表
-
 
         // 構建數據陣列
         const data = [];
@@ -79,7 +70,6 @@ class ExcelExporter {
         data.push(specRow);
 
         // 數據行（從第3行開始）
-        let currentRow = 2; // Index 2 is Row 3
         for (const batch of itemData.batches) {
             const batchName = batch.name;
             const batchData = batch.data;
@@ -91,13 +81,13 @@ class ExcelExporter {
             }
 
             data.push(row);
+        }
 
-            // 為該行設置字體（批號用 JhengHei，數據用 Times New Roman）
-            for (let col = 0; col < row.length; col++) {
-                const cellAddr = XLSX.utils.encode_cell({ r: currentRow, c: col });
-                // Note: Worksheet data is not yet in AAO format in memory until aoa_to_sheet
-            }
-            currentRow++;
+        // 寫入產品資訊 (動態附加到末尾，避免固定 B5/B6 覆蓋數據)
+        if (productInfo) {
+            data.push([]); // 空行
+            data.push(['', 'ProductName', 'MeasurementUnit']); // 標題欄位
+            data.push(['', productInfo.productName || 'N/A', productInfo.measurementUnit || 'mm']); // 數值欄位
         }
 
         // 創建工作表
@@ -105,12 +95,15 @@ class ExcelExporter {
 
         // 套用數據行字體 (After aoa_to_sheet)
         for (let r = 2; r < data.length; r++) {
+            // 如果是最後兩行產品資訊，使用 JhengHei
+            const isProductInfoRow = productInfo && (r >= data.length - 2);
+
             for (let c = 0; c < data[0].length; c++) {
                 const cellAddr = XLSX.utils.encode_cell({ r: r, c: c });
                 if (worksheet[cellAddr]) {
                     if (!worksheet[cellAddr].s) worksheet[cellAddr].s = {};
                     worksheet[cellAddr].s.font = {
-                        name: (c === 0) ? 'Microsoft JhengHei' : 'Times New Roman'
+                        name: (c === 0 || isProductInfoRow) ? 'Microsoft JhengHei' : 'Times New Roman'
                     };
                 }
             }
@@ -118,7 +111,7 @@ class ExcelExporter {
 
         // 設置列寬
         const colWidths = [
-            { wch: 15 },  // 生產批號
+            { wch: 20 },  // 生產批號（拉寬以防檔名較長）
             { wch: 12 },  // Target
             { wch: 12 },  // USL
             { wch: 12 }   // LSL
@@ -128,28 +121,14 @@ class ExcelExporter {
         }
         worksheet['!cols'] = colWidths;
 
-        // 設置儲存格樣式（SheetJS 基礎版不支援完整樣式，但我們記錄意圖）
-        // 標題行樣式
+        // 設置儲存格樣式
         this.setHeaderStyles(worksheet, headerRow.length);
-
-        // 規格行樣式
         this.setSpecificationStyles(worksheet, itemData.specification);
 
         // 添加到工作簿
         XLSX.utils.book_append_sheet(this.workbook, worksheet, cleanName);
 
-        // 寫入產品資訊 (比照 VBA: B5/C5 標題, B6/C6 內容)
-        if (productInfo) {
-            // 修正：從 B 欄開始寫入，避免覆蓋 A 欄的生產批號
-            const infoHeader = [['ProductName', 'MeasurementUnit']]; // Row 5 (index 4), starting at Col B
-            const infoData = [[productInfo.productName || '', productInfo.measurementUnit || '']]; // Row 6 (index 5), starting at Col B
-
-            // 使用 sheet_add_aoa 寫入 (origin: B5 means start at Row 5, Col B)
-            XLSX.utils.sheet_add_aoa(worksheet, infoHeader, { origin: 'B5' });
-            XLSX.utils.sheet_add_aoa(worksheet, infoData, { origin: 'B6' });
-        }
-
-        console.log(`創建工作表: ${cleanName}, 批次數: ${batches.length}, 穴數: ${cavities.length}`);
+        console.log(`創建工作表: ${cleanName}, 批次數: ${itemData.batches.length}, 穴數: ${cavities.length}`);
     }
 
     /**
@@ -158,12 +137,9 @@ class ExcelExporter {
      * @param {number} colCount 
      */
     setHeaderStyles(worksheet, colCount) {
-        // SheetJS 免費版樣式支援有限，這裡主要設置數字格式
-        // 使用 xlsx-style 或 exceljs 可以獲得完整樣式支援
         for (let c = 0; c < colCount; c++) {
             const cellAddr = XLSX.utils.encode_cell({ r: 0, c: c });
             if (worksheet[cellAddr]) {
-                // 標記為標題（供後續處理）
                 worksheet[cellAddr].s = {
                     font: { bold: true, name: 'Microsoft JhengHei' },
                     fill: { fgColor: { rgb: '92D050' } },
@@ -179,7 +155,6 @@ class ExcelExporter {
      * @param {Object} specification 
      */
     setSpecificationStyles(worksheet, specification) {
-        // 設置規格數字格式與字體
         for (let c = 1; c <= 3; c++) {
             const cellAddr = XLSX.utils.encode_cell({ r: 1, c: c });
             if (worksheet[cellAddr]) {
@@ -196,9 +171,7 @@ class ExcelExporter {
      * @returns {string}
      */
     cleanSheetName(name) {
-        // 移除不允許的字符
         let result = name.replace(/[\\/:*?"<>|]/g, '_');
-        // 限制長度（Excel 最多31字符）
         if (result.length > 31) {
             result = result.substring(0, 31);
         }
@@ -207,7 +180,6 @@ class ExcelExporter {
 
     /**
      * 導出 Excel 檔案
-     * @param {string} filename - 檔案名稱（不含副檔名）
      */
     export(filename = 'QIP_數據提取結果') {
         const fullFilename = `${filename}.xlsx`;
@@ -215,10 +187,6 @@ class ExcelExporter {
         console.log(`Excel 檔案已導出: ${fullFilename}`);
     }
 
-    /**
-     * 獲取 Excel 二進制數據
-     * @returns {ArrayBuffer}
-     */
     getArrayBuffer() {
         return XLSX.write(this.workbook, {
             bookType: 'xlsx',
@@ -226,10 +194,6 @@ class ExcelExporter {
         });
     }
 
-    /**
-     * 獲取 Blob 物件（用於下載）
-     * @returns {Blob}
-     */
     getBlob() {
         const buffer = this.getArrayBuffer();
         return new Blob([buffer], {
@@ -237,10 +201,6 @@ class ExcelExporter {
         });
     }
 
-    /**
-     * 觸發下載
-     * @param {string} filename 
-     */
     download(filename = 'QIP_數據提取結果') {
         const blob = this.getBlob();
         const url = URL.createObjectURL(blob);
@@ -254,17 +214,10 @@ class ExcelExporter {
         console.log(`開始下載: ${filename}.xlsx`);
     }
 
-    /**
-     * 獲取工作表數量
-     * @returns {number}
-     */
     getSheetCount() {
         return this.workbook.SheetNames.length;
     }
 
-    /**
-     * 重置（創建新工作簿）
-     */
     reset() {
         this.workbook = XLSX.utils.book_new();
         this.workbook.Props = {

@@ -157,6 +157,9 @@ class QIPProcessor {
     async processWorksheet(workbook, worksheet, sheetName, sheetIndex) {
         // 獲取批號（使用工作表名稱作為批號）
         const batchName = sheetName;
+        // 用於彙整該工作表（批次）中所有穴組的數據
+        // itemName -> merged data object
+        const batchItemData = {};
 
         // 處理每個穴組
         for (let groupIndex = 1; groupIndex <= 6; groupIndex++) {
@@ -179,8 +182,17 @@ class QIPProcessor {
             const items = this.extractInspectionItemsFromGroup(targetWs, groupConfig);
 
             for (const item of items) {
-                this.addToResults(item.inspectionItem, batchName, item.data);
+                if (!batchItemData[item.inspectionItem]) {
+                    batchItemData[item.inspectionItem] = {};
+                }
+                // 合併數據（如果穴號重複，後面的穴組會覆蓋前面的，通常穴組之間穴號不應重複）
+                Object.assign(batchItemData[item.inspectionItem], item.data);
             }
+        }
+
+        // 將該批次合併後的數據一次性加入結果
+        for (const [itemName, data] of Object.entries(batchItemData)) {
+            this.addToResults(itemName, batchName, data);
         }
     }
 

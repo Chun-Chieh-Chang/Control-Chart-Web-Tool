@@ -1137,7 +1137,7 @@ var SPCApp = {
         for (var b = 0; b < 25; b++) {
             var name = pageLabels[b] || '';
             html += '<td style="border:1px solid var(--table-border); height:120px; white-space:nowrap; padding:4px; vertical-align:bottom; text-align:center;">' +
-                '<div style="transform: rotate(180deg); writing-mode: vertical-rl; margin:0 auto; width:100%; font-size:11px;">' + name + '</div></td>';
+                '<div style="transform: rotate(180deg); writing-mode: vertical-rl; margin:0 auto; width:100%; font-size:14px; font-weight:bold; letter-spacing:1px;">' + name + '</div></td>';
         }
         html += '<td colspan="4" style="border:1px solid var(--table-border); width:120px;">' + this.t('彙總', 'Stats') + '</td></tr>';
 

@@ -5,7 +5,12 @@
 // Clean batch name by removing suffixes like "-1", "(2)", " (2)", etc.
 function cleanBatchName(name) {
     if (!name) return '';
-    return String(name).trim();
+    var str = String(name).trim();
+    // Remove patterns like: -1, -2, (1), (2), _1, _2, etc.
+    str = str.replace(/[\-_]\d+$/, '');        // Remove -1, -2, _1, _2 at end
+    str = str.replace(/\s*\(\d+\)$/, '');      // Remove (1), (2), " (1)" at end
+    str = str.replace(/\s*\[\d+\]$/, '');      // Remove [1], [2] at end
+    return str.trim();
 }
 
 /**

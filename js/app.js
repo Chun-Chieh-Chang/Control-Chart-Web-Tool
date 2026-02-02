@@ -532,13 +532,20 @@ var SPCApp = {
                 var wb = res.workbook;
                 wb.SheetNames.forEach(function (name) {
                     var ws = wb.Sheets[name];
+                    var newData = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
+                    // Tag batch names if multiple files to ensure uniqueness
+                    if (results.length > 1 && newData.length > 2) {
+                        for (var r = 2; r < newData.length; r++) {
+                            if (newData[r][0]) newData[r][0] = newData[r][0] + " (" + res.name + ")";
+                        }
+                    }
+
                     if (!merged.Sheets[name]) {
                         merged.SheetNames.push(name);
-                        merged.Sheets[name] = ws;
+                        merged.Sheets[name] = XLSX.utils.aoa_to_sheet(newData);
                     } else {
                         // Merge data rows (Row 3+)
                         var existingData = XLSX.utils.sheet_to_json(merged.Sheets[name], { header: 1, defval: '' });
-                        var newData = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
 
                         if (newData.length > 2) {
                             var rowsToAppend = newData.slice(2);

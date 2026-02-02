@@ -83,11 +83,19 @@ class ExcelExporter {
             data.push(row);
         }
 
-        // 寫入產品資訊 (動態附加到末尾，避免固定 B5/B6 覆蓋數據)
+        // 寫入產品資訊到固定位置 (B5/B6)，以滿足其他工具的讀寫需求
         if (productInfo) {
-            data.push([]); // 空行
-            data.push(['', 'ProductName', 'MeasurementUnit']); // 標題欄位
-            data.push(['', productInfo.productName || 'N/A', productInfo.measurementUnit || 'mm']); // 數值欄位
+            const productLabels = ['', 'ProductName', 'MeasurementUnit'];
+            const productValues = ['', productInfo.productName || 'N/A', productInfo.measurementUnit || 'mm'];
+
+            // 補充空行直到至少有 4 行 (Row 1-4)，確保能放入第 5, 6 行
+            while (data.length < 4) {
+                data.push(['', '', '', '']);
+            }
+
+            // 插入到 index 4 (第 5 行) 和 index 5 (第 6 行)
+            // 這樣原本的 Batch 3, 4... 會被推到後面，符合 VBA 工具讀取 metadata 的結構
+            data.splice(4, 0, productLabels, productValues);
         }
 
         // 創建工作表
@@ -95,10 +103,10 @@ class ExcelExporter {
 
         // 套用數據行字體 (After aoa_to_sheet)
         for (let r = 2; r < data.length; r++) {
-            // 如果是最後兩行產品資訊，使用 JhengHei
-            const isProductInfoRow = productInfo && (r >= data.length - 2);
+            // 判斷是否為產品資訊列 (固定在 Row 5, 6)
+            const isProductInfoRow = (r === 4 || r === 5);
 
-            for (let c = 0; c < data[0].length; c++) {
+            for (let c = 0; c < (data[r] ? data[r].length : 0); c++) {
                 const cellAddr = XLSX.utils.encode_cell({ r: r, c: c });
                 if (worksheet[cellAddr]) {
                     if (!worksheet[cellAddr].s) worksheet[cellAddr].s = {};

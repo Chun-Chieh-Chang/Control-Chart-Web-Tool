@@ -32,6 +32,10 @@
   - Tailwind Config 語法正確.
 - **待辦**: 需在 User 端實際部署後確認視覺效果是否符合預期。
 
+### [2026-02-02] 版面配置優化
+- **寬度擴展**: 應使用者需求，將主要工作區容器寬度由 `max-w-7xl` (約 1280px) 放寬為 `max-w-[96%]`，以充分利用寬螢幕空間，優化寬版報表與圖表的閱讀體驗。
+  - 影響範圍: Dashboard, Import, Analysis, History, Nelson Rules 等所有主要視圖。
+
 ---
 
 ## [2026-02-01] UI/UX 現代化改版 (UI/UX Modernization)

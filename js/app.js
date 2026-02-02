@@ -533,12 +533,7 @@ var SPCApp = {
                 wb.SheetNames.forEach(function (name) {
                     var ws = wb.Sheets[name];
                     var newData = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
-                    // Tag batch names if multiple files to ensure uniqueness
-                    if (results.length > 1 && newData.length > 2) {
-                        for (var r = 2; r < newData.length; r++) {
-                            if (newData[r][0]) newData[r][0] = newData[r][0] + " (" + res.name + ")";
-                        }
-                    }
+
 
                     if (!merged.Sheets[name]) {
                         merged.SheetNames.push(name);

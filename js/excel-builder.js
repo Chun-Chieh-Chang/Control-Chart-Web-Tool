@@ -184,7 +184,7 @@ class SPCExcelBuilder {
         const borderThin = { style: 'thin', color: { argb: 'FFBFBFBF' } };
         const borderMedium = { style: 'medium', color: { argb: 'FF000000' } };
         const fontNormal = { name: 'Microsoft JhengHei', size: 10 };
-        const fontData = { name: 'Times New Roman', size: 10 };
+        const fontData = { name: 'Microsoft JhengHei', size: 10 };
         const fontBold = { name: 'Microsoft JhengHei', size: 10, bold: true };
         const fontTitle = { name: 'Microsoft JhengHei', size: 20, bold: true };
         const fontBlueBold = { name: 'Microsoft JhengHei', size: 10, bold: true, color: { argb: 'FF0000FF' } };
@@ -330,7 +330,7 @@ class SPCExcelBuilder {
 
         const addSummary = (r, text) => {
             ws.mergeCells(r, 28, r + 1, 28); const cell = ws.getCell(r, 28); cell.value = text;
-            cell.font = { name: 'Times New Roman', size: 10, bold: true }; cell.alignment = { vertical: 'middle', horizontal: 'left', wrapText: true }; cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFDCE6F1' } };
+            cell.font = { name: 'Microsoft JhengHei', size: 10, bold: true }; cell.alignment = { vertical: 'middle', horizontal: 'left', wrapText: true }; cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFDCE6F1' } };
         };
 
         addSummary(7, `ΣX̄ = ${this.round(sheetSumX)}`); // Sum of Averages

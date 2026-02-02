@@ -36,6 +36,10 @@
 - **寬度擴展**: 應使用者需求，將主要工作區容器寬度由 `max-w-7xl` (約 1280px) 放寬為 `max-w-[96%]`，以充分利用寬螢幕空間，優化寬版報表與圖表的閱讀體驗。
   - 影響範圍: Dashboard, Import, Analysis, History, Nelson Rules 等所有主要視圖。
 
+### [2026-02-02] 報表字體標準化
+- **Excel 導出優化**: 將導出報表中的數字與統計摘要字體從 `Times New Roman` 統一更換為 `Microsoft JhengHei` (微軟正黑體)，以確保中英文混排時的視覺一致性與美觀。
+  - 影響範圍: 數據矩陣 (Data Matrix)、統計摘要 (Summary Stats) 等所有自動生成的單元格。
+
 ---
 
 ## [2026-02-01] UI/UX 現代化改版 (UI/UX Modernization)

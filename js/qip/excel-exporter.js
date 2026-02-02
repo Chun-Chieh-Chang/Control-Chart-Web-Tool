@@ -51,7 +51,7 @@ class ExcelExporter {
             .sort((a, b) => a - b);
 
         // 獲取批號列表
-        const batches = Object.keys(itemData.batches);
+
 
         // 構建數據陣列
         const data = [];
@@ -80,8 +80,9 @@ class ExcelExporter {
 
         // 數據行（從第3行開始）
         let currentRow = 2; // Index 2 is Row 3
-        for (const batchName of batches) {
-            const batchData = itemData.batches[batchName];
+        for (const batch of itemData.batches) {
+            const batchName = batch.name;
+            const batchData = batch.data;
             const row = [batchName, '', '', '']; // 批號 + 3個空欄（規格欄）
 
             for (const cavityNum of cavities) {

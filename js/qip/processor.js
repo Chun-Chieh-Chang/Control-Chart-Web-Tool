@@ -308,7 +308,7 @@ class QIPProcessor {
 
         if (!this.results.inspectionItems[inspectionItem]) {
             this.results.inspectionItems[inspectionItem] = {
-                batches: {},
+                batches: [],
                 allCavities: new Set(),
                 specification: null
             };
@@ -318,19 +318,10 @@ class QIPProcessor {
         const item = this.results.inspectionItems[inspectionItem];
         const cavityIds = Object.keys(data);
 
-        // 如果批次已存在，合併數據
-        if (item.batches[batchName]) {
-            const existingCavities = Object.keys(item.batches[batchName]);
-            Object.assign(item.batches[batchName], data);
-            const mergedCavities = Object.keys(item.batches[batchName]);
-            console.log(`[QIP] 合併數據 - 項目: ${inspectionItem}, 批次: ${batchName}`);
-            console.log(`  ├─ 現有穴號: [${existingCavities.join(', ')}]`);
-            console.log(`  ├─ 新增穴號: [${cavityIds.join(', ')}]`);
-            console.log(`  └─ 合併後總穴數: ${mergedCavities.length} (穴號: [${mergedCavities.sort((a, b) => parseInt(a) - parseInt(b)).join(', ')}])`);
-        } else {
-            item.batches[batchName] = { ...data };
-            console.log(`[QIP] 新增批次 - 項目: ${inspectionItem}, 批次: ${batchName}, 穴號: [${cavityIds.join(', ')}]`);
-        }
+        // Always add a new batch entry instead of merging by name
+        // This supports multiple batches with the same name (e.g. "Setup") from different files
+        item.batches.push({ name: batchName, data: { ...data } });
+        console.log(`[QIP] 新增批次 - 項目: ${inspectionItem}, 批次: ${batchName}, 穴號: [${cavityIds.join(', ')}]`);
 
         // 記錄所有穴號
         for (const cavityId of cavityIds) {
@@ -425,24 +416,30 @@ class QIPProcessor {
      */
     getResults() {
         // 計算實際的唯一批次數（從所有檢驗項目中收集所有唯一批次名稱）
-        const allUniqueBatches = new Set();
+        const allBatchOccurrencesCount = [];
+        const uniqueBatchNames = new Set();
+
         for (const itemName of Object.keys(this.results.inspectionItems)) {
             const item = this.results.inspectionItems[itemName];
-            for (const batchName of Object.keys(item.batches)) {
-                allUniqueBatches.add(batchName);
+            allBatchOccurrencesCount.push(item.batches.length);
+            for (const b of item.batches) {
+                uniqueBatchNames.add(b.name);
             }
         }
-        const actualTotalBatches = allUniqueBatches.size;
+        const maxBatchesInAnyItem = Math.max(...allBatchOccurrencesCount, 0);
+        const actualUniqueBatchNamesCount = uniqueBatchNames.size;
 
         console.log(`[QIP] 處理結果統計:`);
         console.log(`  ├─ 檢驗項目數: ${Object.keys(this.results.inspectionItems).length}`);
-        console.log(`  ├─ 總批次數: ${actualTotalBatches}`);
+        console.log(`  ├─ 最大單項批次數: ${maxBatchesInAnyItem}`);
+        console.log(`  ├─ 唯一批次名稱數: ${actualUniqueBatchNamesCount}`);
         console.log(`  ├─ 最大穴數: ${this.results.totalCavities}`);
         console.log(`  └─ 處理工作表數: ${this.results.processedSheets}`);
 
         return {
             inspectionItems: this.results.inspectionItems,
-            totalBatches: actualTotalBatches,
+            totalBatches: maxBatchesInAnyItem,
+            uniqueBatchNamesCount: actualUniqueBatchNamesCount,
             totalCavities: this.results.totalCavities,
             processedSheets: this.results.processedSheets,
             productInfo: this.results.productInfo,

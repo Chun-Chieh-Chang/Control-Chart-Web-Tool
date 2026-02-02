@@ -786,8 +786,7 @@ var QIPExtractApp = {
         } else {
             itemNames.forEach(function (itemName, idx) {
                 var item = items[itemName];
-                var batchNames = Object.keys(item.batches);
-                var totalBatches = batchNames.length;
+                var totalBatches = item.batches.length;
                 var allCavities = Array.from(item.allCavities).sort(function (a, b) {
                     return parseInt(a) - parseInt(b);
                 });
@@ -830,8 +829,9 @@ var QIPExtractApp = {
                 // Sample Batches (Show first 5)
                 html += '<div class="p-4 space-y-2">';
                 html += '<div class="text-xs font-bold text-slate-500 uppercase mb-2">' + (window.currentLang === 'zh' ? '批次樣本（前5筆）' : 'Sample Batches (First 5)') + '</div>';
-                batchNames.slice(0, 5).forEach(function (batchName) {
-                    var batchData = item.batches[batchName];
+                item.batches.slice(0, 5).forEach(function (batch) {
+                    var batchName = batch.name;
+                    var batchData = batch.data;
                     var cavIds = Object.keys(batchData).sort(function (a, b) { return parseInt(a) - parseInt(b); });
 
                     html += '<div class="flex items-start gap-2 p-2 rounded-lg bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700">';

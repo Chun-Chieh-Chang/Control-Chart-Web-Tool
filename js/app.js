@@ -1103,7 +1103,7 @@ var SPCApp = {
         var cavityCount = data.xbarR.summary.n;
         var totalWidth = 60 + (25 * 58) + 120;
 
-        var html = '<table class="excel-table" style="width:100%; border-collapse:collapse; font-size:12px; font-family:\'Arial\', \'Microsoft JhengHei\', sans-serif; border:2px solid var(--table-border); table-layout:fixed; font-weight: 500;">';
+        var html = '<table class="excel-table" style="width:100%; border-collapse:collapse; font-size:12px; font-family:\'Arial\', \'Microsoft JhengHei\', sans-serif; border:2px solid var(--table-border); table-layout:auto; font-weight: 500;">';
         html += '<colgroup> <col style="width:80px;"> ';
         for (var c = 0; c < 25; c++) html += '<col>'; // Flexible width for data columns
         html += '<col style="width:40px;"><col style="width:40px;"><col style="width:40px;"><col style="width:40px;"> </colgroup>';
@@ -1133,12 +1133,13 @@ var SPCApp = {
         });
 
         html += '<tr style="background:var(--table-data-header-bg); font-weight:bold; text-align:center;">' +
-            '<td style="border:1px solid var(--table-border);">' + this.t('批號', 'Batch') + '</td>';
+            '<td style="border:1px solid var(--table-border); width:80px;">' + this.t('批號', 'Batch') + '</td>';
         for (var b = 0; b < 25; b++) {
             var name = pageLabels[b] || '';
-            html += '<td style="border:1px solid var(--table-border); word-break:break-word; white-space:normal; padding:2px; vertical-align:middle;">' + name + '</td>';
+            html += '<td style="border:1px solid var(--table-border); height:120px; white-space:nowrap; padding:4px; vertical-align:bottom; text-align:center;">' +
+                '<div style="transform: rotate(180deg); writing-mode: vertical-rl; margin:0 auto; width:100%; font-size:11px;">' + name + '</div></td>';
         }
-        html += '<td colspan="4" style="border:1px solid var(--table-border);">' + this.t('彙總', 'Stats') + '</td></tr>';
+        html += '<td colspan="4" style="border:1px solid var(--table-border); width:120px;">' + this.t('彙總', 'Stats') + '</td></tr>';
 
         // Calculate Sheet Stats (Match Excel Logic)
         var sheetSumX = 0, sheetSumR = 0, sheetCount = 0;

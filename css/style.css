@@ -1,57 +1,81 @@
 /**
  * SPC Analysis Tool - Main Stylesheet
- * Consistently themed for Light and Dark modes.
+ * Theme: "Ghibli/Miyazaki" - Nature, Whimsy, and Clarity.
  */
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap');
 
 :root {
-    /* Color Palette - Default Light */
-    --primary: #4f46e5;
-    --background: #f8fafc;
-    --surface: #ffffff;
-    --text-main: #1e293b;
+    /* Color Palette - Ghibli Light (Pastoral Day) */
+    --primary: #569C5B;
+    /* Lush Grass Green */
+    --secondary: #4FA3C4;
+    /* Summer Sky Blue */
+    --accent: #E88D67;
+    /* Warm Sunset/Brick */
+
+    --background: #F2F9F0;
+    /* Very Pale Organic Green/White */
+    --surface: #FFFFFF;
+    /* Cloud White */
+    --text-main: #2C3E50;
+    /* Deep Ink Blue/Grey */
 
     /* Typography Standards */
-    --font-base: 'Inter', system-ui, -apple-system, sans-serif;
+    --font-base: 'Nunito', system-ui, -apple-system, sans-serif;
     --size-min: 12px;
-    --size-base: 14px;
-    --size-md: 16px;
-    --size-lg: 18px;
-    --size-xl: 20px;
-    --size-2xl: 24px;
+    --size-base: 15px;
+    /* Slightly larger for friendliness */
+    --size-md: 17px;
+    --size-lg: 20px;
+    --size-xl: 24px;
+    --size-2xl: 32px;
 
     /* Table Variables */
-    --table-border: #000;
-    --table-bg: #fff;
-    --table-text: #000;
-    --table-header-bg: #f3f4f6;
-    --table-label-bg: #f9fafb;
-    --table-data-header-bg: #e5e7eb;
-    --table-ooc-bg: yellow;
+    --table-border: #CBD5E0;
+    --table-bg: #FFFFFF;
+    --table-text: #2C3E50;
+    --table-header-bg: #E6F0E6;
+    /* Soft Green Tint */
+    --table-label-bg: #F7FAF7;
+    --table-data-header-bg: #EDF2F7;
+    --table-ooc-bg: #FDE047;
+    /* Sunny Yellow */
     --table-ooc-text: #000;
-    --table-stats-bg: #DCE6F1;
+    --table-stats-bg: #E0F2F1;
+    /* Soft Teal */
 
-    --card-bg: rgba(255, 255, 255, 0.7);
+    --card-bg: rgba(255, 255, 255, 0.85);
+    /* Milky Glass */
 }
 
-/* Dark Mode Overrides */
+/* Dark Mode Overrides (Enchanted Night Forest) */
 html.dark {
-    --background: #0f172a;
-    --surface: #1e293b;
-    --text-main: #f1f5f9;
+    --primary: #88D498;
+    /* Glowing Spirit Green */
+    --secondary: #64B5F6;
+    /* Moonlight Blue */
+    --accent: #FFB74D;
+    /* Firefly Orange */
 
-    --table-border: #334155 !important;
-    --table-bg: #0f172a !important;
-    --table-text: #f1f5f9 !important;
-    --table-header-bg: #0f172a !important;
-    --table-label-bg: #0f172a !important;
-    --table-data-header-bg: #0f172a !important;
-    --table-ooc-bg: #991b1b !important;
-    --table-ooc-text: #ffffff !important;
-    --table-stats-bg: #1e293b !important;
+    --background: #1A2634;
+    /* Deep Night Blue */
+    --surface: #243447;
+    /* Darker Blue-Grey */
+    --text-main: #E0F2F1;
+    /* Pale Moonlight */
 
-    --card-bg: rgba(30, 41, 59, 0.7);
+    --table-border: #4A5568 !important;
+    --table-bg: #243447 !important;
+    --table-text: #E0F2F1 !important;
+    --table-header-bg: #2D3748 !important;
+    --table-label-bg: #2D3748 !important;
+    --table-data-header-bg: #2D3748 !important;
+    --table-ooc-bg: #B91C1C !important;
+    --table-ooc-text: #FFFFFF !important;
+    --table-stats-bg: #2C3E50 !important;
+
+    --card-bg: rgba(36, 52, 71, 0.85);
 }
 
 body {
@@ -59,8 +83,18 @@ body {
     color: var(--text-main);
     font-family: var(--font-base);
     font-size: var(--size-base);
-    line-height: 1.5;
+    line-height: 1.6;
     -webkit-font-smoothing: antialiased;
+    transition: background-color 0.5s ease, color 0.5s ease;
+    background-image:
+        radial-gradient(circle at 10% 20%, rgba(86, 156, 91, 0.05) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(79, 163, 196, 0.05) 0%, transparent 40%);
+}
+
+html.dark body {
+    background-image:
+        radial-gradient(circle at 10% 20%, rgba(136, 212, 152, 0.05) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(100, 181, 246, 0.05) 0%, transparent 40%);
 }
 
 /* Ensure no text falls below the minimum readable size */
@@ -76,73 +110,91 @@ small,
     font-size: var(--size-min) !important;
 }
 
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family: 'Nunito', sans-serif;
+    color: var(--text-main);
+}
+
 h1 {
     font-size: var(--size-2xl);
-    font-weight: 700;
+    font-weight: 800;
 }
 
 h2 {
     font-size: var(--size-xl);
-    font-weight: 600;
+    font-weight: 700;
 }
 
 h3 {
     font-size: var(--size-lg);
-    font-weight: 600;
+    font-weight: 700;
 }
 
 h4 {
     font-size: var(--size-md);
-    font-weight: 600;
+    font-weight: 700;
 }
 
 label {
     font-size: var(--size-base);
-    font-weight: 500;
+    font-weight: 600;
 }
 
-/* Glass Card Style - Matching Target UI */
+/* Organic / Glass Card Style */
 .saas-card {
-    border-width: 1px;
-    --tw-border-opacity: 1;
-    border-color: rgb(226 232 240 / var(--tw-border-opacity, 1));
-    background-color: rgba(255, 255, 255, 0.7);
-    --tw-backdrop-blur: blur(24px);
-    backdrop-filter: var(--tw-backdrop-blur);
-    -webkit-backdrop-filter: var(--tw-backdrop-blur);
-    box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.1);
-    border-radius: 2.5rem; /* rounded-[2.5rem] */
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border-width: 0px;
+    /* Removed border for cleaner look */
+    background-color: var(--card-bg);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    box-shadow:
+        0 4px 6px -1px rgba(0, 0, 0, 0.05),
+        0 2px 4px -1px rgba(0, 0, 0, 0.03),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.4);
+    /* Inner shine */
+    border-radius: 2rem;
+    /* Softer, rounder */
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    /* Bouncy transition */
 }
 
 .dark .saas-card {
-    border-color: rgba(255, 255, 255, 0.1);
-    background-color: rgba(15, 23, 42, 0.6);
+    box-shadow:
+        0 4px 6px -1px rgba(0, 0, 0, 0.2),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.05);
 }
 
 .saas-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+    transform: translateY(-6px) scale(1.01);
+    box-shadow:
+        0 20px 25px -5px rgba(0, 0, 0, 0.1),
+        0 8px 10px -6px rgba(0, 0, 0, 0.1),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.6);
 }
 
 /* Glass Navigation */
 .glass-nav {
-    border-bottom-width: 1px;
-    border-color: rgba(226, 232, 240, 1);
+    border-bottom: none;
     background-color: rgba(255, 255, 255, 0.8);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    box-shadow: 0 4px 20px -5px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 20px -5px rgba(86, 156, 91, 0.1);
+    /* Subtle green tint shadow */
 }
 
 .dark .glass-nav {
-    border-color: rgba(255, 255, 255, 0.1);
-    background-color: rgba(2, 6, 23, 0.8);
+    background-color: rgba(26, 38, 52, 0.8);
+    box-shadow: 0 4px 20px -5px rgba(0, 0, 0, 0.3);
 }
 
 /* Hover Lift Effect */
 .hover-lift {
-    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .hover-lift:hover {
@@ -152,41 +204,36 @@ label {
 /* Step Number */
 .step-number {
     display: flex;
-    height: 2rem;
-    width: 2rem;
+    height: 2.25rem;
+    width: 2.25rem;
     align-items: center;
     justify-content: center;
-    border-radius: 0.75rem;
-    font-size: 0.875rem;
-    font-weight: 900;
+    border-radius: 50%;
+    /* Circle */
+    font-size: 1rem;
+    font-weight: 800;
     color: white;
-    background: linear-gradient(135deg, #3b82f6, #2563eb);
-    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    box-shadow: 0 4px 12px rgba(86, 156, 91, 0.3);
 }
 
-/* Button Actions */
-.btn-action {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    border-radius: 0.75rem;
-    padding: 0.5rem 1rem;
-    font-weight: 600;
-    transition: all 0.3s ease;
-}
-
-.btn-action-primary {
+/* Buttons */
+.btn-primary {
     background-color: var(--primary);
     color: white;
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    font-weight: 700;
+    border-radius: 1rem;
+    padding: 0.75rem 1.5rem;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 4px 6px rgba(86, 156, 91, 0.2);
 }
 
-.btn-action-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 14px 20px -5px rgba(0,0,0,0.2); 
+.btn-primary:hover {
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 8px 12px rgba(86, 156, 91, 0.3);
 }
 
-/* Anomaly Pulse Animation */
+/* Anomaly Pulse Animation (Red) */
 @keyframes pulse-red {
     0% {
         transform: scale(1);
@@ -213,48 +260,9 @@ label {
     border-radius: 50%;
 }
 
-/* Loading Spinner */
-.loading-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(255, 255, 255, 0.9);
-    backdrop-filter: blur(8px);
-    display: none;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-    z-index: 9999;
-}
-
-.dark .loading-overlay {
-    background: rgba(15, 23, 42, 0.9);
-}
-
-.spinner {
-    border: 4px solid #f1f5f9;
-    border-top: 4px solid var(--primary);
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    animation: spin 1s cubic-bezier(0.4, 0, 0.2, 1) infinite;
-}
-
-@keyframes spin {
-    0% {
-        transform: rotate(0deg);
-    }
-
-    100% {
-        transform: rotate(360deg);
-    }
-}
-
 /* Scrollbar Refinement */
 ::-webkit-scrollbar {
-    width: 5px;
+    width: 8px;
 }
 
 ::-webkit-scrollbar-track {
@@ -262,23 +270,27 @@ label {
 }
 
 ::-webkit-scrollbar-thumb {
-    background: #e2e8f0;
+    background: #CBD5E0;
     border-radius: 20px;
+    border: 2px solid transparent;
+    background-clip: content-box;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: #cbd5e1;
+    background-color: #A0AEC0;
 }
 
 .dark ::-webkit-scrollbar-thumb {
-    background: #334155;
+    background-color: #4A5568;
 }
 
 /* Navigation Active State */
 .nav-item-active {
     background-color: var(--primary);
     color: #ffffff !important;
-    box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.2);
+    border-radius: 1rem;
+    box-shadow: 0 4px 10px rgba(86, 156, 91, 0.3);
+    font-weight: 700;
 }
 
 /* Detailed Excel Table Styles */
@@ -286,90 +298,46 @@ label {
     background-color: var(--table-bg) !important;
     color: var(--table-text) !important;
     border-color: var(--table-border) !important;
+    font-family: 'Nunito', sans-serif;
+    border-radius: 1rem;
+    overflow: hidden;
 }
 
 .excel-table td,
 .excel-table th {
     border-color: var(--table-border) !important;
     color: inherit !important;
+    padding: 0.75rem;
 }
 
-.dark header {
-    background-color: rgba(30, 41, 59, 0.8) !important;
-    border-color: #334155 !important;
+/* Tooltip & Charts */
+.apexcharts-tooltip {
+    border-radius: 1rem !important;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15) !important;
+    font-family: 'Nunito', sans-serif !important;
 }
 
-/* Utility Text Colors for Dark Mode */
-.dark .text-slate-900 {
-    color: #f8fafc !important;
-    /* Slate-50 */
-}
-
-.dark .text-slate-800 {
-    color: #f1f5f9 !important;
-    /* Slate-100 */
-}
-
-.dark .text-slate-700 {
-    color: #e2e8f0 !important;
-    /* Slate-200 */
-}
-
-.dark .text-slate-600 {
-    color: #cbd5e1 !important;
-    /* Slate-300 */
-}
-
-.dark .text-slate-500 {
-    color: #94a3b8 !important;
-    /* Slate-400 */
-}
-
-/* Utility Background Colors for Dark Mode */
-.dark .bg-white {
-    background-color: #1e293b !important;
-}
-
-.dark .bg-slate-50 {
-    background-color: #0f172a !important;
-}
-
-.dark .bg-slate-100 {
-    background-color: #1e293b !important;
-}
-
-.dark .border-slate-100 {
-    border-color: #334155 !important;
-}
-
-.dark .border-slate-200 {
-    border-color: #334155 !important;
-}
-
-/* ApexCharts Tooltip Dark Mode Fix */
 .dark .apexcharts-tooltip {
-    background: #1e293b !important;
-    border-color: #334155 !important;
-    color: #f1f5f9 !important;
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5) !important;
+    background: var(--surface) !important;
+    border-color: var(--table-border) !important;
+    color: var(--text-main) !important;
 }
 
-.dark .apexcharts-tooltip-title {
-    background: #334155 !important;
-    border-bottom-color: #475569 !important;
+/* Floating Animation Utility */
+.animate-float {
+    animation: float 6s ease-in-out infinite;
 }
 
-.dark .apexcharts-xaxistooltip {
-    background: #1e293b !important;
-    color: #f1f5f9 !important;
-    border-color: #334155 !important;
-}
+@keyframes float {
+    0% {
+        transform: translateY(0px);
+    }
 
-/* Force Chart Axis Label Font Size */
-.apexcharts-xaxis-label,
-.apexcharts-yaxis-label,
-.apexcharts-text,
-.apexcharts-text tspan {
-    font-size: 12px !important;
-    font-family: 'Inter', sans-serif !important;
+    50% {
+        transform: translateY(-10px);
+    }
+
+    100% {
+        transform: translateY(0px);
+    }
 }

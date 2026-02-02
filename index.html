@@ -10,8 +10,7 @@
 
     <!-- Tailwind & Google Fonts -->
     <script src="https://cdn.tailwindcss.com?plugins=forms,typography,container-queries"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
-        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined|Material+Icons+Round"
         rel="stylesheet" />
     <script>
@@ -20,14 +19,30 @@
             theme: {
                 extend: {
                     colors: {
-                        primary: "#4F46E5",
-                        "background-light": "#F8FAFC",
-                        "background-dark": "#0F172A",
+                        primary: "#569C5B", /* Miyazaki Forest Green */
+                        secondary: "#4FA3C4", /* Sky Blue */
+                        accent: "#E88D67", /* Sunset Orange */
+                        "background-light": "#F2F9F0", /* Very Pale Green/White */
+                        "background-dark": "#1A2634", /* Deep Night Blue */
                         "surface-light": "#FFFFFF",
-                        "surface-dark": "#1E293B",
+                        "surface-dark": "#243447",
                     },
                     fontFamily: {
-                        sans: ["Inter", "sans-serif"],
+                        sans: ["Nunito", "sans-serif"],
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'cloud-d': 'cloud 60s linear infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        },
+                        cloud: {
+                            '0%': { transform: 'translateX(100%)' },
+                            '100%': { transform: 'translateX(-100%)' },
+                        }
                     }
                 }
             }

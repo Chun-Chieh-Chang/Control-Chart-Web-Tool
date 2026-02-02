@@ -1,5 +1,39 @@
 # 專案開發與修訂日誌 (Development & Revision Log)
 
+## [2026-02-02] UI 風格重塑 - 國際藝術大師動畫風格 (Global Art Master Animation Style)
+**專案**: Control Chart Web Tool (SPC Analysis Tool)
+**類別**: UI/UX, Aesthetic Overhaul
+
+### 變更內容
+- **風格轉型**: 將介面從標準 SaaS 風格轉型為「吉卜力/宮崎駿 (Ghibli/Miyazaki)」啟發的自然系動畫風格。
+- **色彩系統**: 
+  - 導入高飽和度的自然色系：森林綠 (`#569C5B`)、天空藍 (`#4FA3C4`)、夕陽橘 (`#E88D67`)。
+  - 背景改為動態漸層光暈，模擬自然光影流動。
+- **字體更新**: 
+  - 將主要字體更換為 `Nunito` (圓潤無襯線體)，提升親和力與童趣感，符合動畫風格設定。
+- **動畫特效**:
+  - 新增 `.animate-float` 懸浮動畫，應用於卡片與重要元素，創造輕盈感。
+  - 增強 `.pulse-red` 異常警示動畫，使其更具動態張力。
+  - 卡片互動增加彈性縮放 (`scale-105`) 與光澤流動效果。
+
+### 技術實作細節
+- **CSS 架構**: 
+  - 全面重寫 `css/style.css`，採用 CSS Variables 定義新的色彩語意。
+  - 實作「牛奶玻璃 (Milky Glass)」效果：高模糊度 (`blur(16px)`) 搭配半透明白底 (`rgba(255,255,255,0.85)`)。
+  - 優化 Scrollbar 樣式，使其更圓潤並融入整體色調。
+- **Tailwind 配置**:
+  - 更新 `index.html` 中的 `tailwind.config`，擴展自定義顏色與動畫 `keyframes` (float, cloud)。
+
+### 測試紀錄
+- **自動化測試**: 嘗試使用 `browser_subagent` 進行畫面渲染驗證，但因系統環境變數問題 (`$HOME not set`) 導致 Playwright 無法啟動。
+- **靜態分析**: 人工檢核 HTML 與 CSS 代碼，確認：
+  - Google Fonts 連結正確 (`Nunito`).
+  - CSS 變數引用無誤.
+  - Tailwind Config 語法正確.
+- **待辦**: 需在 User 端實際部署後確認視覺效果是否符合預期。
+
+---
+
 ## [2026-02-01] UI/UX 現代化改版 (UI/UX Modernization)
 
 **專案**: Control Chart Web Tool

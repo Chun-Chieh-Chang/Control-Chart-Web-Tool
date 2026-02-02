@@ -534,20 +534,17 @@ var SPCApp = {
                     var ws = wb.Sheets[name];
                     var newData = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
 
-
-                    if (!merged.Sheets[name]) {
-                        merged.SheetNames.push(name);
-                        merged.Sheets[name] = XLSX.utils.aoa_to_sheet(newData);
-                    } else {
-                        // Merge data rows (Row 3+)
-                        var existingData = XLSX.utils.sheet_to_json(merged.Sheets[name], { header: 1, defval: '' });
-
-                        if (newData.length > 2) {
-                            var rowsToAppend = newData.slice(2);
-                            existingData = existingData.concat(rowsToAppend);
-                            merged.Sheets[name] = XLSX.utils.aoa_to_sheet(existingData);
-                        }
+                    // Handle duplicate sheet names across files by appending a suffix
+                    // This ensures "Setup" from File A and "Setup" from File B are treated as separate items
+                    var uniqueName = name;
+                    var counter = 1;
+                    while (merged.Sheets[uniqueName]) {
+                        uniqueName = name + ' (' + counter + ')';
+                        counter++;
                     }
+
+                    merged.SheetNames.push(uniqueName);
+                    merged.Sheets[uniqueName] = XLSX.utils.aoa_to_sheet(newData);
                 });
             });
 

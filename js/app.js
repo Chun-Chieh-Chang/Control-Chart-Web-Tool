@@ -647,7 +647,7 @@ var SPCApp = {
             var target = 'N/A';
             var sampleCount = 0;
             if (data.length > 1) {
-                target = data[1] && data[1][1] ? data[1][1] : 'N/A';
+                target = data[1] && data[1][0] ? data[1][0] : 'N/A';
                 sampleCount = data.length - 1;
             }
 

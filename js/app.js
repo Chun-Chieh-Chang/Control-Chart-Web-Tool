@@ -1652,8 +1652,8 @@ var SPCApp = {
                         trim: true,
                         maxHeight: 120,
                         formatter: function (v) {
-                            var idx = Math.round(v) - 1;
-                            return (labels && labels[idx]) ? labels[idx] : v;
+                            var i = Math.floor(v);
+                            return (labels && labels[i - 1]) ? labels[i - 1] : v;
                         },
                         style: {
                             colors: theme.text,
@@ -1688,7 +1688,7 @@ var SPCApp = {
                     intersect: false,
                     fixed: { enabled: false },
                     custom: function ({ series, seriesIndex, dataPointIndex, w }) {
-                        var label = w.globals.categoryLabels[dataPointIndex];
+                        var label = (labels && labels[dataPointIndex]) ? labels[dataPointIndex] : w.globals.categoryLabels[dataPointIndex];
                         var html = '<div class="px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 shadow-xl rounded-lg">';
                         html += '<div class="text-xs text-slate-500 dark:text-slate-400 font-bold uppercase mb-1 border-b border-slate-200 dark:border-slate-800 pb-1">' + label + '</div>';
 
@@ -1748,8 +1748,8 @@ var SPCApp = {
                         hideOverlappingLabels: true,
                         trim: true,
                         formatter: function (v) {
-                            var idx = Math.round(v) - 1;
-                            return (labels && labels[idx]) ? labels[idx] : v;
+                            var i = Math.floor(v);
+                            return (labels && labels[i - 1]) ? labels[i - 1] : v;
                         },
                         style: { colors: theme.text, fontSize: labels.length > 25 ? '10px' : '11px', fontFamily: 'Inter, sans-serif' }
                     }

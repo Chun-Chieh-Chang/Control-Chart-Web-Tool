@@ -1,5 +1,21 @@
 # 專案開發與修訂日誌 (Development & Revision Log)
 
+## [2026-02-06] 群組趨勢圖表優化 (Group Trend Chart Optimization)
+**專案**: Control Chart Web Tool
+**類別**: UI Fix, Data Visualization
+
+### 變更內容
+- **X 軸標籤優化**: 實施 -45 度旋轉、自動隱藏重疊標籤及動態字體縮放，解決長批號重疊問題。
+- **Y 軸智能縮放**: 根據數據極值與規格界限 (USL/LSL) 自動計算最優顯示範圍，消除底部空白，提升數據解析度。
+- **數據點標記控制**: 針對大數據集 (>50點) 自動隱藏標記，僅保留趨勢線，減少視覺干擾。
+- **交互增強**: 開放 ApexCharts 全功能工具列 (Zoom, Pan, Reset)，支持局部縮放分析。
+
+### 技術實作
+- 修改 `js/app.js` 中的 `renderCharts` 函數，優化 `gOpt` 配置。
+- 定義 `yMin` / `yMax` 計算邏輯，確保規格線始終在可見範圍內。
+
+---
+
 ## [2026-02-02] UI 風格重塑 - 國際藝術大師動畫風格 (Global Art Master Animation Style)
 **專案**: Control Chart Web Tool (SPC Analysis Tool)
 **類別**: UI/UX, Aesthetic Overhaul

@@ -1478,13 +1478,31 @@ var SPCApp = {
             var labels = data.groupStats.map(s => s.batch);
 
             // 4. Group Trend Chart (Visual match to old Chart.js)
+            // Calculate Y-axis range for better visualization
+            var allValues = data.groupStats.flatMap(s => [s.max, s.avg, s.min]).filter(v => v !== null && !isNaN(v));
+            var dataMin = Math.min(...allValues);
+            var dataMax = Math.max(...allValues);
+            var yMin = Math.min(dataMin, data.specs.lsl) * 0.999; // Add 0.1% margin below
+            var yMax = Math.max(dataMax, data.specs.usl) * 1.001; // Add 0.1% margin above
+
             var gOpt = {
                 chart: {
                     type: 'line',
                     height: 380,
-                    toolbar: { show: true },
+                    toolbar: {
+                        show: true,
+                        tools: {
+                            download: true,
+                            selection: true,
+                            zoom: true,
+                            zoomin: true,
+                            zoomout: true,
+                            pan: true,
+                            reset: true
+                        }
+                    },
                     selection: { enabled: true, type: 'x' },
-                    zoom: { enabled: false },
+                    zoom: { enabled: true, type: 'x', autoScaleYaxis: true },
                     events: {
                         selection: function (chart, e) {
                             if (e.xaxis) {
@@ -1508,10 +1526,51 @@ var SPCApp = {
                     { name: 'LSL', data: new Array(labels.length).fill(data.specs.lsl) }
                 ],
                 colors: ['#ef4444', '#3b82f6', '#ef4444', '#ff9800', '#10b981', '#ff9800'], // Red, Blue, Red, Orange, Emerald, Orange
-                stroke: { width: [1.5, 3, 1.5, 2, 2, 2], dashArray: [0, 0, 0, 5, 0, 5] },
-                markers: { size: [0, 4, 0, 0, 0, 0], colors: ['#3b82f6'], strokeColors: '#fff' },
-                xaxis: { categories: labels, labels: { style: { colors: theme.text, fontSize: '12px', fontFamily: 'Inter, sans-serif' } } },
-                dataLabels: { enabled: false }, yaxis: { labels: { formatter: function (v) { return v.toFixed(4); }, style: { colors: theme.text, fontSize: '12px', fontFamily: 'Inter, sans-serif' } }, title: { text: self.t('測量值', 'Value') } }, grid: { borderColor: theme.grid },
+                stroke: { width: [1.5, 3, 1.5, 2, 2, 2], dashArray: [0, 0, 0, 5, 0, 5], curve: 'straight' },
+                markers: {
+                    size: labels.length > 50 ? [0, 0, 0, 0, 0, 0] : [0, 3, 0, 0, 0, 0], // Hide markers if too many points
+                    colors: ['#3b82f6'],
+                    strokeColors: '#fff',
+                    strokeWidth: 1,
+                    hover: { size: 5 }
+                },
+                xaxis: {
+                    type: 'category', // Force text labels (prevents numeric batch IDs being treated as numeric axis)
+                    categories: labels.map(l => String(l)),
+                    labels: {
+                        rotate: -45,
+                        rotateAlways: labels.length > 20,
+                        hideOverlappingLabels: true,
+                        trim: true,
+                        maxHeight: 120,
+                        style: {
+                            colors: theme.text,
+                            fontSize: labels.length > 50 ? '9px' : '11px',
+                            fontFamily: 'Inter, sans-serif'
+                        }
+                    },
+                    tickAmount: labels.length > 100 ? 20 : undefined, // Limit tick marks for large datasets
+                    tickPlacement: 'on'
+                },
+                dataLabels: { enabled: false },
+                yaxis: {
+                    min: yMin,
+                    max: yMax,
+                    forceNiceScale: false,
+                    labels: {
+                        formatter: function (v) { return v ? v.toFixed(4) : ''; },
+                        style: {
+                            colors: theme.text,
+                            fontSize: '12px',
+                            fontFamily: 'Inter, sans-serif'
+                        }
+                    },
+                    title: {
+                        text: self.t('測量值', 'Value'),
+                        style: { fontSize: '13px', fontWeight: 600 }
+                    }
+                },
+                grid: { borderColor: theme.grid },
                 tooltip: {
                     followCursor: true,
                     intersect: false,
@@ -1568,7 +1627,11 @@ var SPCApp = {
                 colors: ['#8b5cf6'], // Violet-500
                 stroke: { width: 2 },
                 markers: { size: 4, shape: 'square' },
-                xaxis: { categories: labels, labels: { style: { colors: theme.text, fontSize: '12px', fontFamily: 'Inter, sans-serif' } } },
+                xaxis: {
+                    type: 'category',
+                    categories: labels.map(l => String(l)),
+                    labels: { style: { colors: theme.text, fontSize: '12px', fontFamily: 'Inter, sans-serif' } }
+                },
                 dataLabels: { enabled: false }, yaxis: { labels: { formatter: function (v) { return v.toFixed(4); }, style: { colors: theme.text, fontSize: '12px', fontFamily: 'Inter, sans-serif' } }, title: { text: self.t('全距', 'Range') } }, grid: { borderColor: theme.grid },
                 tooltip: { followCursor: true, fixed: { enabled: false }, style: { fontSize: '12px' } }
             };

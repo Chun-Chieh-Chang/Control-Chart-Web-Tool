@@ -232,17 +232,45 @@ class ExcelExporter {
         });
     }
 
-    download(filename = 'QIP_數據提取結果') {
+    async download(filename = 'QIP_數據提取結果') {
         const blob = this.getBlob();
+        const suggestedName = `${filename}.xlsx`;
+
+        // Use File System Access API if available
+        if (window.showSaveFilePicker) {
+            try {
+                const handle = await window.showSaveFilePicker({
+                    suggestedName: suggestedName,
+                    types: [{
+                        description: 'Excel Workbook',
+                        accept: { 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.xlsx'] }
+                    }]
+                });
+                const writable = await handle.createWritable();
+                await writable.write(blob);
+                await writable.close();
+                console.log(`Excel 檔案已儲存: ${suggestedName}`);
+                return;
+            } catch (err) {
+                if (err.name === 'AbortError') {
+                    console.log('使用者取消了存檔');
+                    return;
+                }
+                console.error('檔案儲存失敗:', err);
+                // Fallback to traditional download if picker fails for other reasons
+            }
+        }
+
+        // Fallback: traditional download
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `${filename}.xlsx`;
+        a.download = suggestedName;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
-        console.log(`開始下載: ${filename}.xlsx`);
+        console.log(`開始下載: ${suggestedName} (傳統模式)`);
     }
 
     getSheetCount() {

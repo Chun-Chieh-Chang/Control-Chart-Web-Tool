@@ -2286,14 +2286,37 @@ var SPCApp = {
         }
     },
 
-    exportConfigurations: function () {
+    exportConfigurations: async function () {
         var configs = localStorage.getItem('qip_configs') || '[]';
         var blob = new Blob([configs], { type: 'application/json' });
+        var date = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+        var filename = `SPC_QIP_Configs_Backup_${date}.json`;
+
+        // Use File System Access API if available
+        if (window.showSaveFilePicker) {
+            try {
+                const handle = await window.showSaveFilePicker({
+                    suggestedName: filename,
+                    types: [{
+                        description: 'JSON Configuration File',
+                        accept: { 'application/json': ['.json'] }
+                    }]
+                });
+                const writable = await handle.createWritable();
+                await writable.write(blob);
+                await writable.close();
+                return;
+            } catch (err) {
+                if (err.name === 'AbortError') return;
+                console.error('Config export failed:', err);
+            }
+        }
+
+        // Fallback
         var url = URL.createObjectURL(blob);
         var a = document.createElement('a');
         a.href = url;
-        var date = new Date().toISOString().slice(0, 10).replace(/-/g, '');
-        a.download = `SPC_QIP_Configs_Backup_${date}.json`;
+        a.download = filename;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);

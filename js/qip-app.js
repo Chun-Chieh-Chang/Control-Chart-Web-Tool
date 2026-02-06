@@ -863,7 +863,7 @@ var QIPExtractApp = {
     },
 
 
-    downloadResults: function () {
+    downloadResults: async function () {
         if (!this.processingResults) { alert(this.t('沒有可下載的結果', 'No results to download')); return; }
 
         try {
@@ -871,7 +871,7 @@ var QIPExtractApp = {
             exporter.createFromResults(this.processingResults, this.processingResults.productCode);
 
             const filename = (this.els.productCode.value || 'QIP_Extract').trim();
-            exporter.download(filename);
+            await exporter.download(filename);
 
             console.log('Excel 導出成功');
         } catch (error) {

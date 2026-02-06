@@ -1738,7 +1738,13 @@ var SPCApp = {
                 xaxis: {
                     type: 'category',
                     categories: labels.map(l => String(l)),
-                    labels: { style: { colors: theme.text, fontSize: '12px', fontFamily: 'Inter, sans-serif' } }
+                    labels: {
+                        rotate: -45,
+                        rotateAlways: labels.length > 20,
+                        hideOverlappingLabels: true,
+                        trim: true,
+                        style: { colors: theme.text, fontSize: labels.length > 50 ? '9px' : '11px', fontFamily: 'Inter, sans-serif' }
+                    }
                 },
                 dataLabels: { enabled: false }, yaxis: { labels: { formatter: function (v) { return v.toFixed(4); }, style: { colors: theme.text, fontSize: '12px', fontFamily: 'Inter, sans-serif' } }, title: { text: self.t('全距', 'Range') } }, grid: { borderColor: theme.grid },
                 tooltip: { followCursor: true, fixed: { enabled: false }, style: { fontSize: '12px' } }

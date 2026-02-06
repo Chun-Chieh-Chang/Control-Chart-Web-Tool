@@ -1743,6 +1743,10 @@ var SPCApp = {
                         rotateAlways: labels.length > 20,
                         hideOverlappingLabels: true,
                         trim: true,
+                        formatter: function (v, timestamp, opts) {
+                            var idx = Math.round(v) - 1;
+                            return opts.w.config.xaxis.categories[idx] || v;
+                        },
                         style: { colors: theme.text, fontSize: labels.length > 50 ? '9px' : '11px', fontFamily: 'Inter, sans-serif' }
                     }
                 },

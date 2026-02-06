@@ -1651,6 +1651,10 @@ var SPCApp = {
                         hideOverlappingLabels: true,
                         trim: true,
                         maxHeight: 120,
+                        formatter: function (v) {
+                            var idx = Math.round(v) - 1;
+                            return (labels && labels[idx]) ? labels[idx] : v;
+                        },
                         style: {
                             colors: theme.text,
                             fontSize: labels.length > 50 ? '9px' : '11px',
@@ -1743,14 +1747,22 @@ var SPCApp = {
                         rotateAlways: labels.length > 20,
                         hideOverlappingLabels: true,
                         trim: true,
-                        formatter: function (v, timestamp, opts) {
+                        formatter: function (v) {
                             var idx = Math.round(v) - 1;
-                            return opts.w.config.xaxis.categories[idx] || v;
+                            return (labels && labels[idx]) ? labels[idx] : v;
                         },
-                        style: { colors: theme.text, fontSize: labels.length > 50 ? '9px' : '11px', fontFamily: 'Inter, sans-serif' }
+                        style: { colors: theme.text, fontSize: labels.length > 25 ? '10px' : '11px', fontFamily: 'Inter, sans-serif' }
                     }
                 },
-                dataLabels: { enabled: false }, yaxis: { labels: { formatter: function (v) { return v.toFixed(4); }, style: { colors: theme.text, fontSize: '12px', fontFamily: 'Inter, sans-serif' } }, title: { text: self.t('全距', 'Range') } }, grid: { borderColor: theme.grid },
+                dataLabels: { enabled: false },
+                yaxis: {
+                    labels: {
+                        formatter: function (v) { return (v !== null && v !== undefined) ? v.toFixed(4) : ''; },
+                        style: { colors: theme.text, fontSize: '12px', fontFamily: 'Inter, sans-serif' }
+                    },
+                    title: { text: self.t('全距', 'Range') }
+                },
+                grid: { borderColor: theme.grid },
                 tooltip: { followCursor: true, fixed: { enabled: false }, style: { fontSize: '12px' } }
             };
             var chartV = new ApexCharts(document.querySelector("#groupVarChart"), vOpt);

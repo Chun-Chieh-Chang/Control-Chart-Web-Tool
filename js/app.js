@@ -330,16 +330,30 @@ var SPCApp = {
 
     saveToHistory: function (file, analysisType, item) {
         if (!file) return;
+        var fileName = file.name;
+
+        // Find existing record for this file
+        var existingIndex = this.history.findIndex(h => h.name === fileName);
+
         var entry = {
-            name: file.name,
+            name: fileName,
             size: (file.size / 1024).toFixed(1) + ' KB',
             type: analysisType,
             item: item,
             time: new Date().toISOString(),
             id: Date.now()
         };
+
+        if (existingIndex !== -1) {
+            // Update and move to top
+            this.history.splice(existingIndex, 1);
+        }
+
         this.history.unshift(entry);
+
+        // Keep max 20 unique files
         if (this.history.length > 20) this.history.pop();
+
         localStorage.setItem('spc_history', JSON.stringify(this.history));
         this.renderRecentFiles();
     },
@@ -1176,14 +1190,23 @@ var SPCApp = {
             for (var b = 0; b < 25; b++) {
                 var val = '', style = '';
                 if (pageDataMatrix[b]) {
-                    if (type === 'ΣX') val = SPCEngine.round(pageDataMatrix[b].reduce(function (a, b) { return a + (b || 0); }, 0), 4);
-                    else if (type === 'X̄' && pageXbarR.xBar.data[b] !== undefined) {
-                        var v = pageXbarR.xBar.data[b]; val = SPCEngine.round(v, 4);
-                        if (v > pageXbarR.xBar.UCL || v < pageXbarR.xBar.LCL) style = 'background:var(--table-ooc-bg); color:var(--table-ooc-text);';
-                    }
-                    else if (type === 'R' && pageXbarR.R.data[b] !== undefined) {
-                        var v = pageXbarR.R.data[b]; val = SPCEngine.round(v, 4);
-                        if (v > pageXbarR.R.UCL) style = 'background:var(--table-ooc-bg); color:var(--table-ooc-text);';
+                    // Check if current batch actually has ANY valid numeric data
+                    var validData = pageDataMatrix[b].filter(function (v) {
+                        return v !== null && v !== undefined && v !== '' && !isNaN(v);
+                    });
+
+                    if (validData.length > 0) {
+                        if (type === 'ΣX') {
+                            val = SPCEngine.round(validData.reduce(function (a, b) { return a + b; }, 0), 4);
+                        } else if (type === 'X̄' && pageXbarR.xBar.data[b] !== undefined) {
+                            var v = pageXbarR.xBar.data[b];
+                            val = SPCEngine.round(v, 4);
+                            if (v > pageXbarR.xBar.UCL || v < pageXbarR.xBar.LCL) style = 'background:var(--table-ooc-bg); color:var(--table-ooc-text);';
+                        } else if (type === 'R' && pageXbarR.R.data[b] !== undefined) {
+                            var v = pageXbarR.R.data[b];
+                            val = SPCEngine.round(v, 4);
+                            if (v > pageXbarR.R.UCL) style = 'background:var(--table-ooc-bg); color:var(--table-ooc-text);';
+                        }
                     }
                 }
                 html += '<td style="border:1px solid var(--table-border); ' + style + '">' + val + '</td>';
@@ -1213,6 +1236,12 @@ var SPCApp = {
 
             this.renderDetailedDataTable(pageLabels, pageData, pageXbarR);
 
+            // Calculate Y-axis range for X-Bar to ensure it's not a flat line
+            var xValues = pageXbarR.xBar.data.filter(v => v !== null && !isNaN(v));
+            var xMin = Math.min(...xValues, pageXbarR.xBar.LCL);
+            var xMax = Math.max(...xValues, pageXbarR.xBar.UCL);
+            var xMargin = (xMax - xMin) * 0.1 || 0.001;
+
             var xOpt = {
                 chart: {
                     type: 'line',
@@ -1237,9 +1266,22 @@ var SPCApp = {
                     { name: 'LCL', data: new Array(pageLabels.length).fill(pageXbarR.xBar.LCL) }
                 ],
                 colors: [theme.primary, theme.danger, theme.success, theme.danger],
-                stroke: { width: [3, 1.5, 1.5, 1.5], dashArray: [0, 6, 0, 6] },
-                xaxis: { categories: pageLabels, labels: { style: { colors: theme.text, fontSize: '12px', fontFamily: 'Inter, sans-serif' } } },
-                yaxis: { labels: { formatter: function (v) { return v.toFixed(4); }, style: { colors: theme.text, fontSize: '12px', fontFamily: 'Inter, sans-serif' } } },
+                stroke: {
+                    width: [3, 1.5, 1.5, 1.5],
+                    dashArray: [0, 6, 0, 6],
+                    connectNulls: false
+                },
+                xaxis: {
+                    type: 'category',
+                    categories: pageLabels.map(l => String(l)),
+                    labels: { style: { colors: theme.text, fontSize: '11px', fontFamily: 'Inter, sans-serif' } }
+                },
+                yaxis: {
+                    min: xMin - xMargin,
+                    max: xMax + xMargin,
+                    tickAmount: 5,
+                    labels: { formatter: function (v) { return (v !== null && v !== undefined) ? v.toFixed(4) : ''; }, style: { colors: theme.text, fontSize: '11px', fontFamily: 'Inter, sans-serif' } }
+                },
                 grid: { borderColor: theme.grid },
                 tooltip: {
                     theme: theme.mode,
@@ -1255,7 +1297,7 @@ var SPCApp = {
                         html += '<div class="text-sm text-slate-400 font-bold uppercase mb-1">' + label + '</div>';
                         html += '<div class="flex items-center gap-2 mb-2 pb-2 border-b border-slate-800">';
                         html += '<span class="w-2 h-2 rounded-full" style="background-color:' + w.globals.colors[seriesIndex] + '"></span>';
-                        html += '<span class="text-sm font-bold text-white">' + name + ': ' + val.toFixed(4) + '</span>';
+                        html += '<span class="text-sm font-bold text-white">' + name + ': ' + (val ? val.toFixed(4) : '-') + '</span>';
                         html += '</div>';
 
                         // Check if this point has a Nelson Rule violation
@@ -1310,6 +1352,10 @@ var SPCApp = {
             var chartX = new ApexCharts(document.querySelector("#xbarChart"), xOpt);
             chartX.render(); this.chartInstances.push(chartX);
 
+            // R Chart Range adjustment
+            var rValues = pageXbarR.R.data.filter(v => v !== null && !isNaN(v));
+            var rMax = Math.max(...rValues, pageXbarR.R.UCL);
+
             var rOpt = {
                 chart: {
                     type: 'line',
@@ -1334,8 +1380,16 @@ var SPCApp = {
                 ],
                 colors: ['#64748b', '#f43f5e', '#10b981'],
                 stroke: { width: [2.5, 1, 1], dashArray: [0, 6, 0] },
-                xaxis: { categories: pageLabels, labels: { style: { colors: theme.text, fontSize: '12px', fontFamily: 'Inter, sans-serif' } } },
-                yaxis: { labels: { formatter: function (v) { return v.toFixed(4); }, style: { colors: theme.text, fontSize: '12px', fontFamily: 'Inter, sans-serif' } } },
+                xaxis: {
+                    type: 'category',
+                    categories: pageLabels.map(l => String(l)),
+                    labels: { style: { colors: theme.text, fontSize: '11px', fontFamily: 'Inter, sans-serif' } }
+                },
+                yaxis: {
+                    min: 0,
+                    max: rMax * 1.1,
+                    labels: { formatter: function (v) { return v.toFixed(4); }, style: { colors: theme.text, fontSize: '11px', fontFamily: 'Inter, sans-serif' } }
+                },
                 grid: { borderColor: theme.grid },
                 tooltip: { theme: theme.mode, followCursor: true, fixed: { enabled: false } },
                 markers: { size: [4, 0, 0] }
@@ -1349,7 +1403,7 @@ var SPCApp = {
             var labels = data.cavityStats.map(s => s.name);
             var cpkVal = data.cavityStats.map(s => s.Cpk);
 
-            // 1. Cpk Comparison Chart (Matches VBA + Old Chart.js color scheme)
+            // 1. Cpk Comparison Chart
             var cpkOpt = {
                 chart: {
                     type: 'bar',
@@ -1359,11 +1413,6 @@ var SPCApp = {
                     selection: { enabled: true, type: 'x' },
                     zoom: { enabled: false },
                     events: {
-                        selection: function (chart, e) {
-                            if (e.xaxis) {
-                                chart.updateOptions({ xaxis: { min: e.xaxis.min, max: e.xaxis.max } }, false, false);
-                            }
-                        },
                         mounted: function (chartContext, config) {
                             chartContext.el.addEventListener('dblclick', function () {
                                 chartContext.updateOptions({ xaxis: { min: undefined, max: undefined } }, false, false);
@@ -1373,7 +1422,15 @@ var SPCApp = {
                 },
                 theme: { mode: theme.mode },
                 series: [{ name: 'Cpk', data: cpkVal }],
-                xaxis: { categories: labels, labels: { style: { colors: theme.text, fontSize: '12px', fontFamily: 'Inter, sans-serif' } } },
+                xaxis: {
+                    type: 'category',
+                    categories: labels.map(l => String(l)),
+                    labels: {
+                        rotate: -45,
+                        rotateAlways: labels.length > 8,
+                        style: { colors: theme.text, fontSize: '11px', fontFamily: 'Inter, sans-serif' }
+                    }
+                },
                 plotOptions: {
                     bar: {
                         borderRadius: 4,
@@ -1386,7 +1443,7 @@ var SPCApp = {
                         }
                     }
                 },
-                dataLabels: { enabled: false }, yaxis: { labels: { formatter: function (v) { return v.toFixed(3); }, style: { colors: theme.text, fontSize: '12px', fontFamily: 'Inter, sans-serif' } }, title: { text: 'Cpk' } }, grid: { borderColor: theme.grid },
+                dataLabels: { enabled: false }, yaxis: { labels: { formatter: function (v) { return (v !== null && v !== undefined) ? v.toFixed(3) : ''; }, style: { colors: theme.text, fontSize: '11px', fontFamily: 'Inter, sans-serif' } }, title: { text: 'Cpk' } }, grid: { borderColor: theme.grid },
                 tooltip: { followCursor: true, fixed: { enabled: false } },
                 annotations: {
                     yaxis: [
@@ -1398,7 +1455,19 @@ var SPCApp = {
             var chartCpk = new ApexCharts(document.querySelector("#cpkChart"), cpkOpt);
             chartCpk.render(); this.chartInstances.push(chartCpk);
 
-            // 2. Mean Comparison Chart (Visual match to old Chart.js)
+            // 2. Mean Comparison Chart
+            // Calculate valid range for Y-axis (Filtering out null/0 to prevent stretching)
+            var allValues = [];
+            data.cavityStats.forEach(s => {
+                if (s.mean !== null) allValues.push(s.mean);
+            });
+            allValues.push(data.specs.usl, data.specs.lsl, data.specs.target);
+
+            var validValues = allValues.filter(v => v !== null && !isNaN(v) && v !== 0);
+            var yMin = validValues.length > 0 ? Math.min(...validValues) : 0;
+            var yMax = validValues.length > 0 ? Math.max(...validValues) : 0.1;
+            var yMargin = (yMax - yMin) * 0.1 || 0.001;
+
             var meanOpt = {
                 chart: {
                     type: 'line',
@@ -1408,11 +1477,6 @@ var SPCApp = {
                     selection: { enabled: true, type: 'x' },
                     zoom: { enabled: false },
                     events: {
-                        selection: function (chart, e) {
-                            if (e.xaxis) {
-                                chart.updateOptions({ xaxis: { min: e.xaxis.min, max: e.xaxis.max } }, false, false);
-                            }
-                        },
                         mounted: function (chartContext, config) {
                             chartContext.el.addEventListener('dblclick', function () {
                                 chartContext.updateOptions({ xaxis: { min: undefined, max: undefined } }, false, false);
@@ -1428,36 +1492,46 @@ var SPCApp = {
                     { name: 'LSL', data: new Array(labels.length).fill(data.specs.lsl) }
                 ],
                 colors: ['#3b82f6', '#10b981', '#ef4444', '#ef4444'], // Blue-500, Emerald-500, Red-500
-                stroke: { width: [3, 2, 2, 2], dashArray: [0, 0, 5, 5] },
+                stroke: {
+                    width: [3, 2, 2, 2],
+                    dashArray: [0, 0, 5, 5],
+                    connectNulls: false
+                },
                 markers: { size: [4, 0, 0, 0], hover: { size: 6 } },
-                xaxis: { categories: labels, labels: { style: { colors: theme.text, fontSize: '12px', fontFamily: 'Inter, sans-serif' } } },
-                dataLabels: { enabled: false }, yaxis: { labels: { formatter: function (v) { return v.toFixed(4); }, style: { colors: theme.text, fontSize: '12px', fontFamily: 'Inter, sans-serif' } }, title: { text: self.t('平均值', 'Mean') } }, grid: { borderColor: theme.grid },
+                xaxis: {
+                    type: 'category',
+                    categories: labels.map(l => String(l)),
+                    labels: {
+                        rotate: -45,
+                        rotateAlways: labels.length > 8,
+                        style: { colors: theme.text, fontSize: '11px', fontFamily: 'Inter, sans-serif' }
+                    }
+                },
+                dataLabels: { enabled: false },
+                yaxis: {
+                    min: yMin - yMargin,
+                    max: yMax + yMargin,
+                    labels: { formatter: function (v) { return v ? v.toFixed(4) : ''; }, style: { colors: theme.text, fontSize: '11px', fontFamily: 'Inter, sans-serif' } },
+                    title: { text: self.t('平均值', 'Mean') }
+                },
+                grid: { borderColor: theme.grid },
                 tooltip: { followCursor: true, shared: true, fixed: { enabled: false } }
             };
             var chartMean = new ApexCharts(document.querySelector("#meanChart"), meanOpt);
             chartMean.render(); this.chartInstances.push(chartMean);
 
-            // 3. StdDev Comparison Chart (Visual match to old Chart.js)
+            // 3. StdDev Comparison Chart
+            var sValues = data.cavityStats.flatMap(s => [s.overallStdDev, s.withinStdDev]).filter(v => v !== null && !isNaN(v));
+            var maxVal = sValues.length > 0 ? Math.max(...sValues) : 0.0001;
+            var sMax = (maxVal > 0 ? maxVal * 1.2 : 0.0001);
+
             var stdOpt = {
                 chart: {
                     type: 'line',
                     height: 350,
                     toolbar: { show: true },
                     background: 'transparent',
-                    selection: { enabled: true, type: 'x' },
-                    zoom: { enabled: false },
-                    events: {
-                        selection: function (chart, e) {
-                            if (e.xaxis) {
-                                chart.updateOptions({ xaxis: { min: e.xaxis.min, max: e.xaxis.max } }, false, false);
-                            }
-                        },
-                        mounted: function (chartContext, config) {
-                            chartContext.el.addEventListener('dblclick', function () {
-                                chartContext.updateOptions({ xaxis: { min: undefined, max: undefined } }, false, false);
-                            });
-                        }
-                    }
+                    zoom: { enabled: false }
                 },
                 theme: { mode: theme.mode },
                 series: [
@@ -1465,11 +1539,40 @@ var SPCApp = {
                     { name: 'Overall σ', data: data.cavityStats.map(s => s.overallStdDev) }
                 ],
                 colors: ['#3b82f6', '#ef4444'], // Blue-500, Red-500
-                stroke: { width: 3 },
-                markers: { size: 4, shape: ['circle', 'rect'] },
-                xaxis: { categories: labels, labels: { style: { colors: theme.text, fontSize: '12px', fontFamily: 'Inter, sans-serif' } } },
-                dataLabels: { enabled: false }, yaxis: { min: 0, labels: { formatter: function (v) { return v.toFixed(6); }, style: { colors: theme.text, fontSize: '12px', fontFamily: 'Inter, sans-serif' } }, title: { text: self.t('標準差', 'StdDev') } }, grid: { borderColor: theme.grid },
-                tooltip: { followCursor: true, shared: true, fixed: { enabled: false } }
+                stroke: {
+                    width: [2, 2],
+                    curve: 'straight',
+                    dashArray: [0, 0], // Both solid lines
+                    connectNulls: false
+                },
+                markers: {
+                    size: 4,
+                    shape: ["circle", "square"], // Within is circle, Overall is square
+                    strokeWidth: 2,
+                    hover: { size: 6 }
+                },
+                xaxis: {
+                    type: 'category',
+                    categories: labels.map(l => String(l)),
+                    labels: {
+                        rotate: -45,
+                        rotateAlways: labels.length > 8,
+                        style: { colors: theme.text, fontSize: '11px', fontFamily: 'Inter, sans-serif' }
+                    }
+                },
+                dataLabels: { enabled: false },
+                yaxis: {
+                    min: 0,
+                    max: sMax,
+                    tickAmount: 5,
+                    labels: {
+                        formatter: function (v) { return (v !== null && v !== undefined) ? v.toFixed(6) : ''; },
+                        style: { colors: theme.text, fontSize: '11px', fontFamily: 'Inter, sans-serif' }
+                    },
+                    title: { text: self.t('標準差', 'StdDev') }
+                },
+                grid: { borderColor: theme.grid },
+                tooltip: { followCursor: true, shared: true, theme: theme.mode }
             };
             var chartStd = new ApexCharts(document.querySelector("#stdDevChart"), stdOpt);
             chartStd.render(); this.chartInstances.push(chartStd);
@@ -1477,13 +1580,13 @@ var SPCApp = {
         } else if (data.type === 'group') {
             var labels = data.groupStats.map(s => s.batch);
 
-            // 4. Group Trend Chart (Visual match to old Chart.js)
-            // Calculate Y-axis range for better visualization
-            var allValues = data.groupStats.flatMap(s => [s.max, s.avg, s.min]).filter(v => v !== null && !isNaN(v));
-            var dataMin = Math.min(...allValues);
-            var dataMax = Math.max(...allValues);
-            var yMin = Math.min(dataMin, data.specs.lsl) * 0.999; // Add 0.1% margin below
-            var yMax = Math.max(dataMax, data.specs.usl) * 1.001; // Add 0.1% margin above
+            // Calculate Y-axis range for better visualization (Filtering out 0/null)
+            var gValues = data.groupStats.flatMap(s => [s.max, s.avg, s.min]).filter(v => v !== null && !isNaN(v) && v !== 0);
+            gValues.push(data.specs.usl, data.specs.lsl, data.specs.target);
+            var validGValues = gValues.filter(v => v !== null && !isNaN(v) && v !== 0);
+            var yMin = validGValues.length > 0 ? Math.min(...validGValues) : 0;
+            var yMax = validGValues.length > 0 ? Math.max(...validGValues) : 0.1;
+            var yMargin = (yMax - yMin) * 0.1 || 0.001;
 
             var gOpt = {
                 chart: {
@@ -1502,7 +1605,7 @@ var SPCApp = {
                         }
                     },
                     selection: { enabled: true, type: 'x' },
-                    zoom: { enabled: true, type: 'x', autoScaleYaxis: true },
+                    zoom: { enabled: false },
                     events: {
                         selection: function (chart, e) {
                             if (e.xaxis) {
@@ -1526,7 +1629,12 @@ var SPCApp = {
                     { name: 'LSL', data: new Array(labels.length).fill(data.specs.lsl) }
                 ],
                 colors: ['#ef4444', '#3b82f6', '#ef4444', '#ff9800', '#10b981', '#ff9800'], // Red, Blue, Red, Orange, Emerald, Orange
-                stroke: { width: [1.5, 3, 1.5, 2, 2, 2], dashArray: [0, 0, 0, 5, 0, 5], curve: 'straight' },
+                stroke: {
+                    width: [1.5, 3, 1.5, 2, 2, 2],
+                    dashArray: [0, 0, 0, 5, 0, 5],
+                    curve: 'straight',
+                    connectNulls: false // IMPORTANT: Don't connect points if data is missing
+                },
                 markers: {
                     size: labels.length > 50 ? [0, 0, 0, 0, 0, 0] : [0, 3, 0, 0, 0, 0], // Hide markers if too many points
                     colors: ['#3b82f6'],
@@ -1558,7 +1666,7 @@ var SPCApp = {
                     max: yMax,
                     forceNiceScale: false,
                     labels: {
-                        formatter: function (v) { return v ? v.toFixed(4) : ''; },
+                        formatter: function (v) { return (v !== null && v !== undefined) ? v.toFixed(4) : ''; },
                         style: {
                             colors: theme.text,
                             fontSize: '12px',

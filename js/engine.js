@@ -53,7 +53,7 @@ var SPCEngine = {
 
     mean: function (data) {
         var filtered = data.filter(function (v) { return v !== null && !isNaN(v); });
-        if (filtered.length === 0) return 0;
+        if (filtered.length === 0) return null;
         var sum = 0;
         for (var i = 0; i < filtered.length; i++) sum += filtered[i];
         return sum / filtered.length;
@@ -61,12 +61,12 @@ var SPCEngine = {
 
     min: function (data) {
         var filtered = data.filter(function (v) { return v !== null && !isNaN(v); });
-        return filtered.length > 0 ? Math.min.apply(null, filtered) : 0;
+        return filtered.length > 0 ? Math.min.apply(null, filtered) : null;
     },
 
     max: function (data) {
         var filtered = data.filter(function (v) { return v !== null && !isNaN(v); });
-        return filtered.length > 0 ? Math.max.apply(null, filtered) : 0;
+        return filtered.length > 0 ? Math.max.apply(null, filtered) : null;
     },
 
     range: function (data) {
@@ -75,7 +75,7 @@ var SPCEngine = {
 
     stdDev: function (data) {
         var filtered = data.filter(function (v) { return v !== null && !isNaN(v); });
-        if (filtered.length < 2) return 0;
+        if (filtered.length < 2) return null;
         var avg = this.mean(filtered);
         var sumSq = 0;
         for (var i = 0; i < filtered.length; i++) {

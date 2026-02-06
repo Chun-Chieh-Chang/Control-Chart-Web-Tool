@@ -371,7 +371,8 @@
             <div id="view-import" class="p-8 max-w-[96%] mx-auto space-y-12">
                 <!-- Step 1: Upload & Welcome -->
                 <section id="uploadSection" class="space-y-8">
-                    <header class="mb-10">
+                    <header class="mb-6">
+
                         <h1 class="text-2xl font-bold text-slate-900 dark:text-white mb-2"
                             data-en="Data Import & Configuration" data-zh="數據導入與分析設定">數據導入與分析設定</h1>
                         <p class="text-slate-500 dark:text-slate-400"
@@ -379,77 +380,77 @@
                             data-zh="上傳測量報表以開始統計分析流程。">上傳測量報表以開始統計分析流程。</p>
                     </header>
 
-                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                        <!-- Upload Card -->
-                        <div class="lg:col-span-2 saas-card p-1">
-                            <div class="rounded-[15px] bg-slate-50/50 dark:bg-slate-800/30 border-2 border-dashed border-primary/30 dark:border-primary/40 p-6 text-center flex flex-col items-center justify-center hover:border-primary hover:bg-primary/5 dark:hover:bg-primary/10 transition-all cursor-pointer group relative overflow-hidden"
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <!-- Column 1: Upload Action -->
+                        <div class="saas-card p-1 flex flex-col">
+                            <div class="rounded-[15px] bg-slate-50/50 dark:bg-slate-800/30 border-2 border-dashed border-primary/30 dark:border-primary/40 p-10 text-center flex flex-col items-center justify-center hover:border-primary hover:bg-primary/5 dark:hover:bg-primary/10 transition-all cursor-pointer group relative overflow-hidden h-full min-h-[320px]"
                                 id="uploadZone">
                                 <input type="file" id="fileInput" accept=".xlsx,.xls" multiple hidden>
                                 <div
-                                    class="absolute inset-0 bg-gradient-to-tr from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                                    class="w-14 h-14 bg-white dark:bg-slate-700 rounded-2xl shadow-sm flex items-center justify-center mb-6 group-hover:scale-110 transition-all duration-300 z-10">
+                                    <span class="material-icons-outlined text-primary text-3xl">cloud_upload</span>
                                 </div>
-                                <div
-                                    class="w-16 h-16 bg-white dark:bg-slate-700 rounded-2xl shadow-md flex items-center justify-center mb-6 group-hover:scale-110 group-hover:shadow-xl transition-all duration-300 z-10">
-                                    <span class="material-icons-outlined text-primary text-4xl">cloud_upload</span>
-                                </div>
-                                <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-2 z-10"
-                                    data-en="Upload SPC Report" data-zh="上傳分析報表">上傳分析報表</h3>
-                                <p class="text-sm text-slate-500 dark:text-slate-400 mb-6 max-w-sm z-10"
-                                    data-en="Drop your extracted QIP file or standard Excel here"
-                                    data-zh="將提取後的 QIP 檔案或標準 Excel 拖曳至此">將提取後的 QIP 檔案或標準 Excel 拖曳至此</p>
+                                <h3 class="text-base font-bold text-slate-900 dark:text-white mb-2 z-10"
+                                    data-en="Import Data" data-zh="匯入數據報表">匯入數據報表</h3>
+                                <p class="text-xs text-slate-500 dark:text-slate-400 mb-6 max-w-[200px] mx-auto z-10"
+                                    data-en="Drag & drop QIP / Excel files here" data-zh="點擊或將 QIP 檔案拖曳至此">點擊或將 QIP
+                                    檔案拖曳至此</p>
                                 <button
-                                    class="px-6 py-2.5 bg-primary hover:bg-indigo-700 text-white rounded-lg font-medium shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5 z-10 flex items-center gap-2">
-                                    <span class="material-icons-outlined text-sm">attach_file</span>
-                                    <span data-en="Browse Files" data-zh="瀏覽檔案">瀏覽檔案</span>
+                                    class="px-5 py-2 bg-primary hover:bg-opacity-90 text-white rounded-lg font-bold text-sm shadow-md transition-all z-10">
+                                    <span data-en="Browse" data-zh="瀏覽檔案">瀏覽檔案</span>
                                 </button>
                             </div>
                         </div>
 
-                        <!-- Sidebar Info: Analysis Checklist -->
+                        <!-- Column 2: Recent History -->
+                        <div class="saas-card p-6 flex flex-col h-full bg-white dark:bg-slate-800/50">
+                            <h4 class="font-bold mb-4 flex items-center gap-2 text-sm">
+                                <span class="material-icons-outlined text-primary">history</span>
+                                <span data-en="Recent Activities" data-zh="近期分析活動">近期分析活動</span>
+                            </h4>
+                            <div id="recentFilesContainer" class="flex-1 space-y-1">
+                                <!-- JS Injected History Items -->
+                                <div class="text-[10px] text-slate-400 py-4 text-center italic"
+                                    data-en="Loading history..." data-zh="載入歷史紀錄中...">載入歷史紀錄中...</div>
+                            </div>
+                            <div class="mt-4 pt-4 border-t border-slate-100 dark:border-slate-800">
+                                <button onclick="SPCApp.switchView('history')"
+                                    class="w-full py-2 text-xs font-bold text-slate-500 hover:text-primary transition-colors flex items-center justify-center gap-1">
+                                    <span data-en="View Full History" data-zh="查看完整紀錄">查看完整紀錄</span>
+                                    <span class="material-icons-outlined text-xs">arrow_forward</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Column 3: Guidelines & Specs -->
                         <div class="space-y-6">
-                            <div class="saas-card p-6 bg-slate-900 text-white relative overflow-hidden">
-                                <h4 class="font-bold mb-4 flex items-center gap-2">
-                                    <span class="material-icons-outlined text-amber-400">inventory_2</span>
-                                    <span data-en="Format Requirements" data-zh="格式要求">格式要求</span>
+                            <div class="saas-card p-5 bg-slate-900 text-white relative overflow-hidden">
+                                <h4 class="text-sm font-bold mb-3 flex items-center gap-2">
+                                    <span class="material-icons-outlined text-amber-400">tips_and_updates</span>
+                                    <span data-en="Pro Guidelines" data-zh="作業規範指引">作業規範指引</span>
                                 </h4>
-                                <ul class="text-sm space-y-3 text-slate-300 font-medium">
+                                <ul class="text-[11px] space-y-2 text-slate-300">
                                     <li class="flex items-start gap-2">
                                         <span
-                                            class="material-icons-outlined text-emerald-400 text-sm">check_circle</span>
-                                        <span data-en="First column should contain Batch IDs or Timestamps."
-                                            data-zh="第一欄應包含批號或時間戳記。">第一欄應包含批號或時間戳記。</span>
+                                            class="material-icons-outlined text-emerald-400 text-xs mt-0.5">check_circle</span>
+                                        <span>A 欄：批號 (Batch ID)</span>
                                     </li>
                                     <li class="flex items-start gap-2">
                                         <span
-                                            class="material-icons-outlined text-emerald-400 text-sm">check_circle</span>
-                                        <span data-en="Subsequent columns represent measurement readings."
-                                            data-zh="後續欄位代表測量讀值。">後續欄位代表測量讀值。</span>
-                                    </li>
-                                    <li class="flex items-start gap-2">
-                                        <span
-                                            class="material-icons-outlined text-emerald-400 text-sm">check_circle</span>
-                                        <span data-en="Consistent subgroup size (n >= 2) is recommended."
-                                            data-zh="建議使用一致的子群大小 (n >= 2)。">建議使用一致的子群大小 (n >= 2)。</span>
+                                            class="material-icons-outlined text-emerald-400 text-xs mt-0.5">check_circle</span>
+                                        <span>B 欄起：測量讀值 (Value)</span>
                                     </li>
                                 </ul>
-                                <div class="mt-6 pt-6 border-t border-slate-800">
-                                    <p class="text-sm text-slate-500 uppercase font-bold mb-2" data-en="Pro Tip"
-                                        data-zh="專業建議">專業建議</p>
-                                    <p class="text-sm leading-relaxed italic text-slate-400"
-                                        data-en='"Use the QIP Extract tool first if your data is in raw molding reports."'
-                                        data-zh="「如果您的數據在原始成型報表中，請先使用 QIP 提取工具。」">
-                                        「如果您的數據在原始成型報表中，請先使用 QIP 提取工具。」
-                                    </p>
-                                </div>
+                                <p class="mt-4 text-[10px] italic text-slate-500 border-t border-slate-800 pt-3">
+                                    建議子群大小 n ≥ 2 以獲得最佳穩定性評估。
+                                </p>
                             </div>
 
-                            <div class="saas-card p-6 border-l-4 border-l-blue-500">
-                                <h4 class="text-sm font-bold text-slate-900 dark:text-white mb-2"
-                                    data-en="Analysis Mode" data-zh="分析模式說明">分析模式說明</h4>
-                                <p class="text-sm text-slate-500 leading-relaxed"
-                                    data-en="System will automatically identify items. Choose 'Batch' for X-Bar R charts, or 'Cavity' to evaluate Cpk differences across tools."
-                                    data-zh="系統將自動識別項目。選擇「批次」用於 X-Bar R 管制圖，或「模穴」用於評估模具間的 Cpk 差異。">
-                                    系統將自動識別項目。選擇「批次」用於 X-Bar R 管制圖，或「模穴」用於評估模具間的 Cpk 差異。
+                            <div class="saas-card p-5 border-l-4 border-l-blue-500">
+                                <h4 class="text-xs font-bold text-slate-900 dark:text-white mb-2 uppercase tracking-wider"
+                                    data-en="Quick Help" data-zh="分析模式導覽">分析模式導覽</h4>
+                                <p class="text-[11px] text-slate-500 leading-relaxed">
+                                    系統偵測數據後，請依目的選擇「批次」或「模穴」模式。如需處理原始成型報表，請使用 <strong>Data Extract</strong> 提取工具。
                                 </p>
                             </div>
                         </div>

@@ -403,13 +403,13 @@ var SPCApp = {
             var d = new Date(h.time);
             h.index = i; // Store original index for deletion logic if sorted/sliced
             var timeStr = d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            return '<div class="flex items-center group cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50 p-2 rounded-lg transition-all">' +
-                '<div class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-700 flex items-center justify-center mr-3 group-hover:bg-primary/10 transition-colors">' +
-                '<span class="material-icons-outlined text-sm text-slate-400 group-hover:text-primary transition-colors">description</span>' +
+            return '<div class="flex items-center group cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50 p-1.5 rounded-lg transition-all">' +
+                '<div class="w-7 h-7 rounded bg-slate-100 dark:bg-slate-700 flex items-center justify-center mr-2.5 group-hover:bg-primary/10 transition-colors">' +
+                '<span class="material-icons-outlined text-xs text-slate-400 group-hover:text-primary transition-colors">description</span>' +
                 '</div>' +
                 '<div class="flex-1 min-w-0">' +
-                '<div class="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">' + h.name + '</div>' +
-                '<div class="text-sm text-slate-400">' + h.size + ' • ' + timeStr + '</div>' +
+                '<div class="text-[11px] font-bold text-slate-800 dark:text-slate-200 truncate">' + h.name + '</div>' +
+                '<div class="text-[10px] text-slate-400 tracking-tight">' + h.size + ' • ' + timeStr + '</div>' +
                 '</div>' +
                 '<button onclick="event.stopPropagation(); SPCApp.deleteHistoryItem(' + h.index + ')" class="p-1 opacity-0 group-hover:opacity-100 text-slate-300 hover:text-rose-500 transition-all rounded">' +
                 '<span class="material-icons-outlined text-sm">delete</span>' +

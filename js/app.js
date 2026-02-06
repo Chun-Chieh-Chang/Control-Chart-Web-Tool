@@ -1653,7 +1653,10 @@ var SPCApp = {
                         maxHeight: 120,
                         formatter: function (v) {
                             var i = Math.floor(v);
-                            return (labels && labels[i - 1]) ? labels[i - 1] : v;
+                            // Try multiple mapping strategies to ensure batch label is found
+                            if (labels && labels[i]) return labels[i];
+                            if (labels && labels[i - 1]) return labels[i - 1];
+                            return v;
                         },
                         style: {
                             colors: theme.text,
@@ -1749,7 +1752,10 @@ var SPCApp = {
                         trim: true,
                         formatter: function (v) {
                             var i = Math.floor(v);
-                            return (labels && labels[i - 1]) ? labels[i - 1] : v;
+                            // Try multiple mapping strategies to ensure batch label is found
+                            if (labels && labels[i]) return labels[i];
+                            if (labels && labels[i - 1]) return labels[i - 1];
+                            return v;
                         },
                         style: { colors: theme.text, fontSize: labels.length > 25 ? '10px' : '11px', fontFamily: 'Inter, sans-serif' }
                     }
@@ -1763,7 +1769,24 @@ var SPCApp = {
                     title: { text: self.t('全距', 'Range') }
                 },
                 grid: { borderColor: theme.grid },
-                tooltip: { followCursor: true, fixed: { enabled: false }, style: { fontSize: '12px' } }
+                tooltip: {
+                    followCursor: true,
+                    intersect: false,
+                    fixed: { enabled: false },
+                    custom: function ({ series, seriesIndex, dataPointIndex, w }) {
+                        var label = (labels && labels[dataPointIndex]) ? labels[dataPointIndex] : w.globals.categoryLabels[dataPointIndex];
+                        var html = '<div class="px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 shadow-xl rounded-lg">';
+                        html += '<div class="text-xs text-slate-500 dark:text-slate-400 font-bold uppercase mb-1 border-b border-slate-200 dark:border-slate-800 pb-1">' + label + '</div>';
+                        html += '<div class="flex items-center justify-between gap-4 py-0.5">';
+                        html += '<div class="flex items-center gap-1.5">';
+                        html += '<span class="w-2 h-2 rounded-full" style="background-color:' + w.globals.colors[0] + '"></span>';
+                        html += '<span class="text-xs font-bold text-slate-700 dark:text-slate-200">Range:</span>';
+                        html += '</div>';
+                        html += '<span class="text-xs font-mono font-bold text-slate-600 dark:text-slate-300">' + (series[0][dataPointIndex] !== null ? series[0][dataPointIndex].toFixed(4) : '-') + '</span>';
+                        html += '</div></div>';
+                        return html;
+                    }
+                }
             };
             var chartV = new ApexCharts(document.querySelector("#groupVarChart"), vOpt);
             chartV.render(); this.chartInstances.push(chartV);

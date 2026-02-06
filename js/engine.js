@@ -119,6 +119,7 @@ var SPCEngine = {
         var rLCL = constants.D3 * rBar;
 
         var results = {
+            type: 'standard',
             xBar: {
                 data: xBars,
                 UCL: xUCL,
@@ -137,6 +138,39 @@ var SPCEngine = {
 
         results.xBar.violations = this.checkNelsonRules(xBars, xDoubleBar, results.xBar.sigma);
         return results;
+    },
+
+    /**
+     * calculateExtendedBatchLimits - For Multi-Cavity (Model C/D)
+     * Incorporates between-cavity variation into limits to avoid false alarms.
+     */
+    calculateExtendedBatchLimits: function (dataMatrix) {
+        var standard = this.calculateXBarRLimits(dataMatrix);
+        var n = standard.summary.n;
+
+        // Calculate Overall Variation (including between-cavity)
+        var allValues = dataMatrix.flat().filter(v => v !== null && !isNaN(v));
+        var sigmaTotal = this.stdDev(allValues);
+
+        // Extended Shewhart Limit: CL +/- 3 * SigmaTotal / sqrt(n_effective)
+        // Or AIAG-VDA approach: Adjust limits by adding cavity-to-cavity range assessment
+        var xDoubleBar = standard.xBar.CL;
+        var extendedSigma = sigmaTotal;
+
+        // In Extended Shewhart for Multi-cavity, we often use Total sigma to set X-bar limits
+        // so that the limits represent "process potential" including cavity deltas.
+        var xUCL = xDoubleBar + (3 * extendedSigma / Math.sqrt(n || 1));
+        var xLCL = xDoubleBar - (3 * extendedSigma / Math.sqrt(n || 1));
+
+        standard.type = 'extended';
+        standard.xBar.UCL = xUCL;
+        standard.xBar.LCL = xLCL;
+        standard.xBar.sigma = extendedSigma / Math.sqrt(n || 1);
+
+        // Re-check rules with new limits
+        standard.xBar.violations = this.checkNelsonRules(standard.xBar.data, xDoubleBar, standard.xBar.sigma);
+
+        return standard;
     },
 
     checkNelsonRules: function (data, cl, sigma) {

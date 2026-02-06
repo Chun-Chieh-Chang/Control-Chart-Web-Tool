@@ -941,6 +941,76 @@ var SPCApp = {
                     });
                     var stability = SPCEngine.analyzeGroupStability(groupStats, specs);
                     results = { type: 'group', groupStats: groupStats, specs: specs, stability: stability, productInfo: dataInput.productInfo };
+                } else if (type === 'multi-cavity') {
+                    // IMPLEMENTATION OF ROTATIONAL SAMPLING (n=5)
+                    var specs = dataInput.specs;
+                    var originalMatrix = dataInput.getDataMatrix();
+                    var cavityNames = dataInput.getCavityNames();
+                    var batchNames = dataInput.batchNames;
+                    var flattened = [];
+
+                    // 1. Flatten data while tagging with source cavity and batch
+                    for (var b = 0; b < originalMatrix.length; b++) {
+                        for (var c = 0; c < originalMatrix[b].length; c++) {
+                            var val = originalMatrix[b][c];
+                            if (val !== null && !isNaN(val)) {
+                                flattened.push({
+                                    val: val,
+                                    label: batchNames[b] + ' (' + cavityNames[c] + ')',
+                                    batch: batchNames[b],
+                                    cavity: cavityNames[c]
+                                });
+                            }
+                        }
+                    }
+
+                    // 2. Re-group into subgroups of n=5 (Rotational)
+                    var targetN = 5;
+                    var rotMatrix = [];
+                    var rotLabels = [];
+                    var rotBatchNames = [];
+                    var rotSubgroupLabels = [];
+
+                    for (var i = 0; i < flattened.length; i += targetN) {
+                        var chunk = flattened.slice(i, i + targetN);
+                        if (chunk.length < 2 && i > 0) break; // Skip the very last group if too small
+
+                        rotMatrix.push(chunk.map(item => item.val));
+                        rotSubgroupLabels.push(chunk.map(item => item.label));
+
+                        // Label represents the range of samples in this rotational subgroup
+                        var label = chunk[0].label + ' to ' + chunk[chunk.length - 1].label;
+                        rotLabels.push('Subgroup ' + (rotMatrix.length));
+                        rotBatchNames.push(label);
+                    }
+
+                    // 3. Calculate Extended Limits
+                    var xbarR = SPCEngine.calculateExtendedBatchLimits(rotMatrix);
+                    var allValues = flattened.map(item => item.val);
+                    var cap = SPCEngine.calculateProcessCapability(allValues, specs.usl, specs.lsl, xbarR.summary.rBar, targetN);
+
+                    xbarR.summary.Cpk = cap.Cpk;
+                    xbarR.summary.Ppk = cap.Ppk;
+
+                    // Analysis insights
+                    var distStats = SPCEngine.calculateDistStats(allValues);
+                    var diagnosis = SPCEngine.analyzeVarianceSource(cap.Cpk, cap.Ppk, distStats);
+                    if (diagnosis) {
+                        diagnosis.advice = "【多模穴專業建議】" + diagnosis.advice + " 已採用 $n=5$ 輪替抽樣與擴展管制界限，以容許模穴間系統性差異。";
+                    }
+
+                    results = {
+                        type: 'batch', // Use batch renderer but with our modified data
+                        analysisSubType: 'multi-cavity',
+                        xbarR: xbarR,
+                        batchNames: rotBatchNames,
+                        subgroupLabels: rotSubgroupLabels,
+                        specs: specs,
+                        dataMatrix: rotMatrix,
+                        cavityNames: new Array(targetN).fill(0).map((_, i) => "Sample " + (i + 1)),
+                        productInfo: dataInput.productInfo,
+                        diagnosis: diagnosis
+                    };
                 }
 
                 self.analysisResults = results;
@@ -1002,7 +1072,15 @@ var SPCApp = {
                     '</div>';
             }
 
-            html = '<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">' +
+            var multiCavityBadge = '';
+            if (data.analysisSubType === 'multi-cavity') {
+                multiCavityBadge = '<div class="col-span-full p-4 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 rounded-xl flex items-center gap-4 mb-4">' +
+                    '<div class="w-10 h-10 rounded-lg bg-emerald-500 text-white flex items-center justify-center shrink-0"><span class="material-icons-outlined">verified</span></div>' +
+                    '<div><h4 class="text-sm font-bold text-emerald-900 dark:text-emerald-300">' + this.t('多模穴專業分析模式 (AIAG-VDA 建議)', 'Multi-Cavity Professional Mode (AIAG-VDA Recommended)') + '</h4>' +
+                    '<p class="text-xs text-emerald-700 dark:text-emerald-400 font-medium">' + this.t('已執行輪替抽樣 (n=5) 並採用擴展 Shewhart 管制界限。此模式容許模穴間的系統性差異，避免因模穴偏移導致的頻繁誤報。', 'Executed rotational sampling (n=5) with Extended Shewhart Limits. This mode allows for systematic differences between cavities to reduce false alarms.') + '</p></div></div>';
+            }
+
+            html = multiCavityBadge + '<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">' +
                 '<div class="saas-card p-4"> <div class="text-[10px] font-bold text-slate-500 uppercase">' + this.t('模穴數', 'Cavities') + '</div> <div class="text-xl font-bold dark:text-white">' + data.xbarR.summary.n + '</div> </div>' +
                 '<div class="saas-card p-4"> <div class="text-[10px] font-bold text-slate-500 uppercase">' + this.t('規格上限 (USL)', 'USL') + '</div> <div class="text-xl font-bold font-mono text-slate-700 dark:text-slate-300">' + SPCEngine.round(data.specs.usl, 3) + '</div> </div>' +
                 '<div class="saas-card p-4"> <div class="text-[10px] font-bold text-slate-500 uppercase">' + this.t('標稱值 (Target)', 'Target') + '</div> <div class="text-xl font-bold font-mono text-slate-700 dark:text-slate-300">' + SPCEngine.round(data.specs.target, 3) + '</div> </div>' +
@@ -1020,7 +1098,7 @@ var SPCApp = {
             }
             html += '<div id="detailedTableContainer" class="mb-10 overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm"></div>' +
                 '<div class="grid grid-cols-1 gap-8">' +
-                '<div class="saas-card p-8"> <h3 class="text-base font-bold mb-6 dark:text-white">' + this.t('X̄ 管制圖', 'X-Bar Chart') + '</h3> <div id="xbarChart" class="h-96"></div> </div>' +
+                '<div class="saas-card p-8"> <h3 class="text-base font-bold mb-6 dark:text-white">' + (data.analysisSubType === 'multi-cavity' ? 'Extended Shewhart X̄ Chart' : this.t('X̄ 管制圖', 'X-Bar Chart')) + '</h3> <div id="xbarChart" class="h-96"></div> </div>' +
                 '<div class="saas-card p-8"> <h3 class="text-base font-bold mb-6 dark:text-white">' + this.t('R 管制圖', 'R Chart') + '</h3> <div id="rChart" class="h-80"></div> </div> </div>';
         } else if (data.type === 'cavity') {
             var balHtml = '';
@@ -1232,7 +1310,12 @@ var SPCApp = {
             var end = Math.min(start + p.maxPerPage, p.totalBatches);
             var pageLabels = data.batchNames.slice(start, end);
             var pageData = data.dataMatrix.slice(start, end);
-            var pageXbarR = SPCEngine.calculateXBarRLimits(pageData);
+
+            var calculate = (data.analysisSubType === 'multi-cavity') ?
+                SPCEngine.calculateExtendedBatchLimits.bind(SPCEngine) :
+                SPCEngine.calculateXBarRLimits.bind(SPCEngine);
+
+            var pageXbarR = calculate(pageData);
 
             this.renderDetailedDataTable(pageLabels, pageData, pageXbarR);
 
@@ -1299,6 +1382,21 @@ var SPCApp = {
                         html += '<span class="w-2 h-2 rounded-full" style="background-color:' + w.globals.colors[seriesIndex] + '"></span>';
                         html += '<span class="text-sm font-bold text-white">' + name + ': ' + (val ? val.toFixed(4) : '-') + '</span>';
                         html += '</div>';
+
+                        // Multi-cavity rotational sampling details
+                        if (data.analysisSubType === 'multi-cavity' && data.subgroupLabels) {
+                            var globalIndex = start + dataPointIndex;
+                            var labels = data.subgroupLabels[globalIndex];
+                            if (labels) {
+                                html += '<div class="mt-2 pt-2 border-t border-slate-800">';
+                                html += '<div class="text-[10px] text-slate-500 font-bold uppercase mb-1">' + self.t('構成穴號', 'Subgroup Cavities') + '</div>';
+                                html += '<div class="text-[10px] text-slate-300 grid grid-cols-1 gap-0.5">';
+                                labels.forEach(function (lab) {
+                                    html += '<span>• ' + lab + '</span>';
+                                });
+                                html += '</div></div>';
+                            }
+                        }
 
                         // Check if this point has a Nelson Rule violation
                         var violation = pageXbarR.xBar.violations.find(v => v.index === dataPointIndex);

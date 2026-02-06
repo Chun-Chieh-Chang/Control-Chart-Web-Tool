@@ -1,5 +1,33 @@
 # 專案開發與修訂日誌 (Development & Revision Log)
 
+## [2026-02-07] 多模穴專業分析模型 (Multi-Cavity Professional Analysis)
+**專案**: Control Chart Web Tool
+**類別**: SPC Algorithm, High-Density Data Analysis
+**背景**: 針對 16/32/48 等高模穴數之複雜製程，傳統批次分析因無法區分幾何位移噪音而失效。
+
+### 變更內容
+- **輪替抽樣 (Rotational Sampling)**:
+    - 實現 $n=5$ 輪替抽樣計畫。系統自動將扁平化後的模穴數據進行分組。
+    - 數據點現在具備完整的模穴標籤追蹤，支援在圖表懸停時查看具體構成穴號。
+- **擴展 Shewhart 管制界限 (Extended Limits)**:
+    - 引入 `Extended Shewhart Limits` 計算公式。
+    - 使用總體變異 (Total Sigma) 取代組內變異，容許 Model C 製程中的模穴間系統性位置位移。
+- **UI 整合與專屬標記**:
+    - 新增第四種分析模型卡片「多模穴專業分析」。
+    - 結果頁面新增動態勳章與專業診斷建議標記。
+    - 圖表標籤自動更新為「Extended Shewhart X̄ Chart」。
+- **統計引擎功能擴展**:
+    - `engine.js` 新增 `calculateExtendedBatchLimits` 方法。
+    - 優化 `calculateProcessCapability` 以支援外部傳入 $n$ 值與 R-bar。
+
+### 技術實作
+- 修改 `js/engine.js`: 納入擴展界限模型。
+- 修改 `js/app.js`: 實作數據輪替扁平化邏輯與 Tooltip 擴充。
+- 更新 `index.html`: UI 模型選項。
+- 更新文檔: `README.md`, `docs/specs/SPC_Calculation_Logic.md`。
+
+---
+
 ## [2026-02-06] UI 分佈平衡與專案目錄結構化重整 (UI Balance & Project REORG)
 **專案**: Control Chart Web Tool
 **類別**: UI/UX, File Management, MECE Reorg

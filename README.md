@@ -21,6 +21,9 @@
   - 📈 **批號分析**: X̄-R 管制圖，每頁 25 批號獨立計算管制界限
   - 🔍 **模穴分析**: 模穴比較 + Cpk/Ppk 製程能力評估
     - **獨家功能**: 內建 AI 模穴平衡性分析，自動判定流道平衡狀況。
+  - 📊 **多模穴專業分析**: 針對高度複雜製程 (16/32 穴) 的解決方案
+    - **輪替抽樣**: 自動實施 $n=5$ 的輪替抽樣計畫 (Rotational Sampling)
+    - **擴展管制界限**: 採用擴展 Shewhart 管制界限，容許模穴間系統性位置差異
   - 📊 **群組分析**: Min-Max-Avg 管制圖
   - 🧠 **專家解讀系統**: 
     - 內建 Nelson Rules (1-6) 異常偵測
@@ -180,6 +183,9 @@ MIT License
   - 📈 **Batch Analysis**: X̄-R Control Charts with 25 batches per page
   - 🔍 **Cavity Analysis**: Cavity Comparison + Cpk/Ppk Assessment
     - **Exclusive**: Built-in AI Cavity Balance Analysis for automatic runner balance diagnostic.
+  - 📊 **Multi-Cavity Professional**: Solution for highly complex processes (16/32 cavities)
+    - **Rotational Sampling**: Automatic implementation of $n=5$ rotational sampling plans
+    - **Extended Limits**: Uses Extended Shewhart Control Limits to account for systematic between-cavity position differences
   - 📊 **Group Analysis**: Min-Max-Avg Control Charts
   - 🧠 **Expert Interpretation System**: 
     - Built-in Nelson Rules (1-6) anomaly detection

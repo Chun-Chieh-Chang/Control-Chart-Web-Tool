@@ -1,5 +1,28 @@
 # 專案開發與修訂日誌 (Development & Revision Log)
 
+## [2026-02-06] UI 分佈平衡與專案目錄結構化重整 (UI Balance & Project REORG)
+**專案**: Control Chart Web Tool
+**類別**: UI/UX, File Management, MECE Reorg
+
+### 變更內容
+- **上傳區域佈局重整**: 
+  - 將原本過大的單一上傳卡片（LG 2/3 寬度）改為 **三欄式對稱佈局 (3-Column Grid)**。
+  - **左欄**: 匯入數據報表（上傳區間比例縮減，資訊密度提升）。
+  - **中欄**: 近期分析活動（將原本隱藏在 Dashboard 的歷史紀錄帶入導入頁面，減少跳轉）。
+  - **右欄**: 作業規範指引與模式說明（整合原本零散的側邊資訊）。
+- **頁面寬度標準化**: 將「QIP 提取」與「系統設定」頁面容器寬度統一調整為 `max-w-[96%]`，解決切換視圖時的跳動感，確保水平視覺對齊。
+- **專案目錄 MECE 清理**:
+  - **目錄重整**: 根據 Mutually Exclusive, Collectively Exhaustive 原則，將根目錄下的舊有資料夾（Stitch, templates, VBACode）全數移至 `_archive/reference/` 下進行歸檔。
+  - **資源歸位**: 將根目錄多餘的圖片 (`數字人_225x300.png`) 移入 `assets/`。
+  - **程式碼瘦身**: 檢查並維持 `js/` 目錄的純淨度，將開發中產生的臨時檔案清除或存檔。
+- **失效分析回溯 (Failure Analysis)**: 
+  - 更新 `docs/logs/FAILURE_ANALYSIS.md`，納入「Minitab 風格轉型失敗」與「初期佈局比例失調」的分析紀錄，作為未來新案設計的參考依據。
+
+### 技術實作
+- 修改 `index.html` 中的 Step 1 結構。
+- 更新 `js/app.js` 中的 `renderRecentFiles` 模板，微調其邊距與字體大小以適應新版三欄佈局。
+- 透過指令執行實體檔案搬移與目錄清理。
+
 ## [2026-02-06] 群組趨勢圖表優化 (Group Trend Chart Optimization)
 **專案**: Control Chart Web Tool
 **類別**: UI Fix, Data Visualization

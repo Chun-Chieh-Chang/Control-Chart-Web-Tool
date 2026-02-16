@@ -303,6 +303,11 @@ class QIPProcessor {
                         cavityId = numMatch[0];
                     }
 
+                    // 先佔位，確保即便沒有數據也能在輸出中保留該穴號欄位
+                    if (data[cavityId] === undefined) {
+                        data[cavityId] = null;
+                    }
+
                     // 獲取數據（處理合併儲存格）
                     const cellValue = safeGetMergedValue(dataRow, col);
 

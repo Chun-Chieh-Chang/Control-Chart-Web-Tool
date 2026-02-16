@@ -718,26 +718,43 @@ var QIPExtractApp = {
 
         // Smart Selection Logic: Split multi-row ranges
         if (this.selectionType === 'smart' && sRow !== eRow && this.activeSelectionGroup) {
-            var idRow = start.row;
-            var dataStartRow, dataEndRow;
-
-            if (idRow === sRow) {
-                dataStartRow = sRow + 1;
-                dataEndRow = eRow;
-            } else if (idRow === eRow) {
-                dataStartRow = sRow;
-                dataEndRow = eRow - 1;
-            } else {
-                // If ID is in middle, we take the rest of the range. 
-                // This is rare but we handle it by picking everything except idRow.
-                // However, Excel range strings must be rectangular. 
-                // We'll just take the larger block or current behavior.
-                dataStartRow = (idRow - sRow > eRow - idRow) ? sRow : idRow + 1;
-                dataEndRow = (idRow - sRow > eRow - idRow) ? idRow - 1 : eRow;
+            var idRowStart = start.row;
+            var idRowEnd = start.row;
+            
+            // 偵測 Pt 1 所在的垂直合併儲存格高度
+            var sheetName = this.els.worksheetSelect.value;
+            var ws = this.workbooks[0].Sheets[sheetName];
+            if (ws && ws['!merges']) {
+                var merges = ws['!merges'];
+                for (var mIdx = 0; mIdx < merges.length; mIdx++) {
+                    var m = merges[mIdx];
+                    if (start.row >= m.s.r && start.row <= m.e.r && start.col >= m.s.c && start.col <= m.e.c) {
+                        idRowStart = m.s.r;
+                        idRowEnd = m.e.r;
+                        break;
+                    }
+                }
             }
 
-            var idAddrS = XLSX.utils.encode_cell({ r: idRow, c: sCol });
-            var idAddrE = XLSX.utils.encode_cell({ r: idRow, c: eCol });
+            var dataStartRow, dataEndRow;
+            // 如果 ID 在選取範圍的頂端
+            if (idRowStart === sRow) {
+                dataStartRow = idRowEnd + 1;
+                dataEndRow = eRow;
+            } 
+            // 如果 ID 在選取範圍的底端
+            else if (idRowEnd === eRow) {
+                dataStartRow = sRow;
+                dataEndRow = idRowStart - 1;
+            } 
+            else {
+                // 若 ID 在中間，則以 Pt 1 為基準向下切分 (舊有邏輯防禦)
+                dataStartRow = idRowEnd + 1;
+                dataEndRow = eRow;
+            }
+
+            var idAddrS = XLSX.utils.encode_cell({ r: idRowStart, c: sCol });
+            var idAddrE = XLSX.utils.encode_cell({ r: idRowEnd, c: eCol });
             var dataAddrS = XLSX.utils.encode_cell({ r: dataStartRow, c: sCol });
             var dataAddrE = XLSX.utils.encode_cell({ r: dataEndRow, c: eCol });
 

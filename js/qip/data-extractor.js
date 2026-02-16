@@ -233,10 +233,6 @@ class DataExtractor {
                 // 獲取對應數據（可能跨多行）
                 for (let rowOffset = 0; rowOffset <= dataRangeParsed.endRow - dataRangeParsed.startRow; rowOffset++) {
                     const dataRowIdx = dataRangeParsed.startRow - 1 + rowOffset;
-                    
-                    // 安全檢查：如果當前行剛好是穴號 ID 所在的行，則跳過 (避免將標頭數字當成數據)
-                    if (dataRowIdx === idRow) continue;
-
                     const dataCellAddr = XLSX.utils.encode_cell({ r: dataRowIdx, c: col });
                     const dataCell = worksheet[dataCellAddr];
 

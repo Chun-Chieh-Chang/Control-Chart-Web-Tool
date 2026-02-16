@@ -1086,7 +1086,7 @@ var QIPExtractApp = {
 
     var html = "";
     var items = results.inspectionItems || {};
-    var itemNames = Object.keys(items);
+    var itemNames = results.itemOrder || Object.keys(items);
 
     if (itemNames.length === 0) {
       html =

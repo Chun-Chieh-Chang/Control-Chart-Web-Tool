@@ -8,6 +8,7 @@ class QIPProcessor {
         this.errorLogger = new ErrorLogger();
         this.results = {
             inspectionItems: {},
+            itemOrder: [], // 記錄檢驗項目出現的順序
             totalBatches: 0,
             totalCavities: 0,
             processedSheets: 0,
@@ -350,6 +351,7 @@ class QIPProcessor {
                 allCavities: new Set(),
                 specification: null
             };
+            this.results.itemOrder.push(inspectionItem); // 記錄順序
             console.log(`[QIP] 新增檢驗項目: ${inspectionItem}`);
         }
 
@@ -495,13 +497,14 @@ class QIPProcessor {
 
         return {
             inspectionItems: this.results.inspectionItems,
+            itemOrder: this.results.itemOrder, // 返回原始順序
             totalBatches: maxBatchesInAnyItem,
             uniqueBatchNamesCount: actualUniqueBatchNamesCount,
             totalCavities: this.results.totalCavities,
             processedSheets: this.results.processedSheets,
             productInfo: this.results.productInfo,
             productCode: this.config.productCode || '',
-            itemCount: Object.keys(this.results.inspectionItems).length,
+            itemCount: this.results.itemOrder.length,
             errors: this.errorLogger.getErrors(),
             hasErrors: this.errorLogger.hasErrors()
         };

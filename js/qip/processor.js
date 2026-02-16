@@ -253,8 +253,17 @@ class QIPProcessor {
             };
 
             // 遍歷數據範圍的每一行（每行可能是不同的檢驗項目）
+            const idRow = idRangeParsed.startRow - 1; // 0-indexed
+            
             for (let rowOffset = 0; rowOffset <= dataRangeParsed.endRow - dataRangeParsed.startRow; rowOffset++) {
                 const dataRow = dataRangeParsed.startRow - 1 + rowOffset; // 0-indexed
+                
+                // 跳過穴號 ID 所在的行，避免其被當作數據提取 (解決 INSP. ITEM / 1,2,3 誤判)
+                if (dataRow === idRow) {
+                    console.log(`[QIP][Row${dataRow + 1}] 跳過穴號 ID 行`);
+                    continue;
+                }
+
                 const data = {};
                 let itemName = '';
 
@@ -284,7 +293,6 @@ class QIPProcessor {
 
 
                 // 提取穴號數據
-                const idRow = idRangeParsed.startRow - 1; // 0-indexed
                 let hasData = false;
 
                 for (let colOffset = 0; colOffset < idRangeParsed.endCol - idRangeParsed.startCol + 1; colOffset++) {

@@ -284,6 +284,7 @@ class QIPProcessor {
 
 
                 // 提取穴號數據
+                const idRow = idRangeParsed.startRow - 1; // 0-indexed
                 let hasData = false;
 
                 for (let colOffset = 0; colOffset < idRangeParsed.endCol - idRangeParsed.startCol + 1; colOffset++) {

@@ -52,33 +52,36 @@ DataInput.prototype.parse = function () {
     }
 
     // 提取規格 (Specifications)
-    // 根據新格式：Row 2 (index 1) 的 A, B, C 欄為 Target, USL, LSL
+    // 根據標竿格式：Row 2 (index 1) 的 B, C, D 欄為 Target, USL, LSL
     var row2 = this.data[1] || [];
     this.specs = {
-        target: parseFloat(row2[0]) || 0,
-        usl: parseFloat(row2[1]) || 0,
-        lsl: parseFloat(row2[2]) || 0
+        target: parseFloat(row2[1]) || 0,
+        usl: parseFloat(row2[2]) || 0,
+        lsl: parseFloat(row2[3]) || 0
     };
 
     // 偵測數據列 (Cavity Columns)
-    // 根據新格式：Column E (index 4) 之後為穴號量測值
+    // 根據標竿格式：Column E (index 4) 之後為穴號量測值
     this.headers = this.data[0] || [];
     this.cavityColumns = [];
     for (var i = 4; i < this.headers.length; i++) {
         var header = this.headers[i];
-        if (typeof header === 'string' && (header.indexOf('穴') >= 0 || !isNaN(parseFloat(header)))) {
+        if (header && (header.toString().indexOf('穴') >= 0 || !isNaN(parseFloat(header)))) {
             this.cavityColumns.push({ index: i, name: header });
         }
     }
 
-    // 提取批號與實際數據行
-    // 根據新格式：從 Row 2 (index 1) 開始，批號在 D 欄 (index 3)
-    this.dataRows = this.data.slice(1);
+    // 提取批號與同步數據行
+    // 重要：必須確保 batchNames 與 dataRows 同步，防止圖表 X 軸與 Y 軸錯位
+    // 根據標竿格式：從 Row 3 (index 2) 開始，批號在 A 欄 (index 0)
+    var rawRows = this.data.slice(2);
+    this.dataRows = [];
     this.batchNames = [];
-    for (var j = 0; j < this.dataRows.length; j++) {
-        var name = this.dataRows[j][3]; // D 欄
+    for (var j = 0; j < rawRows.length; j++) {
+        var name = rawRows[j][0]; // A 欄
         if (name && name !== '') {
             this.batchNames.push(cleanBatchName(name));
+            this.dataRows.push(rawRows[j]);
         }
     }
 };

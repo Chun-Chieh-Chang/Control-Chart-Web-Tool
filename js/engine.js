@@ -221,17 +221,6 @@ var SPCEngine = {
                 }
                 if (!anyInside && countHi > 0 && countLo > 0) rules.push(8);
             }
-            if (i >= 14) {
-                var countHi = 0, countLo = 0;
-                var anyInside = false;
-                for (var j = i - 14; j <= i; j++) {
-                    var diff = data[j] - cl;
-                    if (Math.abs(diff) <= sigma) { anyInside = true; break; }
-                    if (diff > 0) countHi++;
-                    else countLo++;
-                }
-                if (!anyInside && countHi > 0 && countLo > 0) rules.push(8);
-            }
             if (rules.length > 0) violations.push({ index: i, rules: rules });
         }
         return violations;

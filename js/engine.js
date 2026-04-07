@@ -205,6 +205,33 @@ var SPCEngine = {
                 for (var j = i - 4; j <= i; j++) { if (data[j] > cl + 1 * sigma) up++; if (data[j] < cl - 1 * sigma) lo++; }
                 if (up >= 4 || lo >= 4) rules.push(6);
             }
+            if (i >= 14) {
+                var withinOne = true;
+                for (var j = i - 14; j <= i; j++) { if (Math.abs(data[j] - cl) > sigma) { withinOne = false; break; } }
+                if (withinOne) rules.push(7);
+            }
+            if (i >= 7) {
+                var countHi = 0, countLo = 0;
+                var anyInside = false;
+                for (var j = i - 7; j <= i; j++) {
+                    var diff = data[j] - cl;
+                    if (Math.abs(diff) <= sigma) { anyInside = true; break; }
+                    if (diff > 0) countHi++;
+                    else countLo++;
+                }
+                if (!anyInside && countHi > 0 && countLo > 0) rules.push(8);
+            }
+            if (i >= 14) {
+                var countHi = 0, countLo = 0;
+                var anyInside = false;
+                for (var j = i - 14; j <= i; j++) {
+                    var diff = data[j] - cl;
+                    if (Math.abs(diff) <= sigma) { anyInside = true; break; }
+                    if (diff > 0) countHi++;
+                    else countLo++;
+                }
+                if (!anyInside && countHi > 0 && countLo > 0) rules.push(8);
+            }
             if (rules.length > 0) violations.push({ index: i, rules: rules });
         }
         return violations;

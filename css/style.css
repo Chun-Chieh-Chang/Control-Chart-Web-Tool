@@ -315,12 +315,49 @@ label {
     border-radius: 1rem !important;
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15) !important;
     font-family: 'Nunito', sans-serif !important;
+    max-width: 350px !important;
+    width: auto !important;
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+    white-space: normal !important;
+}
+
+.apexcharts-tooltip * {
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+    white-space: normal !important;
+}
+
+.apexcharts-tooltip-title {
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+    max-width: 300px !important;
+    white-space: normal !important;
+}
+
+.apexcharts-tooltip-text {
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+    white-space: normal !important;
+}
+
+.apexcharts-tooltip * {
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
 }
 
 .dark .apexcharts-tooltip {
     background: var(--surface) !important;
     border-color: var(--table-border) !important;
     color: var(--text-main) !important;
+    max-width: 350px !important;
+    width: auto !important;
+}
+
+.apexcharts-tooltip-title {
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+    max-width: 300px !important;
 }
 
 /* Floating Animation Utility */

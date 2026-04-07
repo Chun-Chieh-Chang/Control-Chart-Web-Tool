@@ -1187,11 +1187,13 @@ var QIPExtractApp = {
             "</div>";
           html += '<div class="flex-1 flex flex-wrap gap-1">';
           cavIds.forEach(function (cavId) {
+            var value = batchData[cavId];
+            var displayValue = (value !== null && value !== undefined) ? value.toFixed(3) : "N/A";
             html +=
               '<span class="text-xs px-1 py-0.5 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-400 rounded font-mono">' +
               cavId +
               ":" +
-              batchData[cavId].toFixed(3) +
+              displayValue +
               "</span>";
           });
           html += "</div>";

@@ -12,36 +12,156 @@ var SPCApp = {
     batchPagination: { currentPage: 1, totalPages: 1, maxPerPage: 25, totalBatches: 0 },
     nelsonExpertise: {
         1: {
-            zh: { m: "突發異常：異物阻塞射嘴、加熱圈燒毀、模具未鎖緊。", q: "非機遇原因介入 (0.3%)，需立即隔離全檢。" },
-            en: { m: "Sudden Anomaly: Nozzle blockage, heater band burnout, or loose mold lock.", q: "Assignable cause present (0.3%). Isolate batch for 100% inspection." }
+            name: "一點超出 3σ 管制界限",
+            nameEn: "One point beyond 3σ Control Limit",
+            condition: "Out of Control (OOC)",
+            conditionEn: "災難性突發異常",
+            statisticalBasis: "單點超出 3σ 的發生機率僅 0.27%",
+            zh: {
+                m: "這通常代表災難性的突發異常。在射出成型中，最常見的原因是異物阻塞射嘴導致短射 (Short Shot)，或者是加熱圈燒毀導致料溫驟降。如果是尺寸暴增，請檢查是否模具未鎖緊或是產生嚴重毛邊 (Flash)。",
+                q: "統計學上此事件發生機率僅 0.3%，幾乎可以確定有『非機遇原因 (Assignable Cause)』介入。必須立即隔離該批次產品並進行全檢 (100% Inspection)，否則不良品流出的風險極高。此事件發生時，請立即啟動 8D Report 流程並通知製程工程師。"
+            },
+            en: {
+                m: "This typically represents a catastrophic sudden anomaly. In injection molding, the most common causes are foreign material blocking the nozzle causing short shots, or burnt heater bands causing sudden temperature drop. If dimension spikes occur, check if mold is not properly clamped or if severe flash is present.",
+                q: "Statistically, this event has only 0.3% probability of occurring by chance. There is almost certainly an Assignable Cause involved. Immediately quarantine the affected batch and perform 100% inspection, otherwise the risk of defective product escaping is extremely high."
+            },
+            checklist: {
+                molding: ["檢查射嘴是否堵塞或異物", "確認加熱圈運作正常", "檢查模具鎖模力是否足夠", "確認產品是否有毛邊", "檢查料管溫度是否異常"],
+                quality: ["隔離該批次產品", "該批次進行 100% 全檢", "通知製程工程師", "啟動 8D Report 流程", "追溯同批次其他產品"]
+            }
         },
         2: {
-            zh: { m: "製程漂移：原料批次變更、模溫水路積垢、油溫未熱平衡。", q: "平均值移動，Cpk 將下降，建議預防性調整。" },
-            en: { m: "Process Shift: Raw material batch change, scale in cooling lines, or thermal imbalance at startup.", q: "Mean shift detected. Cpk will drop. Recommend process center adjustment." }
+            name: "連續 9 點在中心線同一側",
+            nameEn: "9 consecutive points on same side of CL",
+            condition: "Process Shift (Mean Drift)",
+            conditionEn: "平均值漂移",
+            statisticalBasis: "連續 9 點落在中心線同一側的機率僅 0.39%",
+            zh: {
+                m: "這是典型的平均值漂移 (Process Shift)。最常見原因是更換了不同批次的原料（熔融指數 MI 改變），或者是模溫機冷卻水路逐漸積垢導致散熱效率改變。如果發生在開機初期，可能是機台油溫尚未熱平衡。",
+                q: "雖然個別數據可能還在規格內，但製程分佈已經整體移動。長期來看這將導致 Cpk 下降。若偏移方向是趨近規格上限 (USL)，建議預防性調整參數 (Process Center Adjustment)。"
+            },
+            en: {
+                m: "This is a typical Process Shift pattern. The most common causes are changing to a different batch of raw material (MI value change), or gradual scale buildup in the mold temperature controller's cooling water lines.",
+                q: "Although individual data points may still be within specification, the process distribution has shifted overall. This will lead to Cpk degradation over time. If the shift direction is toward the USL, preventive parameter adjustment is recommended."
+            },
+            checklist: {
+                molding: ["原料批號更換檢查", "模溫機冷卻水路積垢檢查", "開機初期油溫平衡確認", "回收料摻配比例確認", "模具磨損程度評估"],
+                quality: ["計算偏移量對 Cpk 影響", "執行 GR&R 評估", "考慮重新調整加工參數", "提高抽樣頻率", "記錄趨勢供分析"]
+            }
         },
         3: {
-            zh: { m: "漸進變化：頂針/滑塊/止逆環磨損、溫控失效。", q: "強烈失控預兆 (Trend)，應立即預防保養(PM)。" },
-            en: { m: "Drift: Tooling wear (ejectors/sliders/check ring) or failing temperature control.", q: "Strong warning signal (Trend). Perform Preventive Maintenance (PM) immediately." }
+            name: "連續 6 點持續上升或下降",
+            nameEn: "6 consecutive points trending",
+            condition: "Trend (Drift)",
+            conditionEn: "漸進磨損警訊",
+            statisticalBasis: "連續 6 點單調上升或下降是漸進式磨損的明確訊號",
+            zh: {
+                m: "這代表一種漸進式的變化。請重點檢查工具磨損 (Tool Wear)，例如頂針、滑塊或螺桿止逆環 (Check Ring) 的磨耗。另一個可能是料管溫度控制失效導致溫度緩慢持續爬升。",
+                q: "趨勢是一種強烈的警告訊號，預示著製程即將失控。此時不應等待超規發生，而應立即執行預防保養 (PM)。磨耗類的可歸屬原因通常是不可逆的，必須通過更換部件來解決。"
+            },
+            en: {
+                m: "This represents a gradual change. Key inspection areas include tool wear (ejector pins, sliders, check ring). Another possibility is barrel temperature control failure causing slow continuous temperature rise.",
+                q: "A trend is a strong warning signal that the process is about to go out of control. Do not wait for an out-of-spec event; initiate Preventive Maintenance (PM) immediately. Wear-related assignable causes are typically irreversible."
+            },
+            checklist: {
+                molding: ["頂針磨損檢查", "滑塊磨損與潤滑檢查", "止逆環磨損檢查", "料管溫控是否異常爬升", "加熱圈老化程度評估"],
+                quality: ["計算趨勢斜率", "預估達到管制界限時間", "安排預防保養時程", "備妥更換零件庫存", "持續監控趨勢變化"]
+            }
         },
         4: {
-            zh: { m: "人為過度干預：頻繁調整保壓/背壓，或液壓不穩。", q: "負自相關 (Oscillation)，請停止微調 (Hands Off)。" },
-            en: { m: "Over-control: Frequent manual adjustments by operators or unstable hydraulic pressure.", q: "Negative Autocorrelation. Stop manual micro-adjustments (Hands Off)." }
+            name: "連續 14 點上下交替",
+            nameEn: "14 consecutive alternating points",
+            condition: "Oscillation (Over-control)",
+            conditionEn: "系統震盪",
+            statisticalBasis: "連續 14 點呈現規律性上下交替是過度干預的特徵訊號",
+            zh: {
+                m: "這通常是人為干預過度造成的。現場操作員可能每打一模就去微調保壓或背壓，試圖讓尺寸『完美』，反而造成系統震盪。也可能是機台液壓系統不穩定（Hunting 現象）。",
+                q: "這在統計上稱為負自相關 (Negative Autocorrelation)。請告訴現場人員：『放手 (Hands Off)』。只要製程在管制界限內，自然的隨機變異是正常的，不需要頻繁調整。過度調整只會增加變異。"
+            },
+            en: {
+                m: "This is usually caused by excessive human intervention. Operators may adjust parameters after every single shot, trying to achieve 'perfect' dimensions, which causes system oscillation. It could also be unstable hydraulic system (Hunting phenomenon).",
+                q: "In statistics, this is called Negative Autocorrelation. Tell operators: 'Hands Off!' As long as the process is within control limits, natural random variation is normal and does not require frequent adjustment."
+            },
+            checklist: {
+                molding: ["停止所有手動微調", "鎖定工藝參數設定", "檢查 PID 控制參數", "評估液壓系統穩定性", "必要時檢修液壓系統"],
+                quality: ["教育訓練操作員信心", "建立調整審批流程", "持續觀察自然變異", "記錄震盪模式", "設定調整次數上限"]
+            }
         },
         5: {
-            zh: { m: "製程設定改變：冷卻時間或週期不穩。", q: "中等程度的製程偏移傾向 (2/3 > 2σ)。" },
-            en: { m: "Warning: Instability in cooling time or cycle stability.", q: "Substantial shift warning (2 of 3 > 2σ). Verify First Article." }
+            name: "連續 3 點中有 2 點 > 2σ",
+            nameEn: "2 of 3 consecutive points > 2σ",
+            condition: "Medium Shift Warning",
+            conditionEn: "中度偏移警訊",
+            statisticalBasis: "連續 3 點中有 2 點落在 2σ 與 3σ 之間表示顯著偏移",
+            zh: {
+                m: "這意味著製程設定可能已經發生了實質性的改變。請檢查冷卻時間的穩定性，或是否因為切換了回收料比例導致流動性改變。如果是在開機階段，可能是模溫還未完全穩定。",
+                q: "這是繼 Rule 1 之後最嚴重的警訊。雖然還未正式超規，但製程中心已經偏離到危險區域。建議立即進行首件確認 (First Article Check)，驗證是否需要重新校正機器參數。"
+            },
+            en: {
+                m: "This indicates that the process settings may have undergone substantial changes. Check cooling time stability or if the recycled material ratio change has affected flow properties.",
+                q: "This is the most serious warning after Rule 1. Although not yet out of spec, the process center has shifted to a dangerous zone. Recommend immediately conducting a First Article Check."
+            },
+            checklist: {
+                molding: ["冷卻時間設定檢查", "回收料摻配比例確認", "原料批次/供應商確認", "模溫機設定正確性檢查", "環境溫濕度變化評估"],
+                quality: ["停止生產（視情況）", "進行首件確認", "隔離可疑批次產品", "通知 QE/PE 工程師", "重新驗證工藝參數"]
+            }
         },
         6: {
-            zh: { m: "製程不穩定：原料混合不均或計量不穩。", q: "小幅度的連續偏移 (4/5 > 1σ)。" },
-            en: { m: "Early Warning: Material mixing issues or metering inconsistencies.", q: "Early sensitivity indicator (4 of 5 > 1σ). Monitor closely." }
+            name: "連續 5 點中有 4 點 > 1σ",
+            nameEn: "4 of 5 consecutive points > 1σ",
+            condition: "Early Warning",
+            conditionEn: "輕度偏移警訊",
+            statisticalBasis: "連續 5 點中有 4 點落在 1σ 與 2σ 之間是輕度偏移的早期指標",
+            zh: {
+                m: "這通常是原料相關的問題。如果是混煉色母或回料，請檢查混合機 (Mixer) 的均勻度。也可能是計量行程的終點位置有微小的不穩定（止逆環輕微洩漏）。",
+                q: "這是早期的敏感度指標。如果在高精度要求的產品上（如醫療器材或光學件），這條規則非常重要。如果不予理會，很快就會演變成 Rule 2 或 Rule 5。"
+            },
+            en: {
+                m: "This is usually a material-related issue. For masterbatch or recycled material blending, check the mixer uniformity. It could also be micro-instability at the metering stroke endpoint.",
+                q: "This is an early sensitivity indicator. For high-precision products (medical devices or optical components), this rule is very important. If ignored, it will likely evolve into Rule 2 or Rule 5."
+            },
+            checklist: {
+                molding: ["原料乾燥是否充分", "混合機攪拌均勻度", "色母摻配比例確認", "回收料篩選是否徹底", "止逆環洩漏跡象檢查"],
+                quality: ["增加抽樣頻率", "提高 Cpk 警戒門檻", "記錄趨勢供分析", "評估演變為 Rule 2/5 機率", "密切監控後續變化"]
+            }
         },
         7: {
-            zh: { m: "分層現象：多模穴流動平衡不佳。", q: "數據過於集中 (Hugging Center)，可能變異數估算錯誤。" },
-            en: { m: "Stratification: Poor flow balance across multiple cavities.", q: "Points too close to center (Hugging Center). Possible miscalculation of variance." }
+            name: "連續 15 點在中心線 ±1σ 內",
+            nameEn: "15 consecutive points within ±1σ of CL",
+            condition: "Stratification",
+            conditionEn: "分層現象",
+            statisticalBasis: "數據過度集中可能表示變異數被低估或數據分層",
+            zh: {
+                m: "數據過度集中可能反映多模穴流動不平衡。當不同模穴的平均值趨於相同時，系統變異會看起來變小，但實際上可能掩蓋了模穴間的差異。此外，冷卻系統差異或測量系統問題也可能造成此現象。",
+                q: "這是一種數據過於完美的警訊。正常的隨機變異應該有一定的分散度。如果管制界限是基於這些被壓縮的數據計算，可能會造成管制界限過窄，導致正常變異被判斷為異常。建議重新評估量測系統 (Gage R&R)。"
+            },
+            en: {
+                m: "Overly concentrated data may indicate multi-cavity flow imbalance. When different cavities' means converge, system variation appears smaller, potentially masking inter-cavity differences.",
+                q: "This is a 'data too perfect' warning. Normal random variation should have some dispersion. If control limits are calculated from this compressed data, it may result in control limits being too narrow."
+            },
+            checklist: {
+                molding: ["多模穴流動平衡評估", "冷卻水路差異檢查", "模穴磨損程度一致性", "熱流道系統均溫性", "原料乾燥均勻度"],
+                quality: ["執行 Gage R&R 評估", "檢查數據四捨五入位數", "確認取樣隨機性", "分析模穴間差異", "重新計算管制界限"]
+            }
         },
         8: {
-            zh: { m: "混合分佈：兩台機器混料或雙模穴差異大。", q: "雙峰分佈 (Mixture)，避開了中心區域。" },
-            en: { m: "Mixture: Mixed materials from two machines or large difference between two mold cavities.", q: "Bimodal distribution (Mixture). Points avoid the center area." }
+            name: "連續 8 點兩側交替且無點在 ±1σ 內",
+            nameEn: "8 consecutive alternating points all outside ±1σ",
+            condition: "Mixture (Bimodal)",
+            conditionEn: "混合分佈",
+            statisticalBasis: "呈現雙峰分佈特徵，存在兩個不同的製程來源",
+            zh: {
+                m: "這種模式強烈暗示存在兩個不同的製程來源。在射出成型中，最常見的原因是兩台機台混合生產（設定參數不同），或兩組模穴存在系統性差異。這種混合會導致產品整體良率下降。",
+                q: "雙峰分佈 (Mixture) 是最容易被忽略的異常模式。數據『看起來正常』地落在管制界限內，但實際上是兩個各自正常的製程被錯誤地混合在一起。這會導致 Cpk 被人為低估和產品尺寸分佈不連續。"
+            },
+            en: {
+                m: "This pattern strongly suggests the presence of two different process sources. In injection molding, common causes include mixed production from two machines or systematic differences between two sets of cavities.",
+                q: "Bimodal Distribution is the most easily overlooked anomaly pattern. Data 'appears normal' within control limits, but actually consists of two individually normal processes incorrectly mixed together."
+            },
+            checklist: {
+                molding: ["確認是否多台機台同時生產", "不同機台參數設定差異", "模穴磨損程度一致性", "原料是否來自不同批次", "操作員技術差異評估"],
+                quality: ["分離數據來源分析", "分別計算各來源 Cpk", "統一機台/模穴參數", "或分開標示批次來源", "通知客戶分佈情形"]
+            }
         }
     },
     settings: {
@@ -213,9 +333,9 @@ var SPCApp = {
                 '<tbody class="divide-y dark:divide-slate-700">' +
                 summary.map(function (s) {
                     return '<tr><td class="px-6 py-4 font-bold dark:text-slate-300">' + s.name + '</td>' +
-                        '<td class="px-6 py-4 text-center font-mono ' + (s.cpk < 1.33 ? 'text-rose-500' : 'text-emerald-500') + '">' + s.cpk.toFixed(3) + '</td>' +
-                        '<td class="px-6 py-4 text-center">' + s.imbalance.toFixed(1) + '%</td>' +
-                        '<td class="px-6 py-4 text-center"><span class="px-2 py-0.5 rounded text-[10px] font-bold ' + (s.status === 'Bad' ? 'bg-rose-50 text-rose-600' : 'bg-emerald-50 text-emerald-600') + '">' + s.status + '</span></td></tr>';
+                        '<td class="px-6 py-4 text-center font-mono ' + (s.cpk < 1.33 ? 'text-rose-500' : 'text-emerald-500') + '">' + (s.cpk != null ? s.cpk.toFixed(3) : 'N/A') + '</td>' +
+                        '<td class="px-6 py-4 text-center">' + (s.imbalance != null ? s.imbalance.toFixed(1) : 'N/A') + '%</td>' +
+                        '<td class="px-6 py-4 text-center"><span class="px-2 py-0.5 rounded text-[10px] font-bold ' + (s.status === 'Bad' ? 'bg-rose-50 text-rose-600' : 'bg-emerald-50 text-emerald-600') + '">' + (s.status || 'N/A') + '</span></td></tr>';
                 }).join('') +
                 '</tbody></table></div></div>';
 
@@ -1103,12 +1223,13 @@ var SPCApp = {
         } else if (data.type === 'cavity') {
             var balHtml = '';
             if (data.balance) {
+                var imbalanceRatio = data.balance.imbalanceRatio != null ? data.balance.imbalanceRatio.toFixed(1) : 'N/A';
                 balHtml = '<div class="saas-card p-6 border-l-4" style="border-left-color:' + data.balance.color + ' text-wrap: wrap;">' +
                     '<div class="flex justify-between items-center mb-4">' +
                     '<div> <h3 class="text-sm font-bold text-slate-500 uppercase">' + this.t('模穴平衡分析', 'Cavity Balance Analysis') + '</h3> ' +
                     '<div class="text-2xl font-bold mt-1" style="color:' + data.balance.color + '">' + data.balance.status + '</div> </div>' +
                     '<div class="text-right"> <div class="text-[10px] font-bold text-slate-400">' + this.t('全距 / 公差比', 'Range/Tol Ratio') + '</div>' +
-                    '<div class="text-xl font-mono font-bold text-slate-700 dark:text-slate-300">' + data.balance.imbalanceRatio.toFixed(1) + '%</div> </div> </div>' +
+                    '<div class="text-xl font-mono font-bold text-slate-700 dark:text-slate-300">' + imbalanceRatio + '%</div> </div> </div>' +
                     '<div class="w-full bg-slate-100 dark:bg-slate-700 h-2 rounded-full mb-4 overflow-hidden"> ' +
                     '<div class="h-full rounded-full" style="width:' + Math.min(data.balance.imbalanceRatio, 100) + '%; background-color:' + data.balance.color + '"></div> </div>' +
                     '<div class="flex items-start gap-3 p-3 bg-slate-50 dark:bg-slate-900/50 rounded-lg border border-slate-100 dark:border-slate-800">' +
@@ -1132,12 +1253,13 @@ var SPCApp = {
         } else if (data.type === 'group') {
             var groupHtml = '';
             if (data.stability) {
+                var consistencyScore = data.stability.consistencyScore != null ? (data.stability.consistencyScore * 100).toFixed(1) : 'N/A';
                 groupHtml = '<div class="saas-card p-6 border-l-4 mb-8" style="border-left-color:' + data.stability.color + '">' +
                     '<div class="flex justify-between items-center mb-4">' +
                     '<div> <h3 class="text-sm font-bold text-slate-500 uppercase">' + this.t('群組穩定度 AI 診斷', 'Group Stability AI Analysis') + '</h3> ' +
                     '<div class="text-2xl font-bold mt-1" style="color:' + data.stability.color + '">' + data.stability.status + '</div> </div>' +
                     '<div class="text-right"> <div class="text-[10px] font-bold text-slate-400">' + this.t('變異一致性得分', 'Consistency Score') + '</div>' +
-                    '<div class="text-xl font-mono font-bold text-slate-700 dark:text-slate-300">' + (data.stability.consistencyScore * 100).toFixed(1) + '%</div> </div> </div>' +
+                    '<div class="text-xl font-mono font-bold text-slate-700 dark:text-slate-300">' + consistencyScore + '%</div> </div> </div>' +
                     '<div class="flex items-start gap-3 p-3 bg-slate-50 dark:bg-slate-900/50 rounded-lg border border-slate-100 dark:border-slate-800">' +
                     '<span class="material-icons-outlined text-indigo-500 mt-0.5">psychology</span>' +
                     '<div class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed font-bold">' +
@@ -1375,12 +1497,12 @@ var SPCApp = {
                         var name = w.globals.seriesNames[seriesIndex];
                         var label = w.globals.categoryLabels[dataPointIndex];
 
-                        // Build standard tooltip header
-                        var html = '<div class="px-3 py-2 bg-slate-900 border border-slate-700 shadow-xl rounded-lg">';
-                        html += '<div class="text-sm text-slate-400 font-bold uppercase mb-1">' + label + '</div>';
+                        // Build standard tooltip header with max-width constraint and word-wrap
+                        var html = '<div class="px-3 py-2 bg-slate-900 border border-slate-700 shadow-xl rounded-lg max-w-[320px] break-words" style="word-wrap: break-word; overflow-wrap: break-word; max-width: 320px;">';
+                        html += '<div class="text-sm text-slate-400 font-bold uppercase mb-1 break-words" style="word-wrap: break-word;">' + label + '</div>';
                         html += '<div class="flex items-center gap-2 mb-2 pb-2 border-b border-slate-800">';
-                        html += '<span class="w-2 h-2 rounded-full" style="background-color:' + w.globals.colors[seriesIndex] + '"></span>';
-                        html += '<span class="text-sm font-bold text-white">' + name + ': ' + (val ? val.toFixed(4) : '-') + '</span>';
+                        html += '<span class="w-2 h-2 rounded-full shrink-0" style="background-color:' + w.globals.colors[seriesIndex] + '"></span>';
+                        html += '<span class="text-sm font-bold text-white break-words" style="word-wrap: break-word;">' + name + ': ' + (val ? val.toFixed(4) : '-') + '</span>';
                         html += '</div>';
 
                         // Multi-cavity rotational sampling details
@@ -1415,13 +1537,13 @@ var SPCApp = {
                                 };
                                 var advice = pair[currentLang] || pair['zh'];
 
-                                moldingAdviceHtml += '<div class="text-xs text-slate-300 leading-normal pl-0 mt-1 flex items-start">' +
-                                    '<span class="inline-block px-1 rounded bg-slate-700 text-[10px] text-slate-300 mr-1 min-w-[20px] text-center">R' + ruleId + '</span>' +
-                                    '<span>' + advice.m + '</span></div>';
+                                moldingAdviceHtml += '<div class="text-xs text-slate-300 leading-normal pl-0 mt-1 flex items-start flex-wrap" style="word-wrap: break-word;">' +
+                                    '<span class="inline-block px-1 rounded bg-slate-700 text-[10px] text-slate-300 mr-1 min-w-[20px] text-center shrink-0">R' + ruleId + '</span>' +
+                                    '<span class="break-words" style="word-wrap: break-word; overflow-wrap: break-word;">' + advice.m + '</span></div>';
 
-                                qualityAdviceHtml += '<div class="text-xs text-slate-300 leading-normal pl-0 mt-1 flex items-start">' +
-                                    '<span class="inline-block px-1 rounded bg-slate-700 text-[10px] text-slate-300 mr-1 min-w-[20px] text-center">R' + ruleId + '</span>' +
-                                    '<span>' + advice.q + '</span></div>';
+                                qualityAdviceHtml += '<div class="text-xs text-slate-300 leading-normal pl-0 mt-1 flex items-start flex-wrap" style="word-wrap: break-word;">' +
+                                    '<span class="inline-block px-1 rounded bg-slate-700 text-[10px] text-slate-300 mr-1 min-w-[20px] text-center shrink-0">R' + ruleId + '</span>' +
+                                    '<span class="break-words" style="word-wrap: break-word; overflow-wrap: break-word;">' + advice.q + '</span></div>';
                             });
 
                             html += '<div class="space-y-3 mt-2">';
@@ -1790,8 +1912,8 @@ var SPCApp = {
                     fixed: { enabled: false },
                     custom: function ({ series, seriesIndex, dataPointIndex, w }) {
                         var label = (labels && labels[dataPointIndex]) ? labels[dataPointIndex] : w.globals.categoryLabels[dataPointIndex];
-                        var html = '<div class="px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 shadow-xl rounded-lg">';
-                        html += '<div class="text-xs text-slate-500 dark:text-slate-400 font-bold uppercase mb-1 border-b border-slate-200 dark:border-slate-800 pb-1">' + label + '</div>';
+                        var html = '<div class="px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 shadow-xl rounded-lg max-w-[320px] break-words" style="word-wrap: break-word; overflow-wrap: break-word; max-width: 320px;">';
+                        html += '<div class="text-xs text-slate-500 dark:text-slate-400 font-bold uppercase mb-1 border-b border-slate-200 dark:border-slate-800 pb-1 break-words" style="word-wrap: break-word;">' + label + '</div>';
 
                         w.config.series.forEach(function (s, idx) {
                             var val = series[idx][dataPointIndex];
@@ -1873,11 +1995,11 @@ var SPCApp = {
                     fixed: { enabled: false },
                     custom: function ({ series, seriesIndex, dataPointIndex, w }) {
                         var label = (labels && labels[dataPointIndex]) ? labels[dataPointIndex] : w.globals.categoryLabels[dataPointIndex];
-                        var html = '<div class="px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 shadow-xl rounded-lg">';
-                        html += '<div class="text-xs text-slate-500 dark:text-slate-400 font-bold uppercase mb-1 border-b border-slate-200 dark:border-slate-800 pb-1">' + label + '</div>';
+                        var html = '<div class="px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 shadow-xl rounded-lg max-w-[320px] break-words" style="word-wrap: break-word; overflow-wrap: break-word; max-width: 320px;">';
+                        html += '<div class="text-xs text-slate-500 dark:text-slate-400 font-bold uppercase mb-1 border-b border-slate-200 dark:border-slate-800 pb-1 break-words" style="word-wrap: break-word;">' + label + '</div>';
                         html += '<div class="flex items-center justify-between gap-4 py-0.5">';
                         html += '<div class="flex items-center gap-1.5">';
-                        html += '<span class="w-2 h-2 rounded-full" style="background-color:' + w.globals.colors[0] + '"></span>';
+                        html += '<span class="w-2 h-2 rounded-full shrink-0" style="background-color:' + w.globals.colors[0] + '"></span>';
                         html += '<span class="text-xs font-bold text-slate-700 dark:text-slate-200">Range:</span>';
                         html += '</div>';
                         html += '<span class="text-xs font-mono font-bold text-slate-600 dark:text-slate-300">' + (series[0][dataPointIndex] !== null ? series[0][dataPointIndex].toFixed(4) : '-') + '</span>';

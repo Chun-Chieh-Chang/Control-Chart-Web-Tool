@@ -4,7 +4,7 @@
 > Web-based QIP (Quality Inspection Program) analysis system
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](../LICENSE)
-![Version](https://img.shields.io/badge/version-2.0.0-blue)
+![Version](https://img.shields.io/badge/version-2.1.0-blue)
 [![Deploy to GitHub Pages](https://github.com/Chun-Chieh-Chang/Control-Chart-Web-Tool/actions/workflows/deploy.yml/badge.svg)](https://github.com/Chun-Chieh-Chang/Control-Chart-Web-Tool/actions/workflows/deploy.yml)
 
 > 🚀 **自動部署**: 使用 GitHub Actions 自動部署至 GitHub Pages | [部署文檔](docs/guides/DEPLOYMENT.md)
@@ -17,18 +17,32 @@
 
 ### 📊 功能特色
 
-- **三種分析模式**
+- **四種專業分析模式**
   - 📈 **批號分析**: X̄-R 管制圖，每頁 25 批號獨立計算管制界限
   - 🔍 **模穴分析**: 模穴比較 + Cpk/Ppk 製程能力評估
     - **獨家功能**: 內建 AI 模穴平衡性分析，自動判定流道平衡狀況。
   - 📊 **多模穴專業分析**: 針對高度複雜製程 (16/32 穴) 的解決方案
     - **輪替抽樣**: 自動實施 $n=5$ 的輪替抽樣計畫 (Rotational Sampling)
     - **擴展管制界限**: 採用擴展 Shewhart 管制界限，容許模穴間系統性位置差異
-  - 📊 **群組分析**: Min-Max-Avg 管制圖
-  - 🧠 **專家解讀系統**: 
-    - 內建 Nelson Rules (1-6) 異常偵測
+   - 📊 **群組分析**: Min-Max-Avg 管制圖
+  - 🧠 **專家解讀系統 (Nelson Rules 1-8)**: 
+    - 內建完整的 **Nelson Rules 1-8** 異常偵測
     - 提供「成型現場」與「品管專家」雙視角實務建議
+    - 每條規則包含統計原理說明、診斷檢查表、即時處理項目
     - 支援異常列表懸停即時輔助 (Tooltip)
+
+#### Nelson Rules 1-8 快速參考
+
+| 規則 | 條件 | 嚴重程度 |
+|------|------|----------|
+| Rule 1 | 單點超出 3σ | 🔴 失控 |
+| Rule 2 | 連續 9 點在中心線同側 | 🟠 偏移 |
+| Rule 3 | 連續 6 點趨勢 | 🟡 磨損 |
+| Rule 4 | 連續 14 點交替 | 🟡 震盪 |
+| Rule 5 | 2/3 點 > 2σ | 🟠 中度偏移 |
+| Rule 6 | 4/5 點 > 1σ | 🔵 輕度偏移 |
+| Rule 7 | 15 點在 ±1σ 內 | 🔵 分層 |
+| Rule 8 | 8 點避開中心線 | 🟠 混合分佈 |
 
 - **100% 本地端處理**
   - ✅ 無數據上傳，完全保護隱私
@@ -40,11 +54,6 @@
   - 📊 互動式網頁圖表顯示
   - 🔴 超出管制界限點紅色標示
 
-- **中英雙語介面**
-  - 🌐 支援繁體中文與英文切換
-  - 📱 響應式設計，支援桌面與行動裝置
-  - 🌓 **深色模式**: 支援一鍵切換深色/淺色主題，圖表與表格自動適應配色
-  - 🔍 **全局搜尋**: 支援在檢驗項目清單與歷史紀錄中快速搜尋關鍵字
 
 ### 🚀 使用方法
 
@@ -186,11 +195,25 @@ MIT License
   - 📊 **Multi-Cavity Professional**: Solution for highly complex processes (16/32 cavities)
     - **Rotational Sampling**: Automatic implementation of $n=5$ rotational sampling plans
     - **Extended Limits**: Uses Extended Shewhart Control Limits to account for systematic between-cavity position differences
-  - 📊 **Group Analysis**: Min-Max-Avg Control Charts
-  - 🧠 **Expert Interpretation System**: 
-    - Built-in Nelson Rules (1-6) anomaly detection
+   - 📊 **Group Analysis**: Min-Max-Avg Control Charts
+  - 🧠 **Expert Interpretation System (Nelson Rules 1-8)**: 
+    - Built-in complete **Nelson Rules 1-8** anomaly detection
     - Dual-perspective practical advice from "Molding Expert" & "QC Expert"
+    - Each rule includes: statistical basis, diagnostic checklist, immediate actions
     - Supports hover tooltips on anomaly list for instant guidance
+
+#### Nelson Rules 1-8 Quick Reference
+
+| Rule | Condition | Severity |
+|------|-----------|----------|
+| Rule 1 | One point beyond 3σ | 🔴 Out of Control |
+| Rule 2 | 9 points on same side of CL | 🟠 Mean Shift |
+| Rule 3 | 6 consecutive trending points | 🟡 Drift/Wear |
+| Rule 4 | 14 alternating points | 🟡 Oscillation |
+| Rule 5 | 2 of 3 points > 2σ | 🟠 Medium Shift |
+| Rule 6 | 4 of 5 points > 1σ | 🔵 Small Shift |
+| Rule 7 | 15 points within ±1σ | 🔵 Stratification |
+| Rule 8 | 8 points avoiding center | 🟠 Mixture/Bimodal |
 
 - **100% Client-Side Processing**
   - ✅ No data upload, complete privacy protection

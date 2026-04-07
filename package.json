@@ -1,6 +1,6 @@
 {
   "name": "mouldex-control-chart",
-  "version": "1.0.0",
+  "version": "2.1.0",
   "description": "SPC Statistical Process Control Analysis Tool - Web-based QIP analysis system",
   "main": "index.html",
   "scripts": {

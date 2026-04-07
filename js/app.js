@@ -423,11 +423,19 @@ var SPCApp = {
         var isDark = document.documentElement.classList.contains('dark');
         return {
             mode: isDark ? 'dark' : 'light',
-            text: isDark ? '#f1f5f9' : '#64748b',
-            grid: isDark ? '#334155' : '#f1f5f9',
-            primary: isDark ? '#818cf8' : '#4f46e5', // Indigo-400 for dark, Indigo-600 for light
-            danger: '#f43f5e', // Rose-500 (Good on both)
-            success: '#10b981' // Emerald-500 (Good on both)
+            text: isDark ? '#f1f5f9' : '#334155',
+            textSec: isDark ? '#94a3b8' : '#64748b',
+            grid: isDark ? '#1e293b' : '#e2e8f0',
+            primary: isDark ? '#818cf8' : '#4f46e5',
+            primaryLight: '#6366f1',
+            danger: '#f43f5e',
+            dangerLight: '#fb7185',
+            success: '#10b981',
+            successLight: '#34d399',
+            warning: '#f59e0b',
+            warningLight: '#fbbf24',
+            bg: isDark ? '#0f172a' : '#ffffff',
+            bgSec: isDark ? '#1e293b' : '#f8fafc'
         };
     },
 
@@ -1445,16 +1453,30 @@ var SPCApp = {
             var xValues = pageXbarR.xBar.data.filter(v => v !== null && !isNaN(v));
             var xMin = Math.min(...xValues, pageXbarR.xBar.LCL);
             var xMax = Math.max(...xValues, pageXbarR.xBar.UCL);
-            var xMargin = (xMax - xMin) * 0.1 || 0.001;
+            var xMargin = (xMax - xMin) * 0.15 || 0.001;
+
+            // Calculate sigma zones for X-bar chart
+            var sigma = (pageXbarR.xBar.UCL - pageXbarR.xBar.CL) / 3;
+            var upper3Sigma = pageXbarR.xBar.CL + 3 * sigma;
+            var upper2Sigma = pageXbarR.xBar.CL + 2 * sigma;
+            var upper1Sigma = pageXbarR.xBar.CL + sigma;
+            var lower1Sigma = pageXbarR.xBar.CL - sigma;
+            var lower2Sigma = pageXbarR.xBar.CL - 2 * sigma;
+            var lower3Sigma = pageXbarR.xBar.CL - 3 * sigma;
 
             var xOpt = {
                 chart: {
                     type: 'line',
-                    height: 380,
-                    toolbar: { show: true },
+                    height: 420,
+                    toolbar: { 
+                        show: true,
+                        tools: { download: true, zoom: true, zoomin: true, zoomout: true, pan: true, reset: true },
+                        offsetY: -10
+                    },
                     selection: { enabled: false },
                     background: 'transparent',
                     zoom: { enabled: false },
+                    animations: { enabled: true, easing: 'easeinout', speed: 800 },
                     events: {
                         mounted: function (chartContext, config) {
                             chartContext.el.addEventListener('dblclick', function () {
@@ -1464,6 +1486,15 @@ var SPCApp = {
                     }
                 },
                 theme: { mode: theme.mode },
+                title: {
+                    text: data.analysisSubType === 'multi-cavity' ? 'Extended Shewhart X̄ Chart' : 'X̄ Control Chart',
+                    align: 'left',
+                    style: { fontSize: '16px', fontWeight: 600, color: theme.text }
+                },
+                subtitle: {
+                    text: 'Subgroup Averages with Control Limits',
+                    style: { fontSize: '12px', color: theme.textSec }
+                },
                 series: [
                     { name: 'X-Bar', data: pageXbarR.xBar.data },
                     { name: 'UCL', data: new Array(pageLabels.length).fill(pageXbarR.xBar.UCL) },
@@ -1472,22 +1503,111 @@ var SPCApp = {
                 ],
                 colors: [theme.primary, theme.danger, theme.success, theme.danger],
                 stroke: {
-                    width: [3, 1.5, 1.5, 1.5],
-                    dashArray: [0, 6, 0, 6],
+                    width: [2.5, 1.5, 2, 1.5],
+                    dashArray: [0, 5, 0, 5],
                     connectNulls: false
+                },
+                fill: {
+                    type: 'solid',
+                    opacity: 0.1
                 },
                 xaxis: {
                     type: 'category',
                     categories: pageLabels.map(l => String(l)),
-                    labels: { style: { colors: theme.text, fontSize: '11px', fontFamily: 'Inter, sans-serif' } }
+                    labels: { 
+                        style: { colors: theme.text, fontSize: '11px', fontFamily: 'Inter, sans-serif' },
+                        rotate: -45,
+                        tickAmount: 15
+                    },
+                    axisBorder: { color: theme.grid },
+                    axisTicks: { color: theme.grid }
                 },
                 yaxis: {
-                    min: xMin - xMargin,
-                    max: xMax + xMargin,
-                    tickAmount: 5,
-                    labels: { formatter: function (v) { return (v !== null && v !== undefined) ? v.toFixed(4) : ''; }, style: { colors: theme.text, fontSize: '11px', fontFamily: 'Inter, sans-serif' } }
+                    min: Math.min(xMin - xMargin, lower3Sigma - sigma * 0.5),
+                    max: Math.max(xMax + xMargin, upper3Sigma + sigma * 0.5),
+                    tickAmount: 8,
+                    labels: { 
+                        formatter: function (v) { return (v !== null && v !== undefined) ? v.toFixed(4) : ''; }, 
+                        style: { colors: theme.text, fontSize: '11px', fontFamily: 'Inter, sans-serif' } 
+                    }
                 },
-                grid: { borderColor: theme.grid },
+                grid: { 
+                    borderColor: theme.grid,
+                    strokeDashArray: 4,
+                    xaxis: { lines: { show: true } }
+                },
+                plotOptions: {
+                    bar: { columnWidth: '65%' },
+                    candlestick: {
+                        colors: { upward: theme.danger, downward: theme.success }
+                    }
+                },
+                annotations: {
+                    yaxis: [
+                        {
+                            y: pageXbarR.xBar.UCL,
+                            borderColor: theme.danger,
+                            borderWidth: 1,
+                            borderDash: [5, 5],
+                            label: {
+                                text: 'UCL: ' + pageXbarR.xBar.UCL.toFixed(4),
+                                position: 'right',
+                                style: { background: theme.danger + '20', color: theme.danger, fontWeight: 600 }
+                            }
+                        },
+                        {
+                            y: pageXbarR.xBar.CL,
+                            borderColor: theme.success,
+                            borderWidth: 2,
+                            label: {
+                                text: 'CL: ' + pageXbarR.xBar.CL.toFixed(4),
+                                position: 'right',
+                                style: { background: theme.success + '20', color: theme.success, fontWeight: 600 }
+                            }
+                        },
+                        {
+                            y: pageXbarR.xBar.LCL,
+                            borderColor: theme.danger,
+                            borderWidth: 1,
+                            borderDash: [5, 5],
+                            label: {
+                                text: 'LCL: ' + pageXbarR.xBar.LCL.toFixed(4),
+                                position: 'right',
+                                style: { background: theme.danger + '20', color: theme.danger, fontWeight: 600 }
+                            }
+                        },
+                        // 2-sigma zone lines
+                        {
+                            y: upper2Sigma,
+                            borderColor: '#f59e0b',
+                            borderWidth: 1,
+                            borderDash: [3, 3],
+                            label: { show: false }
+                        },
+                        {
+                            y: lower2Sigma,
+                            borderColor: '#f59e0b',
+                            borderWidth: 1,
+                            borderDash: [3, 3],
+                            label: { show: false }
+                        },
+                        // 1-sigma zone lines
+                        {
+                            y: upper1Sigma,
+                            borderColor: '#10b981',
+                            borderWidth: 1,
+                            borderDash: [2, 2],
+                            label: { show: false }
+                        },
+                        {
+                            y: lower1Sigma,
+                            borderColor: '#10b981',
+                            borderWidth: 1,
+                            borderDash: [2, 2],
+                            label: { show: false }
+                        }
+                    ]
+                },
                 tooltip: {
                     theme: theme.mode,
                     followCursor: true,
@@ -1567,7 +1687,33 @@ var SPCApp = {
                         return html;
                     }
                 },
-                markers: { size: [4, 0, 0, 0], discrete: pageXbarR.xBar.violations.map(function (v) { return { seriesIndex: 0, dataPointIndex: v.index, fillColor: '#f43f5e', strokeColor: '#fff', size: 6 }; }) }
+                markers: { 
+                    size: [5, 0, 0, 0], 
+                    strokeWidth: 2,
+                    strokeColors: [theme.bg, 'transparent', 'transparent', 'transparent'],
+                    hover: { size: 8, sizeOnHover: 10 },
+                    discrete: pageXbarR.xBar.violations.map(function (v) { 
+                        return { 
+                            seriesIndex: 0, 
+                            dataPointIndex: v.index, 
+                            fillColor: theme.danger, 
+                            strokeColor: theme.bg,
+                            size: 8,
+                            shape: 'circle'
+                        }; 
+                    }) 
+                },
+                legend: {
+                    show: true,
+                    position: 'top',
+                    horizontalAlign: 'right',
+                    floating: true,
+                    fontSize: '12px',
+                    fontFamily: 'Inter, sans-serif',
+                    markers: { size: 8, shape: 'circle', strokeWidth: 0, radius: 2 },
+                    itemMargin: { horizontal: 12, vertical: 4 },
+                    labels: { colors: theme.text }
+                }
             };
             var chartX = new ApexCharts(document.querySelector("#xbarChart"), xOpt);
             chartX.render(); this.chartInstances.push(chartX);
@@ -1579,11 +1725,16 @@ var SPCApp = {
             var rOpt = {
                 chart: {
                     type: 'line',
-                    height: 300,
-                    toolbar: { show: true },
+                    height: 320,
+                    toolbar: { 
+                        show: true,
+                        tools: { download: true, zoom: true, zoomin: true, zoomout: true, pan: true, reset: true },
+                        offsetY: -10
+                    },
                     selection: { enabled: false },
                     background: 'transparent',
                     zoom: { enabled: false },
+                    animations: { enabled: true, easing: 'easeinout', speed: 800 },
                     events: {
                         mounted: function (chartContext, config) {
                             chartContext.el.addEventListener('dblclick', function () {
@@ -1593,26 +1744,100 @@ var SPCApp = {
                     }
                 },
                 theme: { mode: theme.mode },
+                title: {
+                    text: 'R Control Chart',
+                    align: 'left',
+                    style: { fontSize: '16px', fontWeight: 600, color: theme.text }
+                },
+                subtitle: {
+                    text: 'Subgroup Range (Variation)',
+                    style: { fontSize: '12px', color: theme.textSec }
+                },
                 series: [
                     { name: 'Range', data: pageXbarR.R.data },
                     { name: 'UCL', data: new Array(pageLabels.length).fill(pageXbarR.R.UCL) },
                     { name: 'CL', data: new Array(pageLabels.length).fill(pageXbarR.R.CL) }
                 ],
-                colors: ['#64748b', '#f43f5e', '#10b981'],
-                stroke: { width: [2.5, 1, 1], dashArray: [0, 6, 0] },
+                colors: [theme.text, theme.danger, theme.success],
+                stroke: { width: [2.5, 1.5, 2], dashArray: [0, 5, 0] },
                 xaxis: {
                     type: 'category',
                     categories: pageLabels.map(l => String(l)),
-                    labels: { style: { colors: theme.text, fontSize: '11px', fontFamily: 'Inter, sans-serif' } }
+                    labels: { 
+                        style: { colors: theme.text, fontSize: '11px', fontFamily: 'Inter, sans-serif' },
+                        rotate: -45,
+                        tickAmount: 15
+                    },
+                    axisBorder: { color: theme.grid },
+                    axisTicks: { color: theme.grid }
                 },
                 yaxis: {
                     min: 0,
-                    max: rMax * 1.1,
+                    max: rMax * 1.15,
+                    tickAmount: 6,
                     labels: { formatter: function (v) { return v.toFixed(4); }, style: { colors: theme.text, fontSize: '11px', fontFamily: 'Inter, sans-serif' } }
                 },
-                grid: { borderColor: theme.grid },
-                tooltip: { theme: theme.mode, followCursor: true, fixed: { enabled: false } },
-                markers: { size: [4, 0, 0] }
+                grid: { 
+                    borderColor: theme.grid,
+                    strokeDashArray: 4
+                },
+                annotations: {
+                    yaxis: [
+                        {
+                            y: pageXbarR.R.UCL,
+                            borderColor: theme.danger,
+                            borderWidth: 1,
+                            borderDash: [5, 5],
+                            label: {
+                                text: 'UCL: ' + pageXbarR.R.UCL.toFixed(4),
+                                position: 'right',
+                                style: { background: theme.danger + '20', color: theme.danger, fontWeight: 600 }
+                            }
+                        },
+                        {
+                            y: pageXbarR.R.CL,
+                            borderColor: theme.success,
+                            borderWidth: 2,
+                            label: {
+                                text: 'CL: ' + pageXbarR.R.CL.toFixed(4),
+                                position: 'right',
+                                style: { background: theme.success + '20', color: theme.success, fontWeight: 600 }
+                            }
+                        }
+                    ]
+                },
+                tooltip: { 
+                    theme: theme.mode, 
+                    followCursor: true, 
+                    fixed: { enabled: false },
+                    custom: function ({ series, seriesIndex, dataPointIndex, w }) {
+                        var val = series[seriesIndex][dataPointIndex];
+                        var name = w.globals.seriesNames[seriesIndex];
+                        var label = w.globals.categoryLabels[dataPointIndex];
+                        var html = '<div class="px-3 py-2 bg-slate-900 border border-slate-700 shadow-xl rounded-lg">';
+                        html += '<div class="text-xs text-slate-400 font-bold uppercase mb-1">' + label + '</div>';
+                        html += '<div class="flex items-center gap-2">';
+                        html += '<span class="w-2 h-2 rounded-full" style="background-color:' + w.globals.colors[seriesIndex] + '"></span>';
+                        html += '<span class="text-sm font-bold text-white">' + name + ': ' + (val ? val.toFixed(4) : '-') + '</span>';
+                        html += '</div></div>';
+                        return html;
+                    }
+                },
+                markers: { 
+                    size: [4, 0, 0],
+                    strokeWidth: 2,
+                    strokeColors: [theme.bg, 'transparent', 'transparent'],
+                    hover: { size: 6 }
+                },
+                legend: {
+                    show: true,
+                    position: 'top',
+                    horizontalAlign: 'right',
+                    floating: true,
+                    fontSize: '12px',
+                    fontFamily: 'Inter, sans-serif',
+                    labels: { colors: theme.text }
+                }
             };
             var chartR = new ApexCharts(document.querySelector("#rChart"), rOpt);
             chartR.render(); this.chartInstances.push(chartR);

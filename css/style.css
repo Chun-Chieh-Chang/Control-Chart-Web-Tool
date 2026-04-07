@@ -1,81 +1,72 @@
 /**
  * SPC Analysis Tool - Main Stylesheet
- * Theme: "Ghibli/Miyazaki" - Nature, Whimsy, and Clarity.
+ * Theme: Vercel-inspired (Engineering Minimalism)
  */
 
-@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
 :root {
-    /* Color Palette - Ghibli Light (Pastoral Day) */
-    --primary: #569C5B;
-    /* Lush Grass Green */
-    --secondary: #4FA3C4;
-    /* Summer Sky Blue */
-    --accent: #E88D67;
-    /* Warm Sunset/Brick */
+    /* Color Palette - Vercel Light */
+    --primary: #10b981;
+    /* Vercel Green */
+    --secondary: #0a72ef;
+    /* Vercel Blue */
+    --accent: #f59e0b;
+    /* Amber */
 
-    --background: #F2F9F0;
-    /* Very Pale Organic Green/White */
-    --surface: #FFFFFF;
-    /* Cloud White */
-    --text-main: #2C3E50;
-    /* Deep Ink Blue/Grey */
+    --background: #fafafa;
+    /* Vercel Gray 50 */
+    --surface: #ffffff;
+    /* Pure White */
+    --text-main: #171717;
+    /* Vercel Black */
 
-    /* Typography Standards */
-    --font-base: 'Nunito', system-ui, -apple-system, sans-serif;
+    /* Typography Standards - Inter */
+    --font-base: 'Inter', system-ui, -apple-system, sans-serif;
+    --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
     --size-min: 12px;
-    --size-base: 15px;
-    /* Slightly larger for friendliness */
-    --size-md: 17px;
+    --size-base: 14px;
+    --size-md: 16px;
     --size-lg: 20px;
     --size-xl: 24px;
     --size-2xl: 32px;
 
     /* Table Variables */
-    --table-border: #CBD5E0;
-    --table-bg: #FFFFFF;
-    --table-text: #2C3E50;
-    --table-header-bg: #E6F0E6;
-    /* Soft Green Tint */
-    --table-label-bg: #F7FAF7;
-    --table-data-header-bg: #EDF2F7;
-    --table-ooc-bg: #FDE047;
-    /* Sunny Yellow */
-    --table-ooc-text: #000;
-    --table-stats-bg: #E0F2F1;
-    /* Soft Teal */
+    --table-border: #e5e5e5;
+    --table-bg: #ffffff;
+    --table-text: #171717;
+    --table-header-bg: #fafafa;
+    --table-label-bg: #fafafa;
+    --table-data-header-bg: #f5f5f5;
+    --table-ooc-bg: #ef4444;
+    --table-ooc-text: #ffffff;
+    --table-stats-bg: #f0fdf4;
 
-    --card-bg: rgba(255, 255, 255, 0.85);
-    /* Milky Glass */
+    --card-bg: #ffffff;
 }
 
-/* Dark Mode Overrides (Enchanted Night Forest) */
+/* Dark Mode Overrides (Vercel-inspired) */
 html.dark {
-    --primary: #88D498;
-    /* Glowing Spirit Green */
-    --secondary: #64B5F6;
-    /* Moonlight Blue */
-    --accent: #FFB74D;
-    /* Firefly Orange */
+    --primary: #10b981;
+    --secondary: #0a72ef;
+    --accent: #f59e0b;
 
-    --background: #1A2634;
-    /* Deep Night Blue */
-    --surface: #243447;
-    /* Darker Blue-Grey */
-    --text-main: #E0F2F1;
-    /* Pale Moonlight */
+    /* Vercel-style dark background */
+    --background: #171717;
+    --surface: #1f1f1f;
+    --text-main: #ededed;
 
-    --table-border: #4A5568 !important;
-    --table-bg: #243447 !important;
-    --table-text: #E0F2F1 !important;
-    --table-header-bg: #2D3748 !important;
-    --table-label-bg: #2D3748 !important;
-    --table-data-header-bg: #2D3748 !important;
-    --table-ooc-bg: #B91C1C !important;
-    --table-ooc-text: #FFFFFF !important;
-    --table-stats-bg: #2C3E50 !important;
+    --table-border: #2f2f2f !important;
+    --table-bg: #1f1f1f !important;
+    --table-text: #ededed !important;
+    --table-header-bg: #252525 !important;
+    --table-label-bg: #252525 !important;
+    --table-data-header-bg: #252525 !important;
+    --table-ooc-bg: #dc2626 !important;
+    --table-ooc-text: #ffffff !important;
+    --table-stats-bg: #14532d !important;
 
-    --card-bg: rgba(36, 52, 71, 0.85);
+    --card-bg: #1f1f1f;
 }
 
 body {
@@ -85,21 +76,24 @@ body {
     font-size: var(--size-base);
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
-    transition: background-color 0.5s ease, color 0.5s ease;
-    background-image:
-        radial-gradient(circle at 10% 20%, rgba(86, 156, 91, 0.05) 0%, transparent 40%),
-        radial-gradient(circle at 90% 80%, rgba(79, 163, 196, 0.05) 0%, transparent 40%);
+    transition: background-color 0.2s ease, color 0.2s ease;
+    /* Vercel-style plain background */
+    background-image: none;
 }
 
 html.dark body {
-    background-image:
-        radial-gradient(circle at 10% 20%, rgba(136, 212, 152, 0.05) 0%, transparent 40%),
-        radial-gradient(circle at 90% 80%, rgba(100, 181, 246, 0.05) 0%, transparent 40%);
+    background-image: none;
 }
 
 /* Ensure no text falls below the minimum readable size */
 * {
     font-size: inherit;
+}
+
+/* Vercel-style Focus Ring */
+*:focus-visible {
+    outline: 2px solid #0a72ef;
+    outline-offset: 2px;
 }
 
 small,
@@ -116,13 +110,15 @@ h3,
 h4,
 h5,
 h6 {
-    font-family: 'Nunito', sans-serif;
+    font-family: 'Inter', sans-serif;
     color: var(--text-main);
+    /* Vercel-style negative letter-spacing for headlines */
+    letter-spacing: -0.02em;
 }
 
 h1 {
     font-size: var(--size-2xl);
-    font-weight: 800;
+    font-weight: 700;
 }
 
 h2 {
@@ -132,12 +128,12 @@ h2 {
 
 h3 {
     font-size: var(--size-lg);
-    font-weight: 700;
+    font-weight: 600;
 }
 
 h4 {
     font-size: var(--size-md);
-    font-weight: 700;
+    font-weight: 600;
 }
 
 label {
@@ -145,51 +141,48 @@ label {
     font-weight: 600;
 }
 
-/* Organic / Glass Card Style */
+/* Vercel-inspired Card Style */
 .saas-card {
     border-width: 0px;
-    /* Removed border for cleaner look */
     background-color: var(--card-bg);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    box-shadow:
-        0 4px 6px -1px rgba(0, 0, 0, 0.05),
-        0 2px 4px -1px rgba(0, 0, 0, 0.03),
-        inset 0 0 0 1px rgba(255, 255, 255, 0.4);
-    /* Inner shine */
-    border-radius: 2rem;
-    /* Softer, rounder */
-    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-    /* Bouncy transition */
+    /* Shadow-as-border: replaces traditional borders */
+    box-shadow: 
+        0px 0px 0px 1px rgba(0, 0, 0, 0.08),
+        0px 4px 6px -1px rgba(0, 0, 0, 0.04),
+        0px 2px 4px -1px rgba(0, 0, 0, 0.02);
+    /* Vercel-style rounded corners */
+    border-radius: 12px;
+    /* Clean, minimal transitions */
+    transition: all 0.15s ease-out;
 }
 
 .dark .saas-card {
-    box-shadow:
-        0 4px 6px -1px rgba(0, 0, 0, 0.2),
-        inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+    box-shadow: 
+        0px 0px 0px 1px rgba(255, 255, 255, 0.08),
+        0px 4px 6px -1px rgba(0, 0, 0, 0.2),
+        0px 2px 4px -1px rgba(0, 0, 0, 0.1);
 }
 
 .saas-card:hover {
-    transform: translateY(-6px) scale(1.01);
-    box-shadow:
-        0 20px 25px -5px rgba(0, 0, 0, 0.1),
-        0 8px 10px -6px rgba(0, 0, 0, 0.1),
-        inset 0 0 0 1px rgba(255, 255, 255, 0.6);
+    /* Subtle lift, no bouncy animation */
+    transform: translateY(-2px);
+    box-shadow: 
+        0px 0px 0px 1px rgba(0, 0, 0, 0.1),
+        0px 8px 16px -4px rgba(0, 0, 0, 0.1),
+        0px 4px 8px -2px rgba(0, 0, 0, 0.06);
 }
 
-/* Glass Navigation */
+/* Vercel-style Navigation */
 .glass-nav {
     border-bottom: none;
-    background-color: rgba(255, 255, 255, 0.8);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    box-shadow: 0 4px 20px -5px rgba(86, 156, 91, 0.1);
-    /* Subtle green tint shadow */
+    background-color: var(--surface);
+    /* Shadow-as-border instead of green tint */
+    box-shadow: 0px 0px 0px 1px rgba(0, 0, 0, 0.06);
 }
 
 .dark .glass-nav {
-    background-color: rgba(26, 38, 52, 0.8);
-    box-shadow: 0 4px 20px -5px rgba(0, 0, 0, 0.3);
+    background-color: var(--surface);
+    box-shadow: 0px 0px 0px 1px rgba(255, 255, 255, 0.08);
 }
 
 /* Hover Lift Effect */
@@ -217,20 +210,22 @@ label {
     box-shadow: 0 4px 12px rgba(86, 156, 91, 0.3);
 }
 
-/* Buttons */
+/* Buttons - Vercel-style */
 .btn-primary {
     background-color: var(--primary);
     color: white;
-    font-weight: 700;
-    border-radius: 1rem;
-    padding: 0.75rem 1.5rem;
-    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-    box-shadow: 0 4px 6px rgba(86, 156, 91, 0.2);
+    font-weight: 600;
+    /* Vercel-style conservative border-radius */
+    border-radius: 8px;
+    padding: 0.625rem 1.25rem;
+    /* Clean transition */
+    transition: all 0.15s ease-out;
+    box-shadow: 0px 0px 0px 1px rgba(0, 0, 0, 0.04);
 }
 
 .btn-primary:hover {
-    transform: translateY(-2px) scale(1.05);
-    box-shadow: 0 8px 12px rgba(86, 156, 91, 0.3);
+    transform: translateY(-1px);
+    box-shadow: 0px 4px 8px -2px rgba(0, 0, 0, 0.1);
 }
 
 /* Anomaly Pulse Animation (Red) */
@@ -298,8 +293,9 @@ label {
     background-color: var(--table-bg) !important;
     color: var(--table-text) !important;
     border-color: var(--table-border) !important;
-    font-family: 'Nunito', sans-serif;
-    border-radius: 1rem;
+    font-family: 'Inter', sans-serif;
+    /* Vercel-style rounded corners */
+    border-radius: 8px;
     overflow: hidden;
 }
 
@@ -310,11 +306,15 @@ label {
     padding: 0.75rem;
 }
 
-/* Tooltip & Charts */
+/* Tooltip & Charts - Vercel-style */
 .apexcharts-tooltip {
-    border-radius: 1rem !important;
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15) !important;
-    font-family: 'Nunito', sans-serif !important;
+    /* Vercel-style rounded corners */
+    border-radius: 8px !important;
+    /* Multi-layer shadow like Vercel */
+    box-shadow: 
+        0px 0px 0px 1px rgba(0, 0, 0, 0.08),
+        0px 8px 16px rgba(0, 0, 0, 0.12) !important;
+    font-family: var(--font-base) !important;
     max-width: 350px !important;
     width: auto !important;
     word-wrap: break-word !important;
@@ -352,6 +352,10 @@ label {
     color: var(--text-main) !important;
     max-width: 350px !important;
     width: auto !important;
+    /* Dark mode shadow */
+    box-shadow: 
+        0px 0px 0px 1px rgba(255, 255, 255, 0.08),
+        0px 8px 16px rgba(0, 0, 0, 0.4) !important;
 }
 
 .apexcharts-tooltip-title {

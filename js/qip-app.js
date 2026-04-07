@@ -532,6 +532,20 @@ var QIPExtractApp = {
 
     this.els.previewContent.innerHTML = html;
     this.bindCellEvents();
+    
+    // Scroll to I23 by default (column I = 8, row 23)
+    var previewContent = document.getElementById("qip-preview-content");
+    if (previewContent) {
+      var cellWidth = 80; // default cell width in px
+      var cellHeight = 24; // default cell height in px
+      var headerHeight = 30; // header row height
+      var colI = 8; // Column I (0-indexed)
+      var row23 = 22; // Row 23 (0-indexed)
+      
+      // Scroll to position cell I23 at top-left
+      previewContent.scrollTop = (row23 * cellHeight) - headerHeight;
+      previewContent.scrollLeft = (colI * cellWidth);
+    }
   },
 
   bindCellEvents: function () {

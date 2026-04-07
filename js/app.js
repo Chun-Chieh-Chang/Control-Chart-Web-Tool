@@ -242,7 +242,7 @@ var SPCApp = {
 
         modal.classList.remove('hidden');
         modal.classList.add('flex');
-        content.innerHTML = '<div class="flex flex-col items-center justify-center py-12"><div class="spinner mb-4"></div><p class="text-slate-500 font-bold">正在掃描全局數據項目，請稍後...</p></div>';
+        content.innerHTML = '<div class="flex flex-col items-center justify-center py-12"><div class="spinner mb-4"></div><p class="text-slate-500 font-bold">' + self.t('正在掃描全局數據項目，請稍後...', 'Scanning global data, please wait...') + '</p></div>';
 
         setTimeout(function () {
             var sheets = self.workbook.SheetNames;
@@ -296,24 +296,24 @@ var SPCApp = {
             var severityColor = "#10b981";
 
             if (globalImbalanceCount / total > 0.6) {
-                diagnosisResult = "全局性模具結構問題 (Global Mold Structure Issue)";
-                advice = "偵測到超過 60% 的尺寸項目呈現嚴重模穴不平衡。這通常表示模具的主流道設計、熱流道總溫控或模仁冷卻系統存在全局性的物理偏差。建議優先進行模具大修或流道平衡優化。";
+                diagnosisResult = self.t('全局性模具結構問題', 'Global Mold Structure Issue');
+                advice = self.t('偵測到超過 60% 的尺寸項目呈現嚴重模穴不平衡。這通常表示模具的主流道設計、熱流道總溫控或模仁冷卻系統存在全局性的物理偏差。建議優先進行模具大修或流道平衡優化。', 'Detected over 60% of items showing severe cavity imbalance. This usually indicates global physical bias in mold runner design, hot runner temperature control, or core cooling system. Recommend priority mold overhaul or runner balance optimization.');
                 severityColor = "#f43f5e";
             } else if (globalInstabilityCount / total > 0.5) {
-                diagnosisResult = "製程重複精度問題 (Shot-to-Shot Instability)";
-                advice = "多個測項同步顯示批次間波動過大，但單發內相對穩定。建議檢查機台止逆環、料筒控溫穩定性或更換穩定的原料批次。";
+                diagnosisResult = self.t('製程重複精度問題', 'Shot-to-Shot Instability');
+                advice = self.t('多個測項同步顯示批次間波動過大，但單發內相對穩定。建議檢查機台止逆環、料筒控溫穩定性或更換穩定的原料批次。', 'Multiple items show excessive batch-to-batch variation while individual shots are relatively stable. Recommend checking check ring, barrel temperature stability, or switching to stable material batch.');
                 severityColor = "#f59e0b";
             } else if (globalImbalanceCount > 0) {
-                diagnosisResult = "局部特徵失效診斷 (Localized Feature Failure)";
-                advice = "僅特定尺寸（如厚度或特定部位尺寸）呈現不平衡，代表模具大架構穩定，但個別穴位的澆口或排氣功能已失效。建議針對異常項目對應的穴位進行局部維護。";
+                diagnosisResult = self.t('局部特徵失效診斷', 'Localized Feature Failure');
+                advice = self.t('僅特定尺寸呈現不平衡，代表模具大架構穩定，但個別穴位的澆口或排氣功能已失效。建議針對異常項目對應的穴位進行局部維護。', 'Only specific dimensions show imbalance, indicating mold overall structure is stable but individual cavity gate or venting has failed. Recommend localized maintenance for affected cavities.');
                 severityColor = "#6366f1";
             } else if (lowCpkCount > 0) {
-                diagnosisResult = "公差定義與製程能力衝突 (Tolerance Conflict)";
-                advice = "製程穩定度良好，但 Cpk 指數偏低。這通常是規格限值 (USL/LSL) 定義過於嚴苛，已超出當前設備的物理加工極限。建議評估放寬公差或更換高流動性材料。";
+                diagnosisResult = self.t('公差定義與製程能力衝突', 'Tolerance Conflict');
+                advice = self.t('製程穩定度良好，但 Cpk 指數偏低。這通常是規格限值定義過於嚴苛，已超出當前設備的物理加工極限。建議評估放寬公差或更換高流動性材料。', 'Process stability is good but Cpk is low. This usually means specification limits are too tight, exceeding current equipment physical limits. Recommend evaluating wider tolerances or switching to higher flow material.');
                 severityColor = "#f59e0b";
             } else {
-                diagnosisResult = "製程體質健康 (Healthy Process)";
-                advice = "所有檢驗項目均表現優異。請維持當前保壓條件與週期穩定，並建立定期預防保養計畫。";
+                diagnosisResult = self.t('製程體質健康', 'Healthy Process');
+                advice = self.t('所有檢驗項目均表現優異。請維持當前保壓條件與週期穩定，並建立定期預防保養計畫。', 'All inspection items show excellent performance. Maintain current holding conditions and cycle stability, establish regular preventive maintenance schedule.');
                 severityColor = "#10b981";
             }
 
@@ -324,12 +324,12 @@ var SPCApp = {
                 '<div><h4 class="text-xl font-bold mb-2" style="color:' + severityColor + '">' + diagnosisResult + '</h4>' +
                 '<p class="text-slate-600 dark:text-slate-300 leading-relaxed font-bold">' + advice + '</p></div></div>' +
                 '<div class="grid grid-cols-1 md:grid-cols-3 gap-4">' +
-                '<div class="saas-card p-4 text-center"><div class="text-[10px] font-bold text-slate-400 uppercase">低能力項目數</div><div class="text-2xl font-bold text-rose-500">' + lowCpkCount + ' / ' + total + '</div></div>' +
-                '<div class="saas-card p-4 text-center"><div class="text-[10px] font-bold text-slate-400 uppercase">模穴失衡比例</div><div class="text-2xl font-bold text-indigo-500">' + Math.round((globalImbalanceCount / total) * 100) + '%</div></div>' +
-                '<div class="saas-card p-4 text-center"><div class="text-[10px] font-bold text-slate-400 uppercase">批次不穩比例</div><div class="text-2xl font-bold text-amber-500 text-blue-500">' + Math.round((globalInstabilityCount / total) * 100) + '%</div></div>' +
+                '<div class="saas-card p-4 text-center"><div class="text-[10px] font-bold text-slate-400 uppercase">' + self.t('低能力項目數', 'Low Cpk Items') + '</div><div class="text-2xl font-bold text-rose-500">' + lowCpkCount + ' / ' + total + '</div></div>' +
+                '<div class="saas-card p-4 text-center"><div class="text-[10px] font-bold text-slate-400 uppercase">' + self.t('模穴失衡比例', 'Cavity Imbalance') + '</div><div class="text-2xl font-bold text-indigo-500">' + Math.round((globalImbalanceCount / total) * 100) + '%</div></div>' +
+                '<div class="saas-card p-4 text-center"><div class="text-[10px] font-bold text-slate-400 uppercase">' + self.t('批次不穩比例', 'Batch Instability') + '</div><div class="text-2xl font-bold text-amber-500 text-blue-500">' + Math.round((globalInstabilityCount / total) * 100) + '%</div></div>' +
                 '</div>' +
                 '<div class="saas-card overflow-hidden"><table class="w-full text-sm text-left"><thead class="bg-slate-50 dark:bg-slate-800 text-slate-500 font-bold">' +
-                '<tr><th class="px-6 py-3">分析項目 (Inspection Item)</th><th class="px-6 py-3 text-center">Cpk</th><th class="px-6 py-3 text-center">不平衡率</th><th class="px-6 py-3 text-center">診斷</th></tr></thead>' +
+                '<tr><th class="px-6 py-3">' + self.t('分析項目', 'Inspection Item') + '</th><th class="px-6 py-3 text-center">Cpk</th><th class="px-6 py-3 text-center">' + self.t('不平衡率', 'Imbalance Rate') + '</th><th class="px-6 py-3 text-center">' + self.t('診斷', 'Diagnosis') + '</th></tr></thead>' +
                 '<tbody class="divide-y dark:divide-slate-700">' +
                 summary.map(function (s) {
                     return '<tr><td class="px-6 py-4 font-bold dark:text-slate-300">' + s.name + '</td>' +
@@ -1201,7 +1201,7 @@ var SPCApp = {
             }
 
             html = multiCavityBadge + '<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">' +
-                '<div class="saas-card p-4"> <div class="text-[10px] font-bold text-slate-500 uppercase">' + this.t('模穴數', 'Cavities') + '</div> <div class="text-xl font-bold dark:text-white">' + data.xbarR.summary.n + '</div> </div>' +
+                '<div class="saas-card p-4"> <div class="text-[10px] font-bold text-slate-500 uppercase">' + this.t('子組數', 'Subgroups') + '</div> <div class="text-xl font-bold dark:text-white">' + data.xbarR.summary.n + '</div> </div>' +
                 '<div class="saas-card p-4"> <div class="text-[10px] font-bold text-slate-500 uppercase">' + this.t('規格上限 (USL)', 'USL') + '</div> <div class="text-xl font-bold font-mono text-slate-700 dark:text-slate-300">' + SPCEngine.round(data.specs.usl, 3) + '</div> </div>' +
                 '<div class="saas-card p-4"> <div class="text-[10px] font-bold text-slate-500 uppercase">' + this.t('標稱值 (Target)', 'Target') + '</div> <div class="text-xl font-bold font-mono text-slate-700 dark:text-slate-300">' + SPCEngine.round(data.specs.target, 3) + '</div> </div>' +
                 '<div class="saas-card p-4"> <div class="text-[10px] font-bold text-slate-500 uppercase">' + this.t('規格下限 (LSL)', 'LSL') + '</div> <div class="text-xl font-bold font-mono text-slate-700 dark:text-slate-300">' + SPCEngine.round(data.specs.lsl, 3) + '</div> </div>' +

@@ -219,8 +219,13 @@
                     class="p-2 hover:bg-slate-100 rounded-lg transition-all text-slate-600 border border-slate-200 shadow-sm flex items-center">
                     <span id="langText" class="text-sm font-bold px-1">EN</span>
                 </button>
+                <!-- Dark Mode Toggle -->
+                <button id="darkModeBtn"
+                    class="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-all text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-600 shadow-sm flex items-center">
+                    <span class="material-icons-outlined block dark:hidden">dark_mode</span>
+                    <span class="material-icons-outlined hidden dark:block">light_mode</span>
+                </button>
                 <div class="w-px h-6 bg-slate-200"></div>
-                <!-- Notification -->
                 <!-- Notification -->
                 <button id="anomalyToggleBtn" onclick="SPCApp.toggleAnomalySidebar()"
                     class="p-2 text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 transition-colors relative"
@@ -231,15 +236,6 @@
                 </button>
             </div>
         </header>
-
-        <!-- Dark Mode Toggle (Floating) -->
-        <div class="fixed bottom-6 right-6 z-50">
-            <button id="darkModeBtn"
-                class="w-12 h-12 bg-slate-800 text-white rounded-full shadow-2xl flex items-center justify-center hover:bg-slate-700 transition-all active:scale-90">
-                <span class="material-icons-outlined block dark:hidden">dark_mode</span>
-                <span class="material-icons-outlined hidden dark:block">light_mode</span>
-            </button>
-        </div>
 
         <!-- Dynamic Main Scrollable Area -->
         <main class="flex-1 overflow-y-auto relative bg-slate-50 dark:bg-slate-900" id="mainContent">
@@ -437,21 +433,21 @@
                             <div class="saas-card p-5 bg-slate-900 text-white relative overflow-hidden">
                                 <h4 class="text-sm font-bold mb-3 flex items-center gap-2">
                                     <span class="material-icons-outlined text-amber-400">tips_and_updates</span>
-                                    <span data-en="Pro Guidelines" data-zh="作業規範指引">作業規範指引</span>
+                                    <span class="text-white" data-en="Pro Guidelines" data-zh="作業規範指引">作業規範指引</span>
                                 </h4>
                                 <ul class="text-[11px] space-y-2 text-slate-300">
                                     <li class="flex items-start gap-2">
                                         <span
                                             class="material-icons-outlined text-emerald-400 text-xs mt-0.5">check_circle</span>
-                                        <span>A 欄：批號 (Batch ID)</span>
+                                        <span data-en="Column A: Batch ID" data-zh="A 欄：批號 (Batch ID)">A 欄：批號 (Batch ID)</span>
                                     </li>
                                     <li class="flex items-start gap-2">
                                         <span
                                             class="material-icons-outlined text-emerald-400 text-xs mt-0.5">check_circle</span>
-                                        <span>B 欄起：測量讀值 (Value)</span>
+                                        <span data-en="Column B onwards: Measured Values" data-zh="B 欄起：測量讀值 (Value)">B 欄起：測量讀值 (Value)</span>
                                     </li>
                                 </ul>
-                                <p class="mt-4 text-[10px] italic text-slate-500 border-t border-slate-800 pt-3">
+                                <p class="mt-4 text-[10px] italic text-slate-500 border-t border-slate-800 pt-3" data-en="Recommended subgroup size n ≥ 2 for optimal stability assessment." data-zh="建議子群大小 n ≥ 2 以獲得最佳穩定性評估。">
                                     建議子群大小 n ≥ 2 以獲得最佳穩定性評估。
                                 </p>
                             </div>
@@ -459,7 +455,8 @@
                             <div class="saas-card p-5 border-l-4 border-l-blue-500">
                                 <h4 class="text-xs font-bold text-slate-900 dark:text-white mb-2 uppercase tracking-wider"
                                     data-en="Quick Help" data-zh="分析模式導覽">分析模式導覽</h4>
-                                <p class="text-[11px] text-slate-500 leading-relaxed">
+                                <p class="text-[11px] text-slate-500 leading-relaxed" data-en="After system detects data, choose 'Batch' or 'Cavity' mode based on purpose. To process raw molding reports, use Data Extract tool."
+                                   data-zh="系統偵測數據後，請依目的選擇「批次」或「模穴」模式。如需處理原始成型報表，請使用 Data Extract 提取工具。">
                                     系統偵測數據後，請依目的選擇「批次」或「模穴」模式。如需處理原始成型報表，請使用 <strong>Data Extract</strong> 提取工具。
                                 </p>
                             </div>
@@ -940,8 +937,8 @@
                             <div class="flex gap-4">
                                 <div class="w-10 h-10 rounded-lg bg-sky-500 text-white flex items-center justify-center font-bold text-lg">3</div>
                                 <div>
-                                    <h3 class="text-lg font-bold text-slate-900 dark:text-white">連續 6 點持續上升或下降</h3>
-                                    <p class="text-sm font-mono text-sky-600 dark:text-sky-400 mt-1">Trend (Drift) - 漸進磨損警訊</p>
+                                    <h3 class="text-lg font-bold text-slate-900 dark:text-white" data-en="6 consecutive trending points (up or down)" data-zh="連續 6 點持續上升或下降">連續 6 點持續上升或下降</h3>
+                                    <p class="text-sm font-mono text-sky-600 dark:text-sky-400 mt-1" data-en="Trend (Drift)" data-zh="Trend (Drift) - 漸進磨損警訊">Trend (Drift) - 漸進磨損警訊</p>
                                 </div>
                             </div>
                             <span class="material-icons-outlined text-sky-300 text-4xl group-hover:scale-110 transition-transform">trending_up</span>
@@ -949,45 +946,50 @@
                         <div class="px-6 pt-4 pb-2 bg-slate-50 dark:bg-slate-800/50">
                             <div class="flex items-center gap-2 text-xs font-bold text-slate-500 uppercase tracking-wider">
                                 <span class="material-icons-outlined text-sm">functions</span>
-                                <span>統計原理</span>
+                                <span data-en="Statistical Basis" data-zh="統計原理">統計原理</span>
                             </div>
-                            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">連續 6 點單調上升或下降是<strong class="text-sky-500">漸進式磨損</strong>的明確訊號，表示工具或設備正在持續劣化的過程中。</p>
+                            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1" data-en="6 consecutive points trending up or down is a clear signal of progressive wear - indicating tools or equipment are continuously deteriorating."
+                               data-zh="連續 6 點單調上升或下降是漸進式磨損的明確訊號，表示工具或設備正在持續劣化的過程中。">
+                                連續 6 點單調上升或下降是漸進式磨損的明確訊號，表示工具或設備正在持續劣化的過程中。
+                            </p>
                         </div>
                         <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-8">
                             <div class="space-y-3">
                                 <div class="flex items-center gap-2 text-blue-600 font-bold text-sm mb-2">
                                     <span class="material-icons-outlined text-base">precision_manufacturing</span>
-                                    <span>成型現場觀點</span>
+                                    <span data-en="Field Expert View" data-zh="成型現場觀點">成型現場觀點</span>
                                 </div>
-                                <p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
-                                    「這代表一種<strong class="text-sky-600">漸進式的變化</strong>。請重點檢查<span class="text-slate-900 dark:text-white font-bold">工具磨損 (Tool Wear)</span>，例如頂針、滑塊或螺桿止逆環 (Check Ring) 的磨耗。另一個可能是<span class="text-slate-900 dark:text-white font-bold">料管溫度控制失效</span>導致溫度緩慢持續爬升。」
+                                <p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed" data-en="This represents a gradual change. Key inspection areas include tool wear (ejector pins, sliders, check ring). Another possibility is barrel temperature control failure causing continuous temperature rise."
+                                   data-zh="這代表一種漸進式的變化。請重點檢查工具磨損，例如頂針、滑塊或螺桿止逆環的磨耗。另一個可能是料管溫度控制失效導致溫度緩慢持續爬升。">
+                                    「這代表一種漸進式的變化。請重點檢查工具磨損 (Tool Wear)，例如頂針、滑塊或螺桿止逆環 (Check Ring) 的磨耗。另一個可能是料管溫度控制失效導致溫度緩慢持續爬升。」
                                 </p>
                                 <div class="mt-3 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-100 dark:border-blue-800">
-                                    <p class="text-xs font-bold text-blue-700 dark:text-blue-400 mb-2">🔧 磨損檢查重點</p>
+                                    <p class="text-xs font-bold text-blue-700 dark:text-blue-400 mb-2" data-en="Wear Inspection Points" data-zh="🔧 磨損檢查重點">🔧 磨損檢查重點</p>
                                     <ul class="text-xs text-blue-800 dark:text-blue-300 space-y-1">
-                                        <li>□ 頂針 (Ejector Pins) 磨損檢查</li>
-                                        <li>□ 滑塊 (Slider) 磨損與潤滑</li>
-                                        <li>□ 止逆環 (Check Ring) 磨損</li>
-                                        <li>□ 料管溫控是否異常爬升</li>
-                                        <li>□ 加熱圈老化程度評估</li>
+                                        <li data-en="Ejector pins wear inspection" data-zh="頂針 (Ejector Pins) 磨損檢查">頂針 (Ejector Pins) 磨損檢查</li>
+                                        <li data-en="Slider wear and lubrication" data-zh="滑塊 (Slider) 磨損與潤滑">滑塊 (Slider) 磨損與潤滑</li>
+                                        <li data-en="Check ring wear" data-zh="止逆環 (Check Ring) 磨損">止逆環 (Check Ring) 磨損</li>
+                                        <li data-en="Barrel temp control anomaly" data-zh="料管溫控是否異常爬升">料管溫控是否異常爬升</li>
+                                        <li data-en="Heating element aging assessment" data-zh="加熱圈老化程度評估">加熱圈老化程度評估</li>
                                     </ul>
                                 </div>
                             </div>
                             <div class="space-y-3 pl-0 md:pl-8 md:border-l border-slate-100 dark:border-slate-700">
                                 <div class="flex items-center gap-2 text-emerald-600 font-bold text-sm mb-2">
                                     <span class="material-icons-outlined text-base">assignment_turned_in</span>
-                                    <span>品管專家解讀</span>
+                                    <span data-en="Quality Expert View" data-zh="品管專家解讀">品管專家解讀</span>
                                 </div>
-                                <p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
-                                    「趨勢是一種<strong>強烈的警告訊號</strong>，預示著製程即將失控。此時不應等待超規發生，而應立即執行預防保養 (PM)。<strong>磨耗類的可歸屬原因通常是不可逆的</strong>，必須通過更換部件來解決。建議計算平均磨損速率，預測何時會達到管制界限。」
+                                <p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed" data-en="Trend is a strong warning signal that process is about to go out of control. Do not wait for out-of-spec; initiate PM immediately. Wear-related causes are irreversible - must replace components."
+                                   data-zh="趨勢是一種強烈的警告訊號，預示著製程即將失控。此時不應等待超規發生，而應立即執行預防保養 (PM)。磨耗類的可歸屬原因通常是不可逆的，必須通過更換部件來解決。">
+                                    「趨勢是一種強烈的警告訊號，預示著製程即將失控。此時不應等待超規發生，而應立即執行預防保養 (PM)。磨耗類的可歸屬原因通常是不可逆的，必須通過更換部件來解決。建議計算平均磨損速率，預測何時會達到管制界限。」
                                 </p>
                                 <div class="mt-3 p-3 bg-emerald-50 dark:bg-emerald-900/20 rounded-lg border border-emerald-100 dark:border-emerald-800">
-                                    <p class="text-xs font-bold text-emerald-700 dark:text-emerald-400 mb-2">⏱️ 維護時程評估</p>
+                                    <p class="text-xs font-bold text-emerald-700 dark:text-emerald-400 mb-2" data-en="Maintenance Schedule Assessment" data-zh="⏱️ 維護時程評估">⏱️ 維護時程評估</p>
                                     <ul class="text-xs text-emerald-800 dark:text-emerald-300 space-y-1">
-                                        <li>□ 計算趨勢斜率 (Slope)</li>
-                                        <li>□ 預估達到 UCL/LCL 時間</li>
-                                        <li>□ 安排預防保養 (PM) 時程</li>
-                                        <li>□ 備妥更換零件庫存</li>
+                                        <li data-en="Calculate trend slope" data-zh="計算趨勢斜率 (Slope)">計算趨勢斜率 (Slope)</li>
+                                        <li data-en="Predict time to UCL/LCL" data-zh="預估達到 UCL/LCL 時間">預估達到 UCL/LCL 時間</li>
+                                        <li data-en="Schedule preventive maintenance" data-zh="安排預防保養 (PM) 時程">安排預防保養 (PM) 時程</li>
+                                        <li data-en="Prepare spare parts inventory" data-zh="備妥更換零件庫存">備妥更換零件庫存</li>
                                     </ul>
                                 </div>
                             </div>
@@ -1022,8 +1024,8 @@
                             <div class="flex gap-4">
                                 <div class="w-10 h-10 rounded-lg bg-indigo-500 text-white flex items-center justify-center font-bold text-lg">4</div>
                                 <div>
-                                    <h3 class="text-lg font-bold text-slate-900 dark:text-white">連續 14 點上下交替</h3>
-                                    <p class="text-sm font-mono text-indigo-600 dark:text-indigo-400 mt-1">Oscillation (Over-control) - 系統震盪</p>
+                                    <h3 class="text-lg font-bold text-slate-900 dark:text-white" data-en="14 consecutive alternating points" data-zh="連續 14 點上下交替">連續 14 點上下交替</h3>
+                                    <p class="text-sm font-mono text-indigo-600 dark:text-indigo-400 mt-1" data-en="Oscillation (Over-control)" data-zh="Oscillation (Over-control) - 系統震盪">Oscillation (Over-control) - 系統震盪</p>
                                 </div>
                             </div>
                             <span class="material-icons-outlined text-indigo-300 text-4xl group-hover:scale-110 transition-transform">waves</span>
@@ -1031,46 +1033,51 @@
                         <div class="px-6 pt-4 pb-2 bg-slate-50 dark:bg-slate-800/50">
                             <div class="flex items-center gap-2 text-xs font-bold text-slate-500 uppercase tracking-wider">
                                 <span class="material-icons-outlined text-sm">functions</span>
-                                <span>統計原理</span>
+                                <span data-en="Statistical Basis" data-zh="統計原理">統計原理</span>
                             </div>
-                            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">連續 14 點呈現規律性上下交替稱為<strong class="text-indigo-500">負自相關 (Negative Autocorrelation)</strong>，這是「過度干預」的特徵訊號，而非自然變異。</p>
+                            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1" data-en="14 consecutive points showing regular alternating pattern indicates Negative Autocorrelation - a sign of over-intervention, not natural variation."
+                               data-zh="連續 14 點呈現規律性上下交替稱為負自相關，這是過度干預的特徵訊號，而非自然變異。">
+                                連續 14 點呈現規律性上下交替稱為負自相關 (Negative Autocorrelation)，這是「過度干預」的特徵訊號，而非自然變異。
+                            </p>
                         </div>
                         <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-8">
                             <div class="space-y-3">
                                 <div class="flex items-center gap-2 text-blue-600 font-bold text-sm mb-2">
                                     <span class="material-icons-outlined text-base">precision_manufacturing</span>
-                                    <span>成型現場觀點</span>
+                                    <span data-en="Field Expert View" data-zh="成型現場觀點">成型現場觀點</span>
                                 </div>
-                                <p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
-                                    「這通常是<strong class="text-indigo-600">人為干預過度</strong>造成的。現場操作員可能每打一模就去微調保壓或背壓，試圖讓尺寸『完美』，反而造成系統震盪。也可能是<span class="text-slate-900 dark:text-white font-bold">機台液壓系統不穩定</span>（Hunting 現象）。」
+                                <p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed" data-en="Usually caused by excessive human intervention. Operators may adjust parameters after every shot trying to achieve perfect dimensions, causing system oscillation. Could also be unstable hydraulic system."
+                                   data-zh="這通常是人為干預過度造成的。現場操作員可能每打一模就去微調保壓或背壓，試圖讓尺寸完美，反而造成系統震盪。也可能是機台液壓系統不穩定。">
+                                    「這通常是人為干預過度造成的。現場操作員可能每打一模就去微調保壓或背壓，試圖讓尺寸『完美』，反而造成系統震盪。也可能是機台液壓系統不穩定（Hunting 現象）。」
                                 </p>
                                 <div class="mt-3 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-100 dark:border-blue-800">
-                                    <p class="text-xs font-bold text-blue-700 dark:text-blue-400 mb-2">⚠️ 過度調整徵兆</p>
+                                    <p class="text-xs font-bold text-blue-700 dark:text-blue-400 mb-2" data-en="Over-adjustment Signs" data-zh="⚠️ 過度調整徵兆">⚠️ 過度調整徵兆</p>
                                     <ul class="text-xs text-blue-800 dark:text-blue-300 space-y-1">
-                                        <li>□ 每模調整工藝參數</li>
-                                        <li>□ 根據單一尺寸結果調整</li>
-                                        <li>□ 操作員對尺寸過度焦慮</li>
-                                        <li>□ 液壓系統反覆振盪</li>
-                                        <li>□ PID 控制參數不當</li>
+                                        <li data-en="Adjust parameters every shot" data-zh="每模調整工藝參數">每模調整工藝參數</li>
+                                        <li data-en="Adjust based on single measurement" data-zh="根據單一尺寸結果調整">根據單一尺寸結果調整</li>
+                                        <li data-en="Operator over-anxious about dimensions" data-zh="操作員對尺寸過度焦慮">操作員對尺寸過度焦慮</li>
+                                        <li data-en="Hydraulic system oscillation" data-zh="液壓系統反覆振盪">液壓系統反覆振盪</li>
+                                        <li data-en="Improper PID control parameters" data-zh="PID 控制參數不當">PID 控制參數不當</li>
                                     </ul>
                                 </div>
                             </div>
                             <div class="space-y-3 pl-0 md:pl-8 md:border-l border-slate-100 dark:border-slate-700">
                                 <div class="flex items-center gap-2 text-emerald-600 font-bold text-sm mb-2">
                                     <span class="material-icons-outlined text-base">assignment_turned_in</span>
-                                    <span>品管專家解讀</span>
+                                    <span data-en="Quality Expert View" data-zh="品管專家解讀">品管專家解讀</span>
                                 </div>
-                                <p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
-                                    「這在統計上稱為<strong>負自相關 (Negative Autocorrelation)</strong>。請告訴現場人員：『<strong class="text-red-500">放手 (Hands Off)</strong>』。只要製程在管制界限內，自然的隨機變異是正常的，不需要頻繁調整。<strong>過度調整只會增加變異</strong>。」
+                                <p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed" data-en="This is called Negative Autocorrelation in statistics. Tell operators: 'Hands Off!' As long as process is within control limits, natural random variation is normal. Over-adjustment only increases variation."
+                                   data-zh="這在統計上稱為負自相關。請告訴現場人員：放手 (Hands Off)。只要製程在管制界限內，自然的隨機變異是正常的，不需要頻繁調整。過度調整只會增加變異。">
+                                    「這在統計上稱為負自相關 (Negative Autocorrelation)。請告訴現場人員：『放手 (Hands Off)』。只要製程在管制界限內，自然的隨機變異是正常的，不需要頻繁調整。過度調整只會增加變異。」
                                 </p>
                                 <div class="mt-3 p-3 bg-emerald-50 dark:bg-emerald-900/20 rounded-lg border border-emerald-100 dark:border-emerald-800">
-                                    <p class="text-xs font-bold text-emerald-700 dark:text-emerald-400 mb-2">🛑 正確處置</p>
+                                    <p class="text-xs font-bold text-emerald-700 dark:text-emerald-400 mb-2" data-en="Correct Actions" data-zh="🛑 正確處置">🛑 正確處置</p>
                                     <ul class="text-xs text-emerald-800 dark:text-emerald-300 space-y-1">
-                                        <li>□ 停止所有手動微調</li>
-                                        <li>□ 鎖定工藝參數設定</li>
-                                        <li>□ 持續觀察自然變異</li>
-                                        <li>□ 必要時檢修液壓系統</li>
-                                        <li>□ 教育訓練操作員信心</li>
+                                        <li data-en="Stop all manual adjustments" data-zh="停止所有手動微調">停止所有手動微調</li>
+                                        <li data-en="Lock process parameters" data-zh="鎖定工藝參數設定">鎖定工藝參數設定</li>
+                                        <li data-en="Observe natural variation" data-zh="持續觀察自然變異">持續觀察自然變異</li>
+                                        <li data-en="Service hydraulic system if needed" data-zh="必要時檢修液壓系統">必要時檢修液壓系統</li>
+                                        <li data-en="Train operator confidence" data-zh="教育訓練操作員信心">教育訓練操作員信心</li>
                                     </ul>
                                 </div>
                             </div>
@@ -1105,8 +1112,8 @@
                             <div class="flex gap-4">
                                 <div class="w-10 h-10 rounded-lg bg-orange-500 text-white flex items-center justify-center font-bold text-lg">5</div>
                                 <div>
-                                    <h3 class="text-lg font-bold text-slate-900 dark:text-white">連續 3 點中有 2 點 > 2σ</h3>
-                                    <p class="text-sm font-mono text-orange-600 dark:text-orange-400 mt-1">Medium Shift Warning - 中度偏移警訊</p>
+                                    <h3 class="text-lg font-bold text-slate-900 dark:text-white" data-en="2 of 3 consecutive points > 2σ" data-zh="連續 3 點中有 2 點 > 2σ">連續 3 點中有 2 點 > 2σ</h3>
+                                    <p class="text-sm font-mono text-orange-600 dark:text-orange-400 mt-1" data-en="Medium Shift Warning" data-zh="Medium Shift Warning - 中度偏移警訊">Medium Shift Warning - 中度偏移警訊</p>
                                 </div>
                             </div>
                             <span class="material-icons-outlined text-orange-300 text-4xl group-hover:scale-110 transition-transform">priority_high</span>
@@ -1114,46 +1121,51 @@
                         <div class="px-6 pt-4 pb-2 bg-slate-50 dark:bg-slate-800/50">
                             <div class="flex items-center gap-2 text-xs font-bold text-slate-500 uppercase tracking-wider">
                                 <span class="material-icons-outlined text-sm">functions</span>
-                                <span>統計原理</span>
+                                <span data-en="Statistical Basis" data-zh="統計原理">統計原理</span>
                             </div>
-                            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">連續 3 點中有 2 點落在 2σ 與 3σ 之間，表示製程中心已發生<strong class="text-orange-500">顯著偏移</strong>，接近失控邊緣。</p>
+                            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1" data-en="2 of 3 points between 2σ and 3σ indicates significant process mean shift, approaching out-of-control edge."
+                               data-zh="連續 3 點中有 2 點落在 2σ 與 3σ 之間，表示製程中心已發生顯著偏移，接近失控邊緣。">
+                                連續 3 點中有 2 點落在 2σ 與 3σ 之間，表示製程中心已發生顯著偏移，接近失控邊緣。
+                            </p>
                         </div>
                         <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-8">
                             <div class="space-y-3">
                                 <div class="flex items-center gap-2 text-blue-600 font-bold text-sm mb-2">
                                     <span class="material-icons-outlined text-base">precision_manufacturing</span>
-                                    <span>成型現場觀點</span>
+                                    <span data-en="Field Expert View" data-zh="成型現場觀點">成型現場觀點</span>
                                 </div>
-                                <p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
-                                    「這意味著製程設定可能已經發生了<strong class="text-orange-600">實質性的改變</strong>。請檢查<span class="text-slate-900 dark:text-white font-bold">冷卻時間的穩定性</span>，或是否因為切換了回收料比例導致流動性改變。如果是在開機階段，可能是模溫還未完全穩定。」
+                                <p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed" data-en="This indicates process settings may have substantially changed. Check cooling time stability or if recycled material ratio change affected flow properties. If during startup, mold temp may not be stable."
+                                   data-zh="這意味著製程設定可能已經發生了實質性的改變。請檢查冷卻時間的穩定性，或是否因為切換了回收料比例導致流動性改變。">
+                                    「這意味著製程設定可能已經發生了實質性的改變。請檢查冷卻時間的穩定性，或是否因為切換了回收料比例導致流動性改變。如果是在開機階段，可能是模溫還未完全穩定。」
                                 </p>
                                 <div class="mt-3 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-100 dark:border-blue-800">
-                                    <p class="text-xs font-bold text-blue-700 dark:text-blue-400 mb-2">🔍 立即檢查項目</p>
+                                    <p class="text-xs font-bold text-blue-700 dark:text-blue-400 mb-2" data-en="Immediate Inspection Items" data-zh="🔍 立即檢查項目">🔍 立即檢查項目</p>
                                     <ul class="text-xs text-blue-800 dark:text-blue-300 space-y-1">
-                                        <li>□ 冷卻時間設定是否改變</li>
-                                        <li>□ 回收料摻配比例是否變動</li>
-                                        <li>□ 原料批次/供應商更換</li>
-                                        <li>□ 模溫機設定是否正確</li>
-                                        <li>□ 環境溫濕度變化</li>
+                                        <li data-en="Cooling time setting changed" data-zh="冷卻時間設定是否改變">冷卻時間設定是否改變</li>
+                                        <li data-en="Recycled material ratio change" data-zh="回收料摻配比例是否變動">回收料摻配比例是否變動</li>
+                                        <li data-en="Raw material batch change" data-zh="原料批次/供應商更換">原料批次/供應商更換</li>
+                                        <li data-en="Mold temp controller setting" data-zh="模溫機設定是否正確">模溫機設定是否正確</li>
+                                        <li data-en="Environment temp/humidity change" data-zh="環境溫濕度變化">環境溫濕度變化</li>
                                     </ul>
                                 </div>
                             </div>
                             <div class="space-y-3 pl-0 md:pl-8 md:border-l border-slate-100 dark:border-slate-700">
                                 <div class="flex items-center gap-2 text-emerald-600 font-bold text-sm mb-2">
                                     <span class="material-icons-outlined text-base">assignment_turned_in</span>
-                                    <span>品管專家解讀</span>
+                                    <span data-en="Quality Expert View" data-zh="品管專家解讀">品管專家解讀</span>
                                 </div>
-                                <p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
-                                    「這是繼 Rule 1 之後<strong>最嚴重的警訊</strong>。雖然還未正式超規，但製程中心已經偏離到危險區域。建議立即進行<span class="text-slate-900 dark:text-white font-bold">首件確認 (First Article Check)</span>，驗證是否需要重新校正機器參數。」
+                                <p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed" data-en="Most serious warning after Rule 1. Although not yet out-of-spec, process center has shifted to dangerous zone. Recommend immediately conducting First Article Check."
+                                   data-zh="這是繼 Rule 1 之後最嚴重的警訊。雖然還未正式超規，但製程中心已經偏離到危險區域。建議立即進行首件確認。">
+                                    「這是繼 Rule 1 之後最嚴重的警訊。雖然還未正式超規，但製程中心已經偏離到危險區域。建議立即進行首件確認 (First Article Check)，驗證是否需要重新校正機器參數。」
                                 </p>
                                 <div class="mt-3 p-3 bg-emerald-50 dark:bg-emerald-900/20 rounded-lg border border-emerald-100 dark:border-emerald-800">
-                                    <p class="text-xs font-bold text-emerald-700 dark:text-emerald-400 mb-2">📋 處置流程</p>
+                                    <p class="text-xs font-bold text-emerald-700 dark:text-emerald-400 mb-2" data-en="Action Process" data-zh="📋 處置流程">📋 處置流程</p>
                                     <ul class="text-xs text-emerald-800 dark:text-emerald-300 space-y-1">
-                                        <li>□ 停止生產（視情況）</li>
-                                        <li>□ 進行首件確認 (First Article)</li>
-                                        <li>□ 隔離可疑批次產品</li>
-                                        <li>□ 通知 QE/PE 工程師</li>
-                                        <li>□ 重新驗證工藝參數</li>
+                                        <li data-en="Stop production (if needed)" data-zh="停止生產（視情況）">停止生產（視情況）</li>
+                                        <li data-en="Conduct First Article Check" data-zh="進行首件確認 (First Article)">進行首件確認 (First Article)</li>
+                                        <li data-en="Quarantine suspicious batch" data-zh="隔離可疑批次產品">隔離可疑批次產品</li>
+                                        <li data-en="Notify QE/PE engineer" data-zh="通知 QE/PE 工程師">通知 QE/PE 工程師</li>
+                                        <li data-en="Revalidate process parameters" data-zh="重新驗證工藝參數">重新驗證工藝參數</li>
                                     </ul>
                                 </div>
                             </div>
@@ -1188,8 +1200,8 @@
                             <div class="flex gap-4">
                                 <div class="w-10 h-10 rounded-lg bg-teal-500 text-white flex items-center justify-center font-bold text-lg">6</div>
                                 <div>
-                                    <h3 class="text-lg font-bold text-slate-900 dark:text-white">連續 5 點中有 4 點 > 1σ</h3>
-                                    <p class="text-sm font-mono text-teal-600 dark:text-teal-400 mt-1">Early Warning - 輕度偏移警訊</p>
+                                    <h3 class="text-lg font-bold text-slate-900 dark:text-white" data-en="4 of 5 consecutive points > 1σ" data-zh="連續 5 點中有 4 點 > 1σ">連續 5 點中有 4 點 > 1σ</h3>
+                                    <p class="text-sm font-mono text-teal-600 dark:text-teal-400 mt-1" data-en="Early Warning" data-zh="Early Warning - 輕度偏移警訊">Early Warning - 輕度偏移警訊</p>
                                 </div>
                             </div>
                             <span class="material-icons-outlined text-teal-300 text-4xl group-hover:scale-110 transition-transform">notification_important</span>
@@ -1197,46 +1209,50 @@
                         <div class="px-6 pt-4 pb-2 bg-slate-50 dark:bg-slate-800/50">
                             <div class="flex items-center gap-2 text-xs font-bold text-slate-500 uppercase tracking-wider">
                                 <span class="material-icons-outlined text-sm">functions</span>
-                                <span>統計原理</span>
+                                <span data-en="Statistical Basis" data-zh="統計原理">統計原理</span>
                             </div>
-                            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">連續 5 點中有 4 點落在 1σ 與 2σ 之間，是<strong class="text-teal-500">輕度偏移</strong>的早期敏感度指標，需密切監控。</p>
+                            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1" data-en="4 of 5 points between 1σ and 2σ is a sensitive early indicator of slight process shift - requires close monitoring."
+                               data-zh="連續 5 點中有 4 點落在 1σ 與 2σ 之間，是輕度偏移的早期敏感度指標，需密切監控。">
+                                連續 5 點中有 4 點落在 1σ 與 2σ 之間，是<strong class="text-teal-500">輕度偏移</strong>的早期敏感度指標，需密切監控。</p>
                         </div>
                         <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-8">
                             <div class="space-y-3">
                                 <div class="flex items-center gap-2 text-blue-600 font-bold text-sm mb-2">
                                     <span class="material-icons-outlined text-base">precision_manufacturing</span>
-                                    <span>成型現場觀點</span>
+                                    <span data-en="Field Expert View" data-zh="成型現場觀點">成型現場觀點</span>
                                 </div>
-                                <p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+                                <p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed" data-en="This is usually a material-related issue. For masterbatch or recycled material, check the mixer uniformity. There could also be minor instability at the计量行程 endpoint (check ring slight leakage)."
+                                   data-zh="這通常是原料相關的問題。如果是混煉色母或回料，請檢查混合機的均勻度。也可能是計量行程的終點位置有微小的不穩定（止逆環輕微洩漏）。">
                                     「這通常是<span class="text-slate-900 dark:text-white font-bold">原料相關的問題</span>。如果是混煉色母或回料，請檢查<span class="text-slate-900 dark:text-white font-bold">混合機 (Mixer)</span> 的均勻度。也可能是計量行程的終點位置有微小的不穩定（止逆環輕微洩漏）。」
                                 </p>
                                 <div class="mt-3 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-100 dark:border-blue-800">
-                                    <p class="text-xs font-bold text-blue-700 dark:text-blue-400 mb-2">🔍 原料問題排查</p>
+                                    <p class="text-xs font-bold text-blue-700 dark:text-blue-400 mb-2" data-en="Material Issue Check" data-zh="🔍 原料問題排查">🔍 原料問題排查</p>
                                     <ul class="text-xs text-blue-800 dark:text-blue-300 space-y-1">
-                                        <li>□ 原料乾燥是否充分</li>
-                                        <li>□ 混合機攪拌是否均勻</li>
-                                        <li>□ 色母摻配比例是否正確</li>
-                                        <li>□ 回收料篩選是否徹底</li>
-                                        <li>□ 止逆環是否有洩漏跡象</li>
+                                        <li data-en="Adequate material drying" data-zh="原料乾燥是否充分">原料乾燥是否充分</li>
+                                        <li data-en="Mixer uniformity" data-zh="混合機攪拌是否均勻">混合機攪拌是否均勻</li>
+                                        <li data-en="Masterbatch ratio correctness" data-zh="色母摻配比例是否正確">色母摻配比例是否正確</li>
+                                        <li data-en="Recycled material screening" data-zh="回收料篩選是否徹底">回收料篩選是否徹底</li>
+                                        <li data-en="Check ring leakage signs" data-zh="止逆環是否有洩漏跡象">止逆環是否有洩漏跡象</li>
                                     </ul>
                                 </div>
                             </div>
                             <div class="space-y-3 pl-0 md:pl-8 md:border-l border-slate-100 dark:border-slate-700">
                                 <div class="flex items-center gap-2 text-emerald-600 font-bold text-sm mb-2">
                                     <span class="material-icons-outlined text-base">assignment_turned_in</span>
-                                    <span>品管專家解讀</span>
+                                    <span data-en="Quality Expert View" data-zh="品管專家解讀">品管專家解讀</span>
                                 </div>
-                                <p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+                                <p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed" data-en="This is an early sensitivity indicator. For high-precision products (medical/optical), this rule is very important. If ignored, it will quickly evolve into Rule 2 (Process Drift) or Rule 5 (Medium Shift)."
+                                   data-zh="這是早期的敏感度指標。如果在高精度要求的產品上（如醫療器材或光學件），這條規則非常重要。如果不予理會，很快就會演變成 Rule 2 或 Rule 5。">
                                     「這是<strong>早期的敏感度指標</strong>。如果在高精度要求的產品上（如醫療器材或光學件），這條規則非常重要。<strong>如果不予理會，很快就會演變成 Rule 2 (製程漂移) 或 Rule 5 (中度偏移)</strong>。」
                                 </p>
                                 <div class="mt-3 p-3 bg-emerald-50 dark:bg-emerald-900/20 rounded-lg border border-emerald-100 dark:border-emerald-800">
-                                    <p class="text-xs font-bold text-emerald-700 dark:text-emerald-400 mb-2">📊 演變風險評估</p>
+                                    <p class="text-xs font-bold text-emerald-700 dark:text-emerald-400 mb-2" data-en="Evolution Risk Assessment" data-zh="📊 演變風險評估">📊 演變風險評估</p>
                                     <ul class="text-xs text-emerald-800 dark:text-emerald-300 space-y-1">
-                                        <li>□ 演變為 Rule 2：機率 ~20%</li>
-                                        <li>□ 演變為 Rule 5：機率 ~10%</li>
-                                        <li>□ 增加抽樣頻率</li>
-                                        <li>□ 提高 Cpk 警戒門檻</li>
-                                        <li>□ 記錄趨勢供後續分析</li>
+                                        <li data-en="Evolve to Rule 2: ~20% probability" data-zh="演變為 Rule 2：機率 ~20%">演變為 Rule 2：機率 ~20%</li>
+                                        <li data-en="Evolve to Rule 5: ~10% probability" data-zh="演變為 Rule 5：機率 ~10%">演變為 Rule 5：機率 ~10%</li>
+                                        <li data-en="Increase sampling frequency" data-zh="增加抽樣頻率">增加抽樣頻率</li>
+                                        <li data-en="Raise Cpk alert threshold" data-zh="提高 Cpk 警戒門檻">提高 Cpk 警戒門檻</li>
+                                        <li data-en="Record trend for analysis" data-zh="記錄趨勢供後續分析">記錄趨勢供後續分析</li>
                                     </ul>
                                 </div>
                             </div>
@@ -1319,13 +1335,13 @@
                                     「這是一種數據過於完美的警訊。正常的隨機變異應該有一定的分散度。如果管制界限是基於這些被壓縮的數據計算，可能會造成管制界限過窄，導致正常變異被判斷為異常。建議重新評估量測系統 (Gage R&R)。」
                                 </p>
                                 <div class="mt-3 p-3 bg-emerald-50 dark:bg-emerald-900/20 rounded-lg border border-emerald-100 dark:border-emerald-800">
-                                    <p class="text-xs font-bold text-emerald-700 dark:text-emerald-400 mb-2">📊 建議行動</p>
+                                    <p class="text-xs font-bold text-emerald-700 dark:text-emerald-400 mb-2" data-en="Recommended Actions" data-zh="📊 建議行動">📊 建議行動</p>
                                     <ul class="text-xs text-emerald-800 dark:text-emerald-300 space-y-1">
-                                        <li>□ 執行 Gage R&R 評估</li>
-                                        <li>□ 檢查數據四捨五入位數</li>
-                                        <li>□ 確認取樣隨機性</li>
-                                        <li>□ 分析模穴間差異</li>
-                                        <li>□ 重新計算管制界限</li>
+                                        <li data-en="Conduct Gage R&R evaluation" data-zh="執行 Gage R&R 評估">執行 Gage R&R 評估</li>
+                                        <li data-en="Check data rounding precision" data-zh="檢查數據四捨五入位數">檢查數據四捨五入位數</li>
+                                        <li data-en="Confirm sampling randomness" data-zh="確認取樣隨機性">確認取樣隨機性</li>
+                                        <li data-en="Analyze inter-cavity differences" data-zh="分析模穴間差異">分析模穴間差異</li>
+                                        <li data-en="Recalculate control limits" data-zh="重新計算管制界限">重新計算管制界限</li>
                                     </ul>
                                 </div>
                             </div>
@@ -1401,19 +1417,20 @@
                             <div class="space-y-3 pl-0 md:pl-8 md:border-l border-slate-100 dark:border-slate-700">
                                 <div class="flex items-center gap-2 text-emerald-600 font-bold text-sm mb-2">
                                     <span class="material-icons-outlined text-base">assignment_turned_in</span>
-                                    <span>品管專家解讀</span>
+                                    <span data-en="Quality Expert View" data-zh="品管專家解讀">品管專家解讀</span>
                                 </div>
-                                <p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+                                <p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed" data-en="Bimodal Distribution is the most easily overlooked anomaly. Data appears normal within control limits but actually consists of two individually normal processes incorrectly mixed. Results: 1) Artificially low Cpk; 2) Non-continuous size distribution; 3) Customer complaints about dimensional stepping."
+                                   data-zh="雙峰分佈是最容易被忽略的異常模式。數據看起來正常地落在管制界限內，但實際上是兩個各自正常的製程被錯誤地混合在一起。這會導致：1) Cpk 被人為低估；2) 產品尺寸分佈不連續；3) 客戶抱怨尺寸跳階。">
                                     「<strong>雙峰分佈 (Mixture)</strong> 是最容易被忽略的異常模式。數據『看起來正常』地落在管制界限內，但實際上是兩個<strong>各自正常</strong>的製程被錯誤地混合在一起。這會導致：1) Cpk 被人為低估；2) 產品尺寸分佈不連續；3) 客户抱怨尺寸跳階。」
                                 </p>
                                 <div class="mt-3 p-3 bg-emerald-50 dark:bg-emerald-900/20 rounded-lg border border-emerald-100 dark:border-emerald-800">
-                                    <p class="text-xs font-bold text-emerald-700 dark:text-emerald-400 mb-2">📋 分離分析建議</p>
+                                    <p class="text-xs font-bold text-emerald-700 dark:text-emerald-400 mb-2" data-en="Separation Analysis Recommendation" data-zh="📋 分離分析建議">📋 分離分析建議</p>
                                     <ul class="text-xs text-emerald-800 dark:text-emerald-300 space-y-1">
-                                        <li>□ 分離數據來源分析</li>
-                                        <li>□ 分別計算各來源 Cpk</li>
-                                        <li>□ 統一機台/模穴參數</li>
-                                        <li>□ 或分開標示批次來源</li>
-                                        <li>□ 通知客戶分佈情形</li>
+                                        <li data-en="Separate data source analysis" data-zh="分離數據來源分析">分離數據來源分析</li>
+                                        <li data-en="Calculate Cpk for each source" data-zh="分別計算各來源 Cpk">分別計算各來源 Cpk</li>
+                                        <li data-en="Unify machine/cavity parameters" data-zh="統一機台/模穴參數">統一機台/模穴參數</li>
+                                        <li data-en="Or label batch sources separately" data-zh="或分開標示批次來源">或分開標示批次來源</li>
+                                        <li data-en="Notify customer of distribution" data-zh="通知客戶分佈情形">通知客戶分佈情形</li>
                                     </ul>
                                 </div>
                             </div>
@@ -1553,7 +1570,7 @@
                                         <div class="space-y-1">
                                             <label
                                                 class="text-sm font-bold text-slate-400 uppercase tracking-widest pl-1"
-                                                data-en="Cavities" data-zh="模穴數">模穴數</label>
+                                                data-en="Subgroups" data-zh="子組數">子組數</label>
                                             <select id="qip-cavity-count"
                                                 class="w-full px-3 py-2 border border-slate-100 dark:border-slate-700 rounded-lg text-sm bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white focus:ring-2 focus:ring-emerald-500/20">
                                                 <option value="" data-en="Select" data-zh="請選擇">請選擇</option>
@@ -1947,12 +1964,12 @@
                 <!-- d2 Table -->
                 <div
                     class="bg-slate-50 dark:bg-slate-900/50 p-5 rounded-xl border border-slate-200 dark:border-slate-700">
-                    <h4 class="font-bold text-slate-800 dark:text-slate-300 mb-3">d₂ 常數對照表 (對應模穴數)</h4>
+                    <h4 class="font-bold text-slate-800 dark:text-slate-300 mb-3">d₂ 常數對照表 (對應子組數)</h4>
                     <div class="overflow-x-auto">
                         <table class="w-full text-xs border-collapse">
                             <thead>
                                 <tr class="bg-slate-200 dark:bg-slate-700">
-                                    <th class="px-2 py-2 border border-slate-300 dark:border-slate-600">n (模穴數)</th>
+                                    <th class="px-2 py-2 border border-slate-300 dark:border-slate-600">n (子組數)</th>
                                     <th class="px-2 py-2 border border-slate-300 dark:border-slate-600">2</th>
                                     <th class="px-2 py-2 border border-slate-300 dark:border-slate-600">4</th>
                                     <th class="px-2 py-2 border border-slate-300 dark:border-slate-600">8</th>
@@ -1991,7 +2008,8 @@
                             </tbody>
                         </table>
                     </div>
-                    <p class="mt-3 text-[11px] text-slate-500 italic">註：系統已內建 2 至 48 穴之完整的 d₂ 常數表，計算時將自動依據偵測到的模穴數進行匹配。
+                    <p class="mt-3 text-[11px] text-slate-500 italic" data-en="Note: System includes built-in d₂ constant table for 2-48 subgroups, automatically matched based on detected subgroup count." data-zh="註：系統已內建 2 至 48 穴之完整的 d₂ 常數表，計算時將自動依據偵測到的模穴數進行匹配。">
+                        註：系統已內建 2 至 48 穴之完整的 d₂ 常數表，計算時將自動依據偵測到的模穴數進行匹配。
                     </p>
                 </div>
                 <!-- Interpretation -->
@@ -2038,8 +2056,7 @@
             <div class="px-8 py-6 border-b dark:border-slate-800 flex justify-between items-center bg-indigo-600">
                 <div class="flex items-center gap-3 text-white">
                     <span class="material-icons-outlined">fact_check</span>
-                    <h3 class="text-xl font-bold" data-en="Global Mold Health Diagnosis" data-zh="模具健康全局 AI 診斷報告">模具健康全局
-                        AI 診斷報告</h3>
+                    <h3 class="text-xl font-bold" data-en="Global Mold Health Diagnosis" data-zh="模具健康全局 AI 診斷報告">Global Mold Health Diagnosis</h3>
                 </div>
                 <button onclick="SPCApp.hideGlobalDiagnosis()" class="text-white/80 hover:text-white transition-colors">
                     <span class="material-icons-outlined font-bold">close</span>
@@ -2049,12 +2066,12 @@
                 <!-- Data injected here -->
                 <div class="flex flex-col items-center justify-center py-12">
                     <div class="spinner mb-4"></div>
-                    <p class="text-slate-500 font-bold">正在掃描全局數據，請稍後...</p>
+                    <p class="text-slate-500 font-bold" data-en="Scanning global data, please wait..." data-zh="正在掃描全局數據，請稍後...">Scanning global data, please wait...</p>
                 </div>
             </div>
             <div class="px-8 py-4 border-t dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 flex justify-end">
                 <button onclick="SPCApp.hideGlobalDiagnosis()"
-                    class="px-6 py-2 bg-indigo-600 text-white rounded-xl font-bold shadow-lg hover:shadow-indigo-500/30 transition-all">關閉報告</button>
+                    class="px-6 py-2 bg-indigo-600 text-white rounded-xl font-bold shadow-lg hover:shadow-indigo-500/30 transition-all" data-en="Close Report" data-zh="關閉報告">Close Report</button>
             </div>
         </div>
     </div>

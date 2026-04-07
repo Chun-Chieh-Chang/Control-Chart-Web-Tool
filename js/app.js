@@ -1449,20 +1449,11 @@ var SPCApp = {
 
             this.renderDetailedDataTable(pageLabels, pageData, pageXbarR);
 
-            // Calculate Y-axis range for X-Bar to ensure it's not a flat line
+            // Calculate Y-axis range for X-Bar chart
             var xValues = pageXbarR.xBar.data.filter(v => v !== null && !isNaN(v));
             var xMin = Math.min(...xValues, pageXbarR.xBar.LCL);
             var xMax = Math.max(...xValues, pageXbarR.xBar.UCL);
             var xMargin = (xMax - xMin) * 0.15 || 0.001;
-
-            // Calculate sigma zones for X-bar chart
-            var sigma = (pageXbarR.xBar.UCL - pageXbarR.xBar.CL) / 3;
-            var upper3Sigma = pageXbarR.xBar.CL + 3 * sigma;
-            var upper2Sigma = pageXbarR.xBar.CL + 2 * sigma;
-            var upper1Sigma = pageXbarR.xBar.CL + sigma;
-            var lower1Sigma = pageXbarR.xBar.CL - sigma;
-            var lower2Sigma = pageXbarR.xBar.CL - 2 * sigma;
-            var lower3Sigma = pageXbarR.xBar.CL - 3 * sigma;
 
             var xOpt = {
                 chart: {
@@ -1523,8 +1514,8 @@ var SPCApp = {
                     axisTicks: { color: theme.grid }
                 },
                 yaxis: {
-                    min: Math.min(xMin - xMargin, lower3Sigma - sigma * 0.5),
-                    max: Math.max(xMax + xMargin, upper3Sigma + sigma * 0.5),
+                    min: xMin - xMargin,
+                    max: xMax + xMargin,
                     tickAmount: 8,
                     labels: { 
                         formatter: function (v) { return (v !== null && v !== undefined) ? v.toFixed(4) : ''; }, 
@@ -1547,12 +1538,14 @@ var SPCApp = {
                         {
                             y: pageXbarR.xBar.UCL,
                             borderColor: theme.danger,
-                            borderWidth: 1,
-                            borderDash: [5, 5],
+                            borderWidth: 2,
+                            borderDash: [6, 4],
                             label: {
                                 text: 'UCL: ' + pageXbarR.xBar.UCL.toFixed(4),
                                 position: 'right',
-                                style: { background: theme.danger + '20', color: theme.danger, fontWeight: 600 }
+                                offsetX: 0,
+                                style: { background: theme.danger + '20', color: theme.danger, fontWeight: 700, fontSize: '11px' },
+                                marker: { show: false }
                             }
                         },
                         {
@@ -1562,49 +1555,23 @@ var SPCApp = {
                             label: {
                                 text: 'CL: ' + pageXbarR.xBar.CL.toFixed(4),
                                 position: 'right',
-                                style: { background: theme.success + '20', color: theme.success, fontWeight: 600 }
+                                offsetX: 0,
+                                style: { background: theme.success + '20', color: theme.success, fontWeight: 700, fontSize: '11px' },
+                                marker: { show: false }
                             }
                         },
                         {
                             y: pageXbarR.xBar.LCL,
                             borderColor: theme.danger,
-                            borderWidth: 1,
-                            borderDash: [5, 5],
+                            borderWidth: 2,
+                            borderDash: [6, 4],
                             label: {
                                 text: 'LCL: ' + pageXbarR.xBar.LCL.toFixed(4),
                                 position: 'right',
-                                style: { background: theme.danger + '20', color: theme.danger, fontWeight: 600 }
+                                offsetX: 0,
+                                style: { background: theme.danger + '20', color: theme.danger, fontWeight: 700, fontSize: '11px' },
+                                marker: { show: false }
                             }
-                        },
-                        // 2-sigma zone lines
-                        {
-                            y: upper2Sigma,
-                            borderColor: '#f59e0b',
-                            borderWidth: 1,
-                            borderDash: [3, 3],
-                            label: { show: false }
-                        },
-                        {
-                            y: lower2Sigma,
-                            borderColor: '#f59e0b',
-                            borderWidth: 1,
-                            borderDash: [3, 3],
-                            label: { show: false }
-                        },
-                        // 1-sigma zone lines
-                        {
-                            y: upper1Sigma,
-                            borderColor: '#10b981',
-                            borderWidth: 1,
-                            borderDash: [2, 2],
-                            label: { show: false }
-                        },
-                        {
-                            y: lower1Sigma,
-                            borderColor: '#10b981',
-                            borderWidth: 1,
-                            borderDash: [2, 2],
-                            label: { show: false }
                         }
                     ]
                 },
@@ -1710,7 +1677,13 @@ var SPCApp = {
                     floating: true,
                     fontSize: '12px',
                     fontFamily: 'Inter, sans-serif',
-                    markers: { size: 8, shape: 'circle', strokeWidth: 0, radius: 2 },
+                    markers: { 
+                        size: [6, 10, 10, 10], 
+                        shape: ['circle', 'line', 'line', 'line'],
+                        strokeWidth: [0, 2, 2, 2],
+                        strokeColors: [theme.primary, theme.danger, theme.success, theme.danger],
+                        radius: 2 
+                    },
                     itemMargin: { horizontal: 12, vertical: 4 },
                     labels: { colors: theme.text }
                 }
@@ -1786,12 +1759,14 @@ var SPCApp = {
                         {
                             y: pageXbarR.R.UCL,
                             borderColor: theme.danger,
-                            borderWidth: 1,
-                            borderDash: [5, 5],
+                            borderWidth: 2,
+                            borderDash: [6, 4],
                             label: {
                                 text: 'UCL: ' + pageXbarR.R.UCL.toFixed(4),
                                 position: 'right',
-                                style: { background: theme.danger + '20', color: theme.danger, fontWeight: 600 }
+                                offsetX: 0,
+                                style: { background: theme.danger + '20', color: theme.danger, fontWeight: 700, fontSize: '11px' },
+                                marker: { show: false }
                             }
                         },
                         {
@@ -1801,7 +1776,9 @@ var SPCApp = {
                             label: {
                                 text: 'CL: ' + pageXbarR.R.CL.toFixed(4),
                                 position: 'right',
-                                style: { background: theme.success + '20', color: theme.success, fontWeight: 600 }
+                                offsetX: 0,
+                                style: { background: theme.success + '20', color: theme.success, fontWeight: 700, fontSize: '11px' },
+                                marker: { show: false }
                             }
                         }
                     ]
@@ -1836,6 +1813,13 @@ var SPCApp = {
                     floating: true,
                     fontSize: '12px',
                     fontFamily: 'Inter, sans-serif',
+                    markers: { 
+                        size: [6, 10, 10], 
+                        shape: ['circle', 'line', 'line'],
+                        strokeWidth: [0, 2, 2],
+                        strokeColors: [theme.text, theme.danger, theme.success],
+                        radius: 2 
+                    },
                     labels: { colors: theme.text }
                 }
             };

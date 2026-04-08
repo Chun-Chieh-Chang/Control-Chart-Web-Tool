@@ -30,6 +30,16 @@
   - [正式刪除] CSS 備份檔案: `css/style.css.bak`。
 - **維護 (Maintenance)**: 修復 `DEV_LOG.md` 內容重複問題，符合 MECE 原則。
 
+### 2026-04-08: SPC 指標公式補完與基準擴展 (Constants Expansion)
+- [x] **文檔更新**: 擴展 `SPC_Calculation_Logic.md`。
+    - 新增 Xbar-R 管制圖管制界限 (UCL/LCL) 精確公式。
+    - 管制係數表由 $n=10$ 全面擴展至 **$n=48$**，對齊多模穴實務。
+    - 加入子組大小選擇建議 ($n=5$ 核心準則)。
+- [x] **引擎升級**: 擴展 `js/engine.js`。
+    - 寫入 $n=11 \sim 48$ 的精確統計常數，取代 rough fallback。
+    - 強化 `getConstants` 函式，提供超出範圍時的動態係數估算魯棒性。
+- [x] **提交與同步**: git push 同步所有數據基準與計算邏輯。
+
 ### 2. 狀態確認 (Status Verification)
 
 - **MECE 達成**: 專案結構已達精簡狀態，所有核心邏輯均由 `js/` 目錄託管。

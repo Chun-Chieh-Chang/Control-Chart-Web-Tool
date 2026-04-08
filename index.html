@@ -185,6 +185,9 @@
 
         <!-- User Profile (Google Style) -->
         <div class="p-4 border-t border-slate-200 dark:border-white/5">
+            <h3 class="text-sm font-black text-slate-800 dark:text-white uppercase tracking-widest"
+                data-zh="異點即時洞察" data-en="Anomaly Insights">
+                異點即時洞察</h3>
             <div class="flex items-center gap-3 px-2 py-1">
                 <img src="assets/AI數字人.png" class="w-9 h-9 rounded-full bg-slate-700 object-cover" alt="Author">
                 <div class="flex-1 min-w-0">
@@ -1900,7 +1903,7 @@
     <aside id="anomalySidebar" class="w-96 bg-white border-l border-slate-200 flex flex-col hidden z-10 shadow-2xl">
         <div class="p-8 border-b border-slate-100">
             <h3 class="font-bold text-slate-900 text-lg flex items-center justify-between">
-                <span data-en="Anomaly Alerts" data-zh="異常偵測警報">異常偵測警報</span>
+                <span data-en="Anomaly Insights" data-zh="異點即時洞察">異點即時洞察</span>
                 <span
                     class="px-2 py-1 bg-rose-50 text-rose-600 text-sm font-bold rounded uppercase animate-pulse">Live</span>
             </h3>
@@ -1963,14 +1966,14 @@
                         製程能力指標 (Capability Index)</h4>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div class="p-5 rounded-xl border border-emerald-200 dark:border-emerald-800 bg-emerald-50/30 dark:bg-emerald-900/10">
-                            <h5 class="font-bold text-emerald-800 dark:text-emerald-300 mb-2">Cpk (短期製程能力)</h5>
+                            <h5 class="font-bold text-emerald-800 dark:text-emerald-300 mb-2" data-zh="Cpk (短期製程能力)" data-en="Cpk (Short-term Capability)">Cpk (短期製程能力)</h5>
                             <code class="block bg-white dark:bg-slate-900 p-3 rounded-lg text-sm mb-3">min[ (USL-μ)/3σᵨ, (μ-LSL)/3σᵨ ]</code>
                             <p class="text-xs text-slate-500" data-zh="σᵨ = R̄ / d₂ (組內標準差推估)" data-en="σ_within = R̄ / d₂ (Estimated)">σᵨ = R̄ / d₂ (組內標準差推估)</p>
                         </div>
                         <div class="p-5 rounded-xl border border-sky-200 dark:border-sky-800 bg-sky-50/30 dark:bg-sky-900/10">
-                            <h5 class="font-bold text-sky-800 dark:text-sky-300 mb-2">Ppk (整體製程績效)</h5>
+                            <h5 class="font-bold text-sky-800 dark:text-sky-300 mb-2" data-zh="Ppk (整體製程績效)" data-en="Ppk (Overall Performance)">Ppk (整體製程績效)</h5>
                             <code class="block bg-white dark:bg-slate-900 p-3 rounded-lg text-sm mb-3">min[ (USL-μ)/3σₛ, (μ-LSL)/3σₛ ]</code>
-                            <p class="text-xs text-slate-500" data-zh="σₛ = SD (全體數據樣本標準差)" data-en="σ_overall = SD (Sample SD of all data)">σₛ = SD (全體數據樣本標準差)</p>
+                            <p class="text-xs text-slate-500" data-zh="σₛ = SD (全體數據樣本標準差)" data-en="σ_overall = SD (Overall Sample SD)">σₛ = SD (全體數據樣本標準差)</p>
                         </div>
                     </div>
                 </section>

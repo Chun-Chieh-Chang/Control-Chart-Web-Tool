@@ -302,6 +302,11 @@ var SPCApp = {
             } else if (globalInstabilityCount / total > 0.5) {
                 diagnosisResult = self.t('製程重複精度問題', 'Shot-to-Shot Instability');
                 advice = self.t('多個測項同步顯示批次間波動過大，但單發內相對穩定。建議檢查機台止逆環、料筒控溫穩定性或更換穩定的原料批次。', 'Multiple items show excessive batch-to-batch variation while individual shots are relatively stable. Recommend checking check ring, barrel temperature stability, or switching to stable material batch.');
+                // Update language toggle button label
+                var langToggle = document.getElementById('lang-toggle-text');
+                if (langToggle) {
+                    langToggle.textContent = this.settings.language === 'en' ? 'English' : '繁體中文';
+                }
                 severityColor = "#f59e0b";
             } else if (globalImbalanceCount > 0) {
                 diagnosisResult = self.t('局部特徵失效診斷', 'Localized Feature Failure');
@@ -371,6 +376,11 @@ var SPCApp = {
         window.currentLang = this.settings.language;
         var langText = document.getElementById('langText');
         if (langText) langText.textContent = this.currentLanguage === 'zh' ? 'EN' : '中文';
+        
+        // Synchronize with QIPExtractApp if available
+        if (window.QIPExtractApp && typeof window.QIPExtractApp.setLanguage === 'function') {
+            window.QIPExtractApp.setLanguage();
+        }
     },
 
     updateLanguage: function () {
@@ -385,6 +395,15 @@ var SPCApp = {
         placeholders.forEach(function (el) {
             el.placeholder = self.settings.language === 'zh' ? el.dataset.pZh : el.dataset.pEn;
         });
+
+        // 3. Dynamic components (Refresh lists to pick up new language tokens)
+        this.renderRecentFiles();
+        if (document.getElementById('view-dashboard') && !document.getElementById('view-dashboard').classList.contains('hidden')) {
+            this.renderDashboard();
+        }
+        if (document.getElementById('view-history') && !document.getElementById('view-history').classList.contains('hidden')) {
+            this.renderHistoryView();
+        }
     },
 
     setupFileUpload: function () {
@@ -464,12 +483,12 @@ var SPCApp = {
         var existingIndex = this.history.findIndex(h => h.name === fileName);
 
         var entry = {
+            id: 'h_' + Date.now() + '_' + Math.floor(Math.random() * 1000),
             name: fileName,
             size: (file.size / 1024).toFixed(1) + ' KB',
             type: analysisType,
             item: item,
-            time: new Date().toISOString(),
-            id: Date.now()
+            time: new Date().toISOString()
         };
 
         if (existingIndex !== -1) {
@@ -491,6 +510,18 @@ var SPCApp = {
         if (saved) {
             try {
                 this.history = JSON.parse(saved);
+                
+                // Backward compatibility: Ensure all items have a unique ID
+                var modified = false;
+                this.history.forEach(h => {
+                    if (!h.id) {
+                        h.id = 'legacy_' + (h.time ? new Date(h.time).getTime() : Date.now()) + '_' + Math.floor(Math.random() * 1000);
+                        modified = true;
+                    }
+                });
+                
+                if (modified) this.saveHistoryState();
+                
                 this.renderRecentFiles();
             } catch (e) {
                 console.error('History load error', e);
@@ -498,26 +529,47 @@ var SPCApp = {
         }
     },
 
+    saveHistoryState: function() {
+        localStorage.setItem('spc_history', JSON.stringify(this.history));
+        this.renderRecentFiles();
+        this.renderHistoryView();
+        if (document.getElementById('view-dashboard') && !document.getElementById('view-dashboard').classList.contains('hidden')) {
+            this.renderDashboard();
+        }
+    },
+
     clearHistory: function () {
+        console.log('SPCApp: clearHistory triggered');
         this.history = [];
         localStorage.removeItem('spc_history');
         this.renderRecentFiles();
         this.renderHistoryView();
     },
 
-    deleteHistoryItem: function (index) {
-        if (confirm(this.t('確定要刪除此條紀錄嗎？', 'Are you sure you want to delete this record?'))) {
-            this.history.splice(index, 1);
-            localStorage.setItem('spc_history', JSON.stringify(this.history));
-            this.renderRecentFiles();
-            this.renderHistoryView();
-            if (document.getElementById('view-dashboard').classList.contains('hidden') === false) {
-                this.renderDashboard();
+    deleteHistoryItem: function (id) {
+        console.log('SPCApp: deleteHistoryItem triggered for ID:', id);
+        if (!id) return;
+        
+        var confirmMsg = this.t('確定要刪除此條紀錄嗎？', 'Are you sure you want to delete this record?');
+        if (confirm(confirmMsg)) {
+            var index = this.history.findIndex(h => h.id === id);
+            console.log('SPCApp: Deletion index:', index);
+            if (index !== -1) {
+                this.history.splice(index, 1);
+                this.saveHistoryState();
+                console.log('SPCApp: Deletion successful. Remaining count:', this.history.length);
+            } else {
+                console.warn('SPCApp: ID not found in history during deletion attempt.');
             }
         }
     },
 
+    loadHistoryItem: function (id) {
+        this.loadHistoryDetail(id);
+    },
+
     renderRecentFiles: function () {
+        var self = this;
         var container = document.getElementById('recentFilesContainer');
         if (!container) return;
 
@@ -527,19 +579,19 @@ var SPCApp = {
             return;
         }
 
-        var html = this.history.slice(0, 5).map(function (h, i) {
+        var html = this.history.slice(0, 5).map(function (h) {
             var d = new Date(h.time);
-            h.index = i; // Store original index for deletion logic if sorted/sliced
-            var timeStr = d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            var locale = self.settings.language === 'en' ? 'en-US' : 'zh-TW';
+            var timeStr = d.toLocaleDateString(locale) + ' ' + d.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' });
             return '<div class="flex items-center group cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50 p-1.5 rounded-lg transition-all">' +
                 '<div class="w-7 h-7 rounded bg-slate-100 dark:bg-slate-700 flex items-center justify-center mr-2.5 group-hover:bg-primary/10 transition-colors">' +
                 '<span class="material-icons-outlined text-xs text-slate-400 group-hover:text-primary transition-colors">description</span>' +
                 '</div>' +
-                '<div class="flex-1 min-w-0">' +
-                '<div class="text-[11px] font-bold text-slate-800 dark:text-slate-200 truncate">' + h.name + '</div>' +
-                '<div class="text-[10px] text-slate-400 tracking-tight">' + h.size + ' • ' + timeStr + '</div>' +
+                '<div class="flex-1 min-w-0" onclick="window.SPCApp.loadHistoryDetail(\'' + h.id + '\')">' +
+                '<div class="text-[11px] font-bold text-slate-700 dark:text-slate-300 truncate">' + h.name + '</div>' +
+                '<div class="text-[9px] text-slate-400">' + timeStr + '</div>' +
                 '</div>' +
-                '<button onclick="event.stopPropagation(); SPCApp.deleteHistoryItem(' + h.index + ')" class="p-1 opacity-0 group-hover:opacity-100 text-slate-300 hover:text-rose-500 transition-all rounded">' +
+                '<button onclick="event.stopPropagation(); window.SPCApp.deleteHistoryItem(\'' + h.id + '\')" class="p-1 opacity-0 group-hover:opacity-100 text-slate-300 hover:text-rose-500 transition-all rounded">' +
                 '<span class="material-icons-outlined text-sm">delete</span>' +
                 '</button>' +
                 '</div>';
@@ -547,34 +599,67 @@ var SPCApp = {
         container.innerHTML = html;
     },
 
+    loadHistoryDetail: function (id) {
+        var entry = this.history.find(function (h) { return h.id === id; });
+        if (!entry) return;
+
+        // Switch to appropriate view based on entry type
+        this.switchView('charts');
+
+        // If it has diagnostic data, display it
+        if (entry.item && window.QIPExtractApp) {
+            window.QIPExtractApp.displayDiagnostic(entry.item);
+        }
+    },
+
     renderHistoryView: function () {
         var self = this;
-        var tbody = document.getElementById('historyTableBody');
-        if (!tbody) return;
+        var oldTbody = document.getElementById('historyTableBody');
+        if (!oldTbody) return;
+
+        // Clone-replace to strip ALL old event listeners (prevents stacking)
+        var tbody = oldTbody.cloneNode(false);
+        oldTbody.parentNode.replaceChild(tbody, oldTbody);
         tbody.innerHTML = '';
 
         if (this.history.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="5" class="px-6 py-10 text-center text-slate-400 italic">No history available.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="5" class="px-6 py-10 text-center text-slate-400 italic">' +
+                this.t('尚無歷史紀錄', 'No history available.') + '</td></tr>';
             return;
         }
 
-        this.history.forEach(function (h, i) {
+        this.history.forEach(function (h) {
             var row = document.createElement('tr');
             row.className = 'hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors';
             var d = new Date(h.time);
-            var timeStr = d.toLocaleDateString() + ' ' + d.toLocaleTimeString();
+            var locale = self.settings.language === 'en' ? 'en-US' : 'zh-TW';
+            var timeStr = d.toLocaleDateString(locale) + ' ' + d.toLocaleTimeString(locale);
 
             row.innerHTML = '<td class="px-6 py-4 font-bold text-slate-900 dark:text-white">' + h.name + '</td>' +
                 '<td class="px-6 py-4"><span class="px-2 py-1 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 text-sm font-bold rounded uppercase">' + h.type + '</span></td>' +
                 '<td class="px-6 py-4 text-sm text-slate-500">' + (h.item || '-') + '</td>' +
                 '<td class="px-6 py-4 text-sm text-slate-500">' + timeStr + '</td>' +
                 '<td class="px-6 py-4 text-center flex items-center justify-center gap-3">' +
-                '<button class="view-log-btn text-indigo-600 hover:text-indigo-800 font-bold text-sm" data-index="' + i + '">' + self.t('檢視詳情', 'View Log') + '</button>' +
-                '<button onclick="SPCApp.deleteHistoryItem(' + i + ')" class="text-slate-300 hover:text-rose-500 transition-colors">' +
+                '<button class="view-log-btn text-indigo-600 hover:text-indigo-800 font-bold text-sm" data-id="' + h.id + '">' + self.t('檢視詳情', 'Load') + '</button>' +
+                '<button class="delete-log-btn text-slate-300 hover:text-rose-500 transition-colors" data-id="' + h.id + '">' +
                 '<span class="material-icons-outlined text-lg">delete</span>' +
                 '</button>' +
                 '</td>';
             tbody.appendChild(row);
+        });
+
+        // Single event delegation listener on the fresh tbody
+        tbody.addEventListener('click', function (e) {
+            var deleteBtn = e.target.closest('.delete-log-btn');
+            if (deleteBtn) {
+                self.deleteHistoryItem(deleteBtn.dataset.id);
+                return;
+            }
+            var viewBtn = e.target.closest('.view-log-btn');
+            if (viewBtn) {
+                self.loadHistoryDetail(viewBtn.dataset.id);
+                return;
+            }
         });
     },
 
@@ -605,13 +690,16 @@ var SPCApp = {
         if (recentList) {
             recentList.innerHTML = '';
             if (this.history.length === 0) {
-                recentList.innerHTML = '<tr><td class="p-8 text-center text-slate-400 italic">No recent activities found.</td></tr>';
+                recentList.innerHTML = '<tr><td class="p-8 text-center text-slate-400 italic" data-en="No recent activities found." data-zh="尚無近期活動紀錄">No recent activities found.</td></tr>';
             } else {
                 this.history.slice(0, 5).forEach(function (h) {
                     var d = new Date(h.time);
-                    var timeStr = d.toLocaleDateString();
+                    var locale = self.settings.language === 'en' ? 'en-US' : 'zh-TW';
+                    var timeStr = d.toLocaleDateString(locale);
                     var tr = document.createElement('tr');
-                    tr.className = 'group hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors';
+                    tr.className = 'group hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors cursor-pointer';
+                    tr.onclick = function() { SPCApp.loadHistoryDetail(h.id); };
+                    
                     tr.innerHTML = '<td class="px-5 py-4">' +
                         '<div class="flex items-center gap-3">' +
                         '<div class="w-8 h-8 rounded-lg bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 flex items-center justify-center">' +
@@ -619,11 +707,21 @@ var SPCApp = {
                         '</div>' +
                         '<div>' +
                         '<div class="text-sm font-bold text-slate-900 dark:text-white">' + h.name + '</div>' +
-                        '<div class="text-sm text-slate-400">' + h.type.toUpperCase() + ' Analysis</div>' +
+                        '<div class="text-sm text-slate-400">' + h.type.toUpperCase() + ' ' + self.t('分析', 'Analysis') + '</div>' +
                         '</div>' +
                         '</div>' +
                         '</td>' +
-                        '<td class="px-5 py-4 text-xs font-medium text-slate-500 text-right">' + timeStr + '</td>';
+                        '<td class="px-5 py-4 text-xs font-medium text-slate-500 text-right">' +
+                        '<div class="flex flex-col items-end">' +
+                        '<span>' + timeStr + '</span>' +
+                        '<div class="flex items-center gap-2 mt-1 opacity-0 group-hover:opacity-100 transition-opacity">' +
+                        '<span class="text-indigo-600 text-[10px] font-bold uppercase">' + self.t('載入', 'Load') + '</span>' +
+                        '<button onclick="event.stopPropagation(); SPCApp.deleteHistoryItem(\'' + h.id + '\')" class="text-rose-500 p-1 hover:bg-rose-50 rounded">' +
+                        '<span class="material-icons-outlined text-[14px]">delete</span>' +
+                        '</button>' +
+                        '</div>' +
+                        '</div>' +
+                        '</td>';
                     recentList.appendChild(tr);
                 });
             }
@@ -866,8 +964,8 @@ var SPCApp = {
         if (historyBody) {
             historyBody.addEventListener('click', function (e) {
                 if (e.target.classList.contains('view-log-btn')) {
-                    var idx = parseInt(e.target.dataset.index);
-                    var entry = self.history[idx];
+                    var id = e.target.dataset.id;
+                    var entry = self.history.find(h => h.id === id);
                     if (entry) {
                         alert("Log Details:\n\nFile: " + entry.name + "\nAnalysis: " + entry.type + "\nItem: " + entry.item + "\nTimestamp: " + entry.time);
                     }
@@ -1123,8 +1221,9 @@ var SPCApp = {
                     // Analysis insights
                     var distStats = SPCEngine.calculateDistStats(allValues);
                     var diagnosis = SPCEngine.analyzeVarianceSource(cap.Cpk, cap.Ppk, distStats);
-                    if (diagnosis) {
-                        diagnosis.advice = "【多模穴專業建議】" + diagnosis.advice + " 已採用 $n=5$ 輪替抽樣與擴展管制界限，以容許模穴間系統性差異。";
+                    if (diagnosis && diagnosis.advice) {
+                        diagnosis.advice.zh = "【多模穴專業建議】" + diagnosis.advice.zh + " 已採用 $n=5$ 輪替抽樣與擴展管制界限，以容許模穴間系統性差異。";
+                        diagnosis.advice.en = "【Multi-Cavity Expert Advice】" + diagnosis.advice.en + " Subgroup n=5 rotational sampling and expanded control limits applied to accommodate systematic differences.";
                     }
 
                     results = {
@@ -1253,7 +1352,7 @@ var SPCApp = {
                 '<div class="saas-card p-8"> <h3 class="text-base font-bold mb-6 dark:text-white">' + this.t('均值比較', 'Mean Comp') + '</h3> <div id="meanChart" class="h-80"></div> </div>' +
                 '<div class="saas-card p-8"> <h3 class="text-base font-bold mb-6 dark:text-white">' + this.t('標準差比較', 'StdDev Comp') + '</h3> <div id="stdDevChart" class="h-80"></div> </div> </div>' +
                 '<div class="saas-card overflow-hidden"> <div class="p-6 border-b dark:border-slate-700"> <h3 class="text-base font-bold dark:text-white">' + this.t('數據明細', 'Details') + '</h3> </div>' +
-                '<table class="w-full text-sm text-left"> <thead class="text-xs text-slate-400 bg-slate-50/50 dark:bg-slate-700/50 uppercase"> <tr><th class="px-6 py-3">Name</th><th class="px-6 py-3 text-center">Mean</th><th class="px-6 py-3 text-center">Cpk</th><th class="px-6 py-3 text-center">n</th></tr> </thead>' +
+                '<table class="w-full text-sm text-left"> <thead class="text-xs text-slate-400 bg-slate-50/50 dark:bg-slate-700/50 uppercase"> <tr><th class="px-6 py-3">' + this.t('名稱', 'Name') + '</th><th class="px-6 py-3 text-center">' + this.t('平均值', 'Mean') + '</th><th class="px-6 py-3 text-center">Cpk</th><th class="px-6 py-3 text-center">n</th></tr> </thead>' +
                 '<tbody class="divide-y dark:divide-slate-700">' + data.cavityStats.map(function (s) {
                     return '<tr> <td class="px-6 py-4 font-bold dark:text-slate-300">' + s.name + '</td> <td class="px-6 py-4 text-center font-mono dark:text-slate-300">' + SPCEngine.round(s.mean, 4) + '</td> <td class="px-6 py-4 text-center">' +
                         '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold ' + (s.Cpk < 1.33 ? 'bg-rose-50 text-rose-600' : 'bg-emerald-50 text-emerald-600') + '">' + SPCEngine.round(s.Cpk, 3) + '</span></td> <td class="px-6 py-4 text-center dark:text-slate-400">' + s.count + '</td> </tr>';
@@ -1336,9 +1435,9 @@ var SPCApp = {
         // Match Excel Layout (Approximate)
         var meta = [
             { l1: this.t('產品名稱', 'Product'), v1: info.name, l2: this.t('規 格', 'Specs'), v2: this.t('標準', 'Standard'), l3: this.t('管制圖', 'Chart'), v3: 'X̄', v4: 'R', l4: this.t('製造部門', 'Dept'), v4_val: info.dept },
-            { l1: this.t('產品料號', 'Item P/N'), v1: info.item, l2: this.t('最大值', 'Max (USL)'), v2: SPCEngine.round(specs.usl, 4), l3: this.t('上 限', 'UCL'), v3: SPCEngine.round(pageXbarR.xBar.UCL, 4), v4: SPCEngine.round(pageXbarR.R.UCL, 4), l4: this.t('檢驗單位', 'Insp. Unit'), v4_val: '品管組' },
+            { l1: this.t('產品料號', 'Item P/N'), v1: info.item, l2: this.t('最大值', 'Max (USL)'), v2: SPCEngine.round(specs.usl, 4), l3: this.t('上 限', 'UCL'), v3: SPCEngine.round(pageXbarR.xBar.UCL, 4), v4: SPCEngine.round(pageXbarR.R.UCL, 4), l4: this.t('檢驗單位', 'Insp. Unit'), v4_val: this.t('品管組', 'Quality Dept.') },
             { l1: this.t('測量單位', 'Unit'), v1: info.unit, l2: this.t('目標值', 'Target'), v2: SPCEngine.round(specs.target, 4), l3: this.t('中心值', 'CL'), v3: SPCEngine.round(pageXbarR.xBar.CL, 4), v4: SPCEngine.round(pageXbarR.R.CL, 4), l4: this.t('檢驗人員', 'Inspector'), v4_val: info.inspector },
-            { l1: this.t('管制特性', 'Char'), v1: '平均值/全距', l2: this.t('最小值', 'Min (LSL)'), v2: SPCEngine.round(specs.lsl, 4), l3: this.t('下 限', 'LCL'), v3: SPCEngine.round(pageXbarR.xBar.LCL, 4), v4: '-', l4: this.t('檢驗日期', 'Date'), v4_val: info.batchRange || '-' }
+            { l1: this.t('管制特性', 'Char'), v1: this.t('平均值/全距', 'Avg/Range'), l2: this.t('最小值', 'Min (LSL)'), v2: SPCEngine.round(specs.lsl, 4), l3: this.t('下 限', 'LCL'), v3: SPCEngine.round(pageXbarR.xBar.LCL, 4), v4: '-', l4: this.t('檢驗日期', 'Date'), v4_val: info.batchRange || '-' }
         ];
 
         meta.forEach(function (r) {
@@ -1478,19 +1577,19 @@ var SPCApp = {
                 },
                 theme: { mode: theme.mode },
                 title: {
-                    text: data.analysisSubType === 'multi-cavity' ? 'Extended Shewhart X̄ Chart' : 'X̄ Control Chart',
+                    text: data.analysisSubType === 'multi-cavity' ? this.t('擴展型 Shewhart X̄ 管制圖', 'Extended Shewhart X̄ Chart') : this.t('X̄ 管制圖', 'X̄ Control Chart'),
                     align: 'left',
                     style: { fontSize: '16px', fontWeight: 600, color: theme.text }
                 },
                 subtitle: {
-                    text: 'Subgroup Averages with Control Limits',
+                    text: this.t('子組平均值與管制界限', 'Subgroup Averages with Control Limits'),
                     style: { fontSize: '12px', color: theme.textSec }
                 },
                 series: [
-                    { name: 'X-Bar', data: pageXbarR.xBar.data },
-                    { name: 'UCL', data: new Array(pageLabels.length).fill(pageXbarR.xBar.UCL) },
-                    { name: 'CL', data: new Array(pageLabels.length).fill(pageXbarR.xBar.CL) },
-                    { name: 'LCL', data: new Array(pageLabels.length).fill(pageXbarR.xBar.LCL) }
+                    { name: this.t('平均值', 'X-Bar'), data: pageXbarR.xBar.data },
+                    { name: this.t('上控制界限', 'UCL'), data: new Array(pageLabels.length).fill(pageXbarR.xBar.UCL) },
+                    { name: this.t('中心線', 'CL'), data: new Array(pageLabels.length).fill(pageXbarR.xBar.CL) },
+                    { name: this.t('下控制界限', 'LCL'), data: new Array(pageLabels.length).fill(pageXbarR.xBar.LCL) }
                 ],
                 colors: [theme.primary, theme.danger, theme.success, theme.danger],
                 stroke: {
@@ -1541,7 +1640,7 @@ var SPCApp = {
                             borderWidth: 2,
                             borderDash: [6, 4],
                             label: {
-                                text: 'UCL: ' + pageXbarR.xBar.UCL.toFixed(4),
+                                text: this.t('上控制界限: ', 'UCL: ') + pageXbarR.xBar.UCL.toFixed(4),
                                 position: 'right',
                                 offsetX: 0,
                                 style: { background: theme.danger + '20', color: theme.danger, fontWeight: 700, fontSize: '11px' },
@@ -1553,7 +1652,7 @@ var SPCApp = {
                             borderColor: theme.success,
                             borderWidth: 2,
                             label: {
-                                text: 'CL: ' + pageXbarR.xBar.CL.toFixed(4),
+                                text: this.t('中心線: ', 'CL: ') + pageXbarR.xBar.CL.toFixed(4),
                                 position: 'right',
                                 offsetX: 0,
                                 style: { background: theme.success + '20', color: theme.success, fontWeight: 700, fontSize: '11px' },
@@ -1566,7 +1665,7 @@ var SPCApp = {
                             borderWidth: 2,
                             borderDash: [6, 4],
                             label: {
-                                text: 'LCL: ' + pageXbarR.xBar.LCL.toFixed(4),
+                                text: this.t('下控制界限: ', 'LCL: ') + pageXbarR.xBar.LCL.toFixed(4),
                                 position: 'right',
                                 offsetX: 0,
                                 style: { background: theme.danger + '20', color: theme.danger, fontWeight: 700, fontSize: '11px' },
@@ -1609,8 +1708,8 @@ var SPCApp = {
 
                         // Check if this point has a Nelson Rule violation
                         var violation = pageXbarR.xBar.violations.find(v => v.index === dataPointIndex);
-                        if (violation && (seriesIndex === 0 || name === 'X-Bar')) {
-                            var rulesText = violation.rules.map(r => 'Rule ' + r).join(', ');
+                        if (violation && (seriesIndex === 0 || name === this.t('平均值', 'X-Bar'))) {
+                            var rulesText = violation.rules.map(r => self.t('規則 ', 'Rule ') + r).join(', ');
                             var currentLang = self.settings.language || 'zh';
 
                             // 收集所有規則的建議
@@ -1718,18 +1817,18 @@ var SPCApp = {
                 },
                 theme: { mode: theme.mode },
                 title: {
-                    text: 'R Control Chart',
+                    text: this.t('R 管制圖', 'R Control Chart'),
                     align: 'left',
                     style: { fontSize: '16px', fontWeight: 600, color: theme.text }
                 },
                 subtitle: {
-                    text: 'Subgroup Range (Variation)',
+                    text: this.t('子組全距 (變異)', 'Subgroup Range (Variation)'),
                     style: { fontSize: '12px', color: theme.textSec }
                 },
                 series: [
-                    { name: 'Range', data: pageXbarR.R.data },
-                    { name: 'UCL', data: new Array(pageLabels.length).fill(pageXbarR.R.UCL) },
-                    { name: 'CL', data: new Array(pageLabels.length).fill(pageXbarR.R.CL) }
+                    { name: this.t('全距', 'Range'), data: pageXbarR.R.data },
+                    { name: this.t('上控制界限', 'UCL'), data: new Array(pageLabels.length).fill(pageXbarR.R.UCL) },
+                    { name: this.t('中心線', 'CL'), data: new Array(pageLabels.length).fill(pageXbarR.R.CL) }
                 ],
                 colors: [theme.text, theme.danger, theme.success],
                 stroke: { width: [2.5, 1.5, 2], dashArray: [0, 5, 0] },
@@ -1762,7 +1861,7 @@ var SPCApp = {
                             borderWidth: 2,
                             borderDash: [6, 4],
                             label: {
-                                text: 'UCL: ' + pageXbarR.R.UCL.toFixed(4),
+                                text: this.t('上控制界限: ', 'UCL: ') + pageXbarR.R.UCL.toFixed(4),
                                 position: 'right',
                                 offsetX: 0,
                                 style: { background: theme.danger + '20', color: theme.danger, fontWeight: 700, fontSize: '11px' },
@@ -1774,7 +1873,7 @@ var SPCApp = {
                             borderColor: theme.success,
                             borderWidth: 2,
                             label: {
-                                text: 'CL: ' + pageXbarR.R.CL.toFixed(4),
+                                text: this.t('中心線: ', 'CL: ') + pageXbarR.R.CL.toFixed(4),
                                 position: 'right',
                                 offsetX: 0,
                                 style: { background: theme.success + '20', color: theme.success, fontWeight: 700, fontSize: '11px' },
@@ -1877,7 +1976,7 @@ var SPCApp = {
                 annotations: {
                     yaxis: [
                         { y: 1.0, borderColor: theme.danger, strokeDashArray: 4, label: { text: '1.0', style: { color: '#fff', background: theme.danger } } },
-                        { y: this.settings.cpkThreshold, borderColor: theme.success, strokeDashArray: 4, strokeWidth: 2, label: { text: 'Target: ' + this.settings.cpkThreshold, style: { background: theme.success, color: '#fff' } } }
+                        { y: this.settings.cpkThreshold, borderColor: theme.success, strokeDashArray: 4, strokeWidth: 2, label: { text: this.t('目標值: ', 'Target: ') + this.settings.cpkThreshold, style: { background: theme.success, color: '#fff' } } }
                     ]
                 }
             };
@@ -1915,10 +2014,10 @@ var SPCApp = {
                 },
                 theme: { mode: theme.mode },
                 series: [
-                    { name: 'Mean', data: data.cavityStats.map(s => s.mean) },
-                    { name: 'Target', data: new Array(labels.length).fill(data.specs.target) },
-                    { name: 'USL', data: new Array(labels.length).fill(data.specs.usl) },
-                    { name: 'LSL', data: new Array(labels.length).fill(data.specs.lsl) }
+                    { name: self.t('平均值', 'Mean'), data: data.cavityStats.map(s => s.mean) },
+                    { name: self.t('目標值', 'Target'), data: new Array(labels.length).fill(data.specs.target) },
+                    { name: self.t('規格上限', 'USL'), data: new Array(labels.length).fill(data.specs.usl) },
+                    { name: self.t('規格下限', 'LSL'), data: new Array(labels.length).fill(data.specs.lsl) }
                 ],
                 colors: ['#3b82f6', '#10b981', '#ef4444', '#ef4444'], // Blue-500, Emerald-500, Red-500
                 stroke: {
@@ -1964,8 +2063,8 @@ var SPCApp = {
                 },
                 theme: { mode: theme.mode },
                 series: [
-                    { name: 'Within σ', data: data.cavityStats.map(s => s.withinStdDev) },
-                    { name: 'Overall σ', data: data.cavityStats.map(s => s.overallStdDev) }
+                    { name: self.t('組內標準差 (Within σ)', 'Within σ'), data: data.cavityStats.map(s => s.withinStdDev) },
+                    { name: self.t('整體標準差 (Overall σ)', 'Overall σ'), data: data.cavityStats.map(s => s.overallStdDev) }
                 ],
                 colors: ['#3b82f6', '#ef4444'], // Blue-500, Red-500
                 stroke: {
@@ -2050,12 +2149,12 @@ var SPCApp = {
                 },
                 theme: { mode: theme.mode },
                 series: [
-                    { name: 'Max', data: data.groupStats.map(s => s.max) },
-                    { name: 'Avg', data: data.groupStats.map(s => s.avg) },
-                    { name: 'Min', data: data.groupStats.map(s => s.min) },
-                    { name: 'USL', data: new Array(labels.length).fill(data.specs.usl) },
-                    { name: 'Target', data: new Array(labels.length).fill(data.specs.target) },
-                    { name: 'LSL', data: new Array(labels.length).fill(data.specs.lsl) }
+                    { name: self.t('最大值', 'Max'), data: data.groupStats.map(s => s.max) },
+                    { name: self.t('平均值', 'Avg'), data: data.groupStats.map(s => s.avg) },
+                    { name: self.t('最小值', 'Min'), data: data.groupStats.map(s => s.min) },
+                    { name: self.t('規格上限', 'USL'), data: new Array(labels.length).fill(data.specs.usl) },
+                    { name: self.t('目標值', 'Target'), data: new Array(labels.length).fill(data.specs.target) },
+                    { name: self.t('規格下限', 'LSL'), data: new Array(labels.length).fill(data.specs.lsl) }
                 ],
                 colors: ['#ef4444', '#3b82f6', '#ef4444', '#ff9800', '#10b981', '#ff9800'], // Red, Blue, Red, Orange, Emerald, Orange
                 stroke: {
@@ -2404,7 +2503,7 @@ var SPCApp = {
             var card = document.createElement('div');
             card.className = 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-4 rounded-xl mb-3 mx-4 group relative cursor-help hover:border-rose-400 dark:hover:border-rose-500 transition-colors shadow-sm';
 
-            var rulesText = v.rules.map(function (r) { return 'Rule ' + r; }).join(', ');
+            var rulesText = v.rules.map(function (r) { return self.t('規則 ', 'Rule ') + r; }).join(', ');
 
             // 收集所有違反規則的專家意見
             var allMoldingAdvice = [];

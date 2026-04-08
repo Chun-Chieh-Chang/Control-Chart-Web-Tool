@@ -321,8 +321,10 @@ var SPCEngine = {
             status: status,
             color: color,
             advice: status === 'Excellent' ?
-                '模穴平衡良好，製程穩定。' :
-                (status === 'Fair' ? '偵測到輕微模穴不平衡，建議檢查流道平衡。' : '嚴重模穴不平衡！建議優先進行模具維修或熱流道調整。')
+                { zh: '模穴平衡良好，製程穩定。', en: 'Cavity balance is excellent, process is stable.' } :
+                (status === 'Fair' ?
+                    { zh: '偵測到輕微模穴不平衡，建議檢查流道平衡。', en: 'Minor cavity imbalance detected. Recommendation: check runner balance.' } :
+                    { zh: '嚴重模穴不平衡！建議優先進行模具維修或熱流道調整。', en: 'Severe cavity imbalance! Priority recommendation: mold maintenance or hot runner adjustment.' })
         };
     },
 
@@ -364,19 +366,22 @@ var SPCEngine = {
         var color = '#6366f1';
 
         if (stability < 0.8) {
-            primarySource = '批次間變異 (Shot-to-Shot / Equipment)';
-            recommendation = '製程穩定度不足。請檢查機台參數再現性、原料穩定度或環境溫濕度波動。';
+            primarySource = { zh: '批次間變異 (Shot-to-Shot / Equipment)', en: 'Shot-to-Shot Variation (Equipment)' };
+            recommendation = { zh: '製程穩定度不足。請檢查機台參數再現性、原料穩定度或環境溫濕度波動。', en: 'Insufficient process stability. Check machine parameter repeatability, material consistency, or environmental fluctuations.' };
             color = '#f59e0b';
         } else {
-            primarySource = '組內變異 (Within-Shot / Tooling)';
-            recommendation = '製程控制良好，變異主要來自模穴差異或單次注射內的波動。建議檢查模穴平衡性或澆道設計。';
+            primarySource = { zh: '組內變異 (Within-Shot / Tooling)', en: 'Within-Shot Variation (Tooling)' };
+            recommendation = { zh: '製程控制良好，變異主要來自模穴差異或單次注射內的波動。建議檢查模穴平衡性或澆道設計。', en: 'Good process control. Variation primarily stems from cavity differences or within-shot fluctuations. Check cavity balance or runner design.' };
             color = '#10b981';
         }
 
         // Add distribution warning
-        var distWarning = '';
+        var distWarning = null;
         if (Math.abs(distStats.skewness) > 1) {
-            distWarning = '警告：數據呈現偏態分佈 (Skewed)，Cpk 數值可能存在統計偏差，建議確認是否有模穴尺寸不一或數據取樣偏誤。';
+            distWarning = {
+                zh: '警告：數據呈現偏態分佈 (Skewed)，Cpk 數值可能存在統計偏差，建議確認是否有模穴尺寸不一或數據取樣偏誤。',
+                en: 'Warning: Data is skewed. Cpk values may have statistical bias. Suggest verifying cavity dimensions or sampling bias.'
+            };
         }
 
         return {

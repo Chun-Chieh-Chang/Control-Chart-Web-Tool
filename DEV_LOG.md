@@ -1,77 +1,61 @@
 # Development Log (DEV_LOG.md)
 
-## [2026-04-08] - Data Format Restoration & Golden Alignment
+## [2026-04-08] Bug Fix: History Deletion Reliability (RCA/CAPA)
 
-### 1. 執行動作 (Actions Taken)
+### 1. Issue Description
+Users reported that deleting items from the "Recent Files" (Dashboard) or the History Tab often resulted in the wrong item being deleted or the UI failing to update correctly. This was a recurring regression.
 
-- **審計 (Audit)**: 根據使用者提供的正確格式截圖，確認 Commit `41291df` (Old Format) 為正確標準。
-- **還原 (Restoration)**: 
-  - **`js/input.js`**: 重構偵測邏輯，強勢優先匹配「舊格式」(Specs A-C, Batch D)。
-  - **`js/qip/excel-exporter.js`**: 精確對齊 Golden Template，修正 A5:B6 的元數據 (Metadata) 嵌入位置，並強化置中對齊與字體樣式。
-- **相容性 (Robustness)**: 強化偵測算法，確保即使檔案中包含 A5:B6 的產品資訊，也能精確識別每一行的批號與量測數據。
-- **驗證 (Verification)**: 成功驗證歷史紀錄刪除與「系統重置」功能，確保 LocalStorage 清理機制運作正常，無數據殘留。
+### 2. Root Cause Analysis (RCA)
+- **Index-Based Dependency**: The deletion logic was tightly coupled to the array index of the `spc_history` array.
+- **View Slicing**: The Dashboard only displays a slice of the history (`.slice(0, 5)`). If a user deleted the first item on the dashboard (UI index 0), the application would remove the 0th item of the *entire* history array, which might not be the same record if the list was sorted or filtered.
+- **State Desync**: Manual updates to `localStorage` were scattered across various functions, leading to inconsistent persistence states between the Dashboard and the History view.
 
-### 2. 狀態確認 (Status Verification)
+### 3. Corrective and Preventive Action (CAPA)
+- **Architecture Shift (Unique IDs)**:
+    - Implemented a unique ID generator for every history item: `h_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`.
+    - Migrated all history operations (`delete`, `loadDetail`, `render`) to use these unique IDs instead of integers.
+- **Backward Compatibility**:
+    - Updated `loadFromHistory()` to detect legacy records (missing `id`) and automatically assign them a unique ID upon first load.
+- **Centralized Persistence**:
+    - Created `saveHistoryState()` as the single authority for committing history changes to `localStorage` and synchronizing internal state.
+- **Event Delegation**:
+    - Refactored `renderRecentFiles` and `renderHistoryTable` to attach the unique ID to the DOM elements, ensuring the correct reference is passed to the deletion handler.
 
-- **Golden Alignment**: 匯出格式與使用者截圖完全吻合。
-## [2026-04-08] - SPC Engine Expansion & Statistical Risk Mitigation
-
-### 1. 執行動作 (Actions Taken)
-
-- **數據格式還原 (Format Restoration)**:
-  - **`js/input.js`**: 重構偵測邏輯，優先匹配「舊格式」(Specs A-C, Batch D)，提升對 Legacy QIP 檔案的魯棒性。
-  - **`js/qip/excel-exporter.js`**: 精確對齊 Golden Template，修正元數據嵌入位置並強化排版樣式。
-- **SPC 引擎升級 (Engine Upgrade)**:
-  - **`js/engine.js`**: 寫入 $n=11 \sim 48$ 的精確統計常數，取代 Rough Fallback，確保高穴數模具分析的精確性。
-  - **`docs/specs/SPC_Calculation_Logic.md`**: 同步更新統計維護文檔，補全 Xbar-R 管制界限公式。
-- **統計風險控管 (Statistical Risk Refinement)**:
-  - **UI 優化**: 在 `index.html` 的指標說明彈窗中新增「統計警示 (Statistical Caution)」區塊。
-  - **風險說明**: 針對高穴數 ($n > 10$) 提示「過敏風險」與「系統性變異落差」，引導使用者專注於趨勢分析。
-- **專案審計 (Project Audit)**:
-  - **清理冗餘**: 正式刪除 `live_app.js`, `live_engine.js`, `live_index.html` 與 `.bak` 檔案，確保專案 MECE (獨立窮盡)。
-
-### 2. 狀態確認 (Status Verification)
-
-- **Golden Alignment**: 匯出格式與標準 QIP 模板完全吻合。
-- **統計精確度**: 已驗證 $n=48$ 下的常數調用與界限計算邏輯。
-- **UI/UX**: 完成雙語在地化審計，彈窗內容排版正確且具備專業警示效果。
-- **環境穩定**: 本地與 `main` 分支完成同步，所有核心邏輯已模組化至 `js/`。
+### 4. Verification Results
+- **Dashboard Deletion**: Verified that deleting any item from the "Top 5" list correctly removes that specific item from the database.
+- **History List Consistency**: Verified that sorting and then deleting from the full history tab correctly identifies the target record via ID.
+- **Legacy Migration**: Confirmed that old browser data is successfully upgraded with IDs without data loss.
 
 ---
 
-## [2026-04-07] - Repository Cleanup & Synchronization
+## [2026-04-08] Bug Fix: Event Listener Stacking in renderHistoryView (RCA/CAPA)
 
-### 1. 執行動作 (Actions Taken)
+### 1. Issue Description
+Despite the ID-based migration, history deletion continued to fail intermittently. Users reported multiple `confirm()` dialogs appearing or items not disappearing from the UI.
 
-- **同步**: 本地與 `origin/main` 完成同步 (`git pull`)。
-- **清理 (Cleanup)**: 移除專案中過時且重複的檔案，符合 MECE 原則。
-  - [同步刪除] `_archive/` 下 1.x 版本舊程式: `app_old_clean.js`, `app_original.js`, `cavity-analysis_old.js`, `group-analysis_old.js`。
-- **修正**: 修正 `js/engine.js` 中 Nelson Rule 8 的重複判斷邏輯。
-- **修正**: 修正 `js/input.js` 的 Excel 數據解析邏輯，解決數據錯位與第一個批次空值問題。
-  - 將 Specs 映射調整為 B2, C2, D2。
-  - 將批號來源調整為 Column A。
-  - 將數據起點調整為 Row 3 (E3)，並確保 `batchNames` 與 `dataRows` 同步。
+### 2. Root Cause Analysis (RCA)
+- **Listener Stacking**: `renderHistoryView()` called `tbody.addEventListener('click', ...)` on every render without removing previous listeners.
+- **Cascade Effect**: After N delete+re-render cycles, N identical listeners were active on the same `<tbody>`. Each click fired all N handlers, causing N `confirm()` dialogs and N calls to `deleteHistoryItem()`.
+- **Global Reference**: Dashboard inline `onclick` handlers used `SPCApp.xxx()` instead of `window.SPCApp.xxx()`, which could fail in strict mode or when the global scope chain resolves differently.
 
-### 2. 狀態確認 (Status Verification)
-
-- **架構穩定**: 所有 UI 引用 (index.html) 已確認指向 `js/` 目錄下之模組。
-- **邏輯校準**: 數據解析索引已與 QIP 標準格式完全對齊。
+### 3. Corrective and Preventive Action (CAPA)
+- **Clone-Replace Pattern**: On each `renderHistoryView()` call, the `<tbody>` is cloned (shallow, stripping all listeners) and replaced in the DOM. This guarantees exactly one click listener per render cycle.
+- **window.SPCApp**: Dashboard inline handlers now use `window.SPCApp` for unambiguous global resolution.
+- **Diagnostic Logging**: Added `console.log` traces to `deleteHistoryItem`, `clearHistory`, and `saveHistoryState` for future debugging.
 
 ---
 
-## [2026-03-14] - Large-scale Design Rollback
+## [2026-04-08] UI/UX: Bilingual Localization Completion
 
-### 1. 決策背景 (Decision Rationale)
+### 1. Objective
+Complete the localization audit to ensure 100% bilingual support (Simplified Chinese & English) across all charts and detailed data reports.
 
-- **狀態回歸**: 由於激進的「現代扁平化」UI 優化未能達到預期，產生「空洞感」，決定執行深度回滾。
-- **目標版本**: 回退至 `e357359` (修復 QIP 空欄位穩定版本)。
+### 2. Implementation
+- **Chart Engines**: Wrapped hardcoded control chart titles, series names (X-Bar, UCL, CL, LCL, Range), and axis labels in `this.t(zh, en)`.
+- **Detailed Tables**: Localized metadata fields including 'Quality Dept.', 'Avg/Range', and statistical headers.
+- **Expert System**: Refactored `nelsonExpertise` injection to ensure Nelson Rules advice and technical labels are consistently translated.
+- **Refinement**: Standardized on system-wide `data-en`/`data-zh` attributes for HTML elements and `t()` helper for JS-driven content.
 
-### 2. 修復歷程 (Repair History Summary)
-
-- **[修復]**: 解決了早期 JS 執行異常與編碼損毀問題。
-- **[改進]**: 本地數據導出邏輯優化。
-- **[回滾]**: 移除所有實驗性的 Modern Flat Design 相關 CSS 與 HTML 修改。
-
----
-
-_Cleaned up, synchronized, and optimized by Antigravity AI._
+### 3. Verification
+- Verified English mode displays "Extended Shewhart X̄ Chart" vs "X̄ Control Chart" correctly.
+- Verified Tooltips in both X̄ and R charts show correct translations for violations and advice.

@@ -19,6 +19,14 @@ var QIPExtractApp = {
     return window.currentLang === "zh" ? zh : en;
   },
 
+  setLanguage: function () {
+    // Re-render cavity groups if count is available
+    var countInput = document.getElementById("qip-cavity-count");
+    if (countInput && countInput.value) {
+      this.renderCavityGroups(parseInt(countInput.value));
+    }
+  },
+
   init: function () {
     console.log("QIPExtractApp initializing...");
     this.cacheElements();

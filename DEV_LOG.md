@@ -14,41 +14,28 @@
 ### 2. 狀態確認 (Status Verification)
 
 - **Golden Alignment**: 匯出格式與使用者截圖完全吻合。
-- **讀取魯棒性**: 在相容標竿格式的同時，大幅提升對舊版/正規格式的優先識別度。
-- **數據正確性**: 已驗證 A-D 欄位對齊邏輯，確保規格與批號不因元數據嵌入而錯位。
-- **環境穩定**: 已確認 `index.html` 載入路徑正確。
-
----
-
-## [2026-04-08] - Final Repository Audit & Cleanup
+## [2026-04-08] - SPC Engine Expansion & Statistical Risk Mitigation
 
 ### 1. 執行動作 (Actions Taken)
 
-- **審計 (Audit)**: 再次確認專案是否存在冗餘檔案。
-- **清理 (Cleanup)**:
-  - [正式刪除] 根目錄殘留之冗餘檔案: `live_app.js`, `live_engine.js`, `live_index.html`。整合本地環境與 `DEV_LOG.md` 描述一致性。
-  - [正式刪除] CSS 備份檔案: `css/style.css.bak`。
-- **維護 (Maintenance)**: 修復 `DEV_LOG.md` 內容重複問題，符合 MECE 原則。
-- **[DONE]** 2026-04-08: Synchronized SPC help modal in `index.html` with expanded engine logic.
-  - Added Control Limit formulas ($A_2, D_3, D_4$ constants).
-  - Expanded constants table to $n=48$.
-  - Added subgroup selection guidance for high-cavity molds.
-  - Verified full bilingual support (ZH/EN).
-
-### 2026-04-08: SPC 指標公式補完與基準擴展 (Constants Expansion)
-- [x] **文檔更新**: 擴展 `SPC_Calculation_Logic.md`。
-    - 新增 Xbar-R 管制圖管制界限 (UCL/LCL) 精確公式。
-    - 管制係數表由 $n=10$ 全面擴展至 **$n=48$**，對齊多模穴實務。
-    - 加入子組大小選擇建議 ($n=5$ 核心準則)。
-- [x] **引擎升級**: 擴展 `js/engine.js`。
-    - 寫入 $n=11 \sim 48$ 的精確統計常數，取代 rough fallback。
-    - 強化 `getConstants` 函式，提供超出範圍時的動態係數估算魯棒性。
-- [x] **提交與同步**: git push 同步所有數據基準與計算邏輯。
+- **數據格式還原 (Format Restoration)**:
+  - **`js/input.js`**: 重構偵測邏輯，優先匹配「舊格式」(Specs A-C, Batch D)，提升對 Legacy QIP 檔案的魯棒性。
+  - **`js/qip/excel-exporter.js`**: 精確對齊 Golden Template，修正元數據嵌入位置並強化排版樣式。
+- **SPC 引擎升級 (Engine Upgrade)**:
+  - **`js/engine.js`**: 寫入 $n=11 \sim 48$ 的精確統計常數，取代 Rough Fallback，確保高穴數模具分析的精確性。
+  - **`docs/specs/SPC_Calculation_Logic.md`**: 同步更新統計維護文檔，補全 Xbar-R 管制界限公式。
+- **統計風險控管 (Statistical Risk Refinement)**:
+  - **UI 優化**: 在 `index.html` 的指標說明彈窗中新增「統計警示 (Statistical Caution)」區塊。
+  - **風險說明**: 針對高穴數 ($n > 10$) 提示「過敏風險」與「系統性變異落差」，引導使用者專注於趨勢分析。
+- **專案審計 (Project Audit)**:
+  - **清理冗餘**: 正式刪除 `live_app.js`, `live_engine.js`, `live_index.html` 與 `.bak` 檔案，確保專案 MECE (獨立窮盡)。
 
 ### 2. 狀態確認 (Status Verification)
 
-- **MECE 達成**: 專案結構已達精簡狀態，所有核心邏輯均由 `js/` 目錄託管。
-- **環境穩定**: 已確認 `index.html` 載入路徑正確。
+- **Golden Alignment**: 匯出格式與標準 QIP 模板完全吻合。
+- **統計精確度**: 已驗證 $n=48$ 下的常數調用與界限計算邏輯。
+- **UI/UX**: 完成雙語在地化審計，彈窗內容排版正確且具備專業警示效果。
+- **環境穩定**: 本地與 `main` 分支完成同步，所有核心邏輯已模組化至 `js/`。
 
 ---
 

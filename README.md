@@ -81,17 +81,16 @@
 
 Excel 檔案需符合以下格式：
 
-| Row | A (批號) | B (Target) | C (USL) | D (LSL) | E (穴1) | F (穴2) | ... |
+| Row | A (Target) | B (USL) | C (LSL) | D (Batch) | E (穴1) | F (穴2) | ... |
 |-----|----------|------------|---------|---------|---------|---------|-----|
-| 1   | 生產批號 | Target     | USL     | LSL     | 穴1     | 穴2     | ... |
-| 2   | (空白)   | 10.5       | 10.8    | 10.2    | (空白)  | (空白)  | ... |
-| 3   | B001     |            |         |         | 10.42   | 10.51   | ... |
-| 4   | B002     |            |         |         | 10.45   | 10.48   | ... |
+| 1   | Target   | USL        | LSL     | 生產批號 | 穴1     | 穴2     | ... |
+| 2   | 10.5     | 10.8       | 10.2    | B001    | 10.42   | 10.51   | ... |
+| 3   |          |            |         | B002    | 10.45   | 10.48   | ... |
 
 **重點**：
-- 第 1 行：標題列
-- 第 2 行：規格值 (Target, USL, LSL)
-- 第 3 行起：數據
+- 第 1 行：標題列 (鎖定 A:Target, B:USL, C:LSL, D:生產批號)
+- 第 2 行起：規格值 (僅第一橫列) 與 數據起始點
+- 數據列：批號位於 D 欄，量測值從 E 欄開始
 - 模穴欄位標題需包含「穴」字
 
 ### 🎯 規格限值計算邏輯
@@ -257,17 +256,16 @@ MIT License
 
 Excel file must follow this format:
 
-| Row | A (Batch) | B (Target) | C (USL) | D (LSL) | E (穴1) | F (穴2) | ... |
+| Row | A (Target) | B (USL) | C (LSL) | D (Batch) | E (Cavity1) | F (Cavity2) | ... |
 |-----|-----------|------------|---------|---------|---------|---------|-----|
-| 1   | Batch No. | Target     | USL     | LSL     | Cavity1 | Cavity2 | ... |
-| 2   | (empty)   | 10.5       | 10.8    | 10.2    | (empty) | (empty) | ... |
-| 3   | B001      |            |         |         | 10.42   | 10.51   | ... |
-| 4   | B002      |            |         |         | 10.45   | 10.48   | ... |
+| 1   | Target    | USL        | LSL     | BatchNo | Cavity1 | Cavity2 | ... |
+| 2   | 10.5      | 10.8       | 10.2    | B001    | 10.42   | 10.51   | ... |
+| 3   |           |            |         | B002    | 10.45   | 10.48   | ... |
 
 **Key Points**:
-- Row 1: Headers
-- Row 2: Specifications (Target, USL, LSL)
-- Row 3+: Data
+- Row 1: Headers (Locked to A:Target, B:USL, C:LSL, D:Batch)
+- Row 2+: Specifications (first data row only) and Data start
+- Data structure: Batch in Column D, Measurements from Column E
 - Cavity column headers must contain "穴"
 
 ### 🎯 Specification Limit Calculation Logic

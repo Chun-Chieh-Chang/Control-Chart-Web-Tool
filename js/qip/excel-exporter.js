@@ -130,11 +130,14 @@ class ExcelExporter {
                     worksheet[cellAddr].s.font = { name: 'Times New Roman' };
                 }
 
-                // 數值格式
-                if (r > 0 && ((c >= 0 && c <= 2) || (c >= 4))) {
-                    const val = worksheet[cellAddr].v;
-                    if (typeof val === 'number') {
-                        worksheet[cellAddr].z = '0.0000';
+                // 數值格式與對齊
+                if (r > 0) {
+                    worksheet[cellAddr].s.alignment = { horizontal: 'center', vertical: 'middle' };
+                    if ((c >= 0 && c <= 2) || (c >= 4)) {
+                        const val = worksheet[cellAddr].v;
+                        if (typeof val === 'number') {
+                            worksheet[cellAddr].z = '0.0000';
+                        }
                     }
                 }
             }

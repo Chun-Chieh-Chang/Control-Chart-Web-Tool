@@ -1918,7 +1918,7 @@
     <div id="metricsInfoModal"
         class="fixed inset-0 z-[9999] hidden items-center justify-center bg-black/50 backdrop-blur-sm">
         <div
-            class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl max-w-3xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+            class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl max-w-4xl w-full mx-4 max-h-[90vh] overflow-hidden flex flex-col">
             <div
                 class="sticky top-0 bg-white dark:bg-slate-800 p-6 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center">
                 <h3 class="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
@@ -1930,109 +1930,132 @@
                     <span class="material-icons-outlined">close</span>
                 </button>
             </div>
-            <div class="p-6 space-y-6">
-                <!-- Cpk -->
-                <div
-                    class="bg-emerald-50 dark:bg-emerald-900/20 p-5 rounded-xl border border-emerald-200 dark:border-emerald-800">
-                    <h4 class="font-bold text-emerald-800 dark:text-emerald-300 mb-2">Cpk (製程能力指數)</h4>
-                    <code
-                        class="block bg-white dark:bg-slate-900 p-3 rounded-lg text-sm mb-3 font-mono">Cpk = min[ (USL - μ) / 3σ<sub>within</sub>, (μ - LSL) / 3σ<sub>within</sub> ]</code>
-                    <p class="text-sm text-slate-600 dark:text-slate-400"
-                        data-en="Short-term capability considering process centering. Uses within-subgroup standard deviation (σ_within = R̄/d₂)."
-                        data-zh="短期製程能力，考慮製程中心偏移。使用組內標準差 (σ_within = R̄/d₂)。">短期製程能力，考慮製程中心偏移。使用組內標準差 (σ_within =
-                        R̄/d₂)。</p>
-                </div>
-                <!-- Ppk -->
-                <div class="bg-sky-50 dark:bg-sky-900/20 p-5 rounded-xl border border-sky-200 dark:border-sky-800">
-                    <h4 class="font-bold text-sky-800 dark:text-sky-300 mb-2">Ppk (製程績效指數)</h4>
-                    <code
-                        class="block bg-white dark:bg-slate-900 p-3 rounded-lg text-sm mb-3 font-mono">Ppk = min[ (USL - μ) / 3σ<sub>overall</sub>, (μ - LSL) / 3σ<sub>overall</sub> ]</code>
-                    <p class="text-sm text-slate-600 dark:text-slate-400"
-                        data-en="Long-term performance using overall standard deviation of all raw data points."
-                        data-zh="長期製程績效，使用所有原始數據點的整體標準差。">長期製程績效，使用所有原始數據點的整體標準差。</p>
-                </div>
-                <!-- Sigma Within -->
-                <div
-                    class="bg-amber-50 dark:bg-amber-900/20 p-5 rounded-xl border border-amber-200 dark:border-amber-800">
-                    <h4 class="font-bold text-amber-800 dark:text-amber-300 mb-2">σ<sub>within</sub> (組內標準差)</h4>
-                    <code
-                        class="block bg-white dark:bg-slate-900 p-3 rounded-lg text-sm mb-3 font-mono">σ<sub>within</sub> = R̄ / d₂</code>
-                    <p class="text-sm text-slate-600 dark:text-slate-400"
-                        data-en="R̄ is the average of subgroup ranges. d₂ is a constant based on subgroup size (n)."
-                        data-zh="R̄ 為子組全距的平均值。d₂ 為依子組大小 (n) 查表的常數。">R̄ 為子組全距的平均值。d₂ 為依子組大小 (n) 查表的常數。</p>
-                </div>
-                <!-- d2 Table -->
-                <div
-                    class="bg-slate-50 dark:bg-slate-900/50 p-5 rounded-xl border border-slate-200 dark:border-slate-700">
-                    <h4 class="font-bold text-slate-800 dark:text-slate-300 mb-3">d₂ 常數對照表 (對應子組數)</h4>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-xs border-collapse">
+            <div class="p-6 overflow-y-auto space-y-8 custom-scrollbar">
+                <!-- Control Chart Formulas -->
+                <section>
+                    <h4 class="text-base font-black text-primary dark:text-blue-400 mb-4 flex items-center gap-2"
+                        data-zh="管制界限公式 (Control Limits)" data-en="Control Limit Formulas">
+                        管制界限公式 (Control Limits)</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="p-5 rounded-xl bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700">
+                            <div class="text-xs font-bold text-slate-400 mb-2 uppercase tracking-wider">X-bar Chart</div>
+                            <div class="space-y-2 font-mono text-sm text-slate-700 dark:text-slate-300">
+                                <div>UCL = X̄ + A₂ × R̄</div>
+                                <div>CL = X̄</div>
+                                <div>LCL = X̄ - A₂ × R̄</div>
+                            </div>
+                        </div>
+                        <div class="p-5 rounded-xl bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700">
+                            <div class="text-xs font-bold text-slate-400 mb-2 uppercase tracking-wider">R Chart</div>
+                            <div class="space-y-2 font-mono text-sm text-slate-700 dark:text-slate-300">
+                                <div>UCL = D₄ × R̄</div>
+                                <div>CL = R̄</div>
+                                <div>LCL = D₃ × R̄</div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Process Capability Index -->
+                <section>
+                    <h4 class="text-base font-black text-primary dark:text-blue-400 mb-4 flex items-center gap-2"
+                        data-zh="製程能力指標 (Capability Index)" data-en="Process Capability Index">
+                        製程能力指標 (Capability Index)</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="p-5 rounded-xl border border-emerald-200 dark:border-emerald-800 bg-emerald-50/30 dark:bg-emerald-900/10">
+                            <h5 class="font-bold text-emerald-800 dark:text-emerald-300 mb-2">Cpk (短期製程能力)</h5>
+                            <code class="block bg-white dark:bg-slate-900 p-3 rounded-lg text-sm mb-3">min[ (USL-μ)/3σᵨ, (μ-LSL)/3σᵨ ]</code>
+                            <p class="text-xs text-slate-500" data-zh="σᵨ = R̄ / d₂ (組內標準差推估)" data-en="σ_within = R̄ / d₂ (Estimated)">σᵨ = R̄ / d₂ (組內標準差推估)</p>
+                        </div>
+                        <div class="p-5 rounded-xl border border-sky-200 dark:border-sky-800 bg-sky-50/30 dark:bg-sky-900/10">
+                            <h5 class="font-bold text-sky-800 dark:text-sky-300 mb-2">Ppk (整體製程績效)</h5>
+                            <code class="block bg-white dark:bg-slate-900 p-3 rounded-lg text-sm mb-3">min[ (USL-μ)/3σₛ, (μ-LSL)/3σₛ ]</code>
+                            <p class="text-xs text-slate-500" data-zh="σₛ = SD (全體數據樣本標準差)" data-en="σ_overall = SD (Sample SD of all data)">σₛ = SD (全體數據樣本標準差)</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Subgroup Guidance -->
+                <section>
+                    <h4 class="text-base font-black text-primary dark:text-blue-400 mb-4 flex items-center gap-2"
+                        data-zh="子組數選擇建議 (Subgroup Size)" data-en="Subgroup Selection Guidance">
+                        子組數選擇建議 (Subgroup Size)</h4>
+                    <div class="p-5 rounded-xl bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-800">
+                        <div class="space-y-3 text-sm text-slate-700 dark:text-slate-300">
+                            <p class="font-bold text-amber-800 dark:text-amber-400" data-zh="推薦子組數：n = 5" data-en="Recommended size: n = 5">推薦子組數：n = 5</p>
+                            <p data-zh="對於單穴模具或一般製程，n=5 是統計學公認的標準平衡點。它能以較低的成本提供足夠的製程異常偵測靈敏度。" data-en="For single-cavity molds, n=5 is the standard balance between statistical sensitivity and inspection cost.">對於單穴模具或一般製程，n=5 是統計學公認的標準平衡點。它能以較低的成本提供足夠的製程異常偵測靈敏度。</p>
+                            <p class="mt-2 font-bold text-amber-800 dark:text-amber-400" data-zh="高穴數模具 (High-Cavity Molds)：" data-en="High-Cavity Molds:">高穴數模具 (High-Cavity Molds)：</p>
+                            <p data-zh="對於多穴模穴（如 16, 24, 48 穴），建議子組大小直接等於模穴數，以便完整捕捉「一次射出」中各穴間的變異。本工具已針對 n ≤ 48 的高穴數製程進行了公式優化。" data-en="For high-cavity molds (e.g., 16, 24, 48 cavities), set n equal to the cavity count to capture within-shot variation. This tool is optimized for n up to 48.">對於多穴模穴（如 16, 24, 48 穴），建議子組大小直接等於模穴數，以便完整捕捉「一次射出」中各穴間的變異。本工具已針對 n ≤ 48 的高穴數製程進行了公式優化。</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Expanded Constants Table -->
+                <section>
+                    <div class="flex items-center justify-between mb-4">
+                        <h4 class="text-base font-black text-primary dark:text-blue-400 flex items-center gap-2"
+                            data-zh="SPC 統計常數對照表 (n=2~48)" data-en="SPC Constants Table (n=2~48)">
+                            SPC 統計常數對照表 (n=2~48)</h4>
+                    </div>
+                    <div class="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-700">
+                        <table class="w-full text-xs text-left border-collapse">
                             <thead>
-                                <tr class="bg-slate-200 dark:bg-slate-700">
-                                    <th class="px-2 py-2 border border-slate-300 dark:border-slate-600">n (子組數)</th>
-                                    <th class="px-2 py-2 border border-slate-300 dark:border-slate-600">2</th>
-                                    <th class="px-2 py-2 border border-slate-300 dark:border-slate-600">4</th>
-                                    <th class="px-2 py-2 border border-slate-300 dark:border-slate-600">8</th>
-                                    <th class="px-2 py-2 border border-slate-300 dark:border-slate-600">12</th>
-                                    <th class="px-2 py-2 border border-slate-300 dark:border-slate-600">16</th>
-                                    <th class="px-2 py-2 border border-slate-300 dark:border-slate-600">20</th>
-                                    <th class="px-2 py-2 border border-slate-300 dark:border-slate-600">24</th>
-                                    <th class="px-2 py-2 border border-slate-300 dark:border-slate-600">32</th>
-                                    <th class="px-2 py-2 border border-slate-300 dark:border-slate-600">48</th>
+                                <tr class="bg-slate-100 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700">
+                                    <th class="px-3 py-3 font-bold text-slate-800 dark:text-slate-200 border-r border-slate-200 dark:border-slate-700">n</th>
+                                    <th class="px-3 py-3 font-bold text-indigo-600 dark:text-indigo-400">A₂</th>
+                                    <th class="px-3 py-3 font-bold text-emerald-600 dark:text-emerald-400">d₂</th>
+                                    <th class="px-3 py-3 font-bold text-rose-600 dark:text-rose-400">D₃</th>
+                                    <th class="px-3 py-3 font-bold text-rose-600 dark:text-rose-400">D₄</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                <tr>
-                                    <th
-                                        class="px-2 py-2 border border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-800">
-                                        d₂</th>
-                                    <td class="px-2 py-2 border border-slate-300 dark:border-slate-600 text-center">
-                                        1.128</td>
-                                    <td class="px-2 py-2 border border-slate-300 dark:border-slate-600 text-center">
-                                        2.059</td>
-                                    <td class="px-2 py-2 border border-slate-300 dark:border-slate-600 text-center">
-                                        2.847</td>
-                                    <td class="px-2 py-2 border border-slate-300 dark:border-slate-600 text-center">
-                                        3.258</td>
-                                    <td class="px-2 py-2 border border-slate-300 dark:border-slate-600 text-center">
-                                        3.532</td>
-                                    <td class="px-2 py-2 border border-slate-300 dark:border-slate-600 text-center">
-                                        3.735</td>
-                                    <td class="px-2 py-2 border border-slate-300 dark:border-slate-600 text-center">
-                                        3.895</td>
-                                    <td class="px-2 py-2 border border-slate-300 dark:border-slate-600 text-center">
-                                        4.139</td>
-                                    <td class="px-2 py-2 border border-slate-300 dark:border-slate-600 text-center">
-                                        4.466</td>
+                            <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
+                                <tr class="hover:bg-slate-50 dark:hover:bg-slate-900/50">
+                                    <td class="px-3 py-2 font-black border-r border-slate-200 dark:border-slate-700">2</td>
+                                    <td class="px-3 py-2">1.880</td><td class="px-3 py-2">1.128</td><td class="px-3 py-2">0.000</td><td class="px-3 py-2">3.267</td>
+                                </tr>
+                                <tr class="bg-indigo-50/20 dark:bg-indigo-900/10">
+                                    <td class="px-3 py-2 font-black border-r border-slate-200 dark:border-slate-700">5 <span class="text-[10px] text-indigo-500">(Standard)</span></td>
+                                    <td class="px-3 py-2">0.577</td><td class="px-3 py-2">2.326</td><td class="px-3 py-2">0.000</td><td class="px-3 py-2">2.114</td>
+                                </tr>
+                                <tr class="hover:bg-slate-50 dark:hover:bg-slate-900/50">
+                                    <td class="px-3 py-2 font-black border-r border-slate-200 dark:border-slate-700">8</td>
+                                    <td class="px-3 py-2">0.373</td><td class="px-3 py-2">2.847</td><td class="px-3 py-2">0.136</td><td class="px-3 py-2">1.864</td>
+                                </tr>
+                                <tr class="hover:bg-slate-50 dark:hover:bg-slate-900/50">
+                                    <td class="px-3 py-2 font-black border-r border-slate-200 dark:border-slate-700">12</td>
+                                    <td class="px-3 py-2">0.266</td><td class="px-3 py-2">3.258</td><td class="px-3 py-2">0.283</td><td class="px-3 py-2">1.717</td>
+                                </tr>
+                                <tr class="hover:bg-slate-50 dark:hover:bg-slate-900/50">
+                                    <td class="px-3 py-2 font-black border-r border-slate-200 dark:border-slate-700">16</td>
+                                    <td class="px-3 py-2">0.212</td><td class="px-3 py-2">3.532</td><td class="px-3 py-2">0.363</td><td class="px-3 py-2">1.637</td>
+                                </tr>
+                                <tr class="hover:bg-slate-50 dark:hover:bg-slate-900/50">
+                                    <td class="px-3 py-2 font-black border-r border-slate-200 dark:border-slate-700">24</td>
+                                    <td class="px-3 py-2">0.157</td><td class="px-3 py-2">3.895</td><td class="px-3 py-2">0.451</td><td class="px-3 py-2">1.548</td>
+                                </tr>
+                                <tr class="hover:bg-slate-50 dark:hover:bg-slate-900/50">
+                                    <td class="px-3 py-2 font-black border-r border-slate-200 dark:border-slate-700">32</td>
+                                    <td class="px-3 py-2">0.134</td><td class="px-3 py-2">4.128</td><td class="px-3 py-2">0.502</td><td class="px-3 py-2">1.498</td>
+                                </tr>
+                                <tr class="hover:bg-slate-50 dark:hover:bg-slate-900/50">
+                                    <td class="px-3 py-2 font-black border-r border-slate-200 dark:border-slate-700">48</td>
+                                    <td class="px-3 py-2">0.109</td><td class="px-3 py-2">4.435</td><td class="px-3 py-2">0.563</td><td class="px-3 py-2">1.437</td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
-                    <p class="mt-3 text-[11px] text-slate-500 italic" data-en="Note: System includes built-in d₂ constant table for 2-48 subgroups, automatically matched based on detected subgroup count." data-zh="註：系統已內建 2 至 48 穴之完整的 d₂ 常數表，計算時將自動依據偵測到的模穴數進行匹配。">
-                        註：系統已內建 2 至 48 穴之完整的 d₂ 常數表，計算時將自動依據偵測到的模穴數進行匹配。
+                    <p class="mt-3 text-[11px] text-slate-500 italic"
+                        data-en="* Detailed constants for all n (2-48) are built into the engine and applied automatically based on subgroup count."
+                        data-zh="* 系統內建完整 n=2~48 常數表，將根據實際偵測到的子組大小/穴數自動進行匹配計算。">
+                        * 系統內建完整 n=2~48 常數表，將根據實際偵測到的子組大小/穴數自動進行匹配計算。
                     </p>
-                </div>
-                <!-- Interpretation -->
-                <div
-                    class="bg-indigo-50 dark:bg-indigo-900/20 p-5 rounded-xl border border-indigo-200 dark:border-indigo-800">
-                    <h4 class="font-bold text-indigo-800 dark:text-indigo-300 mb-3" data-en="Interpretation Guidelines"
-                        data-zh="判讀標準">判讀標準</h4>
-                    <ul class="text-sm text-slate-600 dark:text-slate-400 space-y-2">
-                        <li class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-emerald-500"></span>
-                            <strong>Cpk ≥ 1.67:</strong> <span data-en="Excellent capability"
-                                data-zh="優異製程能力">優異製程能力</span>
-                        </li>
-                        <li class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-green-500"></span>
-                            <strong>Cpk ≥ 1.33:</strong> <span data-en="Good capability" data-zh="良好製程能力">良好製程能力</span>
-                        </li>
-                        <li class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-amber-500"></span>
-                            <strong>Cpk ≥ 1.00:</strong> <span data-en="Acceptable" data-zh="可接受">可接受</span>
-                        </li>
-                        <li class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-red-500"></span>
-                            <strong>Cpk < 1.00:</strong> <span data-en="Needs improvement" data-zh="需改善">需改善</span>
-                        </li>
-                    </ul>
-                </div>
+                </section>
+            </div>
+            <div
+                class="px-6 py-4 bg-slate-50 dark:bg-slate-900 border-t border-slate-200 dark:border-slate-700 flex justify-end">
+                <button onclick="SPCApp.hideMetricsInfo()"
+                    class="px-6 py-2 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 rounded-xl text-sm font-bold transition-all"
+                    data-en="Close" data-zh="關閉">關閉</button>
             </div>
         </div>
     </div>

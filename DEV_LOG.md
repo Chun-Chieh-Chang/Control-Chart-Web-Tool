@@ -29,6 +29,11 @@
   - [正式刪除] 根目錄殘留之冗餘檔案: `live_app.js`, `live_engine.js`, `live_index.html`。整合本地環境與 `DEV_LOG.md` 描述一致性。
   - [正式刪除] CSS 備份檔案: `css/style.css.bak`。
 - **維護 (Maintenance)**: 修復 `DEV_LOG.md` 內容重複問題，符合 MECE 原則。
+- **[DONE]** 2026-04-08: Synchronized SPC help modal in `index.html` with expanded engine logic.
+  - Added Control Limit formulas ($A_2, D_3, D_4$ constants).
+  - Expanded constants table to $n=48$.
+  - Added subgroup selection guidance for high-cavity molds.
+  - Verified full bilingual support (ZH/EN).
 
 ### 2026-04-08: SPC 指標公式補完與基準擴展 (Constants Expansion)
 - [x] **文檔更新**: 擴展 `SPC_Calculation_Logic.md`。

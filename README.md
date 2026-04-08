@@ -125,7 +125,8 @@ Excel 檔案需符合以下格式：
 
 這確保了數據輸出的邏輯一致性，**避免因輸入順序導致的上限小於下限的情形**。
 
-> 📘 **詳細說明**: 請參閱 [`docs/SPECIFICATION_LIMIT_CALCULATION.md`](docs/SPECIFICATION_LIMIT_CALCULATION.md) 了解完整的計算邏輯與範例
+> 📘 **詳細說明**: 請參閱 [`docs/specs/SPECIFICATION_LIMIT_CALCULATION.md`](docs/specs/SPECIFICATION_LIMIT_CALCULATION.md) 了解完整的計算邏輯與範例
+> 📘 **格式規範**: 請參閱 [`docs/specs/DATA_FORMAT_GOLDEN_v2.md`](docs/specs/DATA_FORMAT_GOLDEN_v2.md) 了解 Golden Format (A-C: Specs, D: Batch) 的詳細欄位定義
 
 ### 🛠️ 技術架構
 
@@ -300,7 +301,8 @@ After calculating two offset boundaries, the system automatically compares and a
 
 This ensures logical consistency in data output and **prevents scenarios where the upper limit is less than the lower limit due to input order**.
 
-> 📘 **Detailed Documentation**: See [`docs/SPECIFICATION_LIMIT_CALCULATION.md`](docs/SPECIFICATION_LIMIT_CALCULATION.md) for complete calculation logic and examples
+> 📘 **Detailed Documentation**: See [`docs/specs/SPECIFICATION_LIMIT_CALCULATION.md`](docs/specs/SPECIFICATION_LIMIT_CALCULATION.md) for complete calculation logic and examples
+> 📘 **Format Standard**: See [`docs/specs/DATA_FORMAT_GOLDEN_v2.md`](docs/specs/DATA_FORMAT_GOLDEN_v2.md) for detailed Golden Format (A-C: Specs, D: Batch) field definitions
 
 ### 🛠️ Tech Stack
 ...

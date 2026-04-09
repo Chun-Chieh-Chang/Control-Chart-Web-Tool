@@ -1282,13 +1282,13 @@ var SPCApp = {
                     '</div>' +
                     '<div>' +
                     '<h3 class="text-sm font-bold text-slate-500 uppercase">' + this.t('製程健康度 AI 診斷', 'Process Health AI Insights') + '</h3>' +
-                    '<div class="text-lg font-bold dark:text-white">' + data.diagnosis.source + '</div>' +
+                    '<div class="text-lg font-bold dark:text-white">' + (this.settings.language === 'zh' ? (data.diagnosis.source.zh || data.diagnosis.source) : (data.diagnosis.source.en || data.diagnosis.source)) + '</div>' +
                     '</div>' +
                     '</div>' +
                     '<div class="space-y-3">' +
                     '<div class="p-3 bg-slate-50 dark:bg-slate-900/50 rounded-lg border border-slate-100 dark:border-slate-800 text-sm">' +
                     '<span class="font-bold text-indigo-600 dark:text-indigo-400">' + this.t('專家建議：', 'Expert Advice: ') + '</span>' +
-                    '<span class="text-slate-600 dark:text-slate-400 font-bold">' + data.diagnosis.advice + '</span>' +
+                    '<span class="text-slate-600 dark:text-slate-400 font-bold">' + (this.settings.language === 'zh' ? (data.diagnosis.advice.zh || data.diagnosis.advice) : (data.diagnosis.advice.en || data.diagnosis.advice)) + '</span>' +
                     '</div>' +
                     (data.diagnosis.distWarning ?
                         '<div class="p-3 bg-rose-50 dark:bg-rose-900/20 rounded-lg border border-rose-100 dark:border-rose-900/30 text-sm text-rose-600 dark:text-rose-400 flex items-center gap-2">' +
@@ -1334,7 +1334,7 @@ var SPCApp = {
                 balHtml = '<div class="saas-card p-6 border-l-4" style="border-left-color:' + data.balance.color + ' text-wrap: wrap;">' +
                     '<div class="flex justify-between items-center mb-4">' +
                     '<div> <h3 class="text-sm font-bold text-slate-500 uppercase">' + this.t('模穴平衡分析', 'Cavity Balance Analysis') + '</h3> ' +
-                    '<div class="text-2xl font-bold mt-1" style="color:' + data.balance.color + '">' + data.balance.status + '</div> </div>' +
+                    '<div class="text-2xl font-bold mt-1" style="color:' + data.balance.color + '">' + (this.settings.language === 'zh' ? (data.balance.status.zh || data.balance.status) : (data.balance.status.en || data.balance.status)) + '</div> </div>' +
                     '<div class="text-right"> <div class="text-[10px] font-bold text-slate-400">' + this.t('全距 / 公差比', 'Range/Tol Ratio') + '</div>' +
                     '<div class="text-xl font-mono font-bold text-slate-700 dark:text-slate-300">' + imbalanceRatio + '%</div> </div> </div>' +
                     '<div class="w-full bg-slate-100 dark:bg-slate-700 h-2 rounded-full mb-4 overflow-hidden"> ' +
@@ -1342,7 +1342,7 @@ var SPCApp = {
                     '<div class="flex items-start gap-3 p-3 bg-slate-50 dark:bg-slate-900/50 rounded-lg border border-slate-100 dark:border-slate-800">' +
                     '<span class="material-icons-outlined text-indigo-500 mt-0.5">psychology</span>' +
                     '<div class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed font-bold">' +
-                    '<span class="text-indigo-600 dark:text-indigo-400 font-bold">' + this.t('智慧診斷：', 'AI Diagnosis: ') + '</span>' + data.balance.advice + '</div> </div> </div>';
+                    '<span class="text-indigo-600 dark:text-indigo-400 font-bold">' + this.t('智慧診斷：', 'AI Diagnosis: ') + '</span>' + (this.settings.language === 'zh' ? (data.balance.advice.zh || data.balance.advice) : (data.balance.advice.en || data.balance.advice)) + '</div> </div> </div>';
             }
 
             html = '<div class="grid grid-cols-1 gap-8">' +
@@ -1364,13 +1364,13 @@ var SPCApp = {
                 groupHtml = '<div class="saas-card p-6 border-l-4 mb-8" style="border-left-color:' + data.stability.color + '">' +
                     '<div class="flex justify-between items-center mb-4">' +
                     '<div> <h3 class="text-sm font-bold text-slate-500 uppercase">' + this.t('群組穩定度 AI 診斷', 'Group Stability AI Analysis') + '</h3> ' +
-                    '<div class="text-2xl font-bold mt-1" style="color:' + data.stability.color + '">' + data.stability.status + '</div> </div>' +
+                    '<div class="text-2xl font-bold mt-1" style="color:' + data.stability.color + '">' + (this.settings.language === 'zh' ? (data.stability.status.zh || data.stability.status) : (data.stability.status.en || data.stability.status)) + '</div> </div>' +
                     '<div class="text-right"> <div class="text-[10px] font-bold text-slate-400">' + this.t('變異一致性得分', 'Consistency Score') + '</div>' +
                     '<div class="text-xl font-mono font-bold text-slate-700 dark:text-slate-300">' + consistencyScore + '%</div> </div> </div>' +
                     '<div class="flex items-start gap-3 p-3 bg-slate-50 dark:bg-slate-900/50 rounded-lg border border-slate-100 dark:border-slate-800">' +
                     '<span class="material-icons-outlined text-indigo-500 mt-0.5">psychology</span>' +
                     '<div class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed font-bold">' +
-                    '<span class="text-indigo-600 dark:text-indigo-400 font-bold">' + this.t('智慧診斷：', 'AI Diagnosis: ') + '</span>' + data.stability.advice + '</div> </div> </div>';
+                    '<span class="text-indigo-600 dark:text-indigo-400 font-bold">' + this.t('智慧診斷：', 'AI Diagnosis: ') + '</span>' + (this.settings.language === 'zh' ? (data.stability.advice.zh || data.stability.advice) : (data.stability.advice.en || data.stability.advice)) + '</div> </div> </div>';
             }
 
             html = '<div class="grid grid-cols-1 gap-8">' +

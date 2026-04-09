@@ -1,5 +1,25 @@
 # Development Log (DEV_LOG.md)
 
+## [2026-04-09] Stabilization: Localization & Branch Merge
+
+### 1. Issue Description
+-   Persistent `[object Object]` rendering errors across AI diagnosis cards.
+-   Typography inconsistency and low sidebar contrast in Light mode.
+-   Merge conflicts between `main` and `master` preventing stable deployment.
+
+### 2. Root Cause Analysis (RCA)
+-   **Localization Regression**: The `SPCEngine` results were recently upgraded to return objects `{zh, en}`, but the UI rendering logic in `app.js` was still concatenating them as raw objects, leading to string coercion.
+-   **Contrast Violation**: The sidebar used a pure white background with light borders, failing WCAG AA standards in light mode.
+-   **Merge Desync**: Divergence between functional fixes in `master` and UI refinements in `main` caused syntax errors and layout breaks after improper merging.
+
+### 3. Corrective and Preventive Action (CAPA)
+-   **Granular Localization**: Refactored `renderAnalysisView` to explicitly check `this.settings.language` before accessing `.zh` or `.en` properties of diagnostic results.
+-   **Visual Excellence**: Transitioned to the `Inter` font stack and implemented a `slate-50` sidebar background with reinforced borders for better hierarchy.
+-   **Branch Finalization**: Performed a hard reset of `main` to `a01977a`, merged `master` with manual conflict resolution, and validated the syntax integrity.
+
+---
+
+
 ## [2026-04-08] Bug Fix: History Deletion Reliability (RCA/CAPA)
 
 ### 1. Issue Description

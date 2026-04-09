@@ -1833,11 +1833,11 @@ var SPCApp = {
                 ],
                 colors: [theme.primary, theme.danger, theme.success, theme.danger],
                 stroke: {
-                    width: [0.5, 0.5, 0.5, 0.5],
+                    width: [1, 1, 1, 1],
                     dashArray: [0, 5, 0, 5],
                     curve: 'straight',
                     connectNulls: false,
-                    opacity: [0.4, 0.2, 0.2, 0.2]
+                    opacity: [0.6, 0.3, 0.3, 0.3]
                 },
                 xaxis: {
                     type: 'category',

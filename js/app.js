@@ -1641,10 +1641,9 @@ var SPCApp = {
                             borderDash: [6, 4],
                             label: {
                                 text: this.t('上管制界限: ', 'UCL: ') + pageXbarR.xBar.UCL.toFixed(4),
-                                position: 'right',
-                                offsetX: 0,
-                                style: { background: theme.danger + '20', color: theme.danger, fontWeight: 700, fontSize: '11px' },
-                                marker: { show: false }
+                                position: 'left',
+                                textAnchor: 'start',
+                                style: { background: theme.danger + '20', color: theme.danger, fontWeight: 700, fontSize: '11px' }
                             }
                         },
                         {
@@ -1653,10 +1652,9 @@ var SPCApp = {
                             borderWidth: 2,
                             label: {
                                 text: this.t('中心線: ', 'CL: ') + pageXbarR.xBar.CL.toFixed(4),
-                                position: 'right',
-                                offsetX: 0,
-                                style: { background: theme.success + '20', color: theme.success, fontWeight: 700, fontSize: '11px' },
-                                marker: { show: false }
+                                position: 'left',
+                                textAnchor: 'start',
+                                style: { background: theme.success + '20', color: theme.success, fontWeight: 700, fontSize: '11px' }
                             }
                         },
                         {
@@ -1666,10 +1664,9 @@ var SPCApp = {
                             borderDash: [6, 4],
                             label: {
                                 text: this.t('下管制界限: ', 'LCL: ') + pageXbarR.xBar.LCL.toFixed(4),
-                                position: 'right',
-                                offsetX: 0,
-                                style: { background: theme.danger + '20', color: theme.danger, fontWeight: 700, fontSize: '11px' },
-                                marker: { show: false }
+                                position: 'left',
+                                textAnchor: 'start',
+                                style: { background: theme.danger + '20', color: theme.danger, fontWeight: 700, fontSize: '11px' }
                             }
                         }
                     ]
@@ -1873,7 +1870,8 @@ var SPCApp = {
                             borderDash: [6, 4],
                             label: {
                                 text: this.t('上管制界限: ', 'UCL: ') + pageXbarR.R.UCL.toFixed(4),
-                                position: 'right',
+                                position: 'left',
+                                textAnchor: 'start',
                                 style: { background: theme.danger + '20', color: theme.danger, fontWeight: 700, fontSize: '11px' }
                             }
                         },
@@ -1883,7 +1881,8 @@ var SPCApp = {
                             borderWidth: 2,
                             label: {
                                 text: this.t('中心線: ', 'CL: ') + pageXbarR.R.CL.toFixed(4),
-                                position: 'right',
+                                position: 'left',
+                                textAnchor: 'start',
                                 style: { background: theme.success + '20', color: theme.success, fontWeight: 700, fontSize: '11px' }
                             }
                         },
@@ -1894,7 +1893,8 @@ var SPCApp = {
                             borderDash: [6, 4],
                             label: {
                                 text: this.t('下管制界限: ', 'LCL: ') + (pageXbarR.R.LCL || 0).toFixed(4),
-                                position: 'right',
+                                position: 'left',
+                                textAnchor: 'start',
                                 style: { background: theme.danger + '20', color: theme.danger, fontWeight: 700, fontSize: '11px' }
                             }
                         }

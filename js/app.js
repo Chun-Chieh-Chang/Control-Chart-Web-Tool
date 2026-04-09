@@ -1829,12 +1829,13 @@ var SPCApp = {
                     { name: this.t('全距', 'Range'), data: pageXbarR.R.data },
                     { name: this.t('上控制界限', 'UCL'), data: new Array(pageLabels.length).fill(pageXbarR.R.UCL) },
                     { name: this.t('中心線', 'CL'), data: new Array(pageLabels.length).fill(pageXbarR.R.CL) },
-                    { name: this.t('下控制界限', 'LCL'), data: new Array(pageLabels.length).fill(pageXbarR.R.LCL) }
+                    { name: this.t('下控制界限', 'LCL'), data: new Array(pageLabels.length).fill(pageXbarR.R.LCL || 0) }
                 ],
                 colors: [theme.primary, theme.danger, theme.success, theme.danger],
                 stroke: {
                     width: [2.5, 1.5, 2, 1.5],
                     dashArray: [0, 5, 0, 5],
+                    curve: 'straight',
                     connectNulls: false
                 },
                 xaxis: {
@@ -1850,8 +1851,8 @@ var SPCApp = {
                 },
                 yaxis: {
                     min: 0,
-                    max: rMax + (rMax * 0.15),
-                    tickAmount: 6,
+                    max: rMax + (rMax * 0.2),
+                    tickAmount: 8,
                     labels: { 
                         formatter: function (v) { return (v !== null && v !== undefined) ? v.toFixed(4) : ''; },
                         style: { colors: theme.text, fontSize: '11px', fontFamily: 'Inter, sans-serif' }
@@ -1872,9 +1873,7 @@ var SPCApp = {
                             label: {
                                 text: this.t('上控制界限: ', 'UCL: ') + pageXbarR.R.UCL.toFixed(4),
                                 position: 'right',
-                                offsetX: 0,
-                                style: { background: theme.danger + '20', color: theme.danger, fontWeight: 700, fontSize: '11px' },
-                                marker: { show: false }
+                                style: { background: theme.danger + '20', color: theme.danger, fontWeight: 700, fontSize: '11px' }
                             }
                         },
                         {
@@ -1884,22 +1883,18 @@ var SPCApp = {
                             label: {
                                 text: this.t('中心線: ', 'CL: ') + pageXbarR.R.CL.toFixed(4),
                                 position: 'right',
-                                offsetX: 0,
-                                style: { background: theme.success + '20', color: theme.success, fontWeight: 700, fontSize: '11px' },
-                                marker: { show: false }
+                                style: { background: theme.success + '20', color: theme.success, fontWeight: 700, fontSize: '11px' }
                             }
                         },
                         {
-                            y: pageXbarR.R.LCL,
+                            y: pageXbarR.R.LCL || 0,
                             borderColor: theme.danger,
                             borderWidth: 2,
                             borderDash: [6, 4],
                             label: {
-                                text: this.t('下控制界限: ', 'LCL: ') + pageXbarR.R.LCL.toFixed(4),
+                                text: this.t('下控制界限: ', 'LCL: ') + (pageXbarR.R.LCL || 0).toFixed(4),
                                 position: 'right',
-                                offsetX: 0,
-                                style: { background: theme.danger + '20', color: theme.danger, fontWeight: 700, fontSize: '11px' },
-                                marker: { show: false }
+                                style: { background: theme.danger + '20', color: theme.danger, fontWeight: 700, fontSize: '11px' }
                             }
                         }
                     ]

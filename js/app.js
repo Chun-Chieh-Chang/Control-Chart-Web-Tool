@@ -1828,10 +1828,15 @@ var SPCApp = {
                 series: [
                     { name: this.t('全距', 'Range'), data: pageXbarR.R.data },
                     { name: this.t('上控制界限', 'UCL'), data: new Array(pageLabels.length).fill(pageXbarR.R.UCL) },
-                    { name: this.t('中心線', 'CL'), data: new Array(pageLabels.length).fill(pageXbarR.R.CL) }
+                    { name: this.t('中心線', 'CL'), data: new Array(pageLabels.length).fill(pageXbarR.R.CL) },
+                    { name: this.t('下控制界限', 'LCL'), data: new Array(pageLabels.length).fill(pageXbarR.R.LCL) }
                 ],
-                colors: [theme.text, theme.danger, theme.success],
-                stroke: { width: [2.5, 1.5, 2], dashArray: [0, 5, 0] },
+                colors: [theme.primary, theme.danger, theme.success, theme.danger],
+                stroke: {
+                    width: [2.5, 1.5, 2, 1.5],
+                    dashArray: [0, 5, 0, 5],
+                    connectNulls: false
+                },
                 xaxis: {
                     type: 'category',
                     categories: pageLabels.map(l => String(l)),
@@ -1845,13 +1850,17 @@ var SPCApp = {
                 },
                 yaxis: {
                     min: 0,
-                    max: rMax * 1.15,
+                    max: rMax + (rMax * 0.15),
                     tickAmount: 6,
-                    labels: { formatter: function (v) { return v.toFixed(4); }, style: { colors: theme.text, fontSize: '11px', fontFamily: 'Inter, sans-serif' } }
+                    labels: { 
+                        formatter: function (v) { return (v !== null && v !== undefined) ? v.toFixed(4) : ''; },
+                        style: { colors: theme.text, fontSize: '11px', fontFamily: 'Inter, sans-serif' }
+                    }
                 },
                 grid: { 
                     borderColor: theme.grid,
-                    strokeDashArray: 4
+                    strokeDashArray: 4,
+                    xaxis: { lines: { show: true } }
                 },
                 annotations: {
                     yaxis: [
@@ -1879,6 +1888,19 @@ var SPCApp = {
                                 style: { background: theme.success + '20', color: theme.success, fontWeight: 700, fontSize: '11px' },
                                 marker: { show: false }
                             }
+                        },
+                        {
+                            y: pageXbarR.R.LCL,
+                            borderColor: theme.danger,
+                            borderWidth: 2,
+                            borderDash: [6, 4],
+                            label: {
+                                text: this.t('下控制界限: ', 'LCL: ') + pageXbarR.R.LCL.toFixed(4),
+                                position: 'right',
+                                offsetX: 0,
+                                style: { background: theme.danger + '20', color: theme.danger, fontWeight: 700, fontSize: '11px' },
+                                marker: { show: false }
+                            }
                         }
                     ]
                 },
@@ -1900,10 +1922,20 @@ var SPCApp = {
                     }
                 },
                 markers: { 
-                    size: [5, 0, 0],
+                    size: [5, 0, 0, 0],
                     strokeWidth: 2,
-                    strokeColors: [theme.bg, 'transparent', 'transparent'],
-                    hover: { size: 8, sizeOnHover: 10 }
+                    strokeColors: [theme.bg, 'transparent', 'transparent', 'transparent'],
+                    hover: { size: 8, sizeOnHover: 10 },
+                    discrete: (pageXbarR.R.violations || []).map(function (v) { 
+                        return { 
+                            seriesIndex: 0, 
+                            dataPointIndex: v.index, 
+                            fillColor: theme.danger, 
+                            strokeColor: theme.bg,
+                            size: 8,
+                            shape: 'circle'
+                        }; 
+                    })
                 },
                 legend: {
                     show: true,
@@ -1913,10 +1945,10 @@ var SPCApp = {
                     fontSize: '12px',
                     fontFamily: 'Inter, sans-serif',
                     markers: { 
-                        size: [6, 10, 10], 
-                        shape: ['circle', 'line', 'line'],
-                        strokeWidth: [0, 2, 2],
-                        strokeColors: [theme.text, theme.danger, theme.success],
+                        size: [6, 10, 10, 10], 
+                        shape: ['circle', 'line', 'line', 'line'],
+                        strokeWidth: [0, 2, 2, 2],
+                        strokeColors: [theme.primary, theme.danger, theme.success, theme.danger],
                         radius: 2 
                     },
                     labels: { colors: theme.text }

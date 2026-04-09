@@ -1900,10 +1900,10 @@ var SPCApp = {
                     }
                 },
                 markers: { 
-                    size: [4, 0, 0],
+                    size: [5, 0, 0],
                     strokeWidth: 2,
                     strokeColors: [theme.bg, 'transparent', 'transparent'],
-                    hover: { size: 6 }
+                    hover: { size: 8, sizeOnHover: 10 }
                 },
                 legend: {
                     show: true,

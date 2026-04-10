@@ -125,14 +125,21 @@
             color: #e2e8f0 !important; /* Slate 200 */
         }
 
-        /* [ULTIMATE UI SHRINK] */
+        /* [ULTIMATE UI SHRINK] - Targeted only at Axis Labels */
         .apexcharts-xaxis-label text, 
+        .apexcharts-xaxis-label tspan,
         .apexcharts-yaxis-label text,
-        .apexcharts-legend-text {
+        .apexcharts-yaxis-label tspan {
             font-size: 7.5px !important;
             transform: scale(0.8) !important;
-            transform-origin: center !important;
+            transform-origin: top left !important;
             transform-box: fill-box !important;
+        }
+
+        /* Restore Legend Size */
+        .apexcharts-legend-text {
+            font-size: 11px !important;
+            transform: none !important;
         }
 
         .excel-table {

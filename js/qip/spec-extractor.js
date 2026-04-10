@@ -134,6 +134,54 @@ class SpecificationExtractor {
     }
 
     /**
+     * 從橫向標頭列查找規格數據 (Flat Header Support)
+     * @param {Object} worksheet 
+     * @param {number} headerRow - 0-indexed row (常為 0)
+     * @param {number} dataRow - 0-indexed row (常為 1)
+     * @returns {Object} SpecificationData
+     */
+    static findSpecificationInRow(worksheet, headerRow, dataRow) {
+        const spec = this.createSpecificationData();
+        if (!worksheet) return spec;
+
+        try {
+            const range = XLSX.utils.decode_range(worksheet['!ref'] || 'A1');
+            const maxCol = Math.min(range.e.c, 40); // 掃描前 40 欄
+
+            for (let c = 0; c <= maxCol; c++) {
+                const headerVal = this.getMergedCellValue(worksheet, headerRow, c);
+                if (headerVal === null) continue;
+
+                const headerStr = String(headerVal).trim().toLowerCase();
+                const dataVal = this.getMergedCellValue(worksheet, dataRow, c);
+                const numericVal = parseFloat(dataVal);
+
+                if (headerStr.includes('target') || headerStr.includes('標稱') || headerStr.includes('目標')) {
+                    spec.target = numericVal || 0;
+                    spec.nominalValue = numericVal || 0;
+                } else if (headerStr.includes('usl') || headerStr.includes('上限')) {
+                    spec.usl = numericVal || 0;
+                } else if (headerStr.includes('lsl') || headerStr.includes('下限')) {
+                    spec.lsl = numericVal || 0;
+                }
+            }
+
+            // 校驗並計算公差
+            if (spec.usl !== 0 || spec.lsl !== 0) {
+                spec.upperTolerance = spec.usl - spec.target;
+                spec.lowerTolerance = spec.lsl - spec.target;
+                spec.isValid = true;
+                console.log(`[SpecExtract] 橫向標頭提取成功: Target=${spec.target}, USL=${spec.usl}, LSL=${spec.lsl}`);
+            }
+
+            return spec;
+        } catch (error) {
+            console.error('SpecificationExtractor.findSpecificationInRow error:', error);
+            return spec;
+        }
+    }
+
+    /**
      * 安全地獲取合併儲存格的值
      * @param {Object} worksheet 
      * @param {number} row 
@@ -313,7 +361,14 @@ class SpecificationExtractor {
                 return this.createSpecificationData();
             }
 
-            const spec = this.findSpecificationByItem(specWs, inspectionItem);
+            let spec = this.findSpecificationByItem(specWs, inspectionItem);
+            
+            // 如果傳統縱向查找失敗，嘗試「橫向扁平標頭」查找 (Row 1 Header, Row 2 Data)
+            if (!spec.isValid) {
+                console.log(`[SpecExtract] 傳統查找失敗，嘗試橫向扁平標頭模式...`);
+                spec = this.findSpecificationInRow(specWs, 0, 1);
+            }
+
             if (spec.isValid) {
                 console.log(`成功提取規格: ${inspectionItem}`, spec);
             } else {

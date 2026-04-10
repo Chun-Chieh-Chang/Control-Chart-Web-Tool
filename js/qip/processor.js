@@ -259,15 +259,12 @@ class QIPProcessor {
                 const data = {};
                 let itemName = '';
 
-                // 提取检验项目名称 - 只从 A 列读取
-                // 注意：检验项目名称可以是數字（如 "1", "2"），必須作為文字處理
+                // 提取檢驗項目名稱 - 先從 A/B 欄讀取
                 let tempValue = safeGetMergedValue(dataRow, 0);  // A 列
-
                 if (tempValue !== null && tempValue !== undefined) {
                     itemName = String(tempValue).trim();
                 }
 
-                // 如果 A 列没有，嘗試 B 列
                 if (!itemName || itemName === '') {
                     tempValue = safeGetMergedValue(dataRow, 1);  // B 列
                     if (tempValue !== null && tempValue !== undefined) {
@@ -275,11 +272,26 @@ class QIPProcessor {
                     }
                 }
 
+                // [扁平標頭專用]：如果 A/B 列都沒有，嘗試從標頭列中識別「生產批號」或「項目」所在的列
+                if (!itemName || itemName === '') {
+                    const idRow = idRangeParsed.startRow - 1;
+                    for (let c = 0; c < 10; c++) { // 掃描前 10 欄
+                        const header = safeGetMergedValue(idRow, c);
+                        if (header && (String(header).includes('項目') || String(header).includes('批號') || String(header).includes('Item'))) {
+                            tempValue = safeGetMergedValue(dataRow, c);
+                            if (tempValue) {
+                                itemName = String(tempValue).trim();
+                                break;
+                            }
+                        }
+                    }
+                }
+
                 if (itemName && itemName !== '') {
-                    itemName = itemName.trim(); // Normalize to prevent duplicates due to spaces
+                    itemName = itemName.trim();
                     console.log(`[QIP][Row${dataRow + 1}] ✓ 找到檢驗項目: "${itemName}"`);
                 } else {
-                    console.warn(`[QIP][Row${dataRow + 1}] ✗ A/B 列都沒有內容，跳過此行`);
+                    console.warn(`[QIP][Row${dataRow + 1}] ✗ 無法識別檢驗項目名稱，跳過此行`);
                     continue;
                 }
 
@@ -447,7 +459,21 @@ class QIPProcessor {
                         if (cellP3 && cellP3.v) productName = String(cellP3.v).trim();
                     }
 
-                    // 掃描 P2:V3 區域
+                    if (!productName) {
+                        const cellA5 = ws['A5'];
+                        if (cellA5 && String(cellA5.v).includes('Product')) {
+                            const cellB5 = ws['B5'];
+                            if (cellB5 && cellB5.v) productName = String(cellB5.v).trim();
+                        }
+                    }
+
+                    if (!measurementUnit) {
+                        const cellA6 = ws['A6'];
+                        if (cellA6 && String(cellA6.v).includes('Unit')) {
+                            const cellB6 = ws['B6'];
+                            if (cellB6 && cellB6.v) measurementUnit = String(cellB6.v).trim();
+                        }
+                    }
                     if (!productName) {
                         for (let r = 1; r <= 2; r++) {
                             for (let c = 15; c <= 21; c++) {

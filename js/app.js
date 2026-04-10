@@ -1652,7 +1652,7 @@ var SPCApp = {
                             borderColor: theme.success,
                             borderWidth: 2,
                             label: {
-                                text: this.t('中心線: ', 'CL: ') + ((pageXbarR.xBar.xBar.CL !== null && pageXbarR.xBar.xBar.CL !== undefined) ? pageXbarR.xBar.xBar.CL.toFixed(4) : '-'),
+                                text: this.t('中心線: ', 'CL: ') + ((pageXbarR.xBar.CL !== null && pageXbarR.xBar.CL !== undefined) ? pageXbarR.xBar.CL.toFixed(4) : '-'),
                                 position: 'left',
                                 textAnchor: 'start',
                                 style: { background: theme.success + '20', color: theme.success, fontWeight: 700, fontSize: '11px' }
@@ -1664,7 +1664,7 @@ var SPCApp = {
                             borderWidth: 2,
                             borderDash: [6, 4],
                             label: {
-                                text: this.t('下管制界限: ', 'LCL: ') + ((pageXbarR.xBar.xBar.LCL !== null && pageXbarR.xBar.xBar.LCL !== undefined) ? pageXbarR.xBar.xBar.LCL.toFixed(4) : '-'),
+                                text: this.t('下管制界限: ', 'LCL: ') + ((pageXbarR.xBar.LCL !== null && pageXbarR.xBar.LCL !== undefined) ? pageXbarR.xBar.LCL.toFixed(4) : '-'),
                                 position: 'left',
                                 textAnchor: 'start',
                                 style: { background: theme.danger + '20', color: theme.danger, fontWeight: 700, fontSize: '11px' }

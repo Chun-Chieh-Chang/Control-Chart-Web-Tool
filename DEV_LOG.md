@@ -151,5 +151,35 @@ Complete the localization audit to ensure 100% bilingual support (Simplified Chi
 - **Refinement**: Standardized on system-wide `data-en`/`data-zh` attributes for HTML elements and `t()` helper for JS-driven content.
 
 ### 3. Verification
-- Verified English mode displays "Extended Shewhart X̄ Chart" vs "X̄ Control Chart" correctly.
 - Verified Tooltips in both X̄ and R charts show correct translations for violations and advice.
+ 
+---
+ 
+## [2026-04-10] Perfection: Symbol Standardization & Signature Compliance
+ 
+### 1. Issue Description
+- **Subscript Invisibility**: Unicode subscripts (e.g., A₂, d₂) were too thin and small, especially in Dark Mode, making statistical constants unreadable.
+- **Regulatory Gaps**: Exported reports pre-filled "Dept" and "Inspector" fields, which violated the requirement for physical handwritten signatures in quality audits.
+- **Legend Misalignment**: Data point markers (Circles) were slightly offset vertically compared to line markers (UCL/LCL) in chart legends, creating a "bumpy" visual effect.
+ 
+### 2. Root Cause Analysis (RCA)
+- **Font Rendering**: Browsers render Unicode subscript glyphs as a separate font style which often ignores parent `font-weight` and `line-height` settings, leading to poor contrast.
+- **Input Over-automation**: The system was designed to be too "smart" by pulling metadata into signature fields, forgetting that some fields MUST be blank for legal traceability.
+- **SVG Bounding Box Variance**: ApexCharts calculates vertical positions differently for `scatter` markers vs `line` stroke markers in the legend SVG, leading to sub-pixel misalignment.
+ 
+### 3. Corrective and Preventive Action (CAPA)
+- **Semantic Subscripts**:
+    - Replaced all Unicode characters with HTML `<sub>` tags in `index.html`.
+    - Applied `font-weight: 700` and `font-size: 11px` to `sub` elements to ensure readability.
+- **Signature Compliance (Blank-out)**:
+    - Updated `renderDetailedDataTable` in `app.js` to set signature fields to `''`.
+    - **Parallel Expansion**: Synced this change into `js/excel-builder.js` for both template and manual build paths.
+- **Universal Legend Alignment**:
+    - Implemented a CSS Flex-Center patch for `.apexcharts-legend-series`.
+    - Standardized all chart `legend.markers` to **12x12px** width/height across `xOpt`, `rOpt`, `meanOpt`, `stdOpt`, `gOpt`, and `vOpt`.
+    - Set `offsetY: 0` to override internal SVG offsets.
+ 
+### 4. Technical Achievements
+- Successfully aligned the digital tool with **ISO/Industrial Quality Standards** for handwritten audit trails.
+- Achieved "Pixel-Perfect" alignment across all analytical charts.
+- Pushed final stable builds to GitHub for production deployment.

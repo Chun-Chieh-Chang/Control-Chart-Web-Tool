@@ -1805,16 +1805,20 @@ var SPCApp = {
                     position: 'top',
                     horizontalAlign: 'right',
                     floating: true,
-                    fontSize: '12px',
+                    offsetY: -10,
+                    fontSize: '11px',
+                    fontWeight: 700,
                     fontFamily: 'Inter, sans-serif',
-                    markers: { 
-                        size: [6, 10, 10, 10], 
-                        shape: ['circle', 'line', 'line', 'line'],
+                    markers: {
+                        width: 12,
+                        height: 12,
                         strokeWidth: [0, 2, 2, 2],
                         strokeColors: [theme.primary, theme.danger, theme.success, theme.danger],
-                        radius: 2 
+                        radius: 12,
+                        offsetX: -2,
+                        offsetY: 0
                     },
-                    itemMargin: { horizontal: 12, vertical: 4 },
+                    itemMargin: { horizontal: 10, vertical: 5 },
                     labels: { colors: theme.text }
                 }
             };
@@ -1979,15 +1983,20 @@ var SPCApp = {
                     position: 'top',
                     horizontalAlign: 'right',
                     floating: true,
-                    fontSize: '12px',
+                    offsetY: -10,
+                    fontSize: '11px',
+                    fontWeight: 700,
                     fontFamily: 'Inter, sans-serif',
-                    markers: { 
-                        size: [6, 10, 10, 10], 
-                        shape: ['circle', 'line', 'line', 'line'],
+                    markers: {
+                        width: 12,
+                        height: 12,
                         strokeWidth: [0, 2, 2, 2],
                         strokeColors: [theme.primary, theme.danger, theme.success, theme.danger],
-                        radius: 2 
+                        radius: 12,
+                        offsetX: -2,
+                        offsetY: 0
                     },
+                    itemMargin: { horizontal: 10, vertical: 5 },
                     labels: { colors: theme.text }
                 }
             };
@@ -2112,7 +2121,20 @@ var SPCApp = {
                     title: { text: self.t('平均值', 'Mean') }
                 },
                 grid: { borderColor: theme.grid },
-                tooltip: { followCursor: true, shared: true, fixed: { enabled: false } }
+                tooltip: { followCursor: true, shared: true, fixed: { enabled: false } },
+                legend: {
+                    show: true,
+                    position: 'top',
+                    horizontalAlign: 'right',
+                    floating: true,
+                    offsetY: -10,
+                    fontSize: '11px',
+                    fontWeight: 700,
+                    fontFamily: 'Inter, sans-serif',
+                    markers: { width: 12, height: 12, strokeWidth: 0, radius: 12, offsetX: -2, offsetY: 0 },
+                    itemMargin: { horizontal: 10, vertical: 5 },
+                    labels: { colors: theme.text }
+                }
             };
             var chartMean = new ApexCharts(document.querySelector("#meanChart"), meanOpt);
             chartMean.render(); this.chartInstances.push(chartMean);
@@ -2169,7 +2191,20 @@ var SPCApp = {
                     title: { text: self.t('標準差', 'StdDev') }
                 },
                 grid: { borderColor: theme.grid },
-                tooltip: { followCursor: true, shared: true, theme: theme.mode }
+                tooltip: { followCursor: true, shared: true, theme: theme.mode },
+                legend: {
+                    show: true,
+                    position: 'top',
+                    horizontalAlign: 'right',
+                    floating: true,
+                    offsetY: -10,
+                    fontSize: '11px',
+                    fontWeight: 700,
+                    fontFamily: 'Inter, sans-serif',
+                    markers: { width: 12, height: 12, strokeWidth: 0, radius: 12, offsetX: -2, offsetY: 0 },
+                    itemMargin: { horizontal: 10, vertical: 5 },
+                    labels: { colors: theme.text }
+                }
             };
             var chartStd = new ApexCharts(document.querySelector("#stdDevChart"), stdOpt);
             chartStd.render(); this.chartInstances.push(chartStd);
@@ -2308,6 +2343,19 @@ var SPCApp = {
                         html += '</div>';
                         return html;
                     }
+                },
+                legend: {
+                    show: true,
+                    position: 'top',
+                    horizontalAlign: 'right',
+                    floating: true,
+                    offsetY: -10,
+                    fontSize: '11px',
+                    fontWeight: 700,
+                    fontFamily: 'Inter, sans-serif',
+                    markers: { width: 12, height: 12, strokeWidth: 0, radius: 12, offsetX: -2, offsetY: 0 },
+                    itemMargin: { horizontal: 10, vertical: 5 },
+                    labels: { colors: theme.text }
                 }
             };
             var chartG = new ApexCharts(document.querySelector("#groupChart"), gOpt);
@@ -2383,6 +2431,19 @@ var SPCApp = {
                         html += '</div></div>';
                         return html;
                     }
+                },
+                legend: {
+                    show: true,
+                    position: 'top',
+                    horizontalAlign: 'right',
+                    floating: true,
+                    offsetY: -10,
+                    fontSize: '11px',
+                    fontWeight: 700,
+                    fontFamily: 'Inter, sans-serif',
+                    markers: { width: 12, height: 12, strokeWidth: 0, radius: 12, offsetX: -2, offsetY: 0 },
+                    itemMargin: { horizontal: 10, vertical: 5 },
+                    labels: { colors: theme.text }
                 }
             };
             var chartV = new ApexCharts(document.querySelector("#groupVarChart"), vOpt);

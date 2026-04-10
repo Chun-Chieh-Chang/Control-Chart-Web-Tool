@@ -33,6 +33,7 @@
     --size-small: 14px;
     --size-caption: 12px;
     --size-data: 14px;
+    --size-min: 8px;
 
     /* Table Variables */
     --table-border: #e5e5e5;
@@ -103,8 +104,9 @@ small,
 .text-xs,
 .text-\[10px\],
 .text-\[11px\],
-.text-\[9px\] {
-    font-size: var(--size-min) !important;
+.text-\[9px\],
+.text-\[8px\] {
+    font-size: var(--size-min);
 }
 
 h1,
@@ -306,7 +308,15 @@ label {
 .excel-table th {
     border-color: var(--table-border) !important;
     color: inherit !important;
-    padding: 0.75rem;
+    padding: 0.5rem 0.25rem !important; /* Tighten up table padding */
+}
+
+/* Force override ApexCharts internal font defaults */
+.apexcharts-xaxis-label text, 
+.apexcharts-yaxis-label text {
+    font-size: 8px !important;
+    transform: scale(0.85); /* Bypass 12px browser limit if present */
+    transform-origin: center;
 }
 
 /* Tooltip & Charts - Vercel-style */

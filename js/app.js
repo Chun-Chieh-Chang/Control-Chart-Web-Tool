@@ -1446,7 +1446,7 @@ var SPCApp = {
         var cavityCount = data.xbarR.summary.n;
         var totalWidth = 60 + (25 * 58) + 120;
 
-        var html = '<table class="excel-table" style="width:100%; border-collapse:collapse; font-size:12px; font-family:\'Arial\', \'Microsoft JhengHei\', sans-serif; border:2px solid var(--table-border); table-layout:auto; font-weight: 500;">';
+        var html = '<table class="excel-table" style="width:100%; border-collapse:collapse; font-size:11px !important; font-family:\'Arial\', \'Microsoft JhengHei\', sans-serif; border:2px solid var(--table-border); table-layout:auto; font-weight: 500;">';
         html += '<colgroup> <col style="width:80px;"> ';
         for (var c = 0; c < 25; c++) html += '<col>'; // Flexible width for data columns
         html += '<col style="width:40px;"><col style="width:40px;"><col style="width:40px;"><col style="width:40px;"> </colgroup>';
@@ -1479,8 +1479,14 @@ var SPCApp = {
             '<td style="border:1px solid var(--table-border); width:80px;">' + this.t('批號', 'Batch') + '</td>';
         for (var b = 0; b < 25; b++) {
             var name = pageLabels[b] || '';
-            html += '<td style="border:1px solid var(--table-border); height:120px; white-space:nowrap; padding:4px; vertical-align:bottom; text-align:center;">' +
-                '<div style="transform: rotate(180deg); writing-mode: vertical-rl; margin:0 auto; width:100%; font-size:12px; font-weight:bold; letter-spacing:0.5px;">' + name + '</div></td>';
+            // 智能換行邏輯：如果名稱太長且包含範圍符號，則實施換行以縮短高度
+            var formattedName = name;
+            if (name.length > 8) {
+                formattedName = name.replace(' to ', '<br>to ').replace(' ～ ', '<br>～ ');
+            }
+            
+            html += '<td style="border:1px solid var(--table-border); min-height:80px; padding:6px 2px; vertical-align:bottom; text-align:center;">' +
+                '<div style="transform: rotate(180deg); writing-mode: vertical-rl; margin:0 auto; width:100%; font-size:9px !important; font-weight:bold; letter-spacing:0px; line-height:1.1;">' + formattedName + '</div></td>';
         }
         html += '<td colspan="4" style="border:1px solid var(--table-border); width:120px;">' + this.t('彙總', 'Stats') + '</td></tr>';
 
@@ -1624,11 +1630,18 @@ var SPCApp = {
                 },
                 xaxis: {
                     type: 'category',
-                    categories: pageLabels.map(l => String(l)),
+                    categories: pageLabels.map(l => {
+                        var str = String(l);
+                        if (str.includes(' to ')) return str.split(' to ').map((s, i) => i === 1 ? 'to ' + s : s);
+                        if (str.includes(' ～ ')) return str.split(' ～ ').map((s, i) => i === 1 ? '～ ' + s : s);
+                        return str;
+                    }),
                     labels: { 
-                        style: { colors: theme.text, fontSize: '11px', fontFamily: 'Inter, sans-serif' },
+                        style: { colors: theme.text, fontSize: '8px', fontFamily: 'Inter, sans-serif' },
                         rotate: -45,
-                        tickAmount: 15
+                        rotateAlways: true,
+                        tickAmount: 15,
+                        maxHeight: 120
                     },
                     axisBorder: { color: theme.grid },
                     axisTicks: { color: theme.grid }
@@ -1859,11 +1872,18 @@ var SPCApp = {
                 },
                 xaxis: {
                     type: 'category',
-                    categories: pageLabels.map(l => String(l)),
+                    categories: pageLabels.map(l => {
+                        var str = String(l);
+                        if (str.includes(' to ')) return str.split(' to ').map((s, i) => i === 1 ? 'to ' + s : s);
+                        if (str.includes(' ～ ')) return str.split(' ～ ').map((s, i) => i === 1 ? '～ ' + s : s);
+                        return str;
+                    }),
                     labels: { 
-                        style: { colors: theme.text, fontSize: '11px', fontFamily: 'Inter, sans-serif' },
+                        style: { colors: theme.text, fontSize: '8px', fontFamily: 'Inter, sans-serif' },
                         rotate: -45,
-                        tickAmount: 15
+                        rotateAlways: true,
+                        tickAmount: 15,
+                        maxHeight: 120
                     },
                     axisBorder: { color: theme.grid },
                     axisTicks: { color: theme.grid }

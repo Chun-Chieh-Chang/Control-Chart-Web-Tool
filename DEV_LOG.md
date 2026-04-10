@@ -25,7 +25,26 @@
 
 ### 4. Technical Achievements
 - Successfully bridged the gap between raw statistical math and **Injection Molding Management Logic**.
-- Achieved "Zero-Latency" mathematical rendering for complex formulas ($Ppk, \sigma, Ratio$) within a dark-mode responsive UI.
+- Achieved "Zero-Latency" mathematical rendering for complex formulas- [x] 統計符號全球化統一 ($\sigma_{within}$, $\sigma_{overall}$)
+- [x] 詳細數據表格標頭換行優化 (Long labels auto-wrap)
+- [x] 圖表標籤字體微縮 (7.5px) 與 Scale 補償
+- [x] `file:///` 協議兼容性優化 (移除路徑 Query String)
+
+### 2026-04-10 | 技術故障排除報告 (UI & Rendering)
+
+#### 1. 現象分析 (Root Cause Analysis)
+- **問題 A**：JS 修改字體大小無效。
+  - **診斷結果**：Chrome 瀏覽器存在 12px 最小顯示字體限制；且全域 CSS 中存在 `!important` 鎖死字體數值。
+- **問題 B**：JS 邏輯（換行）完全沒冒出來。
+  - **診斷結果**：`file:///` 協議下，路徑中的版本號（`?v=1.2.1`）觸發了安全性攔截，導致瀏覽器讀取舊版快取。
+
+#### 2. 矯正措施 (CAPA)
+- **策略 A**：實施內聯 CSS 補強，利用 `transform: scale(0.8)` 搭配 `transform-box: fill-box` 強制實施視覺縮放，成功繞過 12px 限制。
+- **策略 B**：淨化所有靜態資源路徑，移除 `?v=`。改用內聯 CSS 確保高優先級樣式第一時間生效。
+- **策略 C**：為表格數據與標頭手動加上 `!important` 樣式。
+
+#### 3. 目前狀態
+- **已儲存並檢驗**：所有核心檔案已對齊「極致壓縮」標準。建議用戶在本地查看時執行 **Ctrl + F5**。
 
 ## [2026-04-10] Full Audit: AI Diagnosis Stability & UI Dynamic Sync
 

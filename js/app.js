@@ -213,6 +213,26 @@ var SPCApp = {
         }
     },
 
+    showMathPrinciples: function () {
+        var modal = document.getElementById('mathPrinciplesModal');
+        if (modal) {
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            // Trigger LaTeX rendering specifically for this modal to ensure formulas are pretty
+            if (window.renderMathInElement) {
+                renderMathInElement(modal, {
+                    delimiters: [
+                        { left: "$$", right: "$$", display: true },
+                        { left: "$", right: "$", display: false },
+                        { left: "\\[", right: "\\]", display: true },
+                        { left: "\\(", right: "\\)", display: false }
+                    ],
+                    throwOnError: false
+                });
+            }
+        }
+    },
+
     hideMetricsInfo: function () {
         var modal = document.getElementById('metricsInfoModal');
         if (modal) {
@@ -389,7 +409,7 @@ var SPCApp = {
         // 1. Text content
         var elements = document.querySelectorAll('[data-en][data-zh]');
         elements.forEach(function (el) {
-            el.textContent = self.settings.language === 'zh' ? el.dataset.zh : el.dataset.en;
+            el.innerHTML = self.settings.language === 'zh' ? el.dataset.zh : el.dataset.en;
         });
         // 2. Placeholders
         var placeholders = document.querySelectorAll('[data-p-en][data-p-zh]');

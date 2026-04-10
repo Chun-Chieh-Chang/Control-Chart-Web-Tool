@@ -13,6 +13,14 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined|Material+Icons+Round"
         rel="stylesheet" />
+    
+    <!-- KaTeX for Math Rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+    <style>
+        .katex { font-size: 1.1em; }
+    </style>
     <script>
         tailwind.config = {
             darkMode: "class",
@@ -2066,10 +2074,172 @@
                 </section>
             </div>
             <div
-                class="px-6 py-4 bg-slate-50 dark:bg-slate-900 border-t border-slate-200 dark:border-slate-700 flex justify-end">
+                class="px-6 py-4 bg-slate-50 dark:bg-slate-900 border-t border-slate-200 dark:border-slate-700 flex justify-between items-center">
+                <button onclick="SPCApp.showMathPrinciples()"
+                    class="px-4 py-2 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-xl text-sm font-bold flex items-center gap-2 hover:bg-indigo-100 transition-all border border-indigo-200 dark:border-indigo-800">
+                    <span class="material-icons-outlined text-sm">psychology</span>
+                    <span data-en="Deep Dive: Math Principles" data-zh="進階：解構數學原理">進階：解構數學原理</span>
+                </button>
                 <button onclick="SPCApp.hideMetricsInfo()"
                     class="px-6 py-2 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 rounded-xl text-sm font-bold transition-all"
                     data-en="Close" data-zh="關閉">關閉</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Math Principles Deep Dive Modal -->
+    <div id="mathPrinciplesModal"
+        class="fixed inset-0 z-[10000] hidden items-center justify-center bg-slate-950/80 backdrop-blur-md">
+        <div class="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl max-w-5xl w-full mx-4 max-h-[85vh] overflow-hidden flex flex-col border border-indigo-500/20">
+            <div class="p-6 border-b dark:border-slate-800 flex justify-between items-center bg-gradient-to-r from-indigo-700 to-blue-700 text-white">
+                <div class="flex items-center gap-3">
+                    <span class="material-icons-outlined">functions</span>
+                    <h3 class="text-xl font-bold" data-en="Statistical Math Principles" data-zh="SPC 深度數學原理與統計學解構">SPC 深度數學原理與統計學解構</h3>
+                </div>
+                <button onclick="document.getElementById('mathPrinciplesModal').classList.add('hidden')" class="text-white/80 hover:text-white transition-colors">
+                    <span class="material-icons-outlined font-bold">close</span>
+                </button>
+            </div>
+            <div class="p-8 overflow-y-auto space-y-12 custom-scrollbar bg-slate-50/50 dark:bg-slate-950/50">
+                <!-- 0. Executive Summary -->
+                <div class="bg-gradient-to-br from-indigo-500/10 to-blue-500/10 p-6 rounded-2xl border border-indigo-500/20">
+                    <p class="text-sm text-indigo-700 dark:text-indigo-400 font-bold m-0 leading-relaxed" data-zh="本指南旨在解構 SPC（統計製程管制）背後的物理變異邏輯，並說明系統如何透過計算 $Ppk$ 與 $Cpk$ 來協助射出成型廠識別模具失效與機台不穩。" data-en="This guide deconstructs the physical variance logic behind SPC and explains how the system identifies mold failures vs. machine instability.">本指南旨在解構 SPC（統計製程管制）背後的物理變異邏輯，並說明系統如何透過計算 $Ppk$ 與 $Cpk$ 來協助射出成型廠識別模具失效與機台不穩。</p>
+                </div>
+
+                <!-- 1. The Core Logic -->
+                <section>
+                    <div class="flex items-center gap-3 mb-6">
+                        <span class="w-10 h-10 rounded-xl bg-indigo-600 text-white flex items-center justify-center font-bold">01</span>
+                        <h2 class="text-2xl font-bold m-0 dark:text-white" data-zh="變異分解與統計指標" data-en="Variance Decomposition">變異分解與統計指標</h2>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div class="saas-card p-6 border-l-4 border-l-emerald-500 bg-white dark:bg-slate-900">
+                            <h3 class="text-lg font-bold mb-4 flex items-center gap-2">
+                                <span class="material-icons-outlined text-emerald-500">waves</span>
+                                <span data-zh="組內變異 (Within-Shot)" data-en="Within-Shot Variance">組內變異 (Within-Shot)</span>
+                            </h3>
+                            <div class="math-content py-4 text-center">
+                                \[ \sigma_{within} = \frac{\bar{R}}{d_2} \]
+                            </div>
+                            <p class="text-sm text-slate-500 leading-relaxed" data-zh="在射出成型中，這代表『一次射出』內各模穴間的平衡度。當 $\sigma_{within}$ 過大，對應 $Cpk$ 下降，暗示模具流道設計或溫控失效。" data-en="Represents inter-cavity balance in a single shot. Large $\sigma_{within}$ degrades $Cpk$, indicating mold or runner issues.">在射出成型中，這代表『一次射出』內各模穴間的平衡度。當 $\sigma_{within}$ 過大，對應 $Cpk$ 下降，暗示模具流道設計或溫控失效。</p>
+                        </div>
+
+                        <div class="saas-card p-6 border-l-4 border-l-indigo-500 bg-white dark:bg-slate-900">
+                            <h3 class="text-lg font-bold mb-4 flex items-center gap-2">
+                                <span class="material-icons-outlined text-indigo-500">trending_up</span>
+                                <span data-zh="組間變異 (Shot-to-Shot)" data-en="Shot-to-Shot Variance">組間變異 (Shot-to-Shot)</span>
+                            </h3>
+                            <div class="math-content py-4 text-center">
+                                \[ \sigma_{overall} = \sqrt{\frac{\sum(X_i - \bar{\bar{X}})^2}{N-1}} \]
+                            </div>
+                            <p class="text-sm text-slate-500 leading-relaxed" data-zh="代表連續模次間的整體波動。當 $\sigma_{overall}$ 遠大於 $\sigma_{within}$，代表製程中心正在漂移，與機台穩定性、原料一致性有關。" data-en="Represents fluctuations between shots. If $\sigma_{overall} \gg \sigma_{within}$, the process center is drifting, related to machine stability.">代表連續模次間的整體波動。當 $\sigma_{overall}$ 遠大於 $\sigma_{within}$，代表製程中心正在漂移，與機台穩定性、原料一致性有關。</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 2. Capability Matrix -->
+                <section>
+                    <div class="flex items-center gap-3 mb-6">
+                        <span class="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold">02</span>
+                        <h2 class="text-2xl font-bold m-0 dark:text-white" data-zh="製程能力診斷矩陣" data-en="Capability Diagnosis Matrix">製程能力診斷矩陣</h2>
+                    </div>
+
+                    <div class="overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                        <table class="w-full text-sm text-left">
+                            <thead class="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 font-bold">
+                                <tr>
+                                    <th class="px-6 py-4" data-zh="情境分析" data-en="Scenario">情境分析</th>
+                                    <th class="px-6 py-4" data-zh="統計特徵" data-en="Statistical Sign">統計特徵</th>
+                                    <th class="px-6 py-4" data-zh="建議對策" data-en="Action">建議對策</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100 dark:divide-slate-800 bg-white dark:bg-slate-900">
+                                <tr>
+                                    <td class="px-6 py-4 font-bold" data-zh="穩定但能力不足" data-en="Stable but Incapable">穩定但能力不足</td>
+                                    <td class="px-6 py-4 font-mono text-indigo-600">Cpk ≈ Ppk < 1.33</td>
+                                    <td class="px-6 py-4 text-slate-500" data-zh="製程極其穩定但公差太嚴。應評估放寬公差或優化模具幾何。" data-en="Very stable but tolerance too tight. Relax specs or optimize geometry.">製程極其穩定但公差太嚴。應評估放寬公差或優化模具幾何。</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 font-bold" data-zh="中心漂移異常" data-en="Process Drift">中心漂移異常</td>
+                                    <td class="px-6 py-4 font-mono text-amber-600">Cpk > Ppk</td>
+                                    <td class="px-6 py-4 text-slate-500" data-zh="組間波動主導變異。檢查原料乾燥、止逆環與環境溫濕度。" data-en="Shot-to-shot variation dominates. Check material dryer & check-ring.">組間波動主導變異。檢查原料乾燥、止逆環與環境溫濕度。</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 font-bold" data-zh="模穴嚴重失衡" data-en="Severe Imbalance">模穴嚴重失衡</td>
+                                    <td class="px-6 py-4 font-mono text-rose-600">Cpk << 1.0</td>
+                                    <td class="px-6 py-4 text-slate-500" data-zh="組內變異太大。應進行流道平衡分析，檢查閘口尺寸一致性。" data-en="Inter-cavity variation too large. Perform runner balance analysis.">組內變異太大。應進行流道平衡分析，檢查閘口尺寸一致性。</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- 4. Analysis Methodology Selection -->
+                <section>
+                    <div class="flex items-center gap-3 mb-6">
+                        <span class="w-10 h-10 rounded-xl bg-indigo-600 text-white flex items-center justify-center font-bold">04</span>
+                        <h2 class="text-2xl font-bold m-0 dark:text-white" data-zh="分析模型選型指南：批次 vs 多模穴" data-en="Analysis Methodology Selection Guide">分析模型選型指南：批次 vs 多模穴</h2>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                        <div class="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm relative overflow-hidden group">
+                            <div class="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity">
+                                <span class="material-icons-outlined text-6xl">inventory</span>
+                            </div>
+                            <h4 class="text-lg font-bold text-indigo-600 mb-3" data-zh="批次分析 (Batch Analysis)" data-en="Batch Analysis">批次分析 (Batch Analysis)</h4>
+                            <p class="text-sm text-slate-500 mb-4" data-zh="專注於【時間維度】。視各模穴平均值為一個整體，觀察隨生產時間推進（模次間）的穩定性。" data-en="Focuses on the TIME dimension. Treats the mean of all cavities as a single unit to observe stability across shots.">專注於【時間維度】。視各模穴平均值為一個整體，觀察隨生產時間推進（模次間）的穩定性。</p>
+                            <ul class="text-xs space-y-2 text-slate-600 dark:text-slate-400">
+                                <li class="flex items-center gap-2 font-bold"><span class="w-1.5 h-1.5 rounded-full bg-indigo-500"></span> <span data-zh="監控指標：機台重複精度、原料批次變異" data-en="Metrics: Machine precision, material variation">監控指標：機台重複精度、原料批次變異</span></li>
+                                <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-indigo-500"></span> <span data-zh="應用時機：連續生產監控、換料驗證" data-en="Usage: Continuous production, material change">應用時機：連續生產監控、換料驗證</span></li>
+                            </ul>
+                        </div>
+
+                        <div class="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm relative overflow-hidden group">
+                            <div class="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity">
+                                <span class="material-icons-outlined text-6xl">grid_view</span>
+                            </div>
+                            <h4 class="text-lg font-bold text-emerald-600 mb-3" data-zh="多模穴分析 (Multi-Cavity Analysis)" data-en="Multi-Cavity Analysis">多模穴分析 (Multi-Cavity Analysis)</h4>
+                            <p class="text-sm text-slate-500 mb-4" data-zh="專注於【空間維度】。解構同一模次內，各個穴位點之間的物理分佈落差。" data-en="Focuses on the SPACE dimension. Deconstructs physical distribution differences between cavities in the same shot.">專注於【空間維度】。解構同一模次內，各個穴位點之間的物理分佈落差。</p>
+                            <ul class="text-xs space-y-2 text-slate-600 dark:text-slate-400">
+                                <li class="flex items-center gap-2 font-bold"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> <span data-zh="監控指標：模具平衡性、流道完整度" data-en="Metrics: Mold balance, runner integrity">監控指標：模具平衡性、流道完整度</span></li>
+                                <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> <span data-zh="應用時機：T0~T3 模具開發、多模穴異常排查" data-en="Usage: Mold development (T0-T3), anomaly troubleshooting">應用時機：T0~T3 模具開發、多模穴異常排查</span></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="bg-indigo-600 text-white p-8 rounded-3xl shadow-xl space-y-6">
+                        <div class="flex items-center gap-4">
+                            <span class="material-icons-outlined text-3xl">psychology</span>
+                            <h4 class="text-xl font-bold" data-zh="專家診斷背後的數學架構" data-en="Mental Model of Analysis">專家診斷背後的數學架構</h4>
+                        </div>
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+                            <div class="space-y-4">
+                                <p class="text-sm text-indigo-100 leading-relaxed" data-zh="當您選擇【多模穴模式】時，系統會自動引入「不平衡率 (Imbalance Ratio)」計算邏輯。這能協助判斷變異是來自於機台的『不穩定』還是模具的『不平衡』。" data-en="When selecting [Multi-Cavity Mode], the system automatically applies Imbalance Ratio logic to distinguish machine instability from mold imbalance.">當您選擇【多模穴模式】時，系統會自動引入「不平衡率 (Imbalance Ratio)」計算邏輯。這能協助判斷變異是來自於機台的『不穩定』還是模具的『不平衡』。</p>
+                                <div class="p-4 bg-white/10 rounded-2xl border border-white/20">
+                                    <p class="text-[10px] font-bold text-white/60 uppercase tracking-widest mb-2">Imbalance Ratio Formula</p>
+                                    <div class="text-lg font-serif">
+                                        \[ Ratio = \frac{\bar{X}_{max} - \bar{X}_{min}}{\bar{\bar{X}}} \times 100\% \]
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="space-y-3">
+                                <div class="flex gap-3">
+                                    <div class="w-1 bg-white/30 rounded-full"></div>
+                                    <p class="text-sm" data-zh="<strong class='text-emerald-300'>Ratio > 5%：</strong> 偵測到嚴重穴位失衡，通常與流道磨損或澆口受阻有關。" data-en="<strong class='text-emerald-300'>Ratio > 5%:</strong> Severe cavity imbalance detected, often related to runner wear."><strong class='text-emerald-300'>Ratio > 5%：</strong> 偵測到嚴重穴位失衡，通常與流道磨損或澆口受阻有關。</p>
+                                </div>
+                                <div class="flex gap-3">
+                                    <div class="w-1 bg-white/30 rounded-full"></div>
+                                    <p class="text-sm" data-zh="<strong class='text-sky-300'>Ratio 穩定但 Cpk 低：</strong> 物理平衡良好，變異來自計時或環境波動。" data-en="<strong class='text-sky-300'>Ratio stable but low Cpk:</strong> Good physical balance, variation from environment."><strong class='text-sky-300'>Ratio 穩定但 Cpk 低：</strong> 物理平衡良好，變異來自計時或環境波動。</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+            <div class="px-8 py-6 border-t dark:border-slate-800 bg-slate-50 dark:bg-slate-900 flex justify-end">
+                <button onclick="document.getElementById('mathPrinciplesModal').classList.add('hidden')"
+                    class="px-8 py-2 bg-slate-800 text-white rounded-xl font-bold shadow-lg" data-en="Got it" data-zh="我明白了">我明白了</button>
             </div>
         </div>
     </div>

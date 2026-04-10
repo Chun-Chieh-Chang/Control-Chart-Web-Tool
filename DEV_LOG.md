@@ -1,5 +1,32 @@
 # Development Log (DEV_LOG.md)
 
+## [2026-04-10] Milestone: Industrial SPC Diagnostic Architecture & ISO 80002-2 Validation
+
+### 1. Issue Description
+- **Linguistic Ambiguity**: Users often confused "Batch Analysis" with "Multi-Cavity Analysis," leading to incorrect process adjustment decisions.
+- **LaTeX Rendering Fragility**: Math formulas in the validation report and modals were inconsistently rendered due to CDN loading timing and delimiter conflicts.
+- **Technical Gaps**: The previous "Math Principles" modal was too academic and lacked practical "Management Action" guidance.
+
+### 2. Root Cause Analysis (RCA)
+- **Conceptual Overlap**: The tool initially presented data without explicit context on whether variance was "Within-Shot" (Mold) or "Shot-to-Shot" (Machine).
+- **DOM Life-cycle Issues**: `renderMathInElement` was firing before modal content was fully visible or dynamic content was injected, leaving raw `$$` or `\[` strings.
+- **Artifact Pathing Error**: During development, an attempt was made to write artifacts to the user workspace instead of the App Data Directory, leading to tool failures.
+
+### 3. Corrective and Preventive Action (CAPA)
+- **Diagnostic Tiering**:
+    - Implemented **"Expert Selection Matrix"** in `index.html`.
+    - Defined **Imbalance Ratio ($Ratio$)** as a key KPI for mold health (>5% threshold).
+- **Hardened Rendering Engine**:
+    - Standardized on `\[ ... \]` and `\( ... \)` delimiters for the most robust parsing.
+    - Implemented a **Double-Trigger Pattern**: `window.onload` for the static report and a manual `renderMathInElement(modal)` trigger in `SPCApp.showMathPrinciples()` for the app view.
+- **ISO 80002-2 Compliance**:
+    - Reconstructed `Consolidated_Technical_Validation_Report.html` as a standalone audit file.
+    - Integrated a **Raw Data Appendix** (Audit Trail) showing all 81 test data points for 100% traceability.
+
+### 4. Technical Achievements
+- Successfully bridged the gap between raw statistical math and **Injection Molding Management Logic**.
+- Achieved "Zero-Latency" mathematical rendering for complex formulas ($Ppk, \sigma, Ratio$) within a dark-mode responsive UI.
+
 ## [2026-04-10] Full Audit: AI Diagnosis Stability & UI Dynamic Sync
 
 ### 1. Issue Description

@@ -180,14 +180,16 @@ var SPCEngine = {
         var standard = this.calculateXBarRLimits(dataMatrix);
         var n = standard.summary.n;
 
-        // Calculate Overall Variation (including between-cavity)
+        // Calculate Overall Variation (sigma overall)
         var allValues = dataMatrix.flat().filter(v => v !== null && !isNaN(v));
-        var sigmaTotal = this.stdDev(allValues);
+        var sigmaOverall = this.stdDev(allValues);
 
-        // Extended Shewhart Limit: CL +/- 3 * SigmaTotal / sqrt(n_effective)
-        // Or AIAG-VDA approach: Adjust limits by adding cavity-to-cavity range assessment
+        // Extended Shewhart Limit: CL +/- 3 * sigmaOverall / sqrt(n_effective)
+        // This is the boundary for detecting overall system drift.
+        var extendedSigma = sigmaOverall;
+
+        // Adjust limits by adding cavity-to-cavity range assessment
         var xDoubleBar = standard.xBar.CL;
-        var extendedSigma = sigmaTotal;
 
         // In Extended Shewhart for Multi-cavity, we often use Total sigma to set X-bar limits
         // so that the limits represent "process potential" including cavity deltas.

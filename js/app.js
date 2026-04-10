@@ -2112,8 +2112,8 @@ var SPCApp = {
                 },
                 theme: { mode: theme.mode },
                 series: [
-                    { name: self.t('組內標準差 (Within σ)', 'Within σ'), data: data.cavityStats.map(s => s.withinStdDev) },
-                    { name: self.t('整體標準差 (Overall σ)', 'Overall σ'), data: data.cavityStats.map(s => s.overallStdDev) }
+                    { name: self.t('組內標準差 (σ within)', 'σ within'), data: data.cavityStats.map(s => s.withinStdDev) },
+                    { name: self.t('全樣本標準差 (σ overall)', 'σ overall'), data: data.cavityStats.map(s => s.overallStdDev) }
                 ],
                 colors: ['#3b82f6', '#ef4444'], // Blue-500, Red-500
                 stroke: {

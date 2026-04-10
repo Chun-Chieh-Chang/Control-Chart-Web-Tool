@@ -1,22 +1,29 @@
 # Development Log (DEV_LOG.md)
 
-## [2026-04-10] Optimization & Fix: SPC Constants UI/UX
+## [2026-04-10] Full Audit: AI Diagnosis Stability & UI Dynamic Sync
 
 ### 1. Issue Description
--   **Bug Fix**: During bulk import of "Item B", the AI diagnosis card displayed `[object Object]` in the red warning box.
--   **UI Enhancement**: The SPC statistics reference table was hardcoded and incomplete (only 8 rows shown), while the engine supported n=2~48.
+-   **Statistical Crash**: During bulk import (e.g., Project B), the AI diagnosis card displayed `[object Object]` instead of human-readable text.
+-   **UI/Code Desync**: The SPC Constants reference table was incomplete (8 rows) compared to actual engine support (47 rows).
+-   **Runtime Hotfix**: Resolved a syntax error introduced during logic merging.
 
 ### 2. Root Cause Analysis (RCA)
--   **Rendering Regression**: Diagnostic messages were upgraded to bilingual objects, but the specific rendering path for distribution warnings in `app.js` was still concatenating them as raw strings.
--   **UI/Code Desync**: The informational modal was built with static HTML rows, failing to reflect the full analytical range provided by `engine.js`.
+-   **Data Skewness**: Project B's distribution triggered a `distWarning` object. The UI logic used string concatenation on this object, causing default `[object Object]` coercion.
+-   **Static hardcoding**: The informational modal was built with legacy static HTML, failing to reflect modern high-cavity logic in `engine.js`.
+-   **Syntax Oversight**: A missing comma delimiter after `resetSystem()` in `SPCApp` during object insertion.
 
 ### 3. Corrective and Preventive Action (CAPA)
--   **Bilingual Implementation**: Updated `renderAnalysisView` to use `this.t()` for `distWarning` extraction.
--   **Dynamic Table Rendering**: 
-    -   Refactored `Metrics Info Modal` to remove hardcoded rows.
-    -   Implemented `SPCApp.renderConstantsTable()` to dynamically generate the reference table from `SPCEngine.SPC_CONSTANTS`.
-    -   Added `sticky-header` and scrollable area (max-height 400px) for better UX with the full 47-row table.
--   **Documentation**: Created `docs/SPC_Math_Principles.html` for technical transparency.
+-   **Bilingual Protocol**: Updated `renderAnalysisView` to use `this.t()` for all diagnostic objects, securing bilingual output (zh/en).
+-   **Dynamic Table Engine**: 
+    -   Implemented `SPCApp.renderConstantsTable()` to fetch and generate rows from `SPCEngine` data.
+    -   Added **Sticky Header** and **Scroll Area** to the help modal for $n=2\sim48$ data management.
+-   **Technical Transparency**: 
+    -   Added `docs/SPC_Math_Principles.html` with KaTeX formulas for engineering verification.
+-   **Robustness Patch**: Verified and corrected comma delimiters to restore stable runtime.
+
+### 4. Next Steps
+-   **Regression Audit**: Perform a full scan of Nelson Rules #1-8 to ensure similar bilingual object patterns are implemented.
+-   **Performance**: Monitor DOM performance when rendering the 47-row table on lower-end devices.
 
 ---
 

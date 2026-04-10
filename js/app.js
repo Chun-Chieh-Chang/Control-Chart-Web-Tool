@@ -1455,9 +1455,9 @@ var SPCApp = {
 
         // Match Excel Layout (Approximate)
         var meta = [
-            { l1: this.t('產品名稱', 'Product'), v1: info.name, l2: this.t('規 格', 'Specs'), v2: this.t('標準', 'Standard'), l3: this.t('管制圖', 'Chart'), v3: 'X̄', v4: 'R', l4: this.t('製造部門', 'Dept'), v4_val: info.dept },
+            { l1: this.t('產品名稱', 'Product'), v1: info.name, l2: this.t('規 格', 'Specs'), v2: this.t('標準', 'Standard'), l3: this.t('管制圖', 'Chart'), v3: 'X̄', v4: 'R', l4: this.t('製造部門', 'Dept'), v4_val: '' },
             { l1: this.t('產品料號', 'Item P/N'), v1: info.item, l2: this.t('最大值', 'Max (USL)'), v2: SPCEngine.round(specs.usl, 4), l3: this.t('上 限', 'UCL'), v3: SPCEngine.round(pageXbarR.xBar.UCL, 4), v4: SPCEngine.round(pageXbarR.R.UCL, 4), l4: this.t('檢驗單位', 'Insp. Unit'), v4_val: this.t('品管組', 'Quality Dept.') },
-            { l1: this.t('測量單位', 'Unit'), v1: info.unit, l2: this.t('目標值', 'Target'), v2: SPCEngine.round(specs.target, 4), l3: this.t('中心值', 'CL'), v3: SPCEngine.round(pageXbarR.xBar.CL, 4), v4: SPCEngine.round(pageXbarR.R.CL, 4), l4: this.t('檢驗人員', 'Inspector'), v4_val: info.inspector },
+            { l1: this.t('測量單位', 'Unit'), v1: info.unit, l2: this.t('目標值', 'Target'), v2: SPCEngine.round(specs.target, 4), l3: this.t('中心值', 'CL'), v3: SPCEngine.round(pageXbarR.xBar.CL, 4), v4: SPCEngine.round(pageXbarR.R.CL, 4), l4: this.t('檢驗人員', 'Inspector'), v4_val: '' },
             { l1: this.t('管制特性', 'Char'), v1: this.t('平均值/全距', 'Avg/Range'), l2: this.t('最小值', 'Min (LSL)'), v2: SPCEngine.round(specs.lsl, 4), l3: this.t('下 限', 'LCL'), v3: SPCEngine.round(pageXbarR.xBar.LCL, 4), v4: '-', l4: this.t('檢驗日期', 'Date'), v4_val: info.batchRange || '-' }
         ];
 

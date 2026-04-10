@@ -168,8 +168,9 @@ Complete the localization audit to ensure 100% bilingual support (Simplified Chi
 - **SVG Bounding Box Variance**: ApexCharts calculates vertical positions differently for `scatter` markers vs `line` stroke markers in the legend SVG, leading to sub-pixel misalignment.
  
 ### 3. Corrective and Preventive Action (CAPA)
-- **Semantic Subscripts**:
+- **Semantic & Document Standardization**:
     - Replaced all Unicode characters with HTML `<sub>` tags in `index.html`.
+    - **Docs Sync**: Standardized all technical specifications (`README.md`, `SPC_Calculation_Logic.md`) using ASCII subscripts and unified nomenclature ($\sigma_{within}$/$\sigma_{overall}$).
     - Applied `font-weight: 700` and `font-size: 11px` to `sub` elements to ensure readability.
 - **Signature Compliance (Blank-out)**:
     - Updated `renderDetailedDataTable` in `app.js` to set signature fields to `''`.

@@ -33,7 +33,7 @@
 
 #### Nelson Rules 1-8 快速參考
 
-| 規則 | 條件 | 嚴重程度 |
+| Rule | 條件 | 嚴重程度 |
 |------|------|----------|
 | Rule 1 | 單點超出 3σ | 🔴 失控 |
 | Rule 2 | 連續 9 點在中心線同側 | 🟠 偏移 |
@@ -166,8 +166,8 @@ root/                       # 核心進入點
 - LCL(R) = D₃ × R̄
 
 #### 製程能力指標
-- Cp = (USL - LSL) / (6σ)
-- Cpk = min[(USL - μ) / (3σ), (μ - LSL) / (3σ)]
+- Cp = (USL - LSL) / (6σ_within)
+- Cpk = min[(USL - μ) / (3σ_within), (μ - LSL) / (3σ_within)]
 - Pp = (USL - LSL) / (6σ_overall)
 - Ppk = min[(USL - μ) / (3σ_overall), (μ - LSL) / (3σ_overall)]
 
@@ -334,8 +334,8 @@ root/                       # Entry point
 - LCL(R) = D₃ × R̄
 
 #### Process Capability Indices
-- Cp = (USL - LSL) / (6σ)
-- Cpk = min[(USL - μ) / (3σ), (μ - LSL) / (3σ)]
+- Cp = (USL - LSL) / (6σ_within)
+- Cpk = min[(USL - μ) / (3σ_within), (μ - LSL) / (3σ_within)]
 - Pp = (USL - LSL) / (6σ_overall)
 - Ppk = min[(USL - μ) / (3σ_overall), (μ - LSL) / (3σ_overall)]
 

@@ -20,6 +20,7 @@
 -   **Technical Transparency**: 
     -   Added `docs/SPC_Math_Principles.html` with KaTeX formulas for engineering verification.
 -   **Robustness Patch**: Verified and corrected comma delimiters to restore stable runtime.
+-   **Stability Fix (Runtime)**: Resolved "Cannot read properties of null (reading 'toFixed')" in `renderCharts()` by implementing null checks for all statistical annotations.
 
 ### 4. Next Steps
 -   **Regression Audit**: Perform a full scan of Nelson Rules #1-8 to ensure similar bilingual object patterns are implemented.

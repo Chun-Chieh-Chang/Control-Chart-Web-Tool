@@ -1641,7 +1641,7 @@ var SPCApp = {
                             borderWidth: 2,
                             borderDash: [6, 4],
                             label: {
-                                text: this.t('上管制界限: ', 'UCL: ') + pageXbarR.xBar.UCL.toFixed(4),
+                                text: this.t('上管制界限: ', 'UCL: ') + ((pageXbarR.xBar.UCL !== null && pageXbarR.xBar.UCL !== undefined) ? pageXbarR.xBar.UCL.toFixed(4) : '-'),
                                 position: 'left',
                                 textAnchor: 'start',
                                 style: { background: theme.danger + '20', color: theme.danger, fontWeight: 700, fontSize: '11px' }
@@ -1652,7 +1652,7 @@ var SPCApp = {
                             borderColor: theme.success,
                             borderWidth: 2,
                             label: {
-                                text: this.t('中心線: ', 'CL: ') + pageXbarR.xBar.CL.toFixed(4),
+                                text: this.t('中心線: ', 'CL: ') + ((pageXbarR.xBar.xBar.CL !== null && pageXbarR.xBar.xBar.CL !== undefined) ? pageXbarR.xBar.xBar.CL.toFixed(4) : '-'),
                                 position: 'left',
                                 textAnchor: 'start',
                                 style: { background: theme.success + '20', color: theme.success, fontWeight: 700, fontSize: '11px' }
@@ -1664,7 +1664,7 @@ var SPCApp = {
                             borderWidth: 2,
                             borderDash: [6, 4],
                             label: {
-                                text: this.t('下管制界限: ', 'LCL: ') + pageXbarR.xBar.LCL.toFixed(4),
+                                text: this.t('下管制界限: ', 'LCL: ') + ((pageXbarR.xBar.xBar.LCL !== null && pageXbarR.xBar.xBar.LCL !== undefined) ? pageXbarR.xBar.xBar.LCL.toFixed(4) : '-'),
                                 position: 'left',
                                 textAnchor: 'start',
                                 style: { background: theme.danger + '20', color: theme.danger, fontWeight: 700, fontSize: '11px' }
@@ -1870,7 +1870,7 @@ var SPCApp = {
                             borderWidth: 2,
                             borderDash: [6, 4],
                             label: {
-                                text: this.t('上管制界限: ', 'UCL: ') + pageXbarR.R.UCL.toFixed(4),
+                                text: this.t('上管制界限: ', 'UCL: ') + ((pageXbarR.R.UCL !== null && pageXbarR.R.UCL !== undefined) ? pageXbarR.R.UCL.toFixed(4) : '-'),
                                 position: 'left',
                                 textAnchor: 'start',
                                 style: { background: theme.danger + '20', color: theme.danger, fontWeight: 700, fontSize: '11px' }
@@ -1881,7 +1881,7 @@ var SPCApp = {
                             borderColor: theme.success,
                             borderWidth: 2,
                             label: {
-                                text: this.t('中心線: ', 'CL: ') + pageXbarR.R.CL.toFixed(4),
+                                text: this.t('中心線: ', 'CL: ') + ((pageXbarR.R.CL !== null && pageXbarR.R.CL !== undefined) ? pageXbarR.R.CL.toFixed(4) : '-'),
                                 position: 'left',
                                 textAnchor: 'start',
                                 style: { background: theme.success + '20', color: theme.success, fontWeight: 700, fontSize: '11px' }
@@ -1893,7 +1893,7 @@ var SPCApp = {
                             borderWidth: 2,
                             borderDash: [6, 4],
                             label: {
-                                text: this.t('下管制界限: ', 'LCL: ') + (pageXbarR.R.LCL || 0).toFixed(4),
+                                text: this.t('下管制界限: ', 'LCL: ') + ((pageXbarR.R.LCL !== null && pageXbarR.R.LCL !== undefined) ? pageXbarR.R.LCL.toFixed(4) : '0.0000'),
                                 position: 'left',
                                 textAnchor: 'start',
                                 style: { background: theme.danger + '20', color: theme.danger, fontWeight: 700, fontSize: '11px' }

@@ -2844,7 +2844,7 @@ var SPCApp = {
                 alert('Reset failed: ' + e.message);
             }
         }
-    }
+    },
     /**
      * renderConstantsTable - Dynamically generate the constants reference table from SPCEngine data
      */

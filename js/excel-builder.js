@@ -58,7 +58,7 @@ class SPCExcelBuilder {
 
         // 1. Fill Header Info
         if (info.name) ws.getCell('C2').value = info.name;
-        if (info.dept) ws.getCell('O2').value = info.dept;
+        if (info.dept) ws.getCell('O2').value = '';
         const bStart = data.batchNames[0] || '';
         const s1EndIdx = Math.min(24, totalBatches - 1);
         const bEnd = data.batchNames[s1EndIdx] || '';
@@ -73,7 +73,7 @@ class SPCExcelBuilder {
         if (specs.target) ws.getCell('I4').value = specs.target;
         if (data.xbarR.xBar.CL) ws.getCell('M4').value = this.round(data.xbarR.xBar.CL);
         if (data.xbarR.R.CL) ws.getCell('N4').value = this.round(data.xbarR.R.CL);
-        if (info.inspector) ws.getCell('Q4').value = info.inspector;
+        if (info.inspector) ws.getCell('Q4').value = '';
 
         if (specs.lsl) ws.getCell('I5').value = specs.lsl;
         if (data.xbarR.xBar.LCL) ws.getCell('M5').value = this.round(data.xbarR.xBar.LCL);
@@ -222,7 +222,7 @@ class SPCExcelBuilder {
         fillHeaderBox(['G2:H2', 'I2:J2'], '規 格', '標準', true);
         fillHeaderBox(['K2:L2', 'M2'], '管制圖', 'X圖', true);
         ws.getCell('N2').value = 'R圖'; ws.getCell('N2').font = fontBold; ws.getCell('N2').alignment = alignCenter;
-        fillHeaderBox(['O2:P2', 'Q2:R2'], '製造部門', info.dept || '射出課');
+        fillHeaderBox(['O2:P2', 'Q2:R2'], '製造部門', '');
         ws.mergeCells('S2:T5'); ws.getCell('S2').value = '期限'; ws.getCell('S2').alignment = alignCenter; ws.getCell('S2').font = fontBold;
         ws.mergeCells('U2:X5'); // Date Range
         ws.mergeCells('Y2:AB2'); ws.getCell('Y2').value = '管制圖編號'; ws.getCell('Y2').alignment = alignCenter; ws.getCell('Y2').font = fontBold;
@@ -239,7 +239,7 @@ class SPCExcelBuilder {
         fillHeaderBox(['K4:L4', 'M4'], '中心值', this.round(data.xbarR.xBar.CL));
         ws.getCell('N4').value = this.round(data.xbarR.R.CL); ws.getCell('N4').alignment = alignCenter; ws.getCell('N4').font = fontNormal;
         ws.mergeCells('O4:P5'); ws.getCell('O4').value = '檢驗人員'; ws.getCell('O4').alignment = alignCenter; ws.getCell('O4').font = fontBold;
-        ws.mergeCells('Q4:R5'); ws.getCell('Q4').value = info.inspector || ''; ws.getCell('Q4').alignment = alignCenter; ws.getCell('Q4').font = fontNormal;
+        ws.mergeCells('Q4:R5'); ws.getCell('Q4').value = ''; ws.getCell('Q4').alignment = alignCenter; ws.getCell('Q4').font = fontNormal;
 
         fillHeaderBox(['A5:B5', 'C5:F5'], '管制特性', '平均值/全距');
         fillHeaderBox(['G5:H5', 'I5:J5'], '最小值', specs.lsl);

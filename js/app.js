@@ -1293,7 +1293,7 @@ var SPCApp = {
                     (data.diagnosis.distWarning ?
                         '<div class="p-3 bg-rose-50 dark:bg-rose-900/20 rounded-lg border border-rose-100 dark:border-rose-900/30 text-sm text-rose-600 dark:text-rose-400 flex items-center gap-2">' +
                         '<span class="material-icons-outlined text-sm">report_problem</span>' +
-                        '<span class="font-bold">' + data.diagnosis.distWarning + '</span>' +
+                        '<span class="font-bold">' + (typeof data.diagnosis.distWarning === 'object' ? this.t(data.diagnosis.distWarning.zh, data.diagnosis.distWarning.en) : data.diagnosis.distWarning) + '</span>' +
                         '</div>' : '') +
                     '</div>' +
                     '</div>';

@@ -1,5 +1,22 @@
 # Development Log (DEV_LOG.md)
 
+## [2026-04-10] Fix: Broken Object Rendering in AI Diagnosis (Bulk Import)
+
+### 1. Issue Description
+-   During bulk import of "Item B", the AI diagnosis card displayed `[object Object]` in the red warning box.
+-   Individual imports did not trigger this issue.
+
+### 2. Root Cause Analysis (RCA)
+-   **Data Condition**: Item B in bulk mode triggered the "Skewed Distribution" warning (|Skewness| > 1).
+-   **Rendering Regression**: The `distWarning` message was upgraded to a bilingual object `{zh, en}` on 2026-04-09, but the specific rendering path in `app.js` (line 1296) was still concatenating it as a raw object string.
+
+### 3. Corrective and Preventive Action (CAPA)
+-   **Bilingual Implementation**: Updated `renderAnalysisView` to use `this.t()` for `distWarning` extraction.
+-   **System-wide Consistency**: Refactored `analyzeGroupStability` in `engine.js` to return bilingual objects for both `status` and `advice`, ensuring all AI modules follow the same protocol.
+-   **Documentation**: Created `docs/SPC_Math_Principles.html` to provide technical transparency for the Extended Limits logic.
+
+---
+
 ## [2026-04-09] Stabilization: Localization & Branch Merge
 
 ### 1. Issue Description

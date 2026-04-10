@@ -410,24 +410,26 @@ var SPCEngine = {
         var rangeStdDev = this.stdDev(ranges);
         var consistencyScore = avgRange > 0 ? (rangeStdDev / avgRange) : 0;
 
-        var status = 'Stable';
+        var status = { zh: '穩定', en: 'Stable' };
         var color = '#10b981';
-        var advice = '各組變異度一致，製程控制極為穩定。';
+        var advice = { zh: '各組變異度一致，製程控制極為穩定。', en: 'Variation across groups is consistent, process control is very stable.' };
 
         if (consistencyScore > 0.4) {
-            status = 'Unstable';
+            status = { zh: '不穩定', en: 'Unstable' };
             color = '#f43f5e';
-            advice = '組間變異波動劇烈！部分批次的內部品質差異過大，建議檢查機台保壓穩定性與模溫控制。';
+            advice = { zh: '組間變異波動劇烈！部分批次的內部品質差異過大，建議檢查機台保壓穩定性與模溫控制。', en: 'Intense variation between groups! Internal quality of some batches varies significantly. Check machine holding pressure and mold temperature.' };
         } else if (consistencyScore > 0.2) {
-            status = 'Warning';
+            status = { zh: '警告', en: 'Warning' };
             color = '#f59e0b';
-            advice = '製程穩定度有所起伏。建議監測模具排氣狀況與原料進料壓力。';
+            advice = { zh: '製程穩定度有所起伏。建議監測模具排氣狀況與原料進料壓力。', en: 'Process stability is fluctuating. Monitor mold venting and material inlet pressure.' };
         }
 
         // Check for specific outliers
         var outlierBatches = groupStats.filter(function (g) { return g.range > (avgRange + 2 * rangeStdDev); });
         if (outlierBatches.length > 0) {
-            advice += ' 注意：批號 ' + outlierBatches.map(function (b) { return b.batch; }).join(', ') + ' 之變異明顯高於平均。';
+            var batchList = outlierBatches.map(function (b) { return b.batch; }).join(', ');
+            advice.zh += ' 注意：批號 ' + batchList + ' 之變異明顯高於平均。';
+            advice.en += ' Note: Variation in batches ' + batchList + ' is significantly higher than average.';
         }
 
         return {

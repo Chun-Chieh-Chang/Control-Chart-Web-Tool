@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SPC 數學原理：擴展管制界限與多模穴分析</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Noto+Sans+TC:wght@300;400;700&display=swap" rel="stylesheet">
+    <!-- KaTeX for Math -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+    <style>
+        :root {
+            /* Design Tokens matched to project identity */
+            --primary: #3b82f6;
+            --primary-light: #60a5fa;
+            --bg-base: #f9fafb;
+            --surface: #ffffff;
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --accent-green: #10b981;
+            --accent-red: #ef4444;
+            --border: #e5e7eb;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-base: #0f172a;
+                --surface: #1e293b;
+                --text-primary: #f1f5f9;
+                --text-secondary: #94a3b8;
+                --border: #334155;
+            }
+        }
+
+        * {
+            box-sizing: border-box;
+            transition: background-color 0.3s ease;
+        }
+
+        body {
+            font-family: 'Inter', 'Noto Sans TC', sans-serif;
+            background-color: var(--bg-base);
+            color: var(--text-primary);
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+            padding: 40px 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            color: white;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 16px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 0;
+            background: linear-gradient(to right, var(--text-primary), var(--primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .deck {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            margin-top: 10px;
+        }
+
+        .card {
+            background-color: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 40px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 20px -5px rgba(0,0,0,0.05);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--primary);
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-top: 0;
+            display: flex;
+            items-center: center;
+            gap: 10px;
+        }
+
+        .formula-box {
+            background: rgba(59, 130, 246, 0.05);
+            border-radius: 16px;
+            padding: 24px;
+            margin: 20px 0;
+            font-size: 1.2rem;
+            text-align: center;
+            border: 1px dashed var(--primary);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-cols: 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        @media (max-width: 640px) {
+            .grid { grid-template-cols: 1fr; }
+        }
+
+        .sub-card {
+            padding: 20px;
+            border-radius: 16px;
+            background: rgba(0,0,0,0.02);
+            border: 1px solid var(--border);
+        }
+
+        .label {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .highlight {
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        ul {
+            padding-left: 20px;
+        }
+
+        li {
+            margin-bottom: 10px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .katex-display {
+            margin: 1em 0;
+            overflow-x: auto;
+            overflow-y: hidden;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <span class="badge">Technical Guide</span>
+            <h1>SPC 數學原理手冊</h1>
+            <p class="deck">多模穴射出成型與擴展管制界限 (Extended Limits) 之深度解析</p>
+        </header>
+
+        <section class="card">
+            <h2>1. 變異的物理組成</h2>
+            <p>在射出成型中，任何一個數據點的跳動並非隨機，它是由物理特性疊加而成的。我們的數學模型將觀測值 \( X \) 分解為：</p>
+            <div class="formula-box">
+                \[ X = \mu + \Delta_{\text{cavity}} + \epsilon_{\text{machine}} \]
+            </div>
+            <div class="grid">
+                <div class="sub-card">
+                    <span class="label">幾何變異 (Between-Cavity)</span>
+                    <strong>\( \Delta_{\text{cavity}} \)</strong>
+                    <p style="font-size: 0.9rem; color: var(--text-secondary);">模具結構造成的固定偏移（例如 1 號穴水路效能差異）。</p>
+                </div>
+                <div class="sub-card">
+                    <span class="label">隨機變異 (Within-Shot)</span>
+                    <strong>\( \epsilon_{\text{machine}} \)</strong>
+                    <p style="font-size: 0.9rem; color: var(--text-secondary);">每一模射出時，壓力與溫度的隨機波動。</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="card" style="border-left-color: var(--accent-red);">
+            <h2>2. 傳統界限：過敏性風險</h2>
+            <p>標準的 Xbar-R 管制圖僅利用「子組內全距」估算變異：</p>
+            <div class="formula-box" style="border-color: var(--accent-red); background: rgba(239, 68, 68, 0.05);">
+                \[ UCL, LCL = \bar{\bar{X}} \pm 3 \cdot \frac{\bar{R}}{d_2 \sqrt{CavityCount}} \]
+            </div>
+            <ul>
+                <li>當模穴間存在顯著幾何差異時，\( \bar{R} \) 會較大，但管制圖會變得「極窄」。</li>
+                <li>這會導致機台微小波動就觸發報警，產生大量的 <span class="highlight">虛假報警 (False Alarm)</span>。</li>
+            </ul>
+        </section>
+
+        <section class="card" style="border-left-color: var(--accent-green);">
+            <h2>3. 專業模式：擴展管制界限</h2>
+            <p>專案採取的專業模式（AIAG-VDA 建議）會計算「總變異」來容許模具固有價差：</p>
+            <div class="formula-box" style="border-color: var(--accent-green); background: rgba(16, 185, 129, 0.05);">
+                \[ \sigma_{\text{total}} = \sqrt{\sigma_{\text{between}}^2 + \sigma_{\text{within}}^2} \]
+                \[ UCL_{\text{ext}} = \bar{\bar{X}} \pm 3 \cdot \frac{\sigma_{\text{total}}}{\sqrt{5}} \]
+            </div>
+            <p><strong>為何使用總變異？</strong> 數學上，我們將模穴差異納入「自然波動」範圍，從而使管制圖具備包容性，僅監控真正的「過程漂移」。</p>
+        </section>
+
+        <section class="card" style="border-left-color: var(--primary);">
+            <h2>4. 輪替抽樣 (Rotational) 的優勢</h2>
+            <p>本專案強制使用 <span class="highlight">n=5 輪替抽樣</span>，其數學基礎在於：</p>
+            <ul>
+                <li><strong>獨立性 (Independence)</strong>：打破了固定模穴與時間的高度自相關。</li>
+                <li><strong>中央極限定理</strong>：即使原始數據分佈不均，樣本平均值的抽樣分佈仍會趨向「常態分佈」，確保判讀標準（Nelson Rules）正確。</li>
+                <li><strong>偵測效能</strong>：\( n=5 \) 是偵測 \( 1.5\sigma \) 偏移（製程漂移）時，統計效率與量測成本的最佳平衡點。</li>
+            </ul>
+        </section>
+
+        <footer>
+            <p>© 2026 SPC Analysis Tool Architecture. Based on AIAG-VDA Professional SPC Standards.</p>
+        </footer>
+    </div>
+</body>
+</html>

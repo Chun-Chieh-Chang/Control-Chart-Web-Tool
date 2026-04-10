@@ -179,6 +179,7 @@ var SPCApp = {
         this.setupEventListeners();
         this.updateLanguage();
         this.loadFromHistory();
+        this.renderConstantsTable();
         this.switchView('dashboard');
         console.log('SPC Analysis Tool initialized. changeAnalysisModel defined:', typeof this.changeAnalysisModel === 'function');
     },
@@ -2843,6 +2844,38 @@ var SPCApp = {
                 alert('Reset failed: ' + e.message);
             }
         }
+    }
+    /**
+     * renderConstantsTable - Dynamically generate the constants reference table from SPCEngine data
+     */
+    renderConstantsTable: function () {
+        var tbody = document.getElementById('constants-table-body');
+        if (!tbody) return;
+
+        var html = '';
+        var nList = Object.keys(SPCEngine.SPC_CONSTANTS).map(Number).sort((a, b) => a - b);
+
+        var self = this;
+        nList.forEach(function (n) {
+            var constants = SPCEngine.getConstants(n);
+            var d2 = SPCEngine.D2_CONSTANTS[n] || '-';
+
+            var isStandard = (n === 5);
+            var rowClass = isStandard ? 'bg-indigo-50/20 dark:bg-indigo-900/10' : 'hover:bg-slate-50 dark:hover:bg-slate-900/50';
+            var standardLabel = self.t('(標準常數)', '(Standard)');
+
+            html += '<tr class="' + rowClass + '">' +
+                '<td class="px-3 py-2 font-black border-r border-slate-200 dark:border-slate-700">' +
+                n + (isStandard ? ' <span class="text-[10px] text-indigo-500">' + standardLabel + '</span>' : '') +
+                '</td>' +
+                '<td class="px-3 py-2">' + constants.A2.toFixed(3) + '</td>' +
+                '<td class="px-3 py-2">' + (typeof d2 === 'number' ? d2.toFixed(3) : d2) + '</td>' +
+                '<td class="px-3 py-2">' + constants.D3.toFixed(3) + '</td>' +
+                '<td class="px-3 py-2">' + constants.D4.toFixed(3) + '</td>' +
+                '</tr>';
+        });
+
+        tbody.innerHTML = html;
     }
 };
 

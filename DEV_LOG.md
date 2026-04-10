@@ -1,19 +1,22 @@
 # Development Log (DEV_LOG.md)
 
-## [2026-04-10] Fix: Broken Object Rendering in AI Diagnosis (Bulk Import)
+## [2026-04-10] Optimization & Fix: SPC Constants UI/UX
 
 ### 1. Issue Description
--   During bulk import of "Item B", the AI diagnosis card displayed `[object Object]` in the red warning box.
--   Individual imports did not trigger this issue.
+-   **Bug Fix**: During bulk import of "Item B", the AI diagnosis card displayed `[object Object]` in the red warning box.
+-   **UI Enhancement**: The SPC statistics reference table was hardcoded and incomplete (only 8 rows shown), while the engine supported n=2~48.
 
 ### 2. Root Cause Analysis (RCA)
--   **Data Condition**: Item B in bulk mode triggered the "Skewed Distribution" warning (|Skewness| > 1).
--   **Rendering Regression**: The `distWarning` message was upgraded to a bilingual object `{zh, en}` on 2026-04-09, but the specific rendering path in `app.js` (line 1296) was still concatenating it as a raw object string.
+-   **Rendering Regression**: Diagnostic messages were upgraded to bilingual objects, but the specific rendering path for distribution warnings in `app.js` was still concatenating them as raw strings.
+-   **UI/Code Desync**: The informational modal was built with static HTML rows, failing to reflect the full analytical range provided by `engine.js`.
 
 ### 3. Corrective and Preventive Action (CAPA)
 -   **Bilingual Implementation**: Updated `renderAnalysisView` to use `this.t()` for `distWarning` extraction.
--   **System-wide Consistency**: Refactored `analyzeGroupStability` in `engine.js` to return bilingual objects for both `status` and `advice`, ensuring all AI modules follow the same protocol.
--   **Documentation**: Created `docs/SPC_Math_Principles.html` to provide technical transparency for the Extended Limits logic.
+-   **Dynamic Table Rendering**: 
+    -   Refactored `Metrics Info Modal` to remove hardcoded rows.
+    -   Implemented `SPCApp.renderConstantsTable()` to dynamically generate the reference table from `SPCEngine.SPC_CONSTANTS`.
+    -   Added `sticky-header` and scrollable area (max-height 400px) for better UX with the full 47-row table.
+-   **Documentation**: Created `docs/SPC_Math_Principles.html` for technical transparency.
 
 ---
 

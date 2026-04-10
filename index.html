@@ -2040,9 +2040,9 @@
                             data-zh="SPC 統計常數對照表 (n=2~48)" data-en="SPC Constants Table (n=2~48)">
                             SPC 統計常數對照表 (n=2~48)</h4>
                     </div>
-                    <div class="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-700">
-                        <table class="w-full text-xs text-left border-collapse">
-                            <thead>
+                    <div class="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-700" style="max-height: 400px; overflow-y: auto;">
+                        <table class="w-full text-xs text-left border-collapse sticky-header">
+                            <thead class="sticky top-0 z-10">
                                 <tr class="bg-slate-100 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700">
                                     <th class="px-3 py-3 font-bold text-slate-800 dark:text-slate-200 border-r border-slate-200 dark:border-slate-700">n</th>
                                     <th class="px-3 py-3 font-bold text-indigo-600 dark:text-indigo-400">A₂</th>
@@ -2051,40 +2051,11 @@
                                     <th class="px-3 py-3 font-bold text-rose-600 dark:text-rose-400">D₄</th>
                                 </tr>
                             </thead>
-                            <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
-                                <tr class="hover:bg-slate-50 dark:hover:bg-slate-900/50">
-                                    <td class="px-3 py-2 font-black border-r border-slate-200 dark:border-slate-700">2</td>
-                                    <td class="px-3 py-2">1.880</td><td class="px-3 py-2">1.128</td><td class="px-3 py-2">0.000</td><td class="px-3 py-2">3.267</td>
-                                </tr>
-                                <tr class="bg-indigo-50/20 dark:bg-indigo-900/10">
-                                    <td class="px-3 py-2 font-black border-r border-slate-200 dark:border-slate-700">5 <span class="text-[10px] text-indigo-500">(Standard)</span></td>
-                                    <td class="px-3 py-2">0.577</td><td class="px-3 py-2">2.326</td><td class="px-3 py-2">0.000</td><td class="px-3 py-2">2.114</td>
-                                </tr>
-                                <tr class="hover:bg-slate-50 dark:hover:bg-slate-900/50">
-                                    <td class="px-3 py-2 font-black border-r border-slate-200 dark:border-slate-700">8</td>
-                                    <td class="px-3 py-2">0.373</td><td class="px-3 py-2">2.847</td><td class="px-3 py-2">0.136</td><td class="px-3 py-2">1.864</td>
-                                </tr>
-                                <tr class="hover:bg-slate-50 dark:hover:bg-slate-900/50">
-                                    <td class="px-3 py-2 font-black border-r border-slate-200 dark:border-slate-700">12</td>
-                                    <td class="px-3 py-2">0.266</td><td class="px-3 py-2">3.258</td><td class="px-3 py-2">0.283</td><td class="px-3 py-2">1.717</td>
-                                </tr>
-                                <tr class="hover:bg-slate-50 dark:hover:bg-slate-900/50">
-                                    <td class="px-3 py-2 font-black border-r border-slate-200 dark:border-slate-700">16</td>
-                                    <td class="px-3 py-2">0.212</td><td class="px-3 py-2">3.532</td><td class="px-3 py-2">0.363</td><td class="px-3 py-2">1.637</td>
-                                </tr>
-                                <tr class="hover:bg-slate-50 dark:hover:bg-slate-900/50">
-                                    <td class="px-3 py-2 font-black border-r border-slate-200 dark:border-slate-700">24</td>
-                                    <td class="px-3 py-2">0.157</td><td class="px-3 py-2">3.895</td><td class="px-3 py-2">0.451</td><td class="px-3 py-2">1.548</td>
-                                </tr>
-                                <tr class="hover:bg-slate-50 dark:hover:bg-slate-900/50">
-                                    <td class="px-3 py-2 font-black border-r border-slate-200 dark:border-slate-700">32</td>
-                                    <td class="px-3 py-2">0.134</td><td class="px-3 py-2">4.128</td><td class="px-3 py-2">0.502</td><td class="px-3 py-2">1.498</td>
-                                </tr>
-                                <tr class="hover:bg-slate-50 dark:hover:bg-slate-900/50">
-                                    <td class="px-3 py-2 font-black border-r border-slate-200 dark:border-slate-700">48</td>
-                                    <td class="px-3 py-2">0.109</td><td class="px-3 py-2">4.435</td><td class="px-3 py-2">0.563</td><td class="px-3 py-2">1.437</td>
-                                </tr>
+                            <tbody id="constants-table-body" class="divide-y divide-slate-100 dark:divide-slate-800">
+                                <!-- JS Injected Content -->
                             </tbody>
+                        </table>
+                    </div>
                         </table>
                     </div>
                     <p class="mt-3 text-[11px] text-slate-500 italic"

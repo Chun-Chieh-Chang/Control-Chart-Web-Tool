@@ -2664,6 +2664,7 @@ var SPCApp = {
                 annotations: {
                     xaxis: [
                         { x: data.specs.usl, borderColor: '#f43f5e', borderWidth: 2, strokeDashArray: 4, label: { text: 'USL: ' + (data.specs.usl ? data.specs.usl.toFixed(4) : '-'), orientation: 'vertical', style: { color: '#fff', background: '#f43f5e', fontSize: '11px', fontWeight: 700 } } },
+                        { x: data.specs.target, borderColor: '#10b981', borderWidth: 2, strokeDashArray: 4, label: { text: 'Target: ' + (data.specs.target ? data.specs.target.toFixed(4) : '-'), orientation: 'vertical', style: { color: '#fff', background: '#10b981', fontSize: '11px', fontWeight: 700 } } },
                         { x: data.specs.lsl, borderColor: '#f43f5e', borderWidth: 2, strokeDashArray: 4, label: { text: 'LSL: ' + (data.specs.lsl ? data.specs.lsl.toFixed(4) : '-'), orientation: 'vertical', style: { color: '#fff', background: '#f43f5e', fontSize: '11px', fontWeight: 700 } } }
                     ],
                     points: [

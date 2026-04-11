@@ -307,4 +307,38 @@ Complete the localization audit to ensure 100% bilingual support (Simplified Chi
 
 ---
 
+## [2026-04-11] Finale: Statistical Robustness & Visual Semantic Hardening
+
+### 1. Issue Description
+- **Critical: Multi-Cavity NaN Crash**: In multi-cavity mode, Cpk and Ppk cards repeatedly displayed `--` (NaN) when processing datasets with empty cells.
+- **Visual: Missing 2-Sigma Label**: The Normal Distribution chart only showed 1-sigma and 3-sigma zones, failing to provide the critical 95.4% boundary.
+- **Visual: Legend Marker Regression**: Control limits (UCL/CL/LCL) in chart legends persisted as "Circles" despite JS configurations for line segments.
+
+### 2. Root Cause Analysis (RCA)
+- **RCA-A: Phantom Zero Contamination**: 
+    - The `isNaN('')` in JS returns `false` (empty strings convert to 0). 
+    - When ExcelJS reads empty cells as `''`, they were treated as actual observation points with value `0`. 
+    - This artificially inflated variance or caused division-by-zero errors in standard deviation calculations, leading to `NaN` in Cpk/Ppk.
+- **RCA-B: Point Annotation Oversight**: The `dOpt.annotations.points` array lacked entries for `s2p` and `s2n`.
+- **RCA-C: Chart Engine Defaulting / Global Locking**: 
+    - ApexCharts prioritizes its internal SVG shapes for legends based on the series marker setting. 
+    - The `radius: 2` setting was still visually indistinguishable from a circle at small scales. 
+    - Browser-level CSS or library defaults were overriding the `width: 25` JS property.
+
+### 3. Corrective and Preventive Action (CAPA)
+- **Data Dehydration Protocol (Engine-wide)**:
+    - **Strict Numeric Filter**: Upgraded all `.filter()` logic across `SPCEngine` to: `v !== '' && !isNaN(parseFloat(v))`.
+    - **Type Coercion**: Implemented mandatory `parseFloat(v)` mapping for all ingested data sequences to disconnect empty strings from numeric '0'.
+    - **Result**: Incomplete datasets are now accurately "skipped" (as suggested by the user), ensuring valid statistical results.
+- **Visual Completion (2-Sigma)**:
+    - Added $\pm2\sigma$ markers to the Distribution chart in **Amber (#f59e0b)**, creating a clear "Pre-alarm" zone between the 1-sigma core and 3-sigma limits.
+- **Standardized Visual Identity (CSS Hardening)**:
+    - **Global CSS Force**: Implemented a "Nuclear" CSS override in `index.html`: `.apexcharts-legend-marker { border-radius: 0px !important; width: 25px !important; height: 5px !important; }`.
+    - **Semantic Alignment**: This bypasses all library internals, ensuring process limits are FOREVER displayed as authoritative 25px line segments, perfectly distinct from circular observation dots.
+
+### 4. Technical Achievements
+- [x] **Zero-Zero Error Elimination**: Successfully defended the statistical engine against malformed or missing industrial data inputs.
+- [x] **Full Probability Spectrum**: Distribution charts now support the complete 68-95-99.7 sigma visualization.
+- [x] **Branding Consistency**: Achieved 100% uniformity in legend markers across all 8 analytical chart types.
+
 

@@ -1491,15 +1491,15 @@ var SPCApp = {
                 '<div class="grid grid-cols-1 md:grid-cols-2 gap-6">' +
                 '<div class="saas-card p-6"> <h4 class="text-xs font-bold text-slate-400 uppercase mb-4">' + this.t('位置統計', 'Location Stats') + '</h4>' +
                 '<div class="space-y-3">' +
-                '<div class="flex justify-between"> <span class="text-sm text-slate-500">' + this.t('平均值 (Mean)', 'Mean') + '</span> <span class="font-mono font-bold dark:text-white">' + data.stats.mean.toFixed(4) + '</span> </div>' +
-                '<div class="flex justify-between"> <span class="text-sm text-slate-500">' + this.t('最小值 (Min)', 'Min') + '</span> <span class="font-mono font-bold dark:text-white">' + data.stats.min.toFixed(4) + '</span> </div>' +
-                '<div class="flex justify-between"> <span class="text-sm text-slate-500">' + this.t('最大值 (Max)', 'Max') + '</span> <span class="font-mono font-bold dark:text-white">' + data.stats.max.toFixed(4) + '</span> </div>' +
+                '<div class="flex justify-between"> <span class="text-sm text-slate-500">' + this.t('平均值 (Mean)', 'Mean') + '</span> <span class="font-mono font-bold dark:text-white">' + SPCEngine.round(data.stats.mean, 4) + '</span> </div>' +
+                '<div class="flex justify-between"> <span class="text-sm text-slate-500">' + this.t('最小值 (Min)', 'Min') + '</span> <span class="font-mono font-bold dark:text-white">' + SPCEngine.round(data.stats.min, 4) + '</span> </div>' +
+                '<div class="flex justify-between"> <span class="text-sm text-slate-500">' + this.t('最大值 (Max)', 'Max') + '</span> <span class="font-mono font-bold dark:text-white">' + SPCEngine.round(data.stats.max, 4) + '</span> </div>' +
                 '</div> </div>' +
                 '<div class="saas-card p-6"> <h4 class="text-xs font-bold text-slate-400 uppercase mb-4">' + this.t('變異統計', 'Variation Stats') + '</h4>' +
                 '<div class="space-y-3">' +
-                '<div class="flex justify-between"> <span class="text-sm text-slate-500">' + this.t('組內標準差 (Sigma Within)', 'Sigma Within') + '</span> <span class="font-mono font-bold dark:text-white">' + data.stats.withinStdDev.toFixed(4) + '</span> </div>' +
-                '<div class="flex justify-between"> <span class="text-sm text-slate-500">' + this.t('整體標準差 (Sigma Overall)', 'Sigma Overall') + '</span> <span class="font-mono font-bold dark:text-white">' + data.stats.overallStdDev.toFixed(4) + '</span> </div>' +
-                '<div class="flex justify-between"> <span class="text-sm text-slate-500">Cpk</span> <span class="font-mono font-bold text-primary">' + data.stats.Cpk.toFixed(3) + '</span> </div>' +
+                '<div class="flex justify-between"> <span class="text-sm text-slate-500">' + this.t('組內標準差 (Sigma Within)', 'Sigma Within') + '</span> <span class="font-mono font-bold dark:text-white">' + SPCEngine.round(data.stats.withinStdDev, 4) + '</span> </div>' +
+                '<div class="flex justify-between"> <span class="text-sm text-slate-500">' + this.t('整體標準差 (Sigma Overall)', 'Sigma Overall') + '</span> <span class="font-mono font-bold dark:text-white">' + SPCEngine.round(data.stats.overallStdDev, 4) + '</span> </div>' +
+                '<div class="flex justify-between"> <span class="text-sm text-slate-500">Cpk</span> <span class="font-mono font-bold text-primary">' + SPCEngine.round(data.stats.Cpk, 3) + '</span> </div>' +
                 '</div> </div>' +
                 '</div> </div>';
         }

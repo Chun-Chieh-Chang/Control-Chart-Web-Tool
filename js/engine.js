@@ -305,17 +305,25 @@ var SPCEngine = {
             withinStdDev = this.withinStdDev(filtered);
         }
         var overallStdDev = this.stdDev(filtered);
-        var tolerance = usl - lsl;
+        
+        // --- Numeric Safeguard ---
+        var nUSL = parseFloat(usl);
+        var nLSL = parseFloat(lsl);
+        var nMean = parseFloat(mean);
+        
+        if (isNaN(nUSL) || isNaN(nLSL)) return { Cp: 0, Cpk: 0, Pp: 0, Ppk: 0, mean: nMean, withinStdDev: withinStdDev, overallStdDev: overallStdDev, count: filtered.length };
+        
+        var tolerance = nUSL - nLSL;
 
-        var Cp = withinStdDev > 0 ? tolerance / (6 * withinStdDev) : 0;
-        var Cpu = withinStdDev > 0 ? (usl - mean) / (3 * withinStdDev) : 0;
-        var Cpl = withinStdDev > 0 ? (mean - lsl) / (3 * withinStdDev) : 0;
-        var Cpk = Math.min(Cpu, Cpl);
+        var Cp = (withinStdDev > 1e-9) ? tolerance / (6 * withinStdDev) : 0;
+        var Cpu = (withinStdDev > 1e-9) ? (nUSL - nMean) / (3 * withinStdDev) : 0;
+        var Cpl = (withinStdDev > 1e-9) ? (nMean - nLSL) / (3 * withinStdDev) : 0;
+        var Cpk = isNaN(Cpu) || isNaN(Cpl) ? 0 : Math.min(Cpu, Cpl);
 
-        var Pp = overallStdDev > 0 ? tolerance / (6 * overallStdDev) : 0;
-        var Ppu = overallStdDev > 0 ? (usl - mean) / (3 * overallStdDev) : 0;
-        var Ppl = overallStdDev > 0 ? (mean - lsl) / (3 * overallStdDev) : 0;
-        var Ppk = Math.min(Ppu, Ppl);
+        var Pp = (overallStdDev > 1e-9) ? tolerance / (6 * overallStdDev) : 0;
+        var Ppu = (overallStdDev > 1e-9) ? (nUSL - nMean) / (3 * overallStdDev) : 0;
+        var Ppl = (overallStdDev > 1e-9) ? (nMean - nLSL) / (3 * overallStdDev) : 0;
+        var Ppk = isNaN(Ppu) || isNaN(Ppl) ? 0 : Math.min(Ppu, Ppl);
 
         return {
             Cp: Cp, Cpk: Cpk, Pp: Pp, Ppk: Ppk,
@@ -483,7 +491,9 @@ var SPCEngine = {
     },
 
     round: function (value, decimals) {
+        if (value === null || value === undefined || isNaN(value)) return '--';
         decimals = decimals || 4;
-        return Math.round(value * Math.pow(10, decimals)) / Math.pow(10, decimals);
+        var p = Math.pow(10, decimals);
+        return Math.round(value * p) / p;
     }
 };

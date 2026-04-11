@@ -334,29 +334,49 @@ var SPCEngine = {
         var overallStdDev = this.stdDev(filtered);
         
         // --- Numeric Safeguard ---
-        var nUSL = parseFloat(usl);
-        var nLSL = parseFloat(lsl);
+        var nUSL = (usl !== null && usl !== undefined && usl !== '') ? parseFloat(usl) : NaN;
+        var nLSL = (lsl !== null && lsl !== undefined && lsl !== '') ? parseFloat(lsl) : NaN;
         var nMean = parseFloat(mean);
         
-        if (isNaN(nUSL) || isNaN(nLSL)) return { Cp: 0, Cpk: 0, Pp: 0, Ppk: 0, mean: nMean, withinStdDev: withinStdDev, overallStdDev: overallStdDev, count: filtered.length };
+        // Return 0 if both are NaN, otherwise continue for one-sided capability
+        if (isNaN(nUSL) && isNaN(nLSL)) return { Cp: 0, Cpk: 0, Pp: 0, Ppk: 0, mean: nMean, withinStdDev: withinStdDev, overallStdDev: overallStdDev, count: filtered.length };
         
-        var tolerance = nUSL - nLSL;
+        var hasUSL = !isNaN(nUSL);
+        var hasLSL = !isNaN(nLSL);
+        var tolerance = (hasUSL && hasLSL) ? (nUSL - nLSL) : 0;
 
-        var Cp = (withinStdDev > 1e-9) ? tolerance / (6 * withinStdDev) : 0;
-        var Cpu = (withinStdDev > 1e-9) ? (nUSL - nMean) / (3 * withinStdDev) : 0;
-        var Cpl = (withinStdDev > 1e-9) ? (nMean - nLSL) / (3 * withinStdDev) : 0;
-        var Cpk = isNaN(Cpu) || isNaN(Cpl) ? 0 : Math.min(Cpu, Cpl);
+        var Cp = (hasUSL && hasLSL && withinStdDev > 1e-9) ? tolerance / (6 * withinStdDev) : 0;
+        var Cpu = (hasUSL && withinStdDev > 1e-9) ? (nUSL - nMean) / (3 * withinStdDev) : 0;
+        var Cpl = (hasLSL && withinStdDev > 1e-9) ? (nMean - nLSL) / (3 * withinStdDev) : 0;
+        
+        var Cpk;
+        if (hasUSL && hasLSL) Cpk = Math.min(Cpu, Cpl);
+        else if (hasUSL) Cpk = Cpu;
+        else Cpk = Cpl;
+        Cpk = isNaN(Cpk) ? 0 : Cpk;
 
-        var Pp = (overallStdDev > 1e-9) ? tolerance / (6 * overallStdDev) : 0;
-        var Ppu = (overallStdDev > 1e-9) ? (nUSL - nMean) / (3 * overallStdDev) : 0;
-        var Ppl = (overallStdDev > 1e-9) ? (nMean - nLSL) / (3 * overallStdDev) : 0;
-        var Ppk = isNaN(Ppu) || isNaN(Ppl) ? 0 : Math.min(Ppu, Ppl);
+        var Pp = (hasUSL && hasLSL && overallStdDev > 1e-9) ? tolerance / (6 * overallStdDev) : 0;
+        var Ppu = (hasUSL && overallStdDev > 1e-9) ? (nUSL - nMean) / (3 * overallStdDev) : 0;
+        var Ppl = (hasLSL && overallStdDev > 1e-9) ? (nMean - nLSL) / (3 * overallStdDev) : 0;
+        
+        var Ppk;
+        if (hasUSL && hasLSL) Ppk = Math.min(Ppu, Ppl);
+        else if (hasUSL) Ppk = Ppu;
+        else Ppk = Ppl;
+        Ppk = isNaN(Ppk) ? 0 : Ppk;
 
         return {
-            Cp: Cp, Cpk: Cpk, Pp: Pp, Ppk: Ppk,
-            mean: mean, withinStdDev: withinStdDev, overallStdDev: overallStdDev,
-            min: this.min(filtered), max: this.max(filtered),
-            range: this.range(filtered), count: filtered.length
+            Cp: Cp,
+            Cpk: Cpk,
+            Pp: Pp,
+            Ppk: Ppk,
+            mean: nMean,
+            withinStdDev: withinStdDev,
+            overallStdDev: overallStdDev,
+            min: this.min(filtered),
+            max: this.max(filtered),
+            range: this.range(filtered),
+            count: filtered.length
         };
     },
 

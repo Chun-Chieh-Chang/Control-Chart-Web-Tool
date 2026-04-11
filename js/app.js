@@ -1216,8 +1216,9 @@ var SPCApp = {
                     for (var b = 0; b < originalMatrix.length; b++) {
                         for (var c = 0; c < originalMatrix[b].length; c++) {
                             var val = originalMatrix[b][c];
-                            if (val !== null && !isNaN(val)) {
-                                flattened.push({ val: val, label: batchNames[b] + ' (' + cavityNames[c] + ')' });
+                            // Strict Numeric Check: exclude null, undefined, empty strings, and whitespace-only strings
+                            if (val !== null && val !== undefined && val !== '' && !isNaN(parseFloat(val))) {
+                                flattened.push({ val: parseFloat(val), label: batchNames[b] + ' (' + cavityNames[c] + ')' });
                             }
                         }
                     }
@@ -1244,6 +1245,11 @@ var SPCApp = {
                     var cap = SPCEngine.calculateProcessCapability(flattened.map(item => item.val), specs.usl, specs.lsl, xbarR.summary.rBar, targetN);
                     var distStats = SPCEngine.calculateDistStats(flattened.map(item => item.val));
                     var diagnosis = SPCEngine.analyzeVarianceSource(cap.Cpk, cap.Ppk, distStats);
+                    
+                    // Critical: Map calculated capability back to summary for UI rendering
+                    xbarR.summary.Cpk = cap.Cpk;
+                    xbarR.summary.Ppk = cap.Ppk;
+
                     results = { type: 'batch', analysisSubType: 'multi-cavity', xbarR: xbarR, batchNames: rotBatchNames, subgroupLabels: rotSubgroupLabels, specs: specs, dataMatrix: rotMatrix, cavityNames: new Array(targetN).fill(0).map((_, i) => "S" + (i + 1)), productInfo: dataInput.productInfo, diagnosis: diagnosis };
                 } else if (type === 'distribution') {
                     var matrix = dataInput.getDataMatrix();

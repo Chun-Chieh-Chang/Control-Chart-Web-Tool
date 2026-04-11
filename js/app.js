@@ -350,9 +350,9 @@ var SPCApp = {
                 '<div><h4 class="text-xl font-bold mb-2" style="color:' + severityColor + '">' + diagnosisResult + '</h4>' +
                 '<p class="text-slate-600 dark:text-slate-300 leading-relaxed font-bold">' + advice + '</p></div></div>' +
                 '<div class="grid grid-cols-1 md:grid-cols-3 gap-4">' +
-                '<div class="saas-card p-4 text-center"><div class="text-[10px] font-bold text-slate-400 uppercase">' + self.t('低能力項目數', 'Low Cpk Items') + '</div><div class="text-2xl font-bold text-rose-500">' + lowCpkCount + ' / ' + total + '</div></div>' +
-                '<div class="saas-card p-4 text-center"><div class="text-[10px] font-bold text-slate-400 uppercase">' + self.t('模穴失衡比例', 'Cavity Imbalance') + '</div><div class="text-2xl font-bold text-indigo-500">' + Math.round((globalImbalanceCount / total) * 100) + '%</div></div>' +
-                '<div class="saas-card p-4 text-center"><div class="text-[10px] font-bold text-slate-400 uppercase">' + self.t('批次不穩比例', 'Batch Instability') + '</div><div class="text-2xl font-bold text-amber-500 text-blue-500">' + Math.round((globalInstabilityCount / total) * 100) + '%</div></div>' +
+                '<div class="saas-card p-4 text-center"><div class="text-sm font-bold text-slate-600 dark:text-slate-400 uppercase">' + self.t('低能力項目數', 'Low Cpk Items') + '</div><div class="text-2xl font-bold text-rose-500">' + lowCpkCount + ' / ' + total + '</div></div>' +
+                '<div class="saas-card p-4 text-center"><div class="text-sm font-bold text-slate-600 dark:text-slate-400 uppercase">' + self.t('模穴失衡比例', 'Cavity Imbalance') + '</div><div class="text-2xl font-bold text-indigo-500">' + Math.round((globalImbalanceCount / total) * 100) + '%</div></div>' +
+                '<div class="saas-card p-4 text-center"><div class="text-sm font-bold text-slate-600 dark:text-slate-400 uppercase">' + self.t('批次不穩比例', 'Batch Instability') + '</div><div class="text-2xl font-bold text-amber-500 text-blue-500">' + Math.round((globalInstabilityCount / total) * 100) + '%</div></div>' +
                 '</div>' +
                 '<div class="saas-card overflow-hidden"><table class="w-full text-sm text-left"><thead class="bg-slate-50 dark:bg-slate-800 text-slate-500 font-bold">' +
                 '<tr><th class="px-6 py-3">' + self.t('分析項目', 'Inspection Item') + '</th><th class="px-6 py-3 text-center">Cpk</th><th class="px-6 py-3 text-center">' + self.t('不平衡率', 'Imbalance Rate') + '</th><th class="px-6 py-3 text-center">' + self.t('診斷', 'Diagnosis') + '</th></tr></thead>' +
@@ -1350,14 +1350,14 @@ var SPCApp = {
                     '<span class="material-icons-outlined text-indigo-600">psychology</span>' +
                     '</div>' +
                     '<div>' +
-                    '<h3 class="text-sm font-bold text-slate-500 uppercase">' + this.t('製程健康度 AI 診斷', 'Process Health AI Insights') + '</h3>' +
+                    '<h3 class="text-sm font-bold text-slate-600 dark:text-slate-400 uppercase">' + this.t('製程健康度 AI 診斷', 'Process Health AI Insights') + '</h3>' +
                     '<div class="text-lg font-bold dark:text-white">' + (this.settings.language === 'zh' ? (data.diagnosis.source.zh || data.diagnosis.source) : (data.diagnosis.source.en || data.diagnosis.source)) + '</div>' +
                     '</div>' +
                     '</div>' +
                     '<div class="space-y-3">' +
-                    '<div class="p-3 bg-slate-50 dark:bg-slate-900/50 rounded-lg border border-slate-100 dark:border-slate-800 text-sm">' +
+                    '<div class="p-3 bg-slate-50 dark:bg-slate-800/80 rounded-lg border border-slate-100 dark:border-slate-700 text-sm">' +
                     '<span class="font-bold text-indigo-600 dark:text-indigo-400">' + this.t('專家建議：', 'Expert Advice: ') + '</span>' +
-                    '<span class="text-slate-600 dark:text-slate-400 font-bold">' + (this.settings.language === 'zh' ? (data.diagnosis.advice.zh || data.diagnosis.advice) : (data.diagnosis.advice.en || data.diagnosis.advice)) + '</span>' +
+                    '<span class="text-slate-700 dark:text-slate-300">' + (this.settings.language === 'zh' ? (data.diagnosis.advice.zh || data.diagnosis.advice) : (data.diagnosis.advice.en || data.diagnosis.advice)) + '</span>' +
                     '</div>' +
                     (data.diagnosis.distWarning ?
                         '<div class="p-3 bg-rose-50 dark:bg-rose-900/20 rounded-lg border border-rose-100 dark:border-rose-900/30 text-sm text-rose-600 dark:text-rose-400 flex items-center gap-2">' +
@@ -1377,12 +1377,12 @@ var SPCApp = {
             }
 
             html = multiCavityBadge + '<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">' +
-                '<div class="saas-card p-4"> <div class="text-[10px] font-bold text-slate-500 uppercase">' + this.t('子組數', 'Subgroups') + '</div> <div class="text-xl font-bold dark:text-white">' + data.xbarR.summary.n + '</div> </div>' +
-                '<div class="saas-card p-4"> <div class="text-[10px] font-bold text-slate-500 uppercase">' + this.t('規格上限 (USL)', 'USL') + '</div> <div class="text-xl font-bold font-mono text-slate-700 dark:text-slate-300">' + SPCEngine.round(data.specs.usl, 3) + '</div> </div>' +
-                '<div class="saas-card p-4"> <div class="text-[10px] font-bold text-slate-500 uppercase">' + this.t('標稱值 (Target)', 'Target') + '</div> <div class="text-xl font-bold font-mono text-slate-700 dark:text-slate-300">' + SPCEngine.round(data.specs.target, 3) + '</div> </div>' +
-                '<div class="saas-card p-4"> <div class="text-[10px] font-bold text-slate-500 uppercase">' + this.t('規格下限 (LSL)', 'LSL') + '</div> <div class="text-xl font-bold font-mono text-slate-700 dark:text-slate-300">' + SPCEngine.round(data.specs.lsl, 3) + '</div> </div>' +
-                '<div class="saas-card p-4"> <div class="text-[10px] font-bold text-slate-500 uppercase">' + this.t('製程能力 (Cpk)', 'Cpk') + '</div> <div class="text-xl font-bold text-primary">' + SPCEngine.round(data.xbarR.summary.Cpk, 3) + '</div> </div>' +
-                '<div class="saas-card p-4"> <div class="text-[10px] font-bold text-slate-500 uppercase">' + this.t('績效指數 (Ppk)', 'Ppk') + '</div> <div class="text-xl font-bold text-indigo-500">' + SPCEngine.round(data.xbarR.summary.Ppk, 3) + '</div> </div>' +
+                '<div class="saas-card p-4"> <div class="text-sm font-bold text-slate-600 dark:text-slate-400 uppercase">' + this.t('子組數', 'Subgroups') + '</div> <div class="text-xl font-bold dark:text-white">' + data.xbarR.summary.n + '</div> </div>' +
+                '<div class="saas-card p-4"> <div class="text-sm font-bold text-slate-600 dark:text-slate-400 uppercase">' + this.t('規格上限 (USL)', 'USL') + '</div> <div class="text-xl font-bold font-mono text-slate-700 dark:text-slate-300">' + SPCEngine.round(data.specs.usl, 3) + '</div> </div>' +
+                '<div class="saas-card p-4"> <div class="text-sm font-bold text-slate-600 dark:text-slate-400 uppercase">' + this.t('標稱值 (Target)', 'Target') + '</div> <div class="text-xl font-bold font-mono text-slate-700 dark:text-slate-300">' + SPCEngine.round(data.specs.target, 3) + '</div> </div>' +
+                '<div class="saas-card p-4"> <div class="text-sm font-bold text-slate-600 dark:text-slate-400 uppercase">' + this.t('規格下限 (LSL)', 'LSL') + '</div> <div class="text-xl font-bold font-mono text-slate-700 dark:text-slate-300">' + SPCEngine.round(data.specs.lsl, 3) + '</div> </div>' +
+                '<div class="saas-card p-4"> <div class="text-sm font-bold text-slate-600 dark:text-slate-400 uppercase">' + this.t('製程能力 (Cpk)', 'Cpk') + '</div> <div class="text-xl font-bold text-primary">' + SPCEngine.round(data.xbarR.summary.Cpk, 3) + '</div> </div>' +
+                '<div class="saas-card p-4"> <div class="text-sm font-bold text-slate-600 dark:text-slate-400 uppercase">' + this.t('績效指數 (Ppk)', 'Ppk') + '</div> <div class="text-xl font-bold text-indigo-500">' + SPCEngine.round(data.xbarR.summary.Ppk, 3) + '</div> </div>' +
                 '</div>' + diagHtml;
 
             if (this.batchPagination.totalPages > 1) {

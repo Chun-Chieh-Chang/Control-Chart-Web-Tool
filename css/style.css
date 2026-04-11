@@ -6,22 +6,20 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
 :root {
-    /* Color Palette - Vercel Light */
-    --primary: #10b981;
-    /* Vercel Green */
+    /* Color Master Palette - Day Mode */
+    --primary: #3B82F6; /* Royal Blue */
     --secondary: #0a72ef;
-    /* Vercel Blue */
     --accent: #f59e0b;
-    /* Amber */
+    --success: #10B981;
+    --error: #EF4444;
 
-    --background: #fafafa;
-    /* Vercel Gray 50 */
-    --surface: #ffffff;
-    /* Pure White */
-    --text-main: #171717;
-    /* Vercel Black */
+    --background: #F9FAFB;
+    --surface: #FFFFFF;
+    --text-main: #111827;
+    --text-sec: #6B7280;
+    --border: #E5E7EB;
 
-    /* Typography Standards - Inter */
+    /* Typography Standards - 14px Minimum enforced */
     --font-base: 'Inter', system-ui, -apple-system, sans-serif;
     --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
     --size-display: 32px;
@@ -31,46 +29,47 @@
     --size-body: 16px;
     --size-base: 14px;
     --size-small: 14px;
-    --size-caption: 12px;
+    --size-caption: 14px;
     --size-data: 14px;
-    --size-min: 8px;
+    --size-min: 14px;
 
     /* Table Variables */
-    --table-border: #e5e5e5;
-    --table-bg: #ffffff;
-    --table-text: #171717;
-    --table-header-bg: #fafafa;
-    --table-label-bg: #fafafa;
-    --table-data-header-bg: #f5f5f5;
-    --table-ooc-bg: #ef4444;
+    --table-border: var(--border);
+    --table-bg: var(--surface);
+    --table-text: var(--text-main);
+    --table-header-bg: #F9FAFB;
+    --table-label-bg: #F9FAFB;
+    --table-data-header-bg: #F3F4F6;
+    --table-ooc-bg: var(--error);
     --table-ooc-text: #ffffff;
-    --table-stats-bg: #f0fdf4;
+    --table-stats-bg: #ECFDF5;
 
-    --card-bg: #ffffff;
+    --card-bg: var(--surface);
 }
 
-/* Dark Mode Overrides (Vercel-inspired) */
+/* Dark Mode Overrides (Color Master Palette - Night) */
 html.dark {
-    --primary: #10b981;
-    --secondary: #0a72ef;
-    --accent: #f59e0b;
+    --primary: #60A5FA; /* Sky Blue */
+    --success: #34D399;
+    --error: #F87171;
 
-    /* Vercel-style dark background */
-    --background: #171717;
-    --surface: #1f1f1f;
-    --text-main: #ededed;
+    --background: #0F172A; /* Slate 900 */
+    --surface: #1E293B;    /* Slate 800 */
+    --text-main: #F1F5F9;  /* Slate 100 */
+    --text-sec: #94A3B8;   /* Slate 400 */
+    --border: #334155;     /* Slate 700 */
 
-    --table-border: #2f2f2f !important;
-    --table-bg: #1f1f1f !important;
-    --table-text: #ededed !important;
-    --table-header-bg: #252525 !important;
-    --table-label-bg: #252525 !important;
-    --table-data-header-bg: #252525 !important;
-    --table-ooc-bg: #dc2626 !important;
+    --table-border: var(--border) !important;
+    --table-bg: var(--surface) !important;
+    --table-text: var(--text-main) !important;
+    --table-header-bg: #1e293b !important;
+    --table-label-bg: #1e293b !important;
+    --table-data-header-bg: #1e293b !important;
+    --table-ooc-bg: #B91C1C !important;
     --table-ooc-text: #ffffff !important;
-    --table-stats-bg: #14532d !important;
+    --table-stats-bg: #064e3b !important;
 
-    --card-bg: #1f1f1f;
+    --card-bg: var(--surface);
 }
 
 body {
@@ -100,13 +99,15 @@ html.dark body {
     outline-offset: 2px;
 }
 
+/* Ensure readable text sizes */
 small,
 .text-xs,
 .text-\[10px\],
 .text-\[11px\],
+.text-\[12px\],
 .text-\[9px\],
 .text-\[8px\] {
-    font-size: var(--size-min);
+    font-size: var(--size-min) !important; /* Force 14px minimum */
 }
 
 h1,

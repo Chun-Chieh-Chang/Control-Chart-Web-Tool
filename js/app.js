@@ -1404,8 +1404,8 @@ var SPCApp = {
             html += fixedBaselineBadge + '<div id="detailedTableContainer" class="mb-10 overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm"></div>' +
                 paginationHtml +
                 '<div class="grid grid-cols-1 gap-8">' +
-                '<div class="saas-card p-8"> <h3 class="text-base font-bold mb-6 dark:text-white">' + (data.analysisSubType === 'multi-cavity' ? 'Extended Shewhart X̄ Chart' : this.t('X̄ 管制圖', 'X-Bar Chart')) + '</h3> <div id="xbarChart" class="h-96"></div> </div>' +
-                '<div class="saas-card p-8"> <h3 class="text-base font-bold mb-6 dark:text-white">' + this.t('R 管制圖', 'R Chart') + '</h3> <div id="rChart" class="h-96"></div> </div> </div>';
+                '<div class="saas-card p-8"> <h3 class="text-base font-bold mb-6 dark:text-white">' + (data.analysisSubType === 'multi-cavity' ? 'Extended Shewhart X̄ Chart' : this.t('X̄ 管制圖', 'X-Bar Chart')) + '</h3> <div id="xbarChart" class="h-[500px]"></div> </div>' +
+                '<div class="saas-card p-8"> <h3 class="text-base font-bold mb-6 dark:text-white">' + this.t('R 管制圖', 'R Chart') + '</h3> <div id="rChart" class="h-[500px]"></div> </div> </div>';
         } else if (data.type === 'cavity') {
             var balHtml = '';
             if (data.balance) {
@@ -1975,7 +1975,7 @@ var SPCApp = {
             var rOpt = {
                 chart: {
                     type: 'line',
-                    height: 320,
+                    height: 420,
                     toolbar: { 
                         show: true,
                         tools: { download: true, zoom: true, zoomin: true, zoomout: true, pan: true, reset: true },

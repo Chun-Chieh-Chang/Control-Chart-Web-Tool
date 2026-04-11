@@ -1781,7 +1781,7 @@ var SPCApp = {
                         return str;
                     }),
                     labels: { 
-                        style: { colors: theme.text, fontSize: '8px', fontFamily: 'Inter, sans-serif' },
+                        style: { colors: theme.text, fontSize: '11px', fontFamily: 'Inter, sans-serif' },
                         rotate: -45,
                         rotateAlways: true,
                         tickAmount: 15,
@@ -2026,7 +2026,7 @@ var SPCApp = {
                         return str;
                     }),
                     labels: { 
-                        style: { colors: theme.text, fontSize: '8px', fontFamily: 'Inter, sans-serif' },
+                        style: { colors: theme.text, fontSize: '11px', fontFamily: 'Inter, sans-serif' },
                         rotate: -45,
                         rotateAlways: true,
                         tickAmount: 15,
@@ -2459,7 +2459,7 @@ var SPCApp = {
                         },
                         style: {
                             colors: theme.text,
-                            fontSize: labels.length > 50 ? '9px' : '11px',
+                            fontSize: '11px',
                             fontFamily: 'Inter, sans-serif'
                         }
                     },
@@ -2569,7 +2569,7 @@ var SPCApp = {
                             if (labels && labels[i - 1]) return labels[i - 1];
                             return v;
                         },
-                        style: { colors: theme.text, fontSize: labels.length > 25 ? '10px' : '11px', fontFamily: 'Inter, sans-serif' }
+                        style: { colors: theme.text, fontSize: '11px', fontFamily: 'Inter, sans-serif' }
                     }
                 },
                 dataLabels: { enabled: false },

@@ -282,7 +282,7 @@ Complete the localization audit to ensure 100% bilingual support (Simplified Chi
 - [x] **Statistical Clarity**: Glassmorphism callout bubbles for $\mu$ and $\pm1\sigma, \pm3\sigma$ markers.
 - [x] **Interactive Re-analysis**: Seamlessly switching between "Global Data" and "Specific Cavity" with zero-latency recalculation.
 - [x] **Robustness**: Eliminated all known context-related runtime crashes in the analysis module.
-- [x] **Universal Legend Normalization**: Globally replaced circular legend markers with **25x5px Rounded Line Segments** to accurately represent control limits and fit curves.
+- [x] **Logic Consistency Alignment**: Synchronized violation detection logic between X-Bar and R charts. Added red-point markers for specification breaches in Mean and Group summary charts.
 
 ### 5. Recurring Issue Audit: Legend Semantic Mismatch (RCA/CAPA)
 - **Problem**: Reference lines (UCL/LCL/Fit Curves) repeatedly rendered as "Dots" in chart legends in previous iterations.
@@ -295,5 +295,16 @@ Complete the localization audit to ensure 100% bilingual support (Simplified Chi
     2. **Global Elimination**: Performed a full codebase audit (grep) to remove all remaining `radius: 12` instances.
     3. **Implementation SOP**: Added a rule to check legend marker shapes during any new chart implementation to ensure adherence to the "Line Segment" aesthetic.
 
+### 6. Logic Inconsistency: Missing R-Chart Violations (RCA/CAPA)
+- **Problem**: R Control Charts failed to show red-point alerts for out-of-limit data, while X-Bar charts correctly displayed them.
+- **Root Cause Analysis (RCA)**:
+    1. **Asymmetric Engine Implementation**: The statistical engine (`engine.js`) only invoked Nelson Rule checks for X-Bar series, leaving the `R.violations` property uninitialized.
+    2. **UI Mapping Gap**: Rendering options for comparison charts (Mean/Group) lacked conditional styling for specification breaches (USL/LSL).
+- **Corrective and Preventive Action (CAPA)**:
+    1. **Engine Upgrade**: Implemented `checkRangeViolations` in `SPCEngine` to perform Rule 1 detection for all R-series data.
+    2. **UI Standardization**: Synchronized the `discrete` marker configuration across `xOpt`, `rOpt`, `meanOpt`, and `gOpt` to ensure red-point alerts fire whenever statistics exceed boundaries.
+    3. **Technical Audit**: Verified tooltip HTML nesting to ensure alert blocks are correctly containerized within the UI bubbles.
+
 ---
+
 

@@ -173,7 +173,22 @@ var SPCEngine = {
         };
 
         results.xBar.violations = this.checkNelsonRules(xBars, xDoubleBar, results.xBar.sigma);
+        results.R.violations = this.checkRangeViolations(ranges, rUCL, rLCL);
         return results;
+    },
+
+    /**
+     * checkRangeViolations - Specific violation check for R-charts (Rule 1 focus)
+     */
+    checkRangeViolations: function (data, ucl, lcl) {
+        var violations = [];
+        for (var i = 0; i < data.length; i++) {
+            if (data[i] === null || isNaN(data[i])) continue;
+            var rules = [];
+            if (data[i] > ucl || data[i] < lcl) rules.push(1);
+            if (rules.length > 0) violations.push({ index: i, rules: rules });
+        }
+        return violations;
     },
 
     /**
@@ -218,6 +233,7 @@ var SPCEngine = {
 
         // Re-check rules with new limits
         standard.xBar.violations = this.checkNelsonRules(standard.xBar.data, xDoubleBar, standard.xBar.sigma);
+        standard.R.violations = this.checkRangeViolations(standard.R.data, standard.R.UCL, standard.R.LCL);
 
         return standard;
     },

@@ -2090,7 +2090,17 @@ var SPCApp = {
                         html += '<div class="flex items-center gap-2">';
                         html += '<span class="w-2 h-2 rounded-full" style="background-color:' + w.globals.colors[seriesIndex] + '"></span>';
                         html += '<span class="text-sm font-bold text-white">' + name + ': ' + (val ? val.toFixed(4) : '-') + '</span>';
-                        html += '</div></div>';
+                        html += '</div>'; // End flex items
+
+                        var violation = (pageXbarR.R.violations || []).find(v => v.index === dataPointIndex);
+                        if (violation) {
+                            html += '<div class="mt-2 pt-2 border-t border-slate-700">';
+                            html += '<div class="text-[10px] bg-rose-500/20 text-rose-400 px-2 py-0.5 rounded font-bold mb-2">' + self.t('規則 1: 超出界限', 'Rule 1: Beyond Limits') + '</div>';
+                            html += '<div class="text-[11px] text-slate-300 leading-tight italic">' + self.t('變異異常，請檢查模具穩定性或材料一致性。', 'Variation anomaly. Check mold stability or material consistency.') + '</div>';
+                            html += '</div>';
+                        }
+                        
+                        html += '</div>'; // End main container
                         return html;
                     }
                 },
@@ -2235,7 +2245,16 @@ var SPCApp = {
                     dashArray: [0, 0, 5, 5],
                     connectNulls: false
                 },
-                markers: { size: [4, 0, 0, 0], hover: { size: 6 } },
+                markers: { 
+                    size: [4, 0, 0, 0], 
+                    hover: { size: 6 },
+                    discrete: data.cavityStats.map((s, idx) => {
+                        if (s.mean > data.specs.usl || s.mean < data.specs.lsl) {
+                            return { seriesIndex: 0, dataPointIndex: idx, fillColor: theme.danger, strokeColor: theme.bg, size: 7 };
+                        }
+                        return null;
+                    }).filter(v => v !== null)
+                },
                 xaxis: {
                     type: 'category',
                     categories: labels.map(l => String(l)),
@@ -2404,7 +2423,13 @@ var SPCApp = {
                     colors: ['#3b82f6'],
                     strokeColors: '#fff',
                     strokeWidth: 1,
-                    hover: { size: 5 }
+                    hover: { size: 5 },
+                    discrete: data.groupStats.map((s, idx) => {
+                        if (s.avg > data.specs.usl || s.avg < data.specs.lsl) {
+                            return { seriesIndex: 1, dataPointIndex: idx, fillColor: theme.danger, strokeColor: theme.bg, size: 6 };
+                        }
+                        return null;
+                    }).filter(v => v !== null)
                 },
                 xaxis: {
                     type: 'category', // Force text labels (prevents numeric batch IDs being treated as numeric axis)

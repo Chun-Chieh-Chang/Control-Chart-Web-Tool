@@ -913,20 +913,20 @@ var SPCApp = {
             }
 
             var card = document.createElement('div');
-            card.className = 'saas-card p-6 cursor-pointer hover:border-indigo-400 hover:bg-indigo-50/20 dark:hover:bg-indigo-900/10 transition-all group relative overflow-hidden active:scale-95';
+            card.className = 'saas-card p-6 border-2 border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-800/40 cursor-pointer hover:border-indigo-400 dark:hover:border-indigo-500 hover:bg-white dark:hover:bg-slate-800 transition-all group relative overflow-hidden active:scale-95 shadow-sm hover:shadow-lg';
             card.innerHTML =
                 '<div class="relative z-10">' +
                 '<div class="flex justify-between items-start mb-4">' +
-                '<div class="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-700 flex items-center justify-center group-hover:bg-indigo-600 group-hover:text-white transition-all">' +
+                '<div class="w-10 h-10 rounded-xl bg-slate-50 dark:bg-slate-700 flex items-center justify-center group-hover:bg-indigo-600 group-hover:text-white transition-all shadow-sm">' +
                 '<span class="material-icons-outlined text-sm">precision_manufacturing</span>' +
                 '</div>' +
-                '<span class="material-icons-outlined text-slate-200 group-hover:text-indigo-400 transition-colors">check_circle</span>' +
+                '<span class="material-icons-outlined text-slate-200 dark:text-slate-700 group-hover:text-indigo-400 transition-colors">check_circle</span>' +
                 '</div>' +
                 '<div>' +
                 '<h3 class="!text-lg font-bold text-slate-900 dark:text-white truncate mb-4">' + sheetName + '</h3>' +
                 '<div class="grid grid-cols-2 gap-2">' +
-                '<div><p class="!text-xs text-slate-400 uppercase font-bold">' + self.t('目標值', 'Target') + '</p><p class="!text-sm font-mono font-bold text-slate-600 dark:text-slate-300">' + target + '</p></div>' +
-                '<div><p class="!text-xs text-slate-400 uppercase font-bold">' + self.t('樣本數', 'Samples') + '</p><p class="!text-sm font-mono font-bold text-slate-600 dark:text-slate-300">' + sampleCount + '</p></div>' +
+                '<div><p class="!text-[10px] text-slate-500 dark:text-slate-400 uppercase font-black tracking-wider">' + self.t('目標值', 'Target') + '</p><p class="!text-sm font-mono font-bold text-slate-700 dark:text-slate-300">' + target + '</p></div>' +
+                '<div><p class="!text-[10px] text-slate-500 dark:text-slate-400 uppercase font-black tracking-wider">' + self.t('樣本數', 'Samples') + '</p><p class="!text-sm font-mono font-bold text-slate-700 dark:text-slate-300">' + sampleCount + '</p></div>' +
                 '</div>' +
                 '</div>' +
                 '</div>';
@@ -934,8 +934,12 @@ var SPCApp = {
             card.dataset.sheet = sheetName;
             card.addEventListener('click', function () {
                 // Update active state
-                document.querySelectorAll('#itemList .saas-card').forEach(c => c.classList.remove('border-indigo-500', 'bg-indigo-50/50', 'ring-2', 'ring-indigo-100'));
-                this.classList.add('border-indigo-500', 'bg-indigo-50/50', 'ring-2', 'ring-indigo-100');
+                document.querySelectorAll('#itemList .saas-card').forEach(c => {
+                    c.classList.remove('border-indigo-500', 'dark:border-indigo-500', 'bg-indigo-50/30', 'dark:bg-indigo-900/20', 'ring-2', 'ring-indigo-100', 'dark:ring-indigo-900/30');
+                    c.classList.add('border-slate-100', 'dark:border-slate-800');
+                });
+                this.classList.remove('border-slate-100', 'dark:border-slate-800');
+                this.classList.add('border-indigo-500', 'dark:border-indigo-500', 'bg-indigo-50/30', 'dark:bg-indigo-900/20', 'ring-2', 'ring-indigo-100', 'dark:ring-indigo-900/30');
 
                 self.selectedItem = this.dataset.sheet;
                 self.renderDataPreview(this.dataset.sheet);

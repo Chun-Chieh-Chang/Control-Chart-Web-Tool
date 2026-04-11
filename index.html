@@ -393,31 +393,31 @@
                                 data-en="Quick Actions" data-zh="快速操作">快速操作</h4>
                             <div class="grid grid-cols-2 gap-4">
                                 <button onclick="SPCApp.switchView('qip-extract')"
-                                    class="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl hover:bg-indigo-50 dark:hover:bg-indigo-900/30 transition-all text-center group border border-slate-100 dark:border-slate-800">
+                                    class="p-4 bg-white dark:bg-slate-800/60 rounded-xl hover:bg-indigo-50 dark:hover:bg-indigo-900/30 transition-all text-center group border-2 border-slate-100 dark:border-slate-800 shadow-sm">
                                     <span
-                                        class="material-icons-outlined text-indigo-600 mb-2 block group-hover:scale-110 transition-transform">download</span>
-                                    <span class="text-sm font-bold text-slate-600 dark:text-slate-400">QIP
+                                        class="material-icons-outlined text-emerald-500 mb-2 block group-hover:scale-110 transition-transform">auto_awesome</span>
+                                    <span class="text-sm font-bold text-slate-700 dark:text-slate-300">Data
                                         Extract</span>
                                 </button>
                                 <button onclick="SPCApp.switchView('import')"
-                                    class="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl hover:bg-indigo-50 dark:hover:bg-indigo-900/30 transition-all text-center group border border-slate-100 dark:border-slate-800">
+                                    class="p-4 bg-white dark:bg-slate-800/60 rounded-xl hover:bg-indigo-50 dark:hover:bg-indigo-900/30 transition-all text-center group border-2 border-slate-100 dark:border-slate-800 shadow-sm">
                                     <span
                                         class="material-icons-outlined text-indigo-600 mb-2 block group-hover:scale-110 transition-transform">cloud_upload</span>
-                                    <span class="text-sm font-bold text-slate-600 dark:text-slate-400">Upload
+                                    <span class="text-sm font-bold text-slate-700 dark:text-slate-300">Upload
                                         Data</span>
                                 </button>
                                 <button onclick="SPCApp.switchView('nelson')"
-                                    class="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl hover:bg-indigo-50 dark:hover:bg-indigo-900/30 transition-all text-center group border border-slate-100 dark:border-slate-800">
+                                    class="p-4 bg-white dark:bg-slate-800/60 rounded-xl hover:bg-indigo-50 dark:hover:bg-indigo-900/30 transition-all text-center group border-2 border-slate-100 dark:border-slate-800 shadow-sm">
                                     <span
                                         class="material-icons-outlined text-amber-500 mb-2 block group-hover:scale-110 transition-transform">fact_check</span>
-                                    <span class="text-sm font-bold text-slate-600 dark:text-slate-400">Nelson
+                                    <span class="text-sm font-bold text-slate-700 dark:text-slate-300">Nelson
                                         Rules</span>
                                 </button>
                                 <button onclick="SPCApp.resetSystem()"
-                                    class="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl hover:bg-rose-50 dark:hover:bg-rose-900/30 transition-all text-center group border border-slate-100 dark:border-slate-800">
+                                    class="p-4 bg-white dark:bg-slate-800/60 rounded-xl hover:bg-rose-50 dark:hover:bg-rose-900/30 transition-all text-center group border-2 border-slate-100 dark:border-slate-800 shadow-sm">
                                     <span
                                         class="material-icons-outlined text-rose-500 mb-2 block group-hover:scale-110 transition-transform">restart_alt</span>
-                                    <span class="text-sm font-bold text-slate-600 dark:text-slate-400">Reset
+                                    <span class="text-sm font-bold text-slate-700 dark:text-slate-300">Reset
                                         System</span>
                                 </button>
                             </div>
@@ -457,8 +457,8 @@
 
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         <!-- Column 1: Upload Action -->
-                        <div class="saas-card p-1 flex flex-col">
-                            <div class="rounded-[15px] bg-slate-50/50 dark:bg-slate-800/30 border-2 border-dashed border-primary/30 dark:border-primary/40 p-10 text-center flex flex-col items-center justify-center hover:border-primary hover:bg-primary/5 dark:hover:bg-primary/10 transition-all cursor-pointer group relative overflow-hidden h-full min-h-[320px]"
+                        <div class="saas-card p-1 flex flex-col bg-white dark:bg-slate-800/40 border-2 border-slate-100 dark:border-slate-800">
+                            <div class="rounded-[15px] bg-slate-50/30 dark:bg-slate-900/20 border-2 border-dashed border-primary/20 dark:border-primary/30 p-10 text-center flex flex-col items-center justify-center hover:border-primary hover:bg-primary/5 dark:hover:bg-primary/10 transition-all cursor-pointer group relative overflow-hidden h-full min-h-[320px]"
                                 id="uploadZone">
                                 <input type="file" id="fileInput" accept=".xlsx,.xls" multiple hidden>
                                 <div
@@ -467,7 +467,7 @@
                                 </div>
                                 <h3 class="text-base font-bold text-slate-900 dark:text-white mb-2 z-10"
                                     data-en="Import Data" data-zh="匯入數據報表">匯入數據報表</h3>
-                                <p class="text-xs text-slate-500 dark:text-slate-400 mb-6 max-w-[200px] mx-auto z-10"
+                                <p class="text-xs text-slate-600 dark:text-slate-300 mb-6 max-w-[200px] mx-auto z-10 font-medium"
                                     data-en="Drag & drop QIP / Excel files here" data-zh="點擊或將 QIP 檔案拖曳至此">點擊或將 QIP
                                     檔案拖曳至此</p>
                                 <button
@@ -478,7 +478,7 @@
                         </div>
 
                         <!-- Column 2: Recent History -->
-                        <div class="saas-card p-6 flex flex-col h-full bg-white dark:bg-slate-800/50">
+                        <div class="saas-card p-6 flex flex-col h-full bg-white dark:bg-slate-800/40 border-2 border-slate-100 dark:border-slate-800">
                             <h4 class="font-bold mb-4 flex items-center gap-2 text-sm">
                                 <span class="material-icons-outlined text-primary">history</span>
                                 <span data-en="Recent Activities" data-zh="近期分析活動">近期分析活動</span>
@@ -622,15 +622,15 @@
 
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                         <!-- Batch -->
-                        <div class="p-8 rounded-2xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50 hover:bg-white dark:hover:bg-slate-800 hover:border-indigo-200 dark:hover:border-indigo-900 shadow-sm hover:shadow-xl transition-all cursor-pointer group"
+                        <div class="p-8 rounded-2xl border-2 border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-800/40 hover:bg-white dark:hover:bg-slate-800 hover:border-indigo-400 dark:hover:border-indigo-500 shadow-sm hover:shadow-xl transition-all cursor-pointer group"
                             data-analysis="batch">
                             <div
-                                class="w-14 h-14 rounded-2xl bg-white dark:bg-slate-700 shadow-sm flex items-center justify-center mb-6 text-indigo-600 dark:text-indigo-400 group-hover:bg-indigo-600 group-hover:text-white transition-all">
+                                class="w-14 h-14 rounded-2xl bg-slate-50 dark:bg-slate-700 shadow-sm flex items-center justify-center mb-6 text-indigo-600 dark:text-indigo-400 group-hover:bg-indigo-600 group-hover:text-white transition-all">
                                 <span class="material-icons-outlined text-3xl">analytics</span>
                             </div>
                             <h4 class="font-bold text-slate-900 dark:text-white mb-2" data-en="Batch Analysis"
                                 data-zh="批次分析">批次分析</h4>
-                            <p class="text-sm text-slate-500 dark:text-slate-400 leading-relaxed mb-6"
+                            <p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed mb-6"
                                 data-en="X-Bar R control charts with automated Nelson rules violation detection."
                                 data-zh="X-Bar R 管制圖，包含自動化 Nelson Rules 異常偵測。">X-Bar R 管制圖，包含自動化 Nelson Rules 異常偵測。</p>
                             <span
@@ -639,15 +639,15 @@
                                 <span class="material-icons-outlined text-sm ml-1">chevron_right</span></span>
                         </div>
                         <!-- Cavity -->
-                        <div class="p-8 rounded-2xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50 hover:bg-white dark:hover:bg-slate-800 hover:border-indigo-200 dark:hover:border-indigo-900 shadow-sm hover:shadow-xl transition-all cursor-pointer group"
+                        <div class="p-8 rounded-2xl border-2 border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-800/40 hover:bg-white dark:hover:bg-slate-800 hover:border-rose-400 dark:hover:border-rose-500 shadow-sm hover:shadow-xl transition-all cursor-pointer group"
                             data-analysis="cavity">
                             <div
-                                class="w-14 h-14 rounded-2xl bg-white dark:bg-slate-700 shadow-sm flex items-center justify-center mb-6 text-rose-600 dark:text-rose-400 group-hover:bg-rose-600 group-hover:text-white transition-all">
+                                class="w-14 h-14 rounded-2xl bg-slate-50 dark:bg-slate-700 shadow-sm flex items-center justify-center mb-6 text-rose-600 dark:text-rose-400 group-hover:bg-rose-600 group-hover:text-white transition-all">
                                 <span class="material-icons-outlined text-3xl">biotech</span>
                             </div>
                             <h4 class="font-bold text-slate-900 dark:text-white mb-2" data-en="Cavity Analysis"
                                 data-zh="穴號分析">穴號分析</h4>
-                            <p class="text-sm text-slate-500 dark:text-slate-400 leading-relaxed mb-6"
+                            <p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed mb-6"
                                 data-en="Cross-cavity performance comparison. Evaluate Cpk differences between tools."
                                 data-zh="跨模穴表現比較。評估各模穴間的 Cpk 差異。">跨模穴表現比較。評估各模穴間的 Cpk 差異。</p>
                             <span
@@ -656,15 +656,15 @@
                                 <span class="material-icons-outlined text-sm ml-1">chevron_right</span></span>
                         </div>
                         <!-- Group -->
-                        <div class="p-8 rounded-2xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50 hover:bg-white dark:hover:bg-slate-800 hover:border-indigo-200 dark:hover:border-indigo-900 shadow-sm hover:shadow-xl transition-all cursor-pointer group"
+                        <div class="p-8 rounded-2xl border-2 border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-800/40 hover:bg-white dark:hover:bg-slate-800 hover:border-amber-400 dark:hover:border-amber-500 shadow-sm hover:shadow-xl transition-all cursor-pointer group"
                             data-analysis="group">
                             <div
-                                class="w-14 h-14 rounded-2xl bg-white dark:bg-slate-700 shadow-sm flex items-center justify-center mb-6 text-amber-600 dark:text-amber-400 group-hover:bg-amber-600 group-hover:text-white transition-all">
+                                class="w-14 h-14 rounded-2xl bg-slate-50 dark:bg-slate-700 shadow-sm flex items-center justify-center mb-6 text-amber-600 dark:text-amber-400 group-hover:bg-amber-600 group-hover:text-white transition-all">
                                 <span class="material-icons-outlined text-3xl">insights</span>
                             </div>
                             <h4 class="font-bold text-slate-900 dark:text-white mb-2" data-en="Group Variance"
                                 data-zh="群組變異">群組變異</h4>
-                            <p class="text-sm text-slate-500 dark:text-slate-400 leading-relaxed mb-6"
+                            <p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed mb-6"
                                 data-en="Analyze overall variation trends using Min-Max-Average grouping."
                                 data-zh="使用 最小值-最大值-平均值 分組分析整體變異趨勢。">使用 最小值-最大值-平均值 分組分析整體變異趨勢。</p>
                             <span
@@ -673,15 +673,15 @@
                                 <span class="material-icons-outlined text-sm ml-1">chevron_right</span></span>
                         </div>
                         <!-- Multi-Cavity Professional -->
-                        <div class="p-8 rounded-2xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50 hover:bg-white dark:hover:bg-slate-800 hover:border-emerald-200 dark:hover:border-emerald-900 shadow-sm hover:shadow-xl transition-all cursor-pointer group"
+                        <div class="p-8 rounded-2xl border-2 border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-800/40 hover:bg-white dark:hover:bg-slate-800 hover:border-emerald-400 dark:hover:border-emerald-500 shadow-sm hover:shadow-xl transition-all cursor-pointer group"
                             data-analysis="multi-cavity">
                             <div
-                                class="w-14 h-14 rounded-2xl bg-white dark:bg-slate-700 shadow-sm flex items-center justify-center mb-6 text-emerald-600 dark:text-emerald-400 group-hover:bg-emerald-600 group-hover:text-white transition-all">
+                                class="w-14 h-14 rounded-2xl bg-slate-50 dark:bg-slate-700 shadow-sm flex items-center justify-center mb-6 text-emerald-600 dark:text-emerald-400 group-hover:bg-emerald-600 group-hover:text-white transition-all">
                                 <span class="material-icons-outlined text-3xl">account_tree</span>
                             </div>
                             <h4 class="font-bold text-slate-900 dark:text-white mb-2" data-en="Multi-Cavity SPC"
                                 data-zh="多模穴專業分析">多模穴專業分析</h4>
-                            <p class="text-sm text-slate-500 dark:text-slate-400 leading-relaxed mb-6"
+                            <p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed mb-6"
                                 data-en="AIAG-VDA recommended rotational sampling (n=5) for 16/32 cavities."
                                 data-zh="AIAG-VDA 手冊建議：針對 16/32 模穴採用輪替抽樣 (n=5) 與擴展管制界限。">AIAG-VDA 手冊建議：針對 16/32 模穴採用輪替抽樣
                                 (n=5) 與擴展管制界限。</p>
@@ -691,15 +691,15 @@
                                 <span class="material-icons-outlined text-sm ml-1">chevron_right</span></span>
                         </div>
                         <!-- Distribution Analysis -->
-                        <div class="p-8 rounded-2xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50 hover:bg-white dark:hover:bg-slate-800 hover:border-blue-200 dark:hover:border-blue-900 shadow-sm hover:shadow-xl transition-all cursor-pointer group"
+                        <div class="p-8 rounded-2xl border-2 border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-800/40 hover:bg-white dark:hover:bg-slate-800 hover:border-blue-400 dark:hover:border-blue-500 shadow-sm hover:shadow-xl transition-all cursor-pointer group"
                             data-analysis="distribution">
                             <div
-                                class="w-14 h-14 rounded-2xl bg-white dark:bg-slate-700 shadow-sm flex items-center justify-center mb-6 text-blue-600 dark:text-blue-400 group-hover:bg-blue-600 group-hover:text-white transition-all">
+                                class="w-14 h-14 rounded-2xl bg-slate-50 dark:bg-slate-700 shadow-sm flex items-center justify-center mb-6 text-blue-600 dark:text-blue-400 group-hover:bg-blue-600 group-hover:text-white transition-all">
                                 <span class="material-icons-outlined text-3xl">bar_chart</span>
                             </div>
                             <h4 class="font-bold text-slate-900 dark:text-white mb-2" data-en="Distribution Analysis"
                                 data-zh="常態分佈分析">常態分佈分析</h4>
-                            <p class="text-sm text-slate-500 dark:text-slate-400 leading-relaxed mb-6"
+                            <p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed mb-6"
                                 data-en="Histogram visualization, skewness/kurtosis testing, and normality check."
                                 data-zh="直方圖視覺化、偏態/峰度檢定與數據常態性檢查。">直方圖視覺化、偏態/峰度檢定與數據常態性檢查。</p>
                             <span
@@ -718,12 +718,12 @@
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                             <div
-                                class="flex items-start gap-4 p-5 bg-slate-50 dark:bg-slate-800/30 rounded-2xl border border-slate-100 dark:border-slate-700 hover:border-primary/30 transition-all">
+                                class="flex items-start gap-4 p-6 bg-white dark:bg-slate-800/40 rounded-2xl border-2 border-slate-100 dark:border-slate-700 hover:border-primary/40 transition-all shadow-sm">
                                 <div class="mt-1">
                                     <label class="relative inline-flex items-center cursor-pointer">
                                         <input type="checkbox" id="baselineLockToggle" class="sr-only peer">
                                         <div
-                                            class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary">
+                                            class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary">
                                         </div>
                                     </label>
                                 </div>
@@ -731,15 +731,15 @@
                                     <h5 class="font-bold text-slate-900 dark:text-white text-sm"
                                         data-en="Fixed Baseline Monitoring (Phase II)" data-zh="固定基準監控 (Phase II)">
                                         固定基準監控 (Phase II)</h5>
-                                    <p class="text-[11px] text-slate-500 mt-1 leading-relaxed"
+                                    <p class="text-[11px] text-slate-600 dark:text-slate-300 mt-1 leading-relaxed"
                                         data-en="Lock control limits based on first N points. Prevents historical points from being re-judged when new data is added."
                                         data-zh="鎖定前 N 個點作為計算基準。防止新數據加入時導致歷史點位被重新判定，維持評估一致性。">
                                         鎖定前 N 個點作為計算基準。防止新數據加入時導致歷史點位被重新判定，維持評估一致性。</p>
                                     <div class="mt-3 flex items-center gap-3">
-                                        <span class="text-[10px] text-slate-400 uppercase font-black tracking-widest"
+                                        <span class="text-[10px] text-slate-500 dark:text-slate-400 uppercase font-black tracking-widest"
                                             data-en="Points:" data-zh="基準點數:">基準點數:</span>
                                         <input type="number" id="baselinePointCount" value="25" min="2" max="100"
-                                            class="w-16 px-2 py-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded text-xs font-bold text-primary text-center focus:outline-none focus:ring-2 focus:ring-primary/20">
+                                            class="w-16 px-2 py-1 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded text-xs font-bold text-primary text-center focus:outline-none focus:ring-2 focus:ring-primary/20">
                                         <span class="text-[10px] text-slate-400 italic" data-en="(Recommended: 25)"
                                             data-zh="(建議值: 25)">(建議值: 25)</span>
                                     </div>

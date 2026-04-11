@@ -84,7 +84,9 @@ var SPCEngine = {
     },
 
     mean: function (data) {
-        var filtered = data.filter(function (v) { return v !== null && !isNaN(v); });
+        var filtered = data.filter(function (v) { 
+            return v !== null && v !== undefined && v !== '' && !isNaN(parseFloat(v)); 
+        }).map(v => parseFloat(v));
         if (filtered.length === 0) return null;
         var sum = 0;
         for (var i = 0; i < filtered.length; i++) sum += filtered[i];
@@ -92,12 +94,16 @@ var SPCEngine = {
     },
 
     min: function (data) {
-        var filtered = data.filter(function (v) { return v !== null && !isNaN(v); });
+        var filtered = data.filter(function (v) { 
+            return v !== null && v !== undefined && v !== '' && !isNaN(parseFloat(v)); 
+        }).map(v => parseFloat(v));
         return filtered.length > 0 ? Math.min.apply(null, filtered) : null;
     },
 
     max: function (data) {
-        var filtered = data.filter(function (v) { return v !== null && !isNaN(v); });
+        var filtered = data.filter(function (v) { 
+            return v !== null && v !== undefined && v !== '' && !isNaN(parseFloat(v)); 
+        }).map(v => parseFloat(v));
         return filtered.length > 0 ? Math.max.apply(null, filtered) : null;
     },
 
@@ -110,7 +116,9 @@ var SPCEngine = {
     },
 
     stdDev: function (data) {
-        var filtered = data.filter(function (v) { return v !== null && !isNaN(v); });
+        var filtered = data.filter(function (v) { 
+            return v !== null && v !== undefined && v !== '' && !isNaN(parseFloat(v)); 
+        }).map(v => parseFloat(v));
         if (filtered.length < 2) return null;
         var avg = this.mean(filtered);
         var sumSq = 0;
@@ -121,7 +129,9 @@ var SPCEngine = {
     },
 
     withinStdDev: function (data) {
-        var filtered = data.filter(function (v) { return v !== null && !isNaN(v); });
+        var filtered = data.filter(function (v) { 
+            return v !== null && v !== undefined && v !== '' && !isNaN(parseFloat(v)); 
+        }).map(v => parseFloat(v));
         if (filtered.length < 2) return 0;
         var mrSum = 0;
         for (var i = 1; i < filtered.length; i++) {
@@ -230,7 +240,9 @@ var SPCEngine = {
             extendedSigma = fixedSigma;
         } else {
             // Calculate Overall Variation (sigma overall) from data
-            var allValues = dataMatrix.flat().filter(v => v !== null && !isNaN(v));
+            var allValues = dataMatrix.flat().filter(function (v) { 
+                return v !== null && v !== undefined && v !== '' && !isNaN(parseFloat(v)); 
+            }).map(v => parseFloat(v));
             extendedSigma = this.stdDev(allValues);
         }
 
@@ -305,7 +317,9 @@ var SPCEngine = {
     },
 
     calculateProcessCapability: function (data, usl, lsl, rBar, subgroupSize) {
-        var filtered = data.filter(function (v) { return v !== null && !isNaN(v); });
+        var filtered = data.filter(function (v) { 
+            return v !== null && v !== undefined && v !== '' && !isNaN(parseFloat(v)); 
+        }).map(v => parseFloat(v));
         if (filtered.length < 2) return { Cp: 0, Cpk: 0, Pp: 0, Ppk: 0, mean: 0, withinStdDev: 0, overallStdDev: 0, count: 0 };
 
         var mean = this.mean(filtered);
@@ -387,7 +401,9 @@ var SPCEngine = {
      * @param {Array} data - Raw data points
      */
     calculateDistStats: function (data) {
-        var filtered = data.filter(function (v) { return v !== null && !isNaN(v); });
+        var filtered = data.filter(function (v) { 
+            return v !== null && v !== undefined && v !== '' && !isNaN(parseFloat(v)); 
+        }).map(v => parseFloat(v));
         var n = filtered.length;
         if (n < 3) return { skewness: 0, kurtosis: 0 };
 

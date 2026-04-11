@@ -1385,8 +1385,9 @@ var SPCApp = {
                 '<div class="saas-card p-4"> <div class="text-sm font-bold text-slate-600 dark:text-slate-400 uppercase">' + this.t('績效指數 (Ppk)', 'Ppk') + '</div> <div class="text-xl font-bold text-indigo-500">' + SPCEngine.round(data.xbarR.summary.Ppk, 3) + '</div> </div>' +
                 '</div>' + diagHtml;
 
+            var paginationHtml = '';
             if (this.batchPagination.totalPages > 1) {
-                html += '<div class="flex items-center justify-between mb-4 bg-white dark:bg-slate-800 p-3 rounded-lg border border-slate-100 dark:border-slate-700 shadow-sm">' +
+                paginationHtml = '<div class="flex items-center justify-between mb-4 bg-white dark:bg-slate-800 p-3 rounded-lg border border-slate-100 dark:border-slate-700 shadow-sm">' +
                     '<div class="text-xs font-medium dark:text-slate-400" id="pageInfo">' + this.t('第 1 / ', 'Page 1 / ') + this.batchPagination.totalPages + '</div>' +
                     '<div class="flex gap-2">' +
                     '<button id="prevPageBtn" class="px-4 py-1 pb-1.5 text-xs font-bold border rounded-md disabled:opacity-30 dark:text-white">' + this.t('上頁', 'Prev') + '</button>' +
@@ -1401,6 +1402,7 @@ var SPCApp = {
             }
 
             html += fixedBaselineBadge + '<div id="detailedTableContainer" class="mb-10 overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm"></div>' +
+                paginationHtml +
                 '<div class="grid grid-cols-1 gap-8">' +
                 '<div class="saas-card p-8"> <h3 class="text-base font-bold mb-6 dark:text-white">' + (data.analysisSubType === 'multi-cavity' ? 'Extended Shewhart X̄ Chart' : this.t('X̄ 管制圖', 'X-Bar Chart')) + '</h3> <div id="xbarChart" class="h-96"></div> </div>' +
                 '<div class="saas-card p-8"> <h3 class="text-base font-bold mb-6 dark:text-white">' + this.t('R 管制圖', 'R Chart') + '</h3> <div id="rChart" class="h-80"></div> </div> </div>';

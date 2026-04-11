@@ -102,7 +102,11 @@ var SPCEngine = {
     },
 
     range: function (data) {
-        return this.max(data) - this.min(data);
+        var mx = this.max(data);
+        var mn = this.min(data);
+        if (mx === null || mn === null) return 0;
+        var r = mx - mn;
+        return isNaN(r) ? 0 : r;
     },
 
     stdDev: function (data) {
@@ -135,16 +139,25 @@ var SPCEngine = {
 
         for (var i = 0; i < dataMatrix.length; i++) {
             var subgroup = dataMatrix[i];
-            var filtered = subgroup.filter(function (v) { return v !== null && !isNaN(v); });
+            if (!subgroup) continue;
+            
+            // Strict filter: Only keep real numbers
+            var filtered = subgroup.filter(function (v) { 
+                return v !== null && v !== undefined && v !== '' && !isNaN(parseFloat(v)); 
+            }).map(function(v) { return parseFloat(v); });
+            
             if (filtered.length > 0) {
-                xBars.push(self.mean(filtered));
-                ranges.push(self.range(filtered));
+                var m = self.mean(filtered);
+                var r = self.range(filtered);
+                
+                if (!isNaN(m)) xBars.push(m);
+                if (!isNaN(r)) ranges.push(r);
             }
         }
 
         // Use fixed limits if provided (Phase II), otherwise calculate from current data (Phase I)
-        var xDoubleBar = (fixedCL !== undefined) ? fixedCL : this.mean(xBars);
-        var rBar = this.mean(ranges);
+        var xDoubleBar = fixedCL !== undefined ? fixedCL : (xBars.length > 0 ? this.mean(xBars) : 0);
+        var rBar = ranges.length > 0 ? this.mean(ranges) : 0;
         var sigma = (fixedSigma !== undefined) ? fixedSigma : (constants.A2 * rBar / 3); 
         
         // If fixedSigma is not provided, we calculate standard Shewhart sigma: (A2 * R-bar) / 3

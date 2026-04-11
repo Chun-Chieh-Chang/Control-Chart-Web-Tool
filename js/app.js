@@ -1944,9 +1944,8 @@ var SPCApp = {
                     markers: {
                         width: 25,
                         height: 5,
-                        strokeWidth: [0, 2, 2, 2],
-                        strokeColors: [theme.primary, theme.danger, theme.success, theme.danger],
-                        radius: 2,
+                        strokeWidth: 0,
+                        radius: 0,
                         offsetX: -2,
                         offsetY: 0
                     },
@@ -2132,9 +2131,8 @@ var SPCApp = {
                     markers: {
                         width: 25,
                         height: 5,
-                        strokeWidth: [0, 2, 2, 2],
-                        strokeColors: [theme.primary, theme.danger, theme.success, theme.danger],
-                        radius: 2,
+                        strokeWidth: 0,
+                        radius: 0,
                         offsetX: -2,
                         offsetY: 0
                     },
@@ -2282,7 +2280,7 @@ var SPCApp = {
                     fontSize: '11px',
                     fontWeight: 700,
                     fontFamily: 'Inter, sans-serif',
-                    markers: { width: 25, height: 5, strokeWidth: 0, radius: 2, offsetX: -2, offsetY: 0 },
+                    markers: { width: 25, height: 5, strokeWidth: 0, radius: 0, offsetX: -2, offsetY: 0 },
                     itemMargin: { horizontal: 10, vertical: 5 },
                     labels: { colors: theme.text }
                 }
@@ -2352,7 +2350,7 @@ var SPCApp = {
                     fontSize: '11px',
                     fontWeight: 700,
                     fontFamily: 'Inter, sans-serif',
-                    markers: { width: 25, height: 5, strokeWidth: 0, radius: 2, offsetX: -2, offsetY: 0 },
+                    markers: { width: 25, height: 5, strokeWidth: 0, radius: 0, offsetX: -2, offsetY: 0 },
                     itemMargin: { horizontal: 10, vertical: 5 },
                     labels: { colors: theme.text }
                 }
@@ -2510,7 +2508,7 @@ var SPCApp = {
                     fontSize: '11px',
                     fontWeight: 700,
                     fontFamily: 'Inter, sans-serif',
-                    markers: { width: 25, height: 5, strokeWidth: 0, radius: 2, offsetX: -2, offsetY: 0 },
+                    markers: { width: 25, height: 5, strokeWidth: 0, radius: 0, offsetX: -2, offsetY: 0 },
                     itemMargin: { horizontal: 10, vertical: 5 },
                     labels: { colors: theme.text }
                 }
@@ -2598,7 +2596,7 @@ var SPCApp = {
                     fontSize: '11px',
                     fontWeight: 700,
                     fontFamily: 'Inter, sans-serif',
-                    markers: { width: 25, height: 5, strokeWidth: 0, radius: 2, offsetX: -2, offsetY: 0 },
+                    markers: { width: 25, height: 5, strokeWidth: 0, radius: 0, offsetX: -2, offsetY: 0 },
                     itemMargin: { horizontal: 10, vertical: 5 },
                     labels: { colors: theme.text }
                 }
@@ -2678,7 +2676,7 @@ var SPCApp = {
                     fontSize: '11px',
                     fontWeight: 700,
                     fontFamily: 'Inter, sans-serif',
-                    markers: { width: 25, height: 5, strokeWidth: 0, radius: 2, offsetX: -2, offsetY: 0 },
+                    markers: { width: 25, height: 5, strokeWidth: 0, radius: 0, offsetX: -2, offsetY: 0 },
                     itemMargin: { horizontal: 10, vertical: 5 },
                     labels: { colors: theme.text }
                 }

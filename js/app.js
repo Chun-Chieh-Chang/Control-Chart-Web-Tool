@@ -627,8 +627,8 @@ var SPCApp = {
         // Switch to appropriate view based on entry type
         this.switchView('charts');
 
-        // If it has diagnostic data, display it
-        if (entry.item && window.QIPExtractApp) {
+        // If it has diagnostic data, display it (Safety check for legacy/module versions)
+        if (entry.item && window.QIPExtractApp && typeof window.QIPExtractApp.displayDiagnostic === 'function') {
             window.QIPExtractApp.displayDiagnostic(entry.item);
         }
     },
@@ -1134,7 +1134,7 @@ var SPCApp = {
         }
     },
 
-    executeAnalysis: function (type) {
+    executeAnalysis: function (type, specificCavityIdx) {
         var self = this;
         if (!this.selectedItem) { alert(this.t('請先選擇分析項目', 'Please select an item first')); return; }
         this.showLoading(this.t('分析中...', 'Analyzing...'));
@@ -1146,17 +1146,34 @@ var SPCApp = {
             try {
                 var ws = self.workbook.Sheets[self.selectedItem];
                 var dataInput = new DataInput(ws);
+                self.currentDataInput = dataInput;
+                self.currentAnalysisType = type;
 
                 // Fallback: If Item P/N is empty, use the filename (without extension)
                 if (!dataInput.productInfo.item && self.selectedFile && self.selectedFile.name) {
                     dataInput.productInfo.item = self.selectedFile.name.replace(/\.[^/.]+$/, "");
                 }
 
+                console.log('SPCApp: Executing analysis for type:', type);
                 var results;
 
                 if (type === 'batch') {
                     var dataMatrix = dataInput.getDataMatrix();
-                    var xbarR = SPCEngine.calculateXBarRLimits(dataMatrix);
+                    var xbarR;
+
+                    // Baseline Lock Logic (Phase II Monitoring)
+                    var lockBaseline = document.getElementById('baselineLockToggle').checked;
+                    var baselinePointCount = parseInt(document.getElementById('baselinePointCount').value) || 25;
+
+                    if (lockBaseline && dataMatrix.length > baselinePointCount) {
+                        var baselineMatrix = dataMatrix.slice(0, baselinePointCount);
+                        var baselineResults = SPCEngine.calculateXBarRLimits(baselineMatrix);
+                        // Apply fixed limits from baseline to the whole dataset
+                        xbarR = SPCEngine.calculateXBarRLimits(dataMatrix, baselineResults.xBar.CL, baselineResults.xBar.sigma);
+                    } else {
+                        xbarR = SPCEngine.calculateXBarRLimits(dataMatrix);
+                    }
+
                     var allValues = dataMatrix.flat().filter(function (v) { return v !== null; });
                     var specs = dataInput.specs;
                     var n = dataMatrix[0] ? dataMatrix[0].length : 2;
@@ -1189,76 +1206,92 @@ var SPCApp = {
                     var stability = SPCEngine.analyzeGroupStability(groupStats, specs);
                     results = { type: 'group', groupStats: groupStats, specs: specs, stability: stability, productInfo: dataInput.productInfo };
                 } else if (type === 'multi-cavity') {
-                    // IMPLEMENTATION OF ROTATIONAL SAMPLING (n=5)
+                    // ROTATIONAL SAMPLING (n=5)
                     var specs = dataInput.specs;
                     var originalMatrix = dataInput.getDataMatrix();
                     var cavityNames = dataInput.getCavityNames();
                     var batchNames = dataInput.batchNames;
                     var flattened = [];
 
-                    // 1. Flatten data while tagging with source cavity and batch
                     for (var b = 0; b < originalMatrix.length; b++) {
                         for (var c = 0; c < originalMatrix[b].length; c++) {
                             var val = originalMatrix[b][c];
                             if (val !== null && !isNaN(val)) {
-                                flattened.push({
-                                    val: val,
-                                    label: batchNames[b] + ' (' + cavityNames[c] + ')',
-                                    batch: batchNames[b],
-                                    cavity: cavityNames[c]
-                                });
+                                flattened.push({ val: val, label: batchNames[b] + ' (' + cavityNames[c] + ')' });
                             }
                         }
                     }
 
-                    // 2. Re-group into subgroups of n=5 (Rotational)
-                    var targetN = 5;
-                    var rotMatrix = [];
-                    var rotLabels = [];
-                    var rotBatchNames = [];
-                    var rotSubgroupLabels = [];
-
+                    var targetN = 5, rotMatrix = [], rotLabels = [], rotBatchNames = [], rotSubgroupLabels = [];
                     for (var i = 0; i < flattened.length; i += targetN) {
                         var chunk = flattened.slice(i, i + targetN);
-                        if (chunk.length < 2 && i > 0) break; // Skip the very last group if too small
-
+                        if (chunk.length < 2 && i > 0) break;
                         rotMatrix.push(chunk.map(item => item.val));
                         rotSubgroupLabels.push(chunk.map(item => item.label));
-
-                        // Label represents the range of samples in this rotational subgroup
-                        var label = chunk[0].label + ' to ' + chunk[chunk.length - 1].label;
-                        rotLabels.push('Subgroup ' + (rotMatrix.length));
-                        rotBatchNames.push(label);
+                        rotBatchNames.push(chunk[0].label + ' to ' + chunk[chunk.length - 1].label);
                     }
 
-                    // 3. Calculate Extended Limits
-                    var xbarR = SPCEngine.calculateExtendedBatchLimits(rotMatrix);
-                    var allValues = flattened.map(item => item.val);
-                    var cap = SPCEngine.calculateProcessCapability(allValues, specs.usl, specs.lsl, xbarR.summary.rBar, targetN);
-
-                    xbarR.summary.Cpk = cap.Cpk;
-                    xbarR.summary.Ppk = cap.Ppk;
-
-                    // Analysis insights
-                    var distStats = SPCEngine.calculateDistStats(allValues);
+                    var xbarR;
+                    var lockBaseline = document.getElementById('baselineLockToggle').checked;
+                    var baselinePointCount = parseInt(document.getElementById('baselinePointCount').value) || 25;
+                    if (lockBaseline && rotMatrix.length > baselinePointCount) {
+                        var baselineMatrix = rotMatrix.slice(0, baselinePointCount);
+                        var baselineResults = SPCEngine.calculateExtendedBatchLimits(baselineMatrix);
+                        xbarR = SPCEngine.calculateExtendedBatchLimits(rotMatrix, baselineResults.xBar.CL, baselineResults.xBar.sigma);
+                    } else {
+                        xbarR = SPCEngine.calculateExtendedBatchLimits(rotMatrix);
+                    }
+                    var cap = SPCEngine.calculateProcessCapability(flattened.map(item => item.val), specs.usl, specs.lsl, xbarR.summary.rBar, targetN);
+                    var distStats = SPCEngine.calculateDistStats(flattened.map(item => item.val));
                     var diagnosis = SPCEngine.analyzeVarianceSource(cap.Cpk, cap.Ppk, distStats);
-                    if (diagnosis && diagnosis.advice) {
-                        diagnosis.advice.zh = "【多模穴專業建議】" + diagnosis.advice.zh + " 已採用 $n=5$ 輪替抽樣與擴展管制界限，以容許模穴間系統性差異。";
-                        diagnosis.advice.en = "【Multi-Cavity Expert Advice】" + diagnosis.advice.en + " Subgroup n=5 rotational sampling and expanded control limits applied to accommodate systematic differences.";
+                    results = { type: 'batch', analysisSubType: 'multi-cavity', xbarR: xbarR, batchNames: rotBatchNames, subgroupLabels: rotSubgroupLabels, specs: specs, dataMatrix: rotMatrix, cavityNames: new Array(targetN).fill(0).map((_, i) => "S" + (i + 1)), productInfo: dataInput.productInfo, diagnosis: diagnosis };
+                } else if (type === 'distribution') {
+                    var matrix = dataInput.getDataMatrix();
+                    var allValues = [];
+                    var selectionName = self.t('全局數據', 'Global Data');
+                    if (specificCavityIdx !== undefined && specificCavityIdx !== -1) {
+                        for (var r = 0; r < matrix.length; r++) { if (matrix[r][specificCavityIdx] !== null) allValues.push(matrix[r][specificCavityIdx]); }
+                        selectionName = dataInput.getCavityNames()[specificCavityIdx] || (self.t('模穴 ', 'Cavity ') + (specificCavityIdx + 1));
+                    } else {
+                        for (var r = 0; r < matrix.length; r++) { for (var c = 0; c < matrix[r].length; c++) { if (matrix[r][c] !== null) allValues.push(matrix[r][c]); } }
                     }
-
-                    results = {
-                        type: 'batch', // Use batch renderer but with our modified data
-                        analysisSubType: 'multi-cavity',
-                        xbarR: xbarR,
-                        batchNames: rotBatchNames,
-                        subgroupLabels: rotSubgroupLabels,
-                        specs: specs,
-                        dataMatrix: rotMatrix,
-                        cavityNames: new Array(targetN).fill(0).map((_, i) => "Sample " + (i + 1)),
-                        productInfo: dataInput.productInfo,
-                        diagnosis: diagnosis
+                    var specs = dataInput.specs, stats = SPCEngine.calculateProcessCapability(allValues, specs.usl, specs.lsl);
+                    var distStats = SPCEngine.calculateDistStats(allValues), mean = stats.mean, sigma = stats.overallStdDev, totalCount = allValues.length;
+                    var plotMin = Math.min(mean - 4.2 * sigma, specs.lsl !== null ? specs.lsl - 0.5*sigma : mean - 4.5*sigma);
+                    var plotMax = Math.max(mean + 4.2 * sigma, specs.usl !== null ? specs.usl + 0.5*sigma : mean + 4.5*sigma);
+                    var plotRange = plotMax - plotMin, binCount = 40, binWidth = plotRange / binCount, counts = [];
+                    var histData = []; // Will use step coordinates for area chart to simulate bars
+                    for (var i = 0; i < binCount; i++) {
+                        var bMin = plotMin + i * binWidth;
+                        var bMax = bMin + binWidth;
+                        var count = allValues.filter(v => v >= bMin && v < bMax).length;
+                        
+                        // Add 4 points to form a box for the "area" histogram
+                        histData.push({ x: SPCEngine.round(bMin, 6), y: 0 });
+                        histData.push({ x: SPCEngine.round(bMin, 6), y: count });
+                        histData.push({ x: SPCEngine.round(bMax, 6), y: count });
+                        histData.push({ x: SPCEngine.round(bMax, 6), y: 0 });
+                    }
+                    var curveData = [], samples = 200, step = plotRange / samples;
+                    var getPdfY = function(xVal) { 
+                        var exponent = -Math.pow(xVal - mean, 2) / (2 * Math.pow(sigma, 2));
+                        return SPCEngine.round((1 / (sigma * Math.sqrt(2 * Math.PI))) * Math.pow(Math.E, exponent) * totalCount * binWidth, 2);
                     };
+                    for (var j = 0; j <= samples; j++) { var x = plotMin + j * step; curveData.push({ x: SPCEngine.round(x, 6), y: getPdfY(x) }); }
+                    results = { type: 'distribution', allValues: allValues, specs: specs, stats: stats, distStats: distStats, histogram: { counts: histData, curve: curveData }, productInfo: dataInput.productInfo, selectionName: selectionName, cavityIdx: specificCavityIdx,
+                        markers: { 
+                            mean: { x: mean, y: getPdfY(mean) }, 
+                            s1p: { x: mean + sigma, y: getPdfY(mean + sigma) }, 
+                            s1n: { x: mean - sigma, y: getPdfY(mean - sigma) }, 
+                            s2p: { x: mean + 2*sigma, y: getPdfY(mean + 2*sigma) }, 
+                            s2n: { x: mean - 2*sigma, y: getPdfY(mean - 2*sigma) }, 
+                            s3p: { x: mean + 3*sigma, y: getPdfY(mean + 3*sigma) }, 
+                            s3n: { x: mean - 3*sigma, y: getPdfY(mean - 3*sigma) } 
+                        }
+                    };
+                } else {
+                    console.error('SPCApp: Unhandled analysis type:', type);
+                    throw new Error('Unknown analysis type: ' + type);
                 }
 
                 self.analysisResults = results;
@@ -1284,6 +1317,11 @@ var SPCApp = {
         var data = this.analysisResults;
         var self = this;
         var html = '';
+
+        if (!data) {
+            console.error('SPCApp: Attempted to render results but analysisResults is undefined.');
+            return;
+        }
 
         // Ensure sidebar is closed by default for new analysis
         this.toggleAnomalySidebar(false);
@@ -1344,7 +1382,15 @@ var SPCApp = {
                     '<button id="prevPageBtn" class="px-4 py-1 pb-1.5 text-xs font-bold border rounded-md disabled:opacity-30 dark:text-white">' + this.t('上頁', 'Prev') + '</button>' +
                     '<button id="nextPageBtn" class="px-4 py-1 pb-1.5 text-xs font-bold text-white bg-primary rounded-md disabled:opacity-30">' + this.t('下頁', 'Next') + '</button> </div> </div>';
             }
-            html += '<div id="detailedTableContainer" class="mb-10 overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm"></div>' +
+            var fixedBaselineBadge = '';
+            if (data.xbarR.summary.isFixed) {
+                fixedBaselineBadge = '<div class="col-span-full p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl flex items-center gap-4 mb-8">' +
+                    '<div class="w-10 h-10 rounded-lg bg-blue-600 text-white flex items-center justify-center shrink-0"><span class="material-icons-outlined">lock</span></div>' +
+                    '<div><h4 class="text-sm font-bold text-blue-900 dark:text-blue-300">' + this.t('固定基準監控模式 (Phase II)', 'Fixed Baseline Monitoring (Phase II)') + '</h4>' +
+                    '<p class="text-xs text-blue-700 dark:text-blue-400 font-medium leading-relaxed">' + this.t('管制界限已基於初始基準點位鎖定。此舉旨在模擬量產監控環境，確保後續新數據的載入不會導致歷史評估結果發生偏差。', 'Control limits locked based on initial baseline points. This simulates a high-volume manufacturing (HVM) monitor, ensuring new data does not shift historical evaluation results.') + '</p></div></div>';
+            }
+
+            html += fixedBaselineBadge + '<div id="detailedTableContainer" class="mb-10 overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm"></div>' +
                 '<div class="grid grid-cols-1 gap-8">' +
                 '<div class="saas-card p-8"> <h3 class="text-base font-bold mb-6 dark:text-white">' + (data.analysisSubType === 'multi-cavity' ? 'Extended Shewhart X̄ Chart' : this.t('X̄ 管制圖', 'X-Bar Chart')) + '</h3> <div id="xbarChart" class="h-96"></div> </div>' +
                 '<div class="saas-card p-8"> <h3 class="text-base font-bold mb-6 dark:text-white">' + this.t('R 管制圖', 'R Chart') + '</h3> <div id="rChart" class="h-80"></div> </div> </div>';
@@ -1398,10 +1444,76 @@ var SPCApp = {
                 groupHtml +
                 '<div class="saas-card p-8"> <h3 class="text-base font-bold mb-6 dark:text-white">' + this.t('群組趨勢 (Min-Max-Avg)', 'Trend') + '</h3> <div id="groupChart" class="h-96"></div> </div>' +
                 '<div class="saas-card p-8"> <h3 class="text-base font-bold mb-6 dark:text-white">' + this.t('組間全距 (Variation)', 'Variation') + '</h3> <div id="groupVarChart" class="h-96"></div> </div> </div>';
+        } else if (data.type === 'distribution') {
+            var normHtml = '';
+            var isSkewed = Math.abs(data.distStats.skewness) > 1;
+            var normStatus = isSkewed ? this.t('偏態 (Non-Normal)', 'Skewed (Non-Normal)') : this.t('常態 (Normal)', 'Normal');
+            var normColor = isSkewed ? '#f43f5e' : '#10b981';
+
+            // Build Cavity Selector HTML (Only if multiple cavities exist)
+            var selectorHtml = '';
+            var cavityCount = this.currentDataInput ? this.currentDataInput.getCavityCount() : 0;
+            if (cavityCount > 1) {
+                var cavityNames = this.currentDataInput.getCavityNames();
+                selectorHtml = '<div class="flex items-center gap-2 p-1.5 bg-slate-100 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">' +
+                    '<span class="text-[10px] font-bold text-slate-500 ml-1 uppercase">' + (this.settings.language === 'zh' ? '分析對象' : 'Target') + '</span>' +
+                    '<select id="distCavitySelector" class="bg-transparent border-none text-xs font-bold text-indigo-600 focus:outline-none cursor-pointer">' +
+                    '<option value="-1" ' + (data.cavityIdx === -1 ? 'selected' : '') + '>' + this.t('全局數據 (Global)', 'Global Data') + '</option>';
+                
+                cavityNames.forEach(function(name, i) {
+                    selectorHtml += '<option value="' + i + '" ' + (data.cavityIdx === i ? 'selected' : '') + '>' + name + '</option>';
+                });
+                selectorHtml += '</select></div>';
+            }
+
+            normHtml = '<div class="saas-card p-6 border-l-4 mb-8" style="border-left-color:' + normColor + '">' +
+                '<div class="flex justify-between items-center mb-4">' +
+                '<div> <h3 class="text-sm font-bold text-slate-500 uppercase">' + this.t('數據分佈常態性診斷', 'Normality Diagnosis') + '</h3> ' +
+                '<div class="text-2xl font-bold mt-1" style="color:' + normColor + '">' + normStatus + '</div> </div>' +
+                '<div class="text-right"> <div class="text-[10px] font-bold text-slate-400">' + this.t('樣本總數', 'Sample Count') + '</div>' +
+                '<div class="text-xl font-mono font-bold text-slate-700 dark:text-slate-300">' + data.allValues.length + '</div> </div> </div>' +
+                '<div class="flex items-start gap-3 p-3 bg-slate-50 dark:bg-slate-900/50 rounded-lg border border-slate-100 dark:border-slate-800">' +
+                '<span class="material-icons-outlined text-indigo-500 mt-0.5">psychology</span>' +
+                '<div class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed font-bold">' +
+                '<span class="text-indigo-600 dark:text-indigo-400 font-bold">' + this.t('統計摘要：', 'Statistical Summary: ') + '</span>' + 
+                (this.settings.language === 'zh' ? 
+                    '數據偏態值為 ' + data.distStats.skewness.toFixed(3) + '，峰度為 ' + data.distStats.kurtosis.toFixed(3) + '。' + (isSkewed ? '建議檢視是否有模穴差異或局部異常。' : '數據分佈符合常態性假設。') :
+                    'Skewness: ' + data.distStats.skewness.toFixed(3) + ', Kurtosis: ' + data.distStats.kurtosis.toFixed(3) + '. ' + (isSkewed ? 'Normality assumption might be violated.' : 'Data follows a normal distribution.')) + '</div> </div> </div>';
+
+            html = '<div class="grid grid-cols-1 gap-8">' +
+                normHtml +
+                '<div class="saas-card p-8">' +
+                '<div class="flex justify-between items-center mb-6">' +
+                '<h3 class="text-base font-bold dark:text-white">' + this.t('正態分佈直方圖分析', 'Normal Distribution Analysis') + '</h3>' +
+                selectorHtml +
+                '</div>' +
+                '<div id="distChart" class="h-96"></div> </div>' +
+                '<div class="grid grid-cols-1 md:grid-cols-2 gap-6">' +
+                '<div class="saas-card p-6"> <h4 class="text-xs font-bold text-slate-400 uppercase mb-4">' + this.t('位置統計', 'Location Stats') + '</h4>' +
+                '<div class="space-y-3">' +
+                '<div class="flex justify-between"> <span class="text-sm text-slate-500">' + this.t('平均值 (Mean)', 'Mean') + '</span> <span class="font-mono font-bold dark:text-white">' + data.stats.mean.toFixed(4) + '</span> </div>' +
+                '<div class="flex justify-between"> <span class="text-sm text-slate-500">' + this.t('最小值 (Min)', 'Min') + '</span> <span class="font-mono font-bold dark:text-white">' + data.stats.min.toFixed(4) + '</span> </div>' +
+                '<div class="flex justify-between"> <span class="text-sm text-slate-500">' + this.t('最大值 (Max)', 'Max') + '</span> <span class="font-mono font-bold dark:text-white">' + data.stats.max.toFixed(4) + '</span> </div>' +
+                '</div> </div>' +
+                '<div class="saas-card p-6"> <h4 class="text-xs font-bold text-slate-400 uppercase mb-4">' + this.t('變異統計', 'Variation Stats') + '</h4>' +
+                '<div class="space-y-3">' +
+                '<div class="flex justify-between"> <span class="text-sm text-slate-500">' + this.t('組內標準差 (Sigma Within)', 'Sigma Within') + '</span> <span class="font-mono font-bold dark:text-white">' + data.stats.withinStdDev.toFixed(4) + '</span> </div>' +
+                '<div class="flex justify-between"> <span class="text-sm text-slate-500">' + this.t('整體標準差 (Sigma Overall)', 'Sigma Overall') + '</span> <span class="font-mono font-bold dark:text-white">' + data.stats.overallStdDev.toFixed(4) + '</span> </div>' +
+                '<div class="flex justify-between"> <span class="text-sm text-slate-500">Cpk</span> <span class="font-mono font-bold text-primary">' + data.stats.Cpk.toFixed(3) + '</span> </div>' +
+                '</div> </div>' +
+                '</div> </div>';
         }
 
         resultsContent.innerHTML = html;
         document.getElementById('results').style.display = 'block';
+
+        // Add Cavity Selector Listener
+        var cavSelector = document.getElementById('distCavitySelector');
+        if (cavSelector) {
+            cavSelector.addEventListener('change', function() {
+                self.executeAnalysis('distribution', parseInt(this.value));
+            });
+        }
 
         var downloadBtn = document.getElementById('downloadExcel');
         if (downloadBtn) {
@@ -1567,11 +1679,31 @@ var SPCApp = {
             var pageLabels = data.batchNames.slice(start, end);
             var pageData = data.dataMatrix.slice(start, end);
 
-            var calculate = (data.analysisSubType === 'multi-cavity') ?
-                SPCEngine.calculateExtendedBatchLimits.bind(SPCEngine) :
-                SPCEngine.calculateXBarRLimits.bind(SPCEngine);
-
-            var pageXbarR = calculate(pageData);
+            // Use global results from analysis instead of recalculating per page
+            // This ensures global control limits and across-page Nelson rules detection
+            var globalXbarR = data.xbarR;
+            var pageXbarR = {
+                xBar: {
+                    data: globalXbarR.xBar.data.slice(start, end),
+                    UCL: globalXbarR.xBar.UCL,
+                    CL: globalXbarR.xBar.CL,
+                    LCL: globalXbarR.xBar.LCL,
+                    sigma: globalXbarR.xBar.sigma,
+                    violations: globalXbarR.xBar.violations
+                        .filter(v => v.index >= start && v.index < end)
+                        .map(v => ({ index: v.index - start, rules: v.rules }))
+                },
+                R: {
+                    data: globalXbarR.R.data.slice(start, end),
+                    UCL: globalXbarR.R.UCL,
+                    CL: globalXbarR.R.CL,
+                    LCL: globalXbarR.R.LCL,
+                    violations: (globalXbarR.R.violations || [])
+                        .filter(v => v.index >= start && v.index < end)
+                        .map(v => ({ index: v.index - start, rules: v.rules }))
+                },
+                summary: globalXbarR.summary
+            };
 
             this.renderDetailedDataTable(pageLabels, pageData, pageXbarR);
 
@@ -2448,6 +2580,72 @@ var SPCApp = {
             };
             var chartV = new ApexCharts(document.querySelector("#groupVarChart"), vOpt);
             chartV.render(); this.chartInstances.push(chartV);
+        } else if (data.type === 'distribution') {
+            var theme = this.getChartTheme();
+            var dOpt = {
+                chart: { 
+                    type: 'line', 
+                    height: 420, 
+                    toolbar: { show: true }, 
+                    background: 'transparent',
+                    animations: { enabled: false }
+                },
+                series: [
+                    { name: this.t('實測次數', 'Frequency'), type: 'area', data: data.histogram.counts },
+                    { name: this.t('常態分佈擬合', 'Normal Fit'), type: 'line', data: data.histogram.curve }
+                ],
+                stroke: { width: [1, 3], curve: 'straight' },
+                fill: {
+                    type: ['solid', 'none'],
+                    opacity: [0.6, 1]
+                },
+                plotOptions: { bar: { columnWidth: '100%', borderRadius: 0 } },
+                xaxis: { 
+                    type: 'numeric',
+                    tickAmount: 10,
+                    labels: { 
+                        formatter: function(v) { return v ? parseFloat(v).toFixed(4) : ''; },
+                        style: { colors: theme.text }
+                    },
+                    title: { text: this.t('測量值', 'Measured Value'), style: { color: theme.text, fontWeight: 700 } },
+                    axisBorder: { show: true, color: theme.grid },
+                    axisTicks: { show: true, color: theme.grid }
+                },
+                yaxis: { 
+                    title: { text: this.t('次數 (Frequency)', 'Frequency'), style: { color: theme.text, fontWeight: 700 } }, 
+                    labels: { style: { colors: theme.text } } 
+                },
+                colors: [theme.mode === 'dark' ? '#94a3b8' : '#cbd5e1', '#3b82f6'],
+                dataLabels: { enabled: false },
+                title: { 
+                    text: this.t('標準常態分佈分析 (非正規化)', 'Non-Normalized Normal Distribution') + ' (' + data.selectionName + ')', 
+                    align: 'center', 
+                    style: { color: theme.text, fontSize: '18px', fontWeight: 800 } 
+                },
+                subtitle: {
+                    text: this.t('樣本數: ', 'N: ') + data.allValues.length + ' | Mean: ' + data.stats.mean.toFixed(4) + ' | σ: ' + data.stats.overallStdDev.toFixed(4),
+                    align: 'center',
+                    style: { color: theme.textSec, fontSize: '13px', fontWeight: 600 }
+                },
+                theme: { mode: theme.mode },
+                annotations: {
+                    xaxis: [
+                        { x: data.specs.usl, borderColor: '#f43f5e', borderWidth: 2, strokeDashArray: 4, label: { text: 'USL: ' + (data.specs.usl ? data.specs.usl.toFixed(4) : '-'), orientation: 'vertical', style: { color: '#fff', background: '#f43f5e', fontSize: '11px', fontWeight: 700 } } },
+                        { x: data.specs.lsl, borderColor: '#f43f5e', borderWidth: 2, strokeDashArray: 4, label: { text: 'LSL: ' + (data.specs.lsl ? data.specs.lsl.toFixed(4) : '-'), orientation: 'vertical', style: { color: '#fff', background: '#f43f5e', fontSize: '11px', fontWeight: 700 } } }
+                    ],
+                    points: [
+                        { x: data.markers.mean.x, y: data.markers.mean.y, marker: { size: 6, fillColor: '#3b82f6', strokeColor: '#fff', strokeWidth: 2 }, label: { text: 'μ: ' + data.markers.mean.x.toFixed(4), style: { background: '#3b82f6', color: '#fff', fontSize: '11px', padding: {left: 10, right: 10} }, offsetY: -15 } },
+                        { x: data.markers.s1p.x, y: data.markers.s1p.y, marker: { size: 4, fillColor: '#f43f5e' }, label: { text: '+1σ (' + data.markers.s1p.x.toFixed(4) + ')', style: { background: 'rgba(244, 63, 94, 0.1)', color: '#f43f5e', fontSize: '10px' }, offsetY: -10 } },
+                        { x: data.markers.s1n.x, y: data.markers.s1n.y, marker: { size: 4, fillColor: '#f43f5e' }, label: { text: '-1σ (' + data.markers.s1n.x.toFixed(4) + ')', style: { background: 'rgba(244, 63, 94, 0.1)', color: '#f43f5e', fontSize: '10px' }, offsetY: -10 } },
+                        { x: data.markers.s3p.x, y: data.markers.s3p.y, marker: { size: 4, fillColor: '#94a3b8' }, label: { text: '+3σ (' + data.markers.s3p.x.toFixed(4) + ')', style: { background: 'rgba(148, 163, 184, 0.1)', color: '#64748b', fontSize: '10px' }, offsetY: -10 } },
+                        { x: data.markers.s3n.x, y: data.markers.s3n.y, marker: { size: 4, fillColor: '#94a3b8' }, label: { text: '-3σ (' + data.markers.s3n.x.toFixed(4) + ')', style: { background: 'rgba(148, 163, 184, 0.1)', color: '#64748b', fontSize: '10px' }, offsetY: -10 } }
+                    ]
+                },
+                grid: { borderColor: theme.grid, strokeDashArray: 2 }
+            };
+            var dChart = new ApexCharts(document.getElementById('distChart'), dOpt);
+            dChart.render();
+            this.chartInstances.push(dChart);
         }
     },
 

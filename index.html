@@ -687,6 +687,62 @@
                                 <span data-en="Run Model" data-zh="執行專業模型">執行專業模型</span>
                                 <span class="material-icons-outlined text-sm ml-1">chevron_right</span></span>
                         </div>
+                        <!-- Distribution Analysis -->
+                        <div class="p-8 rounded-2xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50 hover:bg-white dark:hover:bg-slate-800 hover:border-blue-200 dark:hover:border-blue-900 shadow-sm hover:shadow-xl transition-all cursor-pointer group"
+                            data-analysis="distribution">
+                            <div
+                                class="w-14 h-14 rounded-2xl bg-white dark:bg-slate-700 shadow-sm flex items-center justify-center mb-6 text-blue-600 dark:text-blue-400 group-hover:bg-blue-600 group-hover:text-white transition-all">
+                                <span class="material-icons-outlined text-3xl">bar_chart</span>
+                            </div>
+                            <h4 class="font-bold text-slate-900 dark:text-white mb-2" data-en="Distribution Analysis"
+                                data-zh="常態分佈分析">常態分佈分析</h4>
+                            <p class="text-sm text-slate-500 dark:text-slate-400 leading-relaxed mb-6"
+                                data-en="Histogram visualization, skewness/kurtosis testing, and normality check."
+                                data-zh="直方圖視覺化、偏態/峰度檢定與數據常態性檢查。">直方圖視覺化、偏態/峰度檢定與數據常態性檢查。</p>
+                            <span
+                                class="text-sm font-bold text-blue-600 dark:text-blue-400 group-hover:translate-x-1 transition-transform inline-flex items-center">
+                                <span data-en="Run Model" data-zh="執行模型">執行模型</span>
+                                <span class="material-icons-outlined text-sm ml-1">chevron_right</span></span>
+                        </div>
+                    </div>
+
+                    <!-- Advanced Config -->
+                    <div class="mt-10 pt-10 border-t border-slate-100 dark:border-slate-800">
+                        <div class="flex items-center gap-3 mb-6">
+                            <span class="material-icons-outlined text-slate-400">tune</span>
+                            <h4 class="text-sm font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider"
+                                data-en="Advanced Configuration" data-zh="進階參數設定">進階參數設定</h4>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div
+                                class="flex items-start gap-4 p-5 bg-slate-50 dark:bg-slate-800/30 rounded-2xl border border-slate-100 dark:border-slate-700 hover:border-primary/30 transition-all">
+                                <div class="mt-1">
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" id="baselineLockToggle" class="sr-only peer">
+                                        <div
+                                            class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary">
+                                        </div>
+                                    </label>
+                                </div>
+                                <div class="flex-1">
+                                    <h5 class="font-bold text-slate-900 dark:text-white text-sm"
+                                        data-en="Fixed Baseline Monitoring (Phase II)" data-zh="固定基準監控 (Phase II)">
+                                        固定基準監控 (Phase II)</h5>
+                                    <p class="text-[11px] text-slate-500 mt-1 leading-relaxed"
+                                        data-en="Lock control limits based on first N points. Prevents historical points from being re-judged when new data is added."
+                                        data-zh="鎖定前 N 個點作為計算基準。防止新數據加入時導致歷史點位被重新判定，維持評估一致性。">
+                                        鎖定前 N 個點作為計算基準。防止新數據加入時導致歷史點位被重新判定，維持評估一致性。</p>
+                                    <div class="mt-3 flex items-center gap-3">
+                                        <span class="text-[10px] text-slate-400 uppercase font-black tracking-widest"
+                                            data-en="Points:" data-zh="基準點數:">基準點數:</span>
+                                        <input type="number" id="baselinePointCount" value="25" min="2" max="100"
+                                            class="w-16 px-2 py-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded text-xs font-bold text-primary text-center focus:outline-none focus:ring-2 focus:ring-primary/20">
+                                        <span class="text-[10px] text-slate-400 italic" data-en="(Recommended: 25)"
+                                            data-zh="(建議值: 25)">(建議值: 25)</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </section>
             </div>
@@ -2337,7 +2393,7 @@
     <script src="js/template-store.js"></script>
     <script src="js/qip-app.js"></script>
     <!-- Main App -->
-    <script src="js/app.js"></script>
+    <script src="js/app.js?v=2.1.1"></script>
 </body>
 
 </html>

@@ -126,7 +126,7 @@ var SPCEngine = {
         return (mrSum / (filtered.length - 1)) / 1.128;
     },
 
-    calculateXBarRLimits: function (dataMatrix) {
+    calculateXBarRLimits: function (dataMatrix, fixedCL, fixedSigma) {
         var self = this;
         var n = dataMatrix[0] ? dataMatrix[0].length : 0;
         var constants = this.getConstants(n);
@@ -142,22 +142,26 @@ var SPCEngine = {
             }
         }
 
-        var xDoubleBar = this.mean(xBars);
+        // Use fixed limits if provided (Phase II), otherwise calculate from current data (Phase I)
+        var xDoubleBar = (fixedCL !== undefined) ? fixedCL : this.mean(xBars);
         var rBar = this.mean(ranges);
+        var sigma = (fixedSigma !== undefined) ? fixedSigma : (constants.A2 * rBar / 3); 
+        
+        // If fixedSigma is not provided, we calculate standard Shewhart sigma: (A2 * R-bar) / 3
 
-        var xUCL = xDoubleBar + constants.A2 * rBar;
-        var xLCL = xDoubleBar - constants.A2 * rBar;
+        var xUCL = xDoubleBar + 3 * sigma;
+        var xLCL = xDoubleBar - 3 * sigma;
         var rUCL = constants.D4 * rBar;
         var rLCL = constants.D3 * rBar;
 
         var results = {
-            type: 'standard',
+            type: (fixedCL !== undefined) ? 'fixed-baseline' : 'standard',
             xBar: {
                 data: xBars,
                 UCL: xUCL,
                 CL: xDoubleBar,
                 LCL: xLCL,
-                sigma: (xUCL - xDoubleBar) / 3
+                sigma: sigma
             },
             R: {
                 data: ranges,
@@ -165,7 +169,7 @@ var SPCEngine = {
                 CL: rBar,
                 LCL: rLCL
             },
-            summary: { n: n, k: xBars.length, xDoubleBar: xDoubleBar, rBar: rBar }
+            summary: { n: n, k: xBars.length, xDoubleBar: xDoubleBar, rBar: rBar, isFixed: (fixedCL !== undefined) }
         };
 
         results.xBar.violations = this.checkNelsonRules(xBars, xDoubleBar, results.xBar.sigma);
@@ -173,33 +177,44 @@ var SPCEngine = {
     },
 
     /**
+     * recalculateWithFixedLimits - Utility to apply Phase II monitoring
+     * @param {Array} dataMatrix - The full dataset matrix
+     * @param {Number} cl - Fixed Center Line 
+     * @param {Number} sigma - Fixed Sigma (Standard Deviation of the mean)
+     */
+    recalculateWithFixedLimits: function (dataMatrix, cl, sigma) {
+        return this.calculateXBarRLimits(dataMatrix, cl, sigma);
+    },
+
+    /**
      * calculateExtendedBatchLimits - For Multi-Cavity (Model C/D)
      * Incorporates between-cavity variation into limits to avoid false alarms.
      */
-    calculateExtendedBatchLimits: function (dataMatrix) {
-        var standard = this.calculateXBarRLimits(dataMatrix);
+    calculateExtendedBatchLimits: function (dataMatrix, fixedCL, fixedSigma) {
+        var standard = this.calculateXBarRLimits(dataMatrix, fixedCL);
         var n = standard.summary.n;
 
-        // Calculate Overall Variation (sigma overall)
-        var allValues = dataMatrix.flat().filter(v => v !== null && !isNaN(v));
-        var sigmaOverall = this.stdDev(allValues);
+        // Use fixed limits if provided, otherwise estimate from data
+        var xDoubleBar = standard.xBar.CL;
+        var extendedSigma;
+
+        if (fixedSigma !== undefined) {
+            extendedSigma = fixedSigma;
+        } else {
+            // Calculate Overall Variation (sigma overall) from data
+            var allValues = dataMatrix.flat().filter(v => v !== null && !isNaN(v));
+            extendedSigma = this.stdDev(allValues);
+        }
 
         // Extended Shewhart Limit: CL +/- 3 * sigmaOverall / sqrt(n_effective)
-        // This is the boundary for detecting overall system drift.
-        var extendedSigma = sigmaOverall;
+        var sigmaOfMean = extendedSigma / Math.sqrt(n || 1);
+        var xUCL = xDoubleBar + (3 * sigmaOfMean);
+        var xLCL = xDoubleBar - (3 * sigmaOfMean);
 
-        // Adjust limits by adding cavity-to-cavity range assessment
-        var xDoubleBar = standard.xBar.CL;
-
-        // In Extended Shewhart for Multi-cavity, we often use Total sigma to set X-bar limits
-        // so that the limits represent "process potential" including cavity deltas.
-        var xUCL = xDoubleBar + (3 * extendedSigma / Math.sqrt(n || 1));
-        var xLCL = xDoubleBar - (3 * extendedSigma / Math.sqrt(n || 1));
-
-        standard.type = 'extended';
+        standard.type = (fixedCL !== undefined) ? 'fixed-extended' : 'extended';
         standard.xBar.UCL = xUCL;
         standard.xBar.LCL = xLCL;
-        standard.xBar.sigma = extendedSigma / Math.sqrt(n || 1);
+        standard.xBar.sigma = sigmaOfMean;
 
         // Re-check rules with new limits
         standard.xBar.violations = this.checkNelsonRules(standard.xBar.data, xDoubleBar, standard.xBar.sigma);

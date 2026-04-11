@@ -184,3 +184,103 @@ Complete the localization audit to ensure 100% bilingual support (Simplified Chi
 - Successfully aligned the digital tool with **ISO/Industrial Quality Standards** for handwritten audit trails.
 - Achieved "Pixel-Perfect" alignment across all analytical charts.
 - Pushed final stable builds to GitHub for production deployment.
+## [2026-04-11] Robustness: Nelson Rules Global Normalization & Pagination Sync
+
+### 1. Issue Description
+- **Pagination Fragility**: Nelson Rules and Control Limits were being recalculated per分頁 (25 batches), causing:
+    - **Limit Jumps**: UCL/CL/LCL shifting when navigating between pages.
+    - **Detection Gaps**: Patterns (e.g., Rule 2: 9 points in a row) failing to trigger if they spanned across page boundaries.
+    - **Visual Desync**: Charts showing different scales for the same process depending on the current view range.
+
+### 2. Root Cause Analysis (RCA)
+- **Local Context Trap**: The `renderCharts()` function called `calculateXBarRLimits()` using `pageData` instead of reusing the global results from `executeAnalysis()`.
+- **State Isolation**: The rendering engine treated each page as a new independent dataset for statistical calculation.
+
+### 3. Corrective and Preventive Action (CAPA)
+- **Global-First Rendering**:
+    - Refactored `renderCharts` to pull limits ($UCL$, $CL$, $LCL$) and violations from the global `analysisResults` object.
+    - Implemented **Violation Context Mapping**: Global violation indices are now mapped to page-relative indices during rendering.
+- **Statistical Consistency**:
+    - Guaranteed identical control limits across all pages for a single analysis session.
+    - Enabled cross-page pattern recognition for all 8 Nelson Rules.
+
+### 4. Verification Plan
+- [X] Load dataset with >25 batches.
+- [X] Verify UCL/LCL labels remain identical on Page 1 and Page 2.
+- [X] Construct a Rule 2 violation (9 points same side) crossing index 25 and verify it is correctly marked on both pages.
+
+---
+
+## 2026-04-11: Phase II Fixed Baseline Monitoring (Lock Baseline)
+
+### 1. User Requirement
+- In an evolving process, recalculating limits based on the full dataset (Rolling Global Limits) can cause "historical shifting," where previously safe points are re-judged as outliers because the process improved or drifted.
+- Need a way to simulate real-world Phase II monitoring by "locking" a stable baseline.
+
+### 2. Implementation Scope
+- **UI Enhancements**: Added "Advanced Configuration" in Step 3 with a "Fixed Baseline Monitoring (Phase II)" toggle and baseline point count input (default: 25).
+- **Statistical Engine Upgrade**:
+    - Modified `SPCEngine.calculateXBarRLimits` to accept `fixedCL` and `fixedSigma`.
+    - Implemented capacity for Phase I (Baseline Calculation) vs. Phase II (Monitoring) logic.
+- **Workflow Integration**:
+    - `SPCApp.executeAnalysis` now checks the lock status.
+    - If active, it slices the first N points to calculate a master baseline, then applies these limits to evaluate the entire dataset.
+- **Visual Feedback**:
+    - Added a blue "Phase II" badge in the analysis view when limits are locked to inform the user of the monitoring context.
+
+### 3. Benefits
+- **Consistency**: Historical points will NEVER change their "In Control" status regardless of how many new points are added.
+- **Industrial Standards Alignment**: Bridges the gap between "Batch Analysis" and "Real-time Monitoring" (Phase II).
+
+---
+
+## 2026-04-11: Normal Distribution Analysis & Robustness Fixes
+
+### 1. New Feature: Distribution Analysis
+- Added a dedicated "Distribution Analysis" model card in Step 3.
+- Implemented **Histogram Visualization** using ApexCharts.
+- Added **Normality Check** based on Skewness and Kurtosis.
+- Integrated comprehensive statistical summary (Mean, Median, StdDev, Cpk/Ppk) into the distribution view.
+
+### 2. Bug Fixes & Robustness
+- **TypeError Prevention**: Resolved `Cannot read properties of undefined (reading 'type')` by adding safety guards in `renderAnalysisView`.
+- **Cache Breaking**: Added `?v=2.1.1` to script tags to force browser updates.
+- **Error Handling**: Added explicit error reporting for unknown analysis types.
+
+
+## [2026-04-11] Milestone: Industrial-Grade Distribution Analysis (Minitab/Excel High-Fidelity)
+
+### 1. Issue Description & Diagnostics
+- **Problem A: Interpolation Wobble (Bitten Curve)**: The Gaussian curve appeared "bitten" or wavy (Runge's phenomenon) especially for narrow distributions (Sigma < 0.001).
+- **Problem B: Histogram Gaps & "Needle" Bars**: On a numeric X-axis, ApexCharts would shrink bars to thin needles if curve resolution was high, or leave gaps between bins.
+- **Problem C: Scoping Crash**: Runtime error `this.t is not a function` during analysis execution.
+- **Problem D: UI Desync**: The cavity selection dropdown was missing or failed to reflect the current file's structure.
+
+### 2. Root Cause Analysis (RCA)
+- **RCA-A (Smoothing Artifacts)**: Using `curve: 'smooth'` with only 50 sampling points on a sharp bell curve caused spline-based overshooting.
+- **RCA-B (Numeric Axis Constraint)**: ApexCharts determines bar width based on the *minimum* distance between X-points across all series. A high-res line series (200 pts) forces the bar series to shrink to a tiny fraction of the bin width.
+- **RCA-C (Context Loss)**: Inside `setTimeout` or nested callbacks, `this` no longer referred to the `SPCApp` instance.
+- **RCA-D (State Decoupling)**: The `currentDataInput` object was not being globally updated during analysis execution, causing the UI renderer to see `undefined` metadata.
+
+### 3. Corrective and Preventive Action (CAPA)
+- **Algorithm Revolution (Area-Step Histogram)**:
+    - Abandoned the native `bar` chart type for histograms.
+    - Implemented a **Step-Coordinate Area Engine** to manually draw histogram boxes. 
+    - **Result**: Perfect 100% width adjacency with 1px borders, regardless of the fitting curve's resolution.
+- **High-Fidelity Fitting (200-pt Bell Curve)**:
+    - Increased sampling density from 50 to **200 points**.
+    - Switched to `curve: 'straight'` with high density to simulate a perfect vector arc without cubic-spline artifacts.
+- **Standardized Scoping**:
+    - Enforced `var self = this;` at the start of all major controller functions.
+    - Replaced `this.t` with `self.t` in all analysis logic to prevent runtime exceptions.
+- **Embedded Control UI**:
+    - Moved the **Cavity Selector** directly into the Chart Card's header.
+    - Added a mandatory sync `this.currentDataInput = dataInput` in `executeAnalysis` before rendering.
+
+### 4. Technical Achievements
+- [x] **Minitab-Style Aesthetics**: 100% bar width, high-resolution smooth bell curve overlay.
+- [x] **Statistical Clarity**: Glassmorphism callout bubbles for $\mu$ and $\pm1\sigma, \pm3\sigma$ markers.
+- [x] **Interactive Re-analysis**: Seamlessly switching between "Global Data" and "Specific Cavity" with zero-latency recalculation.
+- [x] **Robustness**: Eliminated all known context-related runtime crashes in the analysis module.
+
+---

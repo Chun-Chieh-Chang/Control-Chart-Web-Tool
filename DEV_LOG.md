@@ -282,5 +282,18 @@ Complete the localization audit to ensure 100% bilingual support (Simplified Chi
 - [x] **Statistical Clarity**: Glassmorphism callout bubbles for $\mu$ and $\pm1\sigma, \pm3\sigma$ markers.
 - [x] **Interactive Re-analysis**: Seamlessly switching between "Global Data" and "Specific Cavity" with zero-latency recalculation.
 - [x] **Robustness**: Eliminated all known context-related runtime crashes in the analysis module.
+- [x] **Universal Legend Normalization**: Globally replaced circular legend markers with **25x5px Rounded Line Segments** to accurately represent control limits and fit curves.
+
+### 5. Recurring Issue Audit: Legend Semantic Mismatch (RCA/CAPA)
+- **Problem**: Reference lines (UCL/LCL/Fit Curves) repeatedly rendered as "Dots" in chart legends in previous iterations.
+- **Root Cause Analysis (RCA)**: 
+    1. **ApexCharts Defaulting**: The engine defaults to circular markers for all series if not explicitly styled, leading to a "scatter point" visual language for constant reference lines.
+    2. **Configuration Inertia**: Previous fixes used `radius: 12` to solve vertical alignment, which accidentally locked the shape to a circle.
+    3. **Visual Semantic Gap**: Failure to distinguish between "Observation Points" (Discrete) and "Process Limits" (Continuous) at the legend metadata level.
+- **Corrective and Preventive Action (CAPA)**:
+    1. **Standardized UI Token**: Established a mandatory standard for line-based series: `markers: { width: 25, height: 5, radius: 2 }`.
+    2. **Global Elimination**: Performed a full codebase audit (grep) to remove all remaining `radius: 12` instances.
+    3. **Implementation SOP**: Added a rule to check legend marker shapes during any new chart implementation to ensure adherence to the "Line Segment" aesthetic.
 
 ---
+

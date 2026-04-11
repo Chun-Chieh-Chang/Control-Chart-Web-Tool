@@ -1942,11 +1942,11 @@ var SPCApp = {
                     fontWeight: 700,
                     fontFamily: 'Inter, sans-serif',
                     markers: {
-                        width: 12,
-                        height: 12,
+                        width: 25,
+                        height: 5,
                         strokeWidth: [0, 2, 2, 2],
                         strokeColors: [theme.primary, theme.danger, theme.success, theme.danger],
-                        radius: 12,
+                        radius: 2,
                         offsetX: -2,
                         offsetY: 0
                     },
@@ -2120,11 +2120,11 @@ var SPCApp = {
                     fontWeight: 700,
                     fontFamily: 'Inter, sans-serif',
                     markers: {
-                        width: 12,
-                        height: 12,
+                        width: 25,
+                        height: 5,
                         strokeWidth: [0, 2, 2, 2],
                         strokeColors: [theme.primary, theme.danger, theme.success, theme.danger],
-                        radius: 12,
+                        radius: 2,
                         offsetX: -2,
                         offsetY: 0
                     },
@@ -2263,7 +2263,7 @@ var SPCApp = {
                     fontSize: '11px',
                     fontWeight: 700,
                     fontFamily: 'Inter, sans-serif',
-                    markers: { width: 12, height: 12, strokeWidth: 0, radius: 12, offsetX: -2, offsetY: 0 },
+                    markers: { width: 25, height: 5, strokeWidth: 0, radius: 2, offsetX: -2, offsetY: 0 },
                     itemMargin: { horizontal: 10, vertical: 5 },
                     labels: { colors: theme.text }
                 }
@@ -2333,7 +2333,7 @@ var SPCApp = {
                     fontSize: '11px',
                     fontWeight: 700,
                     fontFamily: 'Inter, sans-serif',
-                    markers: { width: 12, height: 12, strokeWidth: 0, radius: 12, offsetX: -2, offsetY: 0 },
+                    markers: { width: 25, height: 5, strokeWidth: 0, radius: 2, offsetX: -2, offsetY: 0 },
                     itemMargin: { horizontal: 10, vertical: 5 },
                     labels: { colors: theme.text }
                 }
@@ -2485,7 +2485,7 @@ var SPCApp = {
                     fontSize: '11px',
                     fontWeight: 700,
                     fontFamily: 'Inter, sans-serif',
-                    markers: { width: 12, height: 12, strokeWidth: 0, radius: 12, offsetX: -2, offsetY: 0 },
+                    markers: { width: 25, height: 5, strokeWidth: 0, radius: 2, offsetX: -2, offsetY: 0 },
                     itemMargin: { horizontal: 10, vertical: 5 },
                     labels: { colors: theme.text }
                 }
@@ -2573,7 +2573,7 @@ var SPCApp = {
                     fontSize: '11px',
                     fontWeight: 700,
                     fontFamily: 'Inter, sans-serif',
-                    markers: { width: 12, height: 12, strokeWidth: 0, radius: 12, offsetX: -2, offsetY: 0 },
+                    markers: { width: 25, height: 5, strokeWidth: 0, radius: 2, offsetX: -2, offsetY: 0 },
                     itemMargin: { horizontal: 10, vertical: 5 },
                     labels: { colors: theme.text }
                 }
@@ -2641,7 +2641,20 @@ var SPCApp = {
                         { x: data.markers.s3n.x, y: data.markers.s3n.y, marker: { size: 4, fillColor: '#94a3b8' }, label: { text: '-3σ (' + data.markers.s3n.x.toFixed(4) + ')', style: { background: 'rgba(148, 163, 184, 0.1)', color: '#64748b', fontSize: '10px' }, offsetY: -10 } }
                     ]
                 },
-                grid: { borderColor: theme.grid, strokeDashArray: 2 }
+                grid: { borderColor: theme.grid, strokeDashArray: 2 },
+                legend: {
+                    show: true,
+                    position: 'top',
+                    horizontalAlign: 'right',
+                    floating: true,
+                    offsetY: -10,
+                    fontSize: '11px',
+                    fontWeight: 700,
+                    fontFamily: 'Inter, sans-serif',
+                    markers: { width: 25, height: 5, strokeWidth: 0, radius: 2, offsetX: -2, offsetY: 0 },
+                    itemMargin: { horizontal: 10, vertical: 5 },
+                    labels: { colors: theme.text }
+                }
             };
             var dChart = new ApexCharts(document.getElementById('distChart'), dOpt);
             dChart.render();
